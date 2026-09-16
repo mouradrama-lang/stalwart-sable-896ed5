@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assilic — École de Langues Étrangères, Tizi Ouzou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #17232B;
+    --ink-soft: #3E4C55;
+    --paper: #F6F4EF;
+    --paper-raised: #FFFFFF;
+    --coral: #B8463A;
+    --coral-deep: #8E3529;
+    --teal: #1F3B3D;
+    --gold: #B98A34;
+    --line: #DDD8CC;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Spectral', serif;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  img, svg { display: block; max-width: 100%; }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(246, 244, 239, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+  }
+
+  .logo {
+    font-family: 'Spectral', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .logo span { color: var(--coral); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: var(--radius);
+    font-size: 0.92rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-primary { background: var(--coral); color: #fff; }
+  .btn-primary:hover { background: var(--coral-deep); }
+  .btn-ghost { border-color: var(--ink); color: var(--ink); }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 90px 0 70px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-pattern {
+    position: absolute;
+    top: 0; right: -60px;
+    width: 480px; height: 480px;
+    opacity: 0.07;
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 56px;
+    align-items: center;
+    position: relative;
+  }
+
+  .kicker {
+    font-size: 0.85rem;
+    color: var(--coral-deep);
+    font-weight: 600;
+    margin-bottom: 18px;
+    letter-spacing: 0.02em;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    margin-bottom: 22px;
+  }
+  .hero h1 em { font-style: italic; color: var(--coral); }
+
+  .hero p.lead {
+    font-size: 1.08rem;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin-bottom: 32px;
+  }
+
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 34px; }
+
+  .hero-meta {
+    display: flex;
+    gap: 34px;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+  .hero-meta strong {
+    display: block;
+    font-family: 'Spectral', serif;
+    font-size: 1.5rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .hero-card {
+    background: var(--teal);
+    color: #EDEAE0;
+    border-radius: var(--radius);
+    padding: 34px;
+    position: relative;
+  }
+  .hero-card h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+  }
+  .hero-card ul { list-style: none; }
+  .hero-card li {
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.14);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+  }
+  .hero-card li:last-child { border-bottom: none; }
+  .hero-card .lang-level { color: var(--gold); font-size: 0.82rem; }
+
+  @media (max-width: 760px) {
+    .hero-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Section shared ---------- */
+  section { padding: 74px 0; }
+  .section-head { max-width: 60ch; margin-bottom: 44px; }
+  .section-head .kicker { margin-bottom: 10px; }
+  .section-head h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+  .section-head p { color: var(--ink-soft); margin-top: 14px; font-size: 1.02rem; }
+
+  /* ---------- Languages ---------- */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .lang-card {
+    background: var(--paper-raised);
+    padding: 32px 26px;
+  }
+  .lang-card .flag-mark {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--coral);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Spectral', serif;
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+  .lang-card:nth-child(2) .flag-mark { background: var(--teal); }
+  .lang-card:nth-child(3) .flag-mark { background: var(--gold); }
+  .lang-card:nth-child(4) .flag-mark { background: var(--ink-soft); }
+
+  .lang-card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+  .lang-card p { color: var(--ink-soft); font-size: 0.92rem; }
+
+  @media (max-width: 760px) {
+    .lang-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ---------- Why us ---------- */
+  .why {
+    background: var(--paper-raised);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  .why-item h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .why-item h3::before {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--coral);
+    display: inline-block;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .why-item p { color: var(--ink-soft); font-size: 0.95rem; }
+
+  @media (max-width: 760px) {
+    .why-grid { grid-template-columns: 1fr; gap: 30px; }
+  }
+
+  /* ---------- Testimonials ---------- */
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .testi {
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper-raised);
+  }
+  .testi p.quote {
+    font-family: 'Spectral', serif;
+    font-style: italic;
+    font-size: 1.02rem;
+    margin-bottom: 18px;
+    color: var(--ink);
+  }
+  .testi .who { font-size: 0.88rem; color: var(--ink-soft); }
+  .testi .who strong { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 760px) {
+    .testi-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Contact ---------- */
+  .contact {
+    background: var(--teal);
+    color: #EDEAE0;
+  }
+  .contact .section-head p { color: #C9D4D2; }
+  .contact .kicker { color: var(--gold); }
+  .contact .section-head h2 { color: #fff; }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+  }
+
+  .info-line {
+    display: flex;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.14);
+    font-size: 0.95rem;
+  }
+  .info-line .label { color: var(--gold); min-width: 84px; font-size: 0.82rem; text-transform: none; }
+
+  form { display: flex; flex-direction: column; gap: 14px; }
+  .field label {
+    display: block;
+    font-size: 0.82rem;
+    color: #C9D4D2;
+    margin-bottom: 6px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.24);
+    border-radius: var(--radius);
+    padding: 11px 13px;
+    color: #fff;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.95rem;
+  }
+  .field input::placeholder, .field textarea::placeholder { color: #8FA09E; }
+  .field textarea { resize: vertical; min-height: 80px; }
+
+  form .btn-primary {
+    justify-content: center;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 760px) {
+    .contact-grid { grid-template-columns: 1fr; gap: 36px; }
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--coral);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: var(--radius);
+    letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo">Assil<span>i</span>c</div>
+    <nav class="nav-links">
+      <a href="#langues">Langues</a>
+      <a href="#pourquoi">Pourquoi nous</a>
+      <a href="#avis">Avis</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="btn btn-primary" href="#contact">Réserver un cours d'essai</a>
+  </div>
+</header>
+
+<section class="hero">
+  <svg class="hero-pattern" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="#8E3529" stroke-width="1.4">
+      <path d="M100 10 L180 100 L100 190 L20 100 Z"/>
+      <path d="M100 40 L150 100 L100 160 L50 100 Z"/>
+      <path d="M100 70 L120 100 L100 130 L80 100 Z"/>
+    </g>
+  </svg>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="kicker">École de langues étrangères — Tizi Ouzou</div>
+      <h1>Une langue en plus, c'est <em>une porte</em> qui s'ouvre.</h1>
+      <p class="lead">Assilic accompagne enfants, lycéens et adultes de Tizi Ouzou vers l'anglais, le français, l'espagnol et l'allemand, en petits groupes et avec des formateurs expérimentés.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#contact">Réserver un cours d'essai</a>
+        <a class="btn btn-ghost" href="tel:+213560399985">Appeler l'école</a>
+      </div>
+      <div class="hero-meta">
+        <div><strong>4</strong>langues enseignées</div>
+        <div><strong>Tous niveaux</strong>débutant à avancé</div>
+        <div><strong>Soir &amp; weekend</strong>créneaux flexibles</div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>Prochaines sessions</h3>
+      <ul>
+        <li>Anglais — groupe débutant <span class="lang-level">places limitées</span></li>
+        <li>Français — préparation examens <span class="lang-level">lycée</span></li>
+        <li>Espagnol — conversation <span class="lang-level">intermédiaire</span></li>
+        <li>Allemand — initiation <span class="lang-level">nouveau</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="langues">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Nos formations</div>
+      <h2>Quatre langues, une seule adresse.</h2>
+      <p>Chaque parcours est construit autour de la pratique orale et d'un suivi individuel, pour progresser sans se perdre dans un grand groupe.</p>
+    </div>
+    <div class="lang-grid">
+      <div class="lang-card">
+        <div class="flag-mark">En</div>
+        <h3>Anglais</h3>
+        <p>De l'initiation au perfectionnement, avec un accent sur la conversation et la préparation aux examens.</p>
+      </div>
+      <div class="lang-card">
+        <div class="flag-mark">Fr</div>
+        <h3>Français</h3>
+        <p>Renforcement scolaire, expression écrite et orale, pour élèves du primaire au lycée.</p>
+      </div>
+      <div class="lang-card">
+        <div class="flag-mark">Es</div>
+        <h3>Espagnol</h3>
+        <p>Cours vivants axés sur la conversation, pour voyager ou simplement découvrir la langue.</p>
+      </div>
+      <div class="lang-card">
+        <div class="flag-mark">De</div>
+        <h3>Allemand</h3>
+        <p>Bases solides pour les études ou les démarches à l'étranger, en petit groupe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="pourquoi">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Pourquoi Assilic</div>
+      <h2>Une école à taille humaine</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-item">
+        <h3>Petits groupes</h3>
+        <p>Des effectifs réduits pour que chaque élève prenne la parole à chaque séance, pas seulement les plus à l'aise.</p>
+      </div>
+      <div class="why-item">
+        <h3>Formateurs expérimentés</h3>
+        <p>Une équipe pédagogique stable, qui connaît ses élèves et adapte le rythme à leur niveau réel.</p>
+      </div>
+      <div class="why-item">
+        <h3>Horaires adaptés</h3>
+        <p>Créneaux en soirée et le weekend, pensés pour les élèves comme pour les actifs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="avis">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Ce qu'on en dit</div>
+      <h2>La parole aux élèves</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi">
+        <p class="quote">« J'ai enfin osé parler anglais sans avoir peur de me tromper. Les groupes sont petits, on a vraiment le temps de pratiquer. »</p>
+        <div class="who"><strong>Lynda</strong> — cours d'anglais, niveau intermédiaire</div>
+      </div>
+      <div class="testi">
+        <p class="quote">« Mon fils a progressé en français en quelques mois. Les profs prennent le temps d'expliquer autrement quand ça ne passe pas. »</p>
+        <div class="who"><strong>Karim</strong> — parent d'élève</div>
+      </div>
+      <div class="testi">
+        <p class="quote">« Ambiance sérieuse mais détendue. On sent que les formateurs aiment ce qu'ils font. »</p>
+        <div class="who"><strong>Samira</strong> — cours d'espagnol</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Nous rejoindre</div>
+      <h2>Réservez votre cours d'essai</h2>
+      <p>Un formateur vous recontacte sous 24h pour confirmer le créneau et le niveau.</p>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <div class="info-line"><span class="label">Adresse</span><span>Rue Frères Ouamrane, Tizi Ouzou</span></div>
+        <div class="info-line"><span class="label">Téléphone</span><span>+213 560 39 99 85</span></div>
+        <div class="info-line"><span class="label">Email</span><span>contact@assilic-langues.dz</span></div>
+        <div class="info-line"><span class="label">Horaires</span><span>Dim – Jeu, 9h – 18h · Sam sur rendez-vous</span></div>
+      </div>
+      <form>
+        <div class="field">
+          <label for="nom">Nom complet</label>
+          <input id="nom" type="text" placeholder="Votre nom">
+        </div>
+        <div class="field">
+          <label for="tel">Téléphone</label>
+          <input id="tel" type="tel" placeholder="05 XX XX XX XX">
+        </div>
+        <div class="field">
+          <label for="langue">Langue souhaitée</label>
+          <select id="langue">
+            <option>Anglais</option>
+            <option>Français</option>
+            <option>Espagnol</option>
+            <option>Allemand</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="msg">Message (optionnel)</label>
+          <textarea id="msg" placeholder="Niveau actuel, disponibilités..."></textarea>
+        </div>
+        <button type="button" class="btn btn-primary">Envoyer la demande</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; width:100%;">
+    <span>© Assilic — École de Langues Étrangères, Tizi Ouzou</span>
+    <span class="badge">Maquette de démonstration</span>
+  </div>
+</footer>
+
+</body>
+</html>
