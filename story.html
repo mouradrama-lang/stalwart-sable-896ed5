@@ -3,6 +3,1269 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Story Mode Pro — Mini-film cinématographique</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+        --bg: #0a0a0f; --panel: #14141c; --panel-2: #1c1c26; --panel-3: #242430;
+        --border: #2a2a38; --border-hover: #3a3a4a;
+        --ink: #f0f0f5; --ink-dim: #8a8a9a; --ink-faint: #555565;
+        --gold: #d4af37; --gold-soft: #9a7d2e; --gold-glow: rgba(212,175,55,0.3);
+        --success: #2d8a4e; --error: #c0392b; --warn: #d4a017; --info: #4a6cf7;
+        --radius: 14px; --radius-sm: 8px;
+        --shadow: 0 4px 20px rgba(0,0,0,0.4);
+        --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background: var(--bg); color: var(--ink); min-height: 100vh;
+        padding: 1.5rem 1rem 6rem; font-size: 15px; line-height: 1.6;
+        max-width: 1000px; margin: 0 auto;
+    }
+    header { margin-bottom: 1.5rem; text-align: center; }
+    h1 {
+        font-size: 1.6rem; font-weight: 700; letter-spacing: 0.03em;
+        margin-bottom: 0.4rem;
+        background: linear-gradient(135deg, #f0f0f5 0%, #d4af37 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .subtitle { font-size: 0.82rem; color: var(--ink-dim); font-style: italic; letter-spacing: 0.06em; }
+
+    .toast {
+        position: fixed; top: 1.5rem; left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        background: var(--gold); color: #0a0a0f;
+        padding: 0.9rem 1.5rem; border-radius: var(--radius);
+        font-size: 0.88rem; font-weight: 600;
+        box-shadow: var(--shadow-lg);
+        z-index: 1000; opacity: 0;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+        max-width: 90vw; text-align: center;
+    }
+    .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); color: #fff; }
+    .toast.error { background: var(--error); color: #fff; }
+    .toast.warn { background: var(--warn); color: #0a0a0f; }
+
+    .info-banner {
+        background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.05) 100%);
+        border-left: 3px solid var(--gold);
+        padding: 1rem 1.2rem; border-radius: var(--radius-sm);
+        font-size: 0.8rem; color: var(--ink);
+        margin-bottom: 1.2rem; line-height: 1.6;
+        box-shadow: var(--shadow);
+    }
+    .info-banner strong { color: var(--gold); }
+
+    .section {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 1.2rem 1.3rem;
+        margin-bottom: 1.2rem;
+        box-shadow: var(--shadow);
+        transition: border-color 0.3s;
+    }
+    .section:hover { border-color: var(--border-hover); }
+    .section.ok { border-color: var(--success); }
+    .section-title {
+        font-size: 0.72rem; text-transform: uppercase;
+        letter-spacing: 0.14em; color: var(--gold);
+        font-weight: 700; margin-bottom: 0.9rem;
+        display: flex; align-items: center; gap: 0.5rem;
+    }
+    .section-title .badge {
+        background: var(--gold); color: #0a0a0f;
+        padding: 0.15rem 0.5rem; border-radius: 12px;
+        font-size: 0.65rem; letter-spacing: 0.06em;
+        font-weight: 700;
+    }
+
+    .api-key-input {
+        width: 100%; padding: 0.9rem 1.1rem;
+        border-radius: var(--radius-sm); border: 1px solid var(--border);
+        background: var(--panel-2); color: var(--ink);
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+        font-size: 0.88rem; margin-bottom: 0.7rem;
+        transition: border-color 0.3s;
+    }
+    .api-key-input:focus { outline: none; border-color: var(--gold); }
+    .api-save-btn {
+        width: 100%; padding: 0.9rem;
+        border-radius: var(--radius-sm); border: none;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%);
+        color: #0a0a0f;
+        font-size: 0.92rem; font-weight: 700; font-family: inherit;
+        cursor: pointer; margin-bottom: 0.7rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 12px var(--gold-glow);
+    }
+    .api-save-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--gold-glow); }
+    .api-save-btn:active { transform: scale(0.98); }
+    .api-status {
+        font-size: 0.78rem; padding: 0.6rem 0.9rem;
+        border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.6rem;
+        background: var(--panel-2); color: var(--ink-dim);
+        transition: background 0.3s;
+    }
+    .api-status.ok { background: rgba(45,138,78,0.15); color: #4ec97a; font-weight: 600; }
+    .api-status .dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: var(--ink-faint); flex-shrink: 0;
+        transition: background 0.3s;
+    }
+    .api-status.ok .dot { background: #4ec97a; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .api-hint { font-size: 0.75rem; color: var(--ink-dim); margin-top: 0.5rem; }
+    .api-hint a { color: var(--gold); text-decoration: underline; }
+
+    .film-info input, .film-info textarea {
+        width: 100%; padding: 0.8rem 1rem;
+        border-radius: var(--radius-sm); border: 1px solid var(--border);
+        background: var(--panel-2); color: var(--ink);
+        font-family: inherit; font-size: 0.9rem;
+        margin-bottom: 0.6rem;
+        transition: border-color 0.3s;
+    }
+    .film-info input:focus, .film-info textarea:focus {
+        outline: none; border-color: var(--gold);
+    }
+    .film-info textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+    .film-info .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+    .story-arc {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        padding: 1.2rem 0.6rem 0.6rem; margin-bottom: 0.6rem;
+        position: relative; height: 100px;
+        background: linear-gradient(180deg, transparent 0%, rgba(212,175,55,0.03) 100%);
+        border-radius: var(--radius-sm);
+    }
+    .story-arc::before {
+        content: ''; position: absolute;
+        left: 0; right: 0; bottom: 28px;
+        height: 1px; background: linear-gradient(90deg,
+            transparent 0%, var(--border) 10%, var(--border) 90%, transparent 100%);
+    }
+    .arc-node {
+        flex: 1; display: flex; flex-direction: column; align-items: center;
+        position: relative; z-index: 2;
+        transition: transform 0.3s;
+    }
+    .arc-node:hover { transform: translateY(-2px); }
+    .arc-bar {
+        width: 5px; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-soft) 100%);
+        border-radius: 3px; transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 15px rgba(212,175,55,0.4);
+    }
+    .arc-label {
+        font-size: 0.62rem; color: var(--ink-dim);
+        text-transform: uppercase; letter-spacing: 0.07em;
+        margin-top: 0.5rem; font-weight: 600;
+        text-align: center;
+        transition: color 0.3s;
+    }
+    .arc-node.active .arc-label { color: var(--gold); }
+    .arc-node.active .arc-bar { box-shadow: 0 0 20px rgba(212,175,55,0.7); }
+
+    .upload-zone {
+        border: 2px dashed var(--border); border-radius: var(--radius);
+        padding: 2rem 1.2rem; text-align: center; cursor: pointer;
+        margin-bottom: 1.2rem; background: var(--panel);
+        transition: all 0.3s;
+        box-shadow: var(--shadow);
+    }
+    .upload-zone:hover { border-color: var(--gold); background: var(--panel-2); }
+    .upload-zone:active { transform: scale(0.99); }
+    .upload-zone.loading { pointer-events: none; opacity: 0.6; }
+    .upload-zone.dragover { border-color: var(--gold); background: rgba(212,175,55,0.05); }
+    .upload-zone input[type="file"] { display: none; }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+    .upload-text { font-size: 1rem; margin-bottom: 0.3rem; color: var(--ink); font-weight: 600; }
+    .upload-hint { font-size: 0.75rem; color: var(--ink-dim); }
+
+    .shots-list { display: flex; flex-direction: column; gap: 0.8rem; }
+    .shot-card {
+        background: var(--panel-2); border: 1px solid var(--border);
+        border-radius: var(--radius); overflow: hidden;
+        display: grid; grid-template-columns: 110px 1fr;
+        gap: 0; position: relative;
+        transition: all 0.3s;
+        box-shadow: var(--shadow);
+    }
+    .shot-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .shot-card::before {
+        content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+        width: 4px; background: linear-gradient(180deg, var(--gold) 0%, var(--gold-soft) 100%);
+        opacity: 0.9;
+    }
+    .shot-thumb {
+        position: relative; overflow: hidden;
+        background: #000; aspect-ratio: 9/16;
+    }
+    .shot-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+    .shot-card:hover .shot-thumb img { transform: scale(1.05); }
+    .shot-thumb .shot-num {
+        position: absolute; top: 8px; left: 8px;
+        background: rgba(10,10,15,0.9); color: var(--gold);
+        font-size: 0.68rem; font-weight: 700;
+        padding: 0.2rem 0.5rem; border-radius: 6px;
+        letter-spacing: 0.06em;
+        backdrop-filter: blur(10px);
+    }
+    .shot-content {
+        padding: 0.75rem 0.85rem;
+        display: flex; flex-direction: column; gap: 0.6rem;
+        min-width: 0;
+    }
+    .shot-role-badge {
+        font-size: 0.65rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.09em;
+        color: var(--gold); margin-bottom: 0.2rem;
+    }
+    .shot-role-name {
+        font-size: 0.88rem; font-weight: 600; color: var(--ink);
+        line-height: 1.3;
+    }
+    .shot-role-desc {
+        font-size: 0.72rem; color: var(--ink-dim);
+        line-height: 1.4; margin-top: 0.15rem;
+    }
+    .shot-note {
+        width: 100%; padding: 0.6rem 0.75rem;
+        border-radius: var(--radius-sm); border: 1px solid var(--border);
+        background: var(--panel); color: var(--ink);
+        font-family: inherit; font-size: 0.82rem;
+        resize: vertical; min-height: 40px;
+        transition: border-color 0.3s;
+    }
+    .shot-note:focus { outline: none; border-color: var(--gold); }
+    .shot-remove {
+        position: absolute; top: 8px; right: 8px;
+        background: rgba(192,57,43,0.9); color: #fff; border: none;
+        width: 26px; height: 26px; border-radius: 50%;
+        font-size: 13px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s;
+        backdrop-filter: blur(10px);
+    }
+    .shot-remove:hover { background: var(--error); transform: scale(1.1); }
+
+    .empty-state {
+        text-align: center; padding: 2.5rem 1.2rem;
+        color: var(--ink-dim); font-size: 0.9rem;
+        font-style: italic;
+    }
+
+    .btn-primary {
+        width: 100%; padding: 1.2rem; border-radius: var(--radius);
+        border: none;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%);
+        color: #0a0a0f;
+        font-size: 1.05rem; font-weight: 700; font-family: inherit;
+        cursor: pointer; margin-bottom: 1.2rem;
+        letter-spacing: 0.04em;
+        box-shadow: 0 4px 25px var(--gold-glow);
+        transition: all 0.3s;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 35px var(--gold-glow); }
+    .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+    .btn-primary:disabled {
+        opacity: 0.35; cursor: not-allowed;
+        box-shadow: none; filter: grayscale(0.5);
+    }
+
+    .btn-stop {
+        width: 100%; padding: 0.9rem; border-radius: var(--radius);
+        border: 1px solid var(--error); background: transparent;
+        color: var(--error); font-size: 0.88rem; font-weight: 700;
+        font-family: inherit; cursor: pointer; margin-bottom: 1.2rem;
+        display: none;
+        transition: all 0.2s;
+    }
+    .btn-stop:hover { background: rgba(192,57,43,0.1); }
+    .btn-stop.visible { display: block; }
+
+    .btn-export {
+        width: 100%; padding: 1rem; border-radius: var(--radius);
+        border: 1px solid var(--success); background: transparent;
+        color: var(--success); font-size: 0.9rem; font-weight: 700;
+        font-family: inherit; cursor: pointer; margin-bottom: 1.2rem;
+        display: none;
+        transition: all 0.2s;
+    }
+    .btn-export:hover { background: rgba(45,138,78,0.1); }
+    .btn-export.visible { display: block; }
+
+    .queue-item {
+        display: flex; align-items: center; gap: 0.9rem;
+        padding: 0.8rem 1rem; border-radius: var(--radius-sm);
+        border: 1px solid var(--border); margin-bottom: 0.5rem;
+        background: var(--panel); font-size: 0.85rem;
+        transition: all 0.3s;
+    }
+    .queue-item.pending { opacity: 0.5; }
+    .queue-item.creating { border-color: var(--warn); background: rgba(212,160,23,0.05); }
+    .queue-item.processing { border-color: var(--gold); background: rgba(212,175,55,0.05); }
+    .queue-item.done { border-color: var(--success); background: rgba(45,138,78,0.05); }
+    .queue-item.failed { border-color: var(--error); background: rgba(192,57,43,0.05); }
+    .queue-item .q-icon { font-size: 1.1rem; width: 1.6rem; text-align: center; flex-shrink: 0; }
+    .queue-item .q-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); font-weight: 500; }
+    .queue-item .q-status { font-size: 0.75rem; color: var(--ink-dim); text-align: right; flex-shrink: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .gallery { margin-top: 2rem; }
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.8rem;
+    }
+    .gallery-item {
+        border-radius: var(--radius); overflow: hidden;
+        border: 1px solid var(--border); background: #000;
+        animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+        box-shadow: var(--shadow);
+        transition: all 0.3s;
+    }
+    .gallery-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .gallery-item video { width: 100%; display: block; aspect-ratio: 9/16; object-fit: cover; }
+    .gallery-item .g-caption {
+        padding: 0.5rem 0.7rem; background: var(--panel);
+        font-size: 0.68rem; color: var(--gold);
+        font-weight: 700; letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+    .gallery-item .g-num {
+        position: absolute; top: 8px; left: 8px;
+        background: rgba(10,10,15,0.9); color: var(--gold);
+        font-size: 0.62rem; font-weight: 700;
+        padding: 0.2rem 0.5rem; border-radius: 6px;
+        letter-spacing: 0.06em;
+        backdrop-filter: blur(10px);
+    }
+
+    .status-bar {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: var(--panel); border-top: 1px solid var(--border);
+        color: var(--ink); padding: 0.9rem 1.2rem;
+        font-size: 0.82rem; display: flex; align-items: center; gap: 0.7rem;
+        transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 100;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+    }
+    .status-bar.visible { transform: translateY(0); }
+    .status-bar .spinner {
+        width: 14px; height: 14px;
+        border: 2px solid rgba(212,175,55,0.3);
+        border-top-color: var(--gold); border-radius: 50%;
+        animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+    #noSleepCanvas, #noSleepVideo {
+        position: fixed; top: 0; left: 0; width: 1px; height: 1px;
+        opacity: 0.01; pointer-events: none; z-index: -1;
+    }
+
+    @media (max-width: 480px) {
+        .shot-card { grid-template-columns: 90px 1fr; }
+        .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    }
+
+    @media (min-width: 768px) {
+        body { padding: 2rem 1.5rem 6rem; }
+        .section { padding: 1.5rem 1.6rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>🎬 STORY MODE PRO</h1>
+    <p class="subtitle">Créez votre mini-film cinématographique en 5 plans</p>
+</header>
+
+<div class="info-banner">
+    <strong>Structure narrative automatique :</strong> Chargez 5 photos, écrivez votre histoire.
+    L'IA génère <strong>un plan animé par image</strong> en suivant un <strong>arc dramatique professionnel</strong>
+    — introduction, développement, tension, climax, résolution. Chaque plan a son propre mouvement de caméra.
+</div>
+
+<div class="section" id="api-panel">
+    <div class="section-title">🔑 Clé API</div>
+    <input type="password" class="api-key-input" id="api-key-input"
+           placeholder="Collez votre clé API (sk-...)" autocomplete="off" spellcheck="false">
+    <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+    <div class="api-status" id="api-status">
+        <span class="dot"></span>
+        <span id="api-status-text">Aucune clé API enregistrée</span>
+    </div>
+    <div class="api-hint">
+        Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a>
+    </div>
+</div>
+
+<div class="section film-info">
+    <div class="section-title">📽️ Fiche du film</div>
+    <div class="row-2">
+        <input type="text" id="film-title" placeholder="Titre du film" autocomplete="off">
+        <input type="text" id="film-genre" placeholder="Genre (drame, aventure…)" autocomplete="off">
+    </div>
+    <textarea id="story-text" placeholder="Écrivez votre histoire en 2-3 phrases. Exemple : « Un voyageur solitaire traverse des paysages oubliés. Il découvre une lumière au bout du chemin qui va tout changer. »"></textarea>
+</div>
+
+<div class="upload-zone" id="upload-zone">
+    <input type="file" id="file-input" accept="image/*" multiple>
+    <div class="upload-icon">🎞️</div>
+    <div class="upload-text">Chargez vos 5 plans</div>
+    <div class="upload-hint">Glissez-déposez ou cliquez pour sélectionner</div>
+</div>
+
+<div class="section" id="arc-section" style="display:none;">
+    <div class="section-title">📊 Arc dramatique <span class="badge" id="shot-count-badge">0</span></div>
+    <div class="story-arc" id="story-arc"></div>
+</div>
+
+<div id="shots-container">
+    <div class="empty-state">Aucun plan chargé.<br>Ajoutez des images pour commencer votre film.</div>
+</div>
+
+<button type="button" class="btn-primary" id="generate-btn" disabled style="margin-top:1.2rem;">
+    Chargez des plans
+</button>
+
+<button type="button" class="btn-stop" id="stop-btn">
+    ⏹ Arrêter la production
+</button>
+
+<button type="button" class="btn-export" id="export-btn">
+    💾 Exporter le projet
+</button>
+
+<div id="queue"></div>
+
+<div class="gallery" id="gallery" style="display:none;">
+    <div class="section-title">🎬 Film généré</div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<div class="status-bar" id="status-bar">
+    <div class="spinner"></div>
+    <span id="status-text">Préparation…</span>
+</div>
+
+<div class="toast" id="toast"><span id="toast-text"></span></div>
+
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+const DURATION_FRAMES = 153;
+
+let createIntervalMs = 62000;
+const CREATE_INTERVAL_MIN = 62000;
+const CREATE_INTERVAL_MAX = 90000;
+const POLL_INTERVAL_SEC = 8;
+const MAX_POLL_ATTEMPTS = 100;
+
+const TIMING_CACHE_KEY = 'agnes_timing_cache_story_v2';
+const API_KEY_STORAGE = 'agnes_api_key';
+const PROJECT_STORAGE = 'agnes_project_story_v2';
+const MAX_IMAGE_SIZE = 12 * 1024 * 1024;
+const THUMBNAIL_MAX_WIDTH = 200;
+
+const NARRATIVE_ROLES = [
+    {
+        id: 'intro',
+        name: 'Introduction',
+        short: 'INTRO',
+        desc: 'Établir le monde, le contexte',
+        arc: 30,
+        prompt: 'Establishing shot. Wide framing revealing the world and context. Slow atmospheric camera movement. Introduce the setting, the mood, the tone. Cinematic, contemplative, patient. The scene sets the stage for what is to come.'
+    },
+    {
+        id: 'dev',
+        name: 'Développement',
+        short: 'DEV',
+        desc: 'Présenter le sujet, l\'action',
+        arc: 50,
+        prompt: 'Development shot. Medium framing introducing the main subject or action. Gentle camera movement, subtle motion. Build curiosity and engagement. The story begins to unfold, the character comes to life.'
+    },
+    {
+        id: 'tension',
+        name: 'Tension',
+        short: 'TENS',
+        desc: 'Monter la pression dramatique',
+        arc: 75,
+        prompt: 'Rising tension shot. Closer framing, more dynamic camera movement. The atmosphere intensifies, shadows deepen, music would rise here. Something is about to happen. Building anticipation and emotional weight.'
+    },
+    {
+        id: 'climax',
+        name: 'Climax',
+        short: 'CLIMAX',
+        desc: 'Le pic dramatique, l\'émotion forte',
+        arc: 100,
+        prompt: 'Climax shot. The emotional and dramatic peak of the film. Dramatic lighting, powerful movement, intense emotion. This is the moment everything has been building toward. Maximum impact, unforgettable.'
+    },
+    {
+        id: 'resolution',
+        name: 'Résolution',
+        short: 'FIN',
+        desc: 'Dénouement, retour au calme',
+        arc: 25,
+        prompt: 'Resolution shot. Calm, wide, reflective framing. Slow pull-back camera movement, release of tension. The story finds its peace. A quiet, satisfying closure. The end of the journey.'
+    }
+];
+
+const state = {
+    shots: [],
+    isRunning: false,
+    stopRequested: false,
+    completed: 0,
+    failed: 0,
+    isLoadingImages: false,
+    filmTitle: '',
+    filmGenre: '',
+    story: ''
+};
+
+let toastTimeout = null;
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const txt = document.getElementById('toast-text');
+    if (!toast || !txt) return;
+    toast.classList.remove('visible', 'success', 'error', 'warn');
+    void toast.offsetWidth;
+    txt.textContent = message;
+    toast.classList.add(type);
+    requestAnimationFrame(() => toast.classList.add('visible'));
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('visible'), 2500);
+}
+
+let wakeLockSentinel = null;
+let canvasStream = null;
+let canvasInterval = null;
+
+async function activateWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLockSentinel = await navigator.wakeLock.request('screen');
+            return;
+        }
+    } catch (e) {}
+    try {
+        const canvas = document.getElementById('noSleepCanvas');
+        const video = document.getElementById('noSleepVideo');
+        if (!canvas || !video) return;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 2, 2);
+        if (typeof canvas.captureStream !== 'function') return;
+        canvasStream = canvas.captureStream(1);
+        let t = false;
+        canvasInterval = setInterval(() => {
+            t = !t;
+            ctx.fillStyle = t ? '#000' : '#010101';
+            ctx.fillRect(0, 0, 2, 2);
+        }, 1000);
+        video.srcObject = canvasStream;
+        video.muted = true; video.playsInline = true;
+        video.play().catch(() => {});
+    } catch (e) {}
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function uid() { return Date.now() + Math.random(); }
+function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function setStatus(text) {
+    const bar = document.getElementById('status-bar');
+    const txt = document.getElementById('status-text');
+    if (!bar || !txt) return;
+    if (text) { bar.classList.add('visible'); txt.textContent = text; }
+    else bar.classList.remove('visible');
+}
+function getRoleById(id) {
+    return NARRATIVE_ROLES.find(r => r.id === id) || NARRATIVE_ROLES[1];
+}
+
+function loadTimingCache() {
+    try { return JSON.parse(localStorage.getItem(TIMING_CACHE_KEY) || '{}'); }
+    catch (e) { return {}; }
+}
+function recordGenerationTime(durationMs) {
+    const cache = loadTimingCache();
+    const key = String(DURATION_FRAMES);
+    if (!cache[key]) cache[key] = [];
+    cache[key].push(durationMs);
+    if (cache[key].length > 10) cache[key] = cache[key].slice(-10);
+    try { localStorage.setItem(TIMING_CACHE_KEY, JSON.stringify(cache)); } catch (e) {}
+}
+function estimateGenerationTime() {
+    const cache = loadTimingCache();
+    const samples = cache[String(DURATION_FRAMES)];
+    if (samples && samples.length > 0) {
+        const sorted = [...samples].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 === 0 ? (sorted[mid-1] + sorted[mid]) / 2 : sorted[mid];
+    }
+    return 30000 + DURATION_FRAMES * 500;
+}
+
+function getApiKey() {
+    try { return (localStorage.getItem(API_KEY_STORAGE) || '').trim(); }
+    catch (e) { return ''; }
+}
+function saveApiKey() {
+    const input = document.getElementById('api-key-input');
+    const key = input.value.trim();
+    if (!key) {
+        try { localStorage.removeItem(API_KEY_STORAGE); } catch (e) {}
+        updateApiPanel();
+        showToast('Clé supprimée', 'warn');
+        return;
+    }
+    if (!key.startsWith('sk-') && !confirm('La clé ne commence pas par "sk-". Sauvegarder ?')) return;
+    try {
+        localStorage.setItem(API_KEY_STORAGE, key);
+        updateApiPanel();
+        showToast('Clé enregistrée ✓', 'success');
+        input.blur();
+    } catch (e) { showToast('Erreur', 'error'); }
+}
+function updateApiPanel() {
+    const panel = document.getElementById('api-panel');
+    const input = document.getElementById('api-key-input');
+    const status = document.getElementById('api-status');
+    const statusText = document.getElementById('api-status-text');
+    const key = getApiKey();
+    if (!panel || !input || !status || !statusText) return;
+    if (key) {
+        panel.classList.add('ok');
+        status.classList.add('ok');
+        statusText.textContent = 'Clé active · ' + key.slice(0, 8) + '…' + key.slice(-4);
+        input.value = key;
+        input.placeholder = '';
+    } else {
+        panel.classList.remove('ok');
+        status.classList.remove('ok');
+        statusText.textContent = 'Aucune clé API enregistrée';
+        input.value = '';
+        input.placeholder = 'Collez votre clé API (sk-...)';
+    }
+    updateBtn();
+}
+function updateBtn() {
+    const btn = document.getElementById('generate-btn');
+    if (!btn) return;
+    const hasShots = state.shots.length > 0;
+    const hasKey = !!getApiKey();
+    btn.disabled = !hasShots || !hasKey || state.isRunning || state.isLoadingImages;
+    if (state.isLoadingImages) btn.textContent = 'Chargement…';
+    else if (state.isRunning) btn.textContent = '🎬 Production en cours… (' + (state.completed + state.failed) + '/' + state.shots.length + ')';
+    else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
+    else if (!hasShots) btn.textContent = 'Chargez des plans';
+    else if (state.shots.length === 5) btn.textContent = '🎬 Générer le film — 5 plans';
+    else btn.textContent = '🎬 Générer le film — ' + state.shots.length + ' plans';
+}
+
+function fileToDataUri(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Erreur'));
+        reader.readAsDataURL(file);
+    });
+}
+function generateThumbnail(dataUri) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            try {
+                const canvas = document.createElement('canvas');
+                const ratio = img.height / img.width;
+                canvas.width = THUMBNAIL_MAX_WIDTH;
+                canvas.height = Math.round(THUMBNAIL_MAX_WIDTH * ratio);
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.75));
+            } catch (e) { resolve(dataUri); }
+        };
+        img.onerror = () => resolve(dataUri);
+        img.src = dataUri;
+    });
+}
+async function processOneFile(file) {
+    if (!file.type.startsWith('image/')) return null;
+    if (file.size > MAX_IMAGE_SIZE) return null;
+    try {
+        const dataUri = await fileToDataUri(file);
+        const thumbnail = await generateThumbnail(dataUri);
+        return { dataUri, thumbnail };
+    } catch (e) { return null; }
+}
+
+async function handleFiles(files) {
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (!imageFiles.length) return;
+
+    state.isLoadingImages = true;
+    updateBtn();
+    setStatus('Chargement de ' + imageFiles.length + ' image' + (imageFiles.length > 1 ? 's' : '') + '…');
+
+    const uploadZone = document.getElementById('upload-zone');
+    uploadZone.classList.add('loading');
+
+    const BATCH = 5;
+    let processed = 0;
+    for (let i = 0; i < imageFiles.length; i += BATCH) {
+        const batch = imageFiles.slice(i, i + BATCH);
+        const results = await Promise.allSettled(batch.map(f => processOneFile(f)));
+        for (const r of results) {
+            if (r.status === 'fulfilled' && r.value) {
+                state.shots.push({
+                    id: uid(),
+                    image: r.value,
+                    roleId: null,
+                    note: ''
+                });
+                processed++;
+            }
+        }
+        renderShots();
+        setStatus('Chargement… ' + processed + '/' + imageFiles.length);
+    }
+
+    assignNarrativeRoles();
+
+    state.isLoadingImages = false;
+    uploadZone.classList.remove('loading');
+    setStatus(null);
+    renderShots();
+    updateBtn();
+    saveProject();
+
+    if (state.shots.length >= 5) {
+        showToast('Structure narrative complète ✓', 'success');
+    } else {
+        showToast(state.shots.length + ' plan' + (state.shots.length > 1 ? 's' : '') + ' chargé' + (state.shots.length > 1 ? 's' : ''), 'success');
+    }
+}
+
+function assignNarrativeRoles() {
+    const n = state.shots.length;
+    if (n === 0) return;
+
+    if (n <= NARRATIVE_ROLES.length) {
+        if (n === 1) {
+            state.shots[0].roleId = 'climax';
+        } else if (n === 2) {
+            state.shots[0].roleId = 'intro';
+            state.shots[1].roleId = 'resolution';
+        } else if (n === 3) {
+            state.shots[0].roleId = 'intro';
+            state.shots[1].roleId = 'climax';
+            state.shots[2].roleId = 'resolution';
+        } else if (n === 4) {
+            state.shots[0].roleId = 'intro';
+            state.shots[1].roleId = 'dev';
+            state.shots[2].roleId = 'climax';
+            state.shots[3].roleId = 'resolution';
+        } else {
+            for (let i = 0; i < 5; i++) {
+                state.shots[i].roleId = NARRATIVE_ROLES[i].id;
+            }
+        }
+    } else {
+        for (let i = 0; i < n; i++) {
+            if (i === 0) state.shots[i].roleId = 'intro';
+            else if (i === n - 1) state.shots[i].roleId = 'resolution';
+            else if (i === n - 2) state.shots[i].roleId = 'climax';
+            else if (i === n - 3) state.shots[i].roleId = 'tension';
+            else {
+                state.shots[i].roleId = (i % 2 === 0) ? 'dev' : 'tension';
+            }
+        }
+    }
+}
+
+function removeShot(id) {
+    state.shots = state.shots.filter(s => s.id !== id);
+    assignNarrativeRoles();
+    renderShots();
+    updateBtn();
+    saveProject();
+}
+
+function updateShotNote(id, note) {
+    const shot = state.shots.find(s => s.id === id);
+    if (shot) shot.note = note;
+    saveProject();
+}
+
+function renderShots() {
+    const container = document.getElementById('shots-container');
+    const arcSection = document.getElementById('arc-section');
+    const arcContainer = document.getElementById('story-arc');
+    const badge = document.getElementById('shot-count-badge');
+
+    if (!state.shots.length) {
+        container.innerHTML = '<div class="empty-state">Aucun plan chargé.<br>Ajoutez des images pour commencer votre film.</div>';
+        if (arcSection) arcSection.style.display = 'none';
+        if (badge) badge.textContent = '0';
+        return;
+    }
+
+    if (badge) badge.textContent = state.shots.length;
+
+    if (arcSection && arcContainer) {
+        arcSection.style.display = 'block';
+        arcContainer.innerHTML = NARRATIVE_ROLES.map(role => {
+            const isUsed = state.shots.some(s => s.roleId === role.id);
+            return '<div class="arc-node ' + (isUsed ? 'active' : '') + '">' +
+                '<div class="arc-bar" style="height:' + role.arc + 'px;"></div>' +
+                '<div class="arc-label">' + role.short + '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    container.innerHTML = '<div class="shots-list">' + state.shots.map((shot, i) => {
+        const role = getRoleById(shot.roleId);
+        const num = String(i + 1).padStart(2, '0');
+        return '<div class="shot-card">' +
+            '<div class="shot-thumb">' +
+                '<img src="' + (shot.image.thumbnail || shot.image.dataUri) + '" alt="">' +
+                '<div class="shot-num">PLAN ' + num + '</div>' +
+            '</div>' +
+            '<div class="shot-content">' +
+                '<div class="shot-role-badge">' + role.short + '</div>' +
+                '<div class="shot-role-name">' + esc(role.name) + '</div>' +
+                '<div class="shot-role-desc">' + esc(role.desc) + '</div>' +
+                '<textarea class="shot-note" data-shot-id="' + shot.id + '" ' +
+                    'placeholder="Note créative (optionnel)…">' + esc(shot.note || '') + '</textarea>' +
+            '</div>' +
+            '<button class="shot-remove" data-remove="' + shot.id + '">✕</button>' +
+        '</div>';
+    }).join('') + '</div>';
+
+    container.querySelectorAll('[data-remove]').forEach(btn => {
+        btn.addEventListener('click', () => removeShot(parseFloat(btn.dataset.remove)));
+    });
+    container.querySelectorAll('.shot-note').forEach(ta => {
+        ta.addEventListener('input', e => {
+            updateShotNote(parseFloat(ta.dataset.shotId), e.target.value);
+        });
+    });
+}
+
+function buildPrompt(shot, index) {
+    const role = getRoleById(shot.roleId);
+    const total = state.shots.length;
+    const parts = [];
+
+    parts.push(
+        'Cinematic story shot #' + (index + 1) + ' of ' + total + ' in a short film. ' +
+        'Animate this exact image as the starting frame. ' +
+        'The subject must remain IDENTICAL to the input image: same face, same identity, same composition, same framing. ' +
+        'This is a CONTINUATION of the source image, not a re-imagination.'
+    );
+
+    parts.push('NARRATIVE ROLE — ' + role.name + ': ' + role.prompt);
+
+    if (state.filmTitle) parts.push('Film title: "' + state.filmTitle + '"');
+    if (state.filmGenre) parts.push('Genre: ' + state.filmGenre);
+    if (state.story) parts.push('Story context: ' + state.story.slice(0, 300));
+
+    if (shot.note && shot.note.trim()) {
+        parts.push('Director\'s note for this shot: ' + shot.note.trim());
+    }
+
+    parts.push('Cinematic 24fps, film grain, professional cinematography, consistent visual style across all shots');
+    parts.push('Sound design: subtle ambient texture, no music, no dialogue');
+    parts.push('Portrait orientation 9:16 vertical, no text, no watermarks');
+
+    return parts.join('. ');
+}
+
+async function apiFetch(url, options = {}) {
+    for (let attempt = 0; attempt < 7; attempt++) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        try {
+            const res = await fetch(url, options);
+            if (res.status === 429) {
+                if (createIntervalMs < 90000) createIntervalMs = Math.min(createIntervalMs + 8000, 90000);
+                const wait = [15, 30, 45, 60, 90, 120, 180][Math.min(attempt, 6)];
+                setStatus('L\'IA se prépare… (' + wait + 's)');
+                await sleep(wait * 1000);
+                continue;
+            }
+            if (res.status === 503) {
+                const wait = [5, 10, 15, 20, 30, 45][Math.min(attempt, 5)];
+                setStatus('Plan en préparation… (' + wait + 's)');
+                await sleep(wait * 1000);
+                continue;
+            }
+            return res;
+        } catch (e) {
+            if (e.message === 'Arrêt demandé') throw e;
+            const wait = [3, 5, 8, 12, 20, 30][Math.min(attempt, 5)];
+            setStatus('Connexion… (' + wait + 's)');
+            await sleep(wait * 1000);
+        }
+    }
+    return fetch(url, options);
+}
+
+async function createVideoTask(imageDataUri, prompt) {
+    const res = await apiFetch(API_BASE + '/videos', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + getApiKey(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: MODEL_VIDEO,
+            prompt: prompt,
+            image: imageDataUri,
+            num_frames: DURATION_FRAMES,
+            frame_rate: FRAME_RATE
+        })
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error('HTTP ' + res.status + ' — ' + err.slice(0, 200));
+    }
+    const data = await res.json();
+    const videoId = data.video_id || data.id || data.task_id;
+    if (!videoId) throw new Error('Pas de video_id');
+    return videoId;
+}
+
+async function pollVideo(videoId, onProgress) {
+    const estimatedSec = estimateGenerationTime() / 1000;
+    let remaining = Math.max(20, Math.floor(estimatedSec * 0.8));
+    while (remaining > 0) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        onProgress('Plan en tournage… — ' + remaining + 's');
+        await sleep(1000);
+        remaining--;
+    }
+    for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        if (attempt > 0) {
+            let r = POLL_INTERVAL_SEC;
+            while (r > 0) {
+                if (state.stopRequested) throw new Error('Arrêt demandé');
+                onProgress('L\'image prend vie… — ' + r + 's');
+                await sleep(1000);
+                r--;
+            }
+        }
+        const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+        const res = await apiFetch(url, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + getApiKey() }
+        });
+        const d = await res.json();
+        const status = d.status || 'unknown';
+        onProgress('Création… — ' + (d.progress || 0) + '%');
+        if (status === 'completed' || status === 'succeeded' || status === 'done') {
+            const videoUrl = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+            if (!videoUrl) throw new Error('Pas d\'URL');
+            return videoUrl;
+        }
+        if (status === 'failed' || status === 'error' || status === 'cancelled') {
+            throw new Error('Échec (' + status + ')');
+        }
+    }
+    throw new Error('Délai dépassé');
+}
+
+const queueItems = [];
+
+function renderQueue() {
+    const queueEl = document.getElementById('queue');
+    if (!queueItems.length) { queueEl.innerHTML = ''; return; }
+    queueEl.innerHTML = queueItems.map(item => {
+        let icon = '○', statusText = 'En attente', cls = 'pending';
+        if (item.status === 'creating') { icon = '◐'; statusText = 'Préparation…'; cls = 'creating'; }
+        else if (item.status === 'processing') { icon = '◐'; statusText = item.progress || 'En cours…'; cls = 'processing'; }
+        else if (item.status === 'done') { icon = '●'; statusText = 'Terminé'; cls = 'done'; }
+        else if (item.status === 'failed') { icon = '✕'; statusText = 'Échec'; cls = 'failed'; }
+        const role = getRoleById(item.roleId);
+        const num = String(item.index + 1).padStart(2, '0');
+        return '<div class="queue-item ' + cls + '">' +
+            '<div class="q-icon">' + icon + '</div>' +
+            '<div class="q-name">PLAN ' + num + ' · ' + esc(role.short) + '</div>' +
+            '<div class="q-status">' + esc(statusText) + '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function addToGallery(videoUrl, index, roleShort) {
+    const galleryEl = document.getElementById('gallery');
+    const galleryGrid = document.getElementById('gallery-grid');
+    galleryEl.style.display = 'block';
+    const el = document.createElement('div');
+    el.className = 'gallery-item';
+    const num = String(index + 1).padStart(2, '0');
+    el.innerHTML =
+        '<div class="g-num">PLAN ' + num + '</div>' +
+        '<video controls preload="metadata" muted playsinline>' +
+        '<source src="' + videoUrl + '" type="video/mp4">' +
+        '</video>' +
+        '<div class="g-caption">' + esc(roleShort) + '</div>';
+    galleryGrid.appendChild(el);
+}
+
+async function processShot(item) {
+    try {
+        item.status = 'creating';
+        item.progress = 'Préparation…';
+        renderQueue();
+
+        const prompt = buildPrompt(item.shot, item.index);
+        const videoId = await createVideoTask(item.shot.image.dataUri, prompt);
+        item.startTime = Date.now();
+        item.status = 'processing';
+        renderQueue();
+
+        const videoUrl = await pollVideo(videoId, (p) => {
+            item.progress = p;
+            renderQueue();
+        });
+
+        const elapsed = Date.now() - item.startTime;
+        recordGenerationTime(elapsed);
+
+        item.status = 'done';
+        item.videoUrl = videoUrl;
+        state.completed++;
+        renderQueue();
+        updateBtn();
+
+        const role = getRoleById(item.shot.roleId);
+        addToGallery(videoUrl, item.index, role.short);
+    } catch (e) {
+        if (e.message !== 'Arrêt demandé') {
+            item.status = 'failed';
+            item.progress = 'Échec';
+            state.failed++;
+        } else {
+            item.status = 'failed';
+            item.progress = 'Arrêté';
+        }
+        renderQueue();
+        updateBtn();
+    }
+}
+
+async function startGeneration() {
+    if (state.isRunning || !state.shots.length) return;
+    if (!getApiKey()) {
+        showToast('Ajoutez votre clé API', 'error');
+        return;
+    }
+
+    state.filmTitle = document.getElementById('film-title').value.trim();
+    state.filmGenre = document.getElementById('film-genre').value.trim();
+    state.story = document.getElementById('story-text').value.trim();
+
+    state.isRunning = true;
+    state.stopRequested = false;
+    state.completed = 0;
+    state.failed = 0;
+    createIntervalMs = CREATE_INTERVAL_MIN;
+
+    queueItems.length = 0;
+    state.shots.forEach((shot, i) => {
+        queueItems.push({
+            shot: shot,
+            index: i,
+            roleId: shot.roleId,
+            status: 'pending',
+            progress: null,
+            startTime: null
+        });
+    });
+
+    document.getElementById('gallery-grid').innerHTML = '';
+    document.getElementById('gallery').style.display = 'none';
+    document.getElementById('stop-btn').classList.add('visible');
+    document.getElementById('generate-btn').disabled = true;
+
+    await activateWakeLock();
+    renderQueue();
+
+    for (let i = 0; i < queueItems.length; i++) {
+        if (state.stopRequested) break;
+        processShot(queueItems[i]);
+
+        if (i < queueItems.length - 1 && !state.stopRequested) {
+            const waitSec = Math.ceil(createIntervalMs / 1000);
+            for (let r = waitSec; r > 0; r--) {
+                if (state.stopRequested) break;
+                setStatus('Production… — Plan ' + (i + 2) + '/' + queueItems.length + ' dans ' + r + 's');
+                await sleep(1000);
+            }
+        }
+    }
+
+    while (queueItems.some(q => q.status === 'creating' || q.status === 'processing') && !state.stopRequested) {
+        await sleep(1000);
+    }
+
+    const summary = state.stopRequested
+        ? 'Production arrêtée — ' + state.completed + '/' + queueItems.length + ' plans'
+        : '🎬 Film terminé — ' + state.completed + '/' + queueItems.length + ' plans';
+    setStatus(summary);
+    await sleep(4000);
+    setStatus(null);
+
+    state.isRunning = false;
+    state.stopRequested = false;
+    document.getElementById('stop-btn').classList.remove('visible');
+    updateBtn();
+
+    if (state.completed > 0) {
+        document.getElementById('export-btn').classList.add('visible');
+        showToast(state.completed + ' plan' + (state.completed > 1 ? 's' : '') + ' du film généré' + (state.completed > 1 ? 's' : ''), 'success');
+    }
+}
+
+function stopGeneration() {
+    if (!state.isRunning) return;
+    state.stopRequested = true;
+    setStatus('Arrêt…');
+}
+
+function saveProject() {
+    try {
+        const project = {
+            shots: state.shots.map(s => ({
+                id: s.id,
+                roleId: s.roleId,
+                note: s.note,
+                image: s.image
+            })),
+            filmTitle: document.getElementById('film-title').value.trim(),
+            filmGenre: document.getElementById('film-genre').value.trim(),
+            story: document.getElementById('story-text').value.trim(),
+            timestamp: Date.now()
+        };
+        localStorage.setItem(PROJECT_STORAGE, JSON.stringify(project));
+    } catch (e) {}
+}
+
+function loadProject() {
+    try {
+        const data = localStorage.getItem(PROJECT_STORAGE);
+        if (!data) return false;
+        const project = JSON.parse(data);
+        if (project.shots && project.shots.length > 0) {
+            state.shots = project.shots;
+            document.getElementById('film-title').value = project.filmTitle || '';
+            document.getElementById('film-genre').value = project.filmGenre || '';
+            document.getElementById('story-text').value = project.story || '';
+            renderShots();
+            updateBtn();
+            showToast('Projet restauré ✓', 'success');
+            return true;
+        }
+    } catch (e) {}
+    return false;
+}
+
+function exportProject() {
+    try {
+        const project = {
+            title: state.filmTitle,
+            genre: state.filmGenre,
+            story: state.story,
+            shots: state.shots.map((s, i) => {
+                const role = getRoleById(s.roleId);
+                const queueItem = queueItems.find(q => q.index === i);
+                return {
+                    plan: i + 1,
+                    role: role.name,
+                    note: s.note,
+                    videoUrl: queueItem?.videoUrl || null
+                };
+            }),
+            exportDate: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (state.filmTitle || 'film') + '_export.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Projet exporté ✓', 'success');
+    } catch (e) {
+        showToast('Erreur d\'export', 'error');
+    }
+}
+
+(function init() {
+    document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
+    document.getElementById('stop-btn').addEventListener('click', stopGeneration);
+    document.getElementById('generate-btn').addEventListener('click', startGeneration);
+    document.getElementById('export-btn').addEventListener('click', exportProject);
+    document.getElementById('api-key-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); }
+    });
+
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+    
+    uploadZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => {
+        handleFiles(e.target.files);
+        fileInput.value = '';
+    });
+
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('dragover');
+    });
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            handleFiles(e.dataTransfer.files);
+        }
+    });
+
+    document.getElementById('film-title').addEventListener('input', saveProject);
+    document.getElementById('film-genre').addEventListener('input', saveProject);
+    document.getElementById('story-text').addEventListener('input', saveProject);
+
+    updateApiPanel();
+    loadProject();
+    renderShots();
+})();
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Story Mode — Mini-film en 5 plans</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
