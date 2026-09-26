@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test API Agnes — Diagnostic</title>
+<style>
+    body { font-family: monospace; background: #0a0a0f; color: #fff; padding: 1rem; max-width: 700px; margin: 0 auto; }
+    h1 { font-size: 1.2rem; color: #00d9ff; margin-bottom: 1rem; }
+    input, button { width: 100%; padding: 0.7rem; margin: 0.4rem 0; border-radius: 8px; font-family: inherit; font-size: 0.85rem; border: 1px solid #2a2a38; background: #1c1c28; color: #fff; }
+    button { background: linear-gradient(135deg, #00d9ff, #ff5eb4); color: #000; font-weight: 800; cursor: pointer; border: none; padding: 0.9rem; }
+    pre { background: #000; padding: 0.8rem; border-radius: 8px; overflow: auto; font-size: 0.7rem; max-height: 400px; border: 1px solid #2a2a38; color: #4ec97a; white-space: pre-wrap; word-break: break-all; margin-top: 0.5rem; }
+    .label { color: #8888a0; font-size: 0.75rem; margin-top: 1rem; display: block; }
+    .status { padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; margin-top: 0.5rem; }
+    .ok { background: rgba(78,201,122,0.15); color: #4ec97a; }
+    .err { background: rgba(192,57,43,0.15); color: #ff6b5a; }
+    .warn { background: rgba(212,160,23,0.15); color: #ffc84a; }
+</style>
+</head>
+<body>
+<h1>🔬 Test API Agnes — Diagnostic</h1>
+
+<input type="password" id="key" placeholder="Collez votre clé API sk-...">
+<button id="btn-test">1️⃣ Tester la clé</button>
+<div id="r1"></div>
+
+<input type="text" id="prompt" value="Un chat dans un jardin" placeholder="Prompt">
+<button id="btn-create">2️⃣ Créer une tâche</button>
+<div id="r2"></div>
+
+<input type="text" id="taskid" placeholder="ID de la tâche (auto-rempli)">
+<button id="btn-poll">3️⃣ Vérifier le statut</button>
+<div id="r3"></div>
+
+<button id="btn-auto">🔄 Auto-poll (toutes les 8 sec)</button>
+<div id="r4"></div>
+
+<label class="label">📋 Réponse brute de l'API :</label>
+<pre id="raw">En attente…</pre>
+
+<script>
+const API = 'https://apihub.agnes-ai.com/v1';
+const POLL = 'https://apihub.agnes-ai.com/agnesapi';
+let autoTimer = null;
+
+function show(id, cls, txt) {
+    document.getElementById(id).innerHTML = '<div class="status ' + cls + '">' + txt + '</div>';
+}
+function raw(obj) {
+    document.getElementById('raw').textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+}
+
+document.getElementById('btn-test').onclick = async () => {
+    const k = document.getElementById('key').value.trim();
+    if (!k) return;
+    raw('Test en cours...');
+    try {
+        const r = await fetch(API + '/models', { headers: { 'Authorization': 'Bearer ' + k } });
+        const d = await r.json();
+        if (r.ok) show('r1', 'ok', '✅ Clé valide · ' + (d.data ? d.data.length + ' modèles' : 'OK'));
+        else show('r1', 'err', '❌ HTTP ' + r.status);
+        raw(d);
+    } catch (e) {
+        show('r1', 'err', '❌ Erreur : ' + e.message);
+        raw(e.message);
+    }
+};
+
+document.getElementById('btn-create').onclick = async () => {
+    const k = document.getElementById('key').value.trim();
+    const p = document.getElementById('prompt').value.trim();
+    if (!k || !p) return;
+    raw('Création de la tâche...');
+    try {
+        const r = await fetch(API + '/videos', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + k, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: 'agnes-video-v2.0', prompt: p, num_frames: 121, frame_rate: 24 })
+        });
+        const d = await r.json();
+        if (r.ok) {
+            const id = d.video_id || d.id || d.task_id;
+            show('r2', 'ok', '✅ Tâche créée · ID : ' + id);
+            document.getElementById('taskid').value = id;
+        } else {
+            show('r2', 'err', '❌ HTTP ' + r.status);
+        }
+        raw(d);
+    } catch (e) {
+        show('r2', 'err', '❌ ' + e.message);
+        raw(e.message);
+    }
+};
+
+document.getElementById('btn-poll').onclick = async () => {
+    const k = document.getElementById('key').value.trim();
+    const id = document.getElementById('taskid').value.trim();
+    if (!k || !id) return;
+    raw('Vérification...');
+    try {
+        const r = await fetch(POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=agnes-video-v2.0', {
+            headers: { 'Authorization': 'Bearer ' + k }
+        });
+        const d = await r.json();
+        if (r.ok) show('r3', 'ok', '📊 Statut : ' + (d.status || '?') + ' · Progression : ' + (d.progress || '?') + '%');
+        else show('r3', 'err', '❌ HTTP ' + r.status);
+        raw(d);
+    } catch (e) {
+        show('r3', 'err', '❌ ' + e.message);
+        raw(e.message);
+    }
+};
+
+document.getElementById('btn-auto').onclick = () => {
+    if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+        document.getElementById('btn-auto').textContent = '🔄 Auto-poll (toutes les 8 sec)';
+        return;
+    }
+    document.getElementById('btn-auto').textContent = '⏸ Arrêter l\'auto-poll';
+    let n = 0;
+    const tick = async () => {
+        n++;
+        const k = document.getElementById('key').value.trim();
+        const id = document.getElementById('taskid').value.trim();
+        if (!k || !id) return;
+        try {
+            const r = await fetch(POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=agnes-video-v2.0', {
+                headers: { 'Authorization': 'Bearer ' + k }
+            });
+            const d = await r.json();
+            const s = d.status || '?';
+            const p = d.progress || 0;
+            let cls = 'warn';
+            if (s === 'completed' || s === 'succeeded' || s === 'done') cls = 'ok';
+            if (s === 'failed' || s === 'error') cls = 'err';
+            show('r4', cls, '#' + n + ' · ' + s + ' · ' + p + '%');
+            raw(d);
+        } catch (e) {
+            show('r4', 'err', '#' + n + ' · Erreur : ' + e.message);
+        }
+    };
+    tick();
+    autoTimer = setInterval(tick, 8000);
+};
+</script>
+</body>
+</html>
