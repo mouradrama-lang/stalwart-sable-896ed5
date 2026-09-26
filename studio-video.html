@@ -35,7 +35,6 @@
     .subtitle { font-size: 0.78rem; color: var(--ink-dim); letter-spacing: 0.03em; }
     .subtitle em { color: var(--cyan-2); font-style: italic; }
 
-    /* Statut du proxy */
     .proxy-status {
         display: flex; align-items: center; gap: 0.5rem;
         background: var(--panel-2); border: 1px solid var(--border);
@@ -138,7 +137,6 @@
         box-shadow: none; filter: grayscale(0.7);
     }
 
-    /* Statut de génération */
     .gen-status {
         display: none; padding: 1rem; margin-top: 1rem;
         background: var(--panel-2); border: 1px solid var(--border);
@@ -219,11 +217,6 @@
     .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.success { background: var(--success); color: #fff; }
     .toast.error { background: var(--error); color: #fff; }
-
-    .empty-state {
-        text-align: center; padding: 1.5rem 1rem;
-        color: var(--ink-faint); font-size: 0.82rem; font-style: italic;
-    }
 </style>
 </head>
 <body>
@@ -233,13 +226,11 @@
     <p class="subtitle">Texte → Vidéo · <em>100% gratuit · sans clé API</em></p>
 </header>
 
-<!-- Statut du proxy -->
 <div class="proxy-status" id="proxy-status">
     <div class="spinner"></div>
     <span id="proxy-text">Connexion au proxy…</span>
 </div>
 
-<!-- Modèle -->
 <div class="panel open" id="panel-model">
     <div class="panel-header" data-toggle="panel-model">
         <div class="panel-title">
@@ -259,13 +250,12 @@
                 <option value="pixverse">🎬 PixVerse V6</option>
             </select>
             <div class="field-hint">
-                💡 Wan Fast est le plus rapide et gratuit. Les autres modèles peuvent être plus lents.
+                💡 Wan Fast est le plus rapide et gratuit.
             </div>
         </div>
     </div>
 </div>
 
-<!-- Prompt -->
 <div class="panel open" id="panel-prompt">
     <div class="panel-header" data-toggle="panel-prompt">
         <div class="panel-title">
@@ -277,20 +267,17 @@
     <div class="panel-body">
         <div class="field">
             <label class="field-label">Décrivez votre vidéo</label>
-            <textarea id="prompt-input" placeholder="Exemple : Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes."></textarea>
-            <div class="field-hint">✏️ Décrivez le sujet, le mouvement, la caméra et l'ambiance. Plus c'est précis, mieux c'est.</div>
+            <textarea id="prompt-input" placeholder="Exemple : Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides."></textarea>
+            <div class="field-hint">✏️ Décrivez le sujet, le mouvement, la caméra et l'ambiance.</div>
         </div>
         <button class="tool-btn" id="demo-btn">📖 Charger un exemple</button>
     </div>
 </div>
 
-<!-- Bouton -->
 <button class="btn-go" id="go-btn" disabled>🎬 Générer la vidéo</button>
 
-<!-- Statut de génération -->
 <div class="gen-status" id="gen-status"></div>
 
-<!-- Galerie -->
 <div class="gallery" id="gallery">
     <div class="gallery-title">✨ Vidéos générées</div>
     <div class="gallery-grid" id="gallery-grid"></div>
@@ -304,7 +291,7 @@
 // ══════════════════════════════════════════════════════════════════
 const PROXY_URL = 'https://inf-renceport-proxy.onrender.com';
 const POLL_INTERVAL_SEC = 10;
-const MAX_POLL_ATTEMPTS = 120; // 20 minutes max
+const MAX_POLL_ATTEMPTS = 120;
 
 // ══════════════════════════════════════════════════════════════════
 // HELPERS
@@ -338,24 +325,19 @@ function hideGenStatus() {
 // ══════════════════════════════════════════════════════════════════
 async function checkProxy() {
     const el = $('proxy-status');
-    const txt = $('proxy-text');
     el.className = 'proxy-status';
     el.innerHTML = '<div class="spinner"></div><span>Connexion au proxy…</span>';
 
     try {
-        const r = await fetch(PROXY_URL + '/v1/healthz', {
-            method: 'GET',
-            mode: 'cors'
-        });
+        const r = await fetch(PROXY_URL + '/v1/healthz', { method: 'GET' });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const data = await r.json();
         if (data.status === 'ok') {
             el.className = 'proxy-status online';
             el.innerHTML = '<div class="dot"></div><span>✅ Proxy connecté · ' + (data.upstream ? 'Service amont disponible' : 'Service amont en attente') + '</span>';
             return true;
-        } else {
-            throw new Error('Proxy hors service');
         }
+        throw new Error('Proxy hors service');
     } catch (e) {
         el.className = 'proxy-status offline';
         el.innerHTML = '<div class="dot"></div><span>❌ Impossible de contacter le proxy. Réessayez dans 30 sec (démarrage à froid).</span>';
@@ -372,7 +354,6 @@ async function generateVideo() {
 
     const model = $('model-select').value;
 
-    // Désactiver le bouton
     $('go-btn').disabled = true;
     $('go-btn').textContent = '🎬 Génération en cours…';
 
@@ -381,7 +362,6 @@ async function generateVideo() {
     );
 
     try {
-        // 1. Créer la tâche
         const createRes = await fetch(PROXY_URL + '/v1/videos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -402,7 +382,6 @@ async function generateVideo() {
             '<div class="gs-line"><span style="font-size:0.7rem;color:var(--ink-faint)">ID : ' + jobId.slice(0, 20) + '…</span></div>'
         );
 
-        // 2. Poller le statut
         let videoUrl = null;
         let attempts = 0;
         let status = 'pending';
@@ -413,10 +392,7 @@ async function generateVideo() {
 
             const statusRes = await fetch(PROXY_URL + '/v1/videos/' + encodeURIComponent(jobId));
             if (!statusRes.ok) {
-                if (statusRes.status === 404) {
-                    // Pas encore prêt, on continue
-                    continue;
-                }
+                if (statusRes.status === 404) continue;
                 throw new Error('Erreur statut HTTP ' + statusRes.status);
             }
 
@@ -443,7 +419,6 @@ async function generateVideo() {
 
         if (!videoUrl) throw new Error('Délai dépassé (20 minutes)');
 
-        // 3. Afficher la vidéo
         hideGenStatus();
         addToGallery(videoUrl, model, prompt);
         toast('Vidéo générée ✓', 'success');
@@ -484,28 +459,23 @@ function escapeHtml(s) {
 // INIT
 // ══════════════════════════════════════════════════════════════════
 (function init() {
-    // Sections repliables
     document.querySelectorAll('[data-toggle]').forEach(h => {
         h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
     });
 
-    // Bouton démo
     const DEMO = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
     $('demo-btn').addEventListener('click', () => {
         $('prompt-input').value = DEMO;
         updateGo();
     });
 
-    // Activer/désactiver le bouton
     $('prompt-input').addEventListener('input', updateGo);
     function updateGo() {
         $('go-btn').disabled = $('prompt-input').value.trim().length === 0;
     }
 
-    // Générer
     $('go-btn').addEventListener('click', generateVideo);
 
-    // Vérifier le proxy au chargement
     checkProxy();
 })();
 </script>
