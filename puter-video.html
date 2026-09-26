@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Puter Video Studio — Texte vers Vidéo</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+        --bg: #0a0a0f;
+        --panel: #16161f;
+        --panel-2: #1c1c28;
+        --border: #2a2a38;
+        --border-2: #35354a;
+        --ink: #f5f5f7;
+        --ink-dim: #8888a0;
+        --ink-faint: #555565;
+        --cyan: #00d9ff;
+        --cyan-2: #5eeeff;
+        --magenta: #ff5eb4;
+        --success: #2d8a4e;
+        --error: #c0392b;
+        --warn: #d4a017;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        padding: 1.2rem 1rem 6rem;
+        font-size: 15px;
+        line-height: 1.5;
+        max-width: 640px;
+        margin: 0 auto;
+        background-image:
+            radial-gradient(circle at 20% 5%, rgba(0,217,255,0.09) 0%, transparent 45%),
+            radial-gradient(circle at 80% 95%, rgba(255,94,180,0.07) 0%, transparent 45%);
+        background-attachment: fixed;
+    }
+
+    header { text-align: center; margin-bottom: 1.5rem; }
+    h1 {
+        font-size: 1.9rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 50%, var(--magenta) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.35rem;
+    }
+    .subtitle {
+        font-size: 0.78rem;
+        color: var(--ink-dim);
+        letter-spacing: 0.03em;
+    }
+    .subtitle em { color: var(--cyan-2); font-style: italic; }
+
+    .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.1rem;
+        margin-bottom: 0.9rem;
+    }
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 0.9rem;
+    }
+    .panel-header.no-toggle { cursor: default; }
+    .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink);
+    }
+    .panel-icon {
+        width: 30px; height: 30px;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
+        border-radius: 8px;
+        font-size: 1rem;
+        box-shadow: 0 4px 12px rgba(0,217,255,0.25);
+    }
+    .panel-badge {
+        font-size: 0.62rem;
+        background: var(--cyan);
+        color: #0a0a0f;
+        padding: 0.15rem 0.5rem;
+        border-radius: 10px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+    }
+    .panel-chevron {
+        font-size: 0.7rem;
+        color: var(--ink-faint);
+        transition: transform 0.2s;
+    }
+    .panel.open .panel-chevron { transform: rotate(180deg); }
+    .panel-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+    }
+    .panel.open .panel-body { max-height: 20000px; }
+
+    .field { margin-bottom: 0.8rem; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+        display: block;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--ink-dim);
+        font-weight: 700;
+        margin-bottom: 0.45rem;
+    }
+    .field-hint {
+        font-size: 0.7rem;
+        color: var(--ink-faint);
+        margin-top: 0.35rem;
+        line-height: 1.4;
+        font-style: italic;
+    }
+
+    input[type="text"], textarea, select {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 0.88rem;
+        transition: border-color 0.15s;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 3px rgba(0,217,255,0.12);
+    }
+    textarea { min-height: 100px; resize: vertical; line-height: 1.5; }
+    select {
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%2300d9ff' d='M6 8L0 0h12z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 11px;
+        padding-right: 2.5rem;
+    }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+    .checkbox-field {
+        display: flex; align-items: center; gap: 0.6rem;
+        padding: 0.7rem 0.8rem; border-radius: 10px;
+        background: var(--panel-2); border: 1px solid var(--border);
+        cursor: pointer;
+    }
+    .checkbox-field input[type="checkbox"] {
+        width: 20px; height: 20px;
+        accent-color: var(--cyan);
+        cursor: pointer; flex-shrink: 0;
+    }
+    .checkbox-label {
+        font-size: 0.82rem; color: var(--ink);
+        font-weight: 500; user-select: none;
+    }
+
+    .btn-go {
+        width: 100%; padding: 1.15rem;
+        border-radius: 14px; border: none;
+        background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
+        color: #0a0a0f; font-size: 1.02rem;
+        font-weight: 800; font-family: inherit;
+        cursor: pointer; letter-spacing: 0.04em;
+        margin-top: 0.8rem;
+        box-shadow: 0 8px 30px rgba(0,217,255,0.35);
+        transition: all 0.15s;
+    }
+    .btn-go:active:not(:disabled) { transform: scale(0.98); }
+    .btn-go:disabled {
+        opacity: 0.3; cursor: not-allowed;
+        box-shadow: none; filter: grayscale(0.7);
+    }
+
+    .status {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: var(--panel); border-top: 1px solid var(--border);
+        color: var(--ink); padding: 0.8rem 1.1rem;
+        font-size: 0.78rem; display: flex; align-items: center; gap: 0.6rem;
+        transform: translateY(100%); transition: transform 0.3s; z-index: 100;
+    }
+    .status.visible { transform: translateY(0); }
+    .status .spin {
+        width: 13px; height: 13px;
+        border: 2px solid rgba(0,217,255,0.25);
+        border-top-color: var(--cyan-2);
+        border-radius: 50%; animation: spin 0.8s linear infinite;
+        flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+        position: fixed; top: 1.2rem; left: 50%;
+        transform: translateX(-50%) translateY(-80px);
+        background: var(--cyan); color: #0a0a0f;
+        padding: 0.8rem 1.4rem; border-radius: 12px;
+        font-size: 0.82rem; font-weight: 700;
+        opacity: 0; transition: all 0.35s; z-index: 1000;
+        max-width: 85vw; text-align: center;
+        box-shadow: 0 6px 30px rgba(0,217,255,0.45);
+    }
+    .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); color: #fff; }
+    .toast.error { background: var(--error); color: #fff; }
+
+    .gallery { margin-top: 1.5rem; display: none; }
+    .gallery.visible { display: block; }
+    .gallery-title {
+        font-size: 0.72rem; text-transform: uppercase;
+        letter-spacing: 0.12em; color: var(--cyan-2);
+        font-weight: 800; margin-bottom: 0.8rem;
+    }
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 0.8rem;
+    }
+    .g-item {
+        border-radius: 12px; overflow: hidden;
+        border: 1px solid var(--border);
+        background: #000; animation: fadeIn 0.4s ease;
+        position: relative;
+    }
+    .g-item video { width: 100%; display: block; aspect-ratio: 9/16; object-fit: cover; }
+    .g-item .g-label {
+        padding: 0.5rem 0.7rem; background: var(--panel);
+        font-size: 0.7rem; color: var(--ink-dim);
+        border-top: 1px solid var(--border);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .empty-state {
+        text-align: center; padding: 1.5rem 1rem;
+        color: var(--ink-faint); font-size: 0.82rem;
+        font-style: italic;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Puter Video Studio</h1>
+    <p class="subtitle">Texte → Vidéo · <em>Aucune clé API requise</em></p>
+</header>
+
+<!-- ═══ MODÈLE ═══ -->
+<div class="panel open" id="panel-model">
+    <div class="panel-header no-toggle">
+        <div class="panel-title">
+            <div class="panel-icon">🎥</div>
+            Modèle de génération
+        </div>
+        <div class="panel-badge" id="model-badge">Prêt</div>
+    </div>
+    <div class="panel-body" style="max-height:none;">
+        <div class="field">
+            <label class="field-label">Choisir le modèle</label>
+            <select id="model-select">
+                <option value="google/veo-3.1-fast">🎬 Google Veo 3.1 Fast (rapide)</option>
+                <option value="google/veo-3.1">🎬 Google Veo 3.1 (haute qualité)</option>
+                <option value="vidu/vidu-q3">🎬 Vidu Q3 (1080p + audio)</option>
+                <option value="pixverse/pixverse-v6">🎬 PixVerse V6 (multi-plans)</option>
+                <option value="wan-ai/wan2.7-t2v">🎬 Wan 2.7 (fluide)</option>
+            </select>
+            <div class="field-hint">
+                💡 Chaque modèle a ses forces : Veo pour le réalisme, Vidu pour l'audio intégré, PixVerse pour les scènes multiples, Wan pour la fluidité.
+            </div>
+        </div>
+
+        <div class="row-2">
+            <div class="field">
+                <label class="field-label">Format</label>
+                <select id="aspect-select">
+                    <option value="9:16" selected>📱 Portrait 9:16</option>
+                    <option value="16:9">🖥️ Paysage 16:9</option>
+                </select>
+            </div>
+            <div class="field">
+                <label class="field-label">Durée cible</label>
+                <select id="duration-select">
+                    <option value="5">5 secondes</option>
+                    <option value="8" selected>8 secondes</option>
+                    <option value="16">16 secondes (si supporté)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="checkbox-field">
+                <input type="checkbox" id="audio-checkbox" checked>
+                <span class="checkbox-label">🔊 Générer l'audio (si le modèle le supporte)</span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ PROMPT ═══ -->
+<div class="panel open" id="panel-prompt">
+    <div class="panel-header" data-toggle="panel-prompt">
+        <div class="panel-title">
+            <div class="panel-icon">✍️</div>
+            Description
+        </div>
+        <div class="panel-chevron">▼</div>
+    </div>
+    <div class="panel-body">
+        <div class="field">
+            <label class="field-label">Décrivez votre vidéo</label>
+            <textarea id="prompt-input" placeholder="Exemple : Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides."></textarea>
+            <div class="field-hint">✏️ Décrivez le sujet, le mouvement, la caméra et l'ambiance. Plus c'est précis, mieux c'est.</div>
+        </div>
+
+        <div class="script-tools" style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.6rem;">
+            <button class="tool-btn" id="demo-btn" style="padding:0.7rem; border-radius:10px; border:1px solid var(--border-2); background:var(--panel-2); color:var(--ink); font-size:0.75rem; font-weight:700; cursor:pointer;">📖 Exemple</button>
+            <button class="tool-btn" id="clear-btn" style="padding:0.7rem; border-radius:10px; border:1px solid var(--border-2); background:var(--panel-2); color:var(--ink); font-size:0.75rem; font-weight:700; cursor:pointer;">🗑️ Effacer</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ BOUTON ═══ -->
+<button class="btn-go" id="go-btn" disabled>🎬 Générer la vidéo</button>
+
+<!-- ═══ GALERIE ═══ -->
+<div class="gallery" id="gallery">
+    <div class="gallery-title">✨ Vidéos générées</div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<div class="status" id="status">
+    <div class="spin"></div>
+    <span id="status-text">…</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://js.puter.com/v2/"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ══════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+let toastT;
+function toast(msg, type = 'success') {
+    const t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast';
+    void t.offsetWidth;
+    t.classList.add(type, 'visible');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('visible'), 2600);
+}
+
+function setStatus(text) {
+    const s = $('status'), st = $('status-text');
+    if (text) { s.classList.add('visible'); st.textContent = text; }
+    else s.classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION
+// ══════════════════════════════════════════════════════════════════
+async function generateVideo() {
+    const prompt = $('prompt-input').value.trim();
+    if (!prompt) { toast('Écrivez d\'abord une description', 'error'); return; }
+
+    const model = $('model-select').value;
+    const aspect = $('aspect-select').value;
+    const duration = parseInt($('duration-select').value, 10);
+    const withAudio = $('audio-checkbox').checked;
+
+    $('go-btn').disabled = true;
+    $('go-btn').textContent = '🎬 Génération en cours…';
+    setStatus('Envoi à Puter.js…');
+
+    try {
+        const options = {
+            model: model,
+            aspect_ratio: aspect,
+            seconds: duration,
+            audio: withAudio
+        };
+
+        setStatus('Rendu de la vidéo… (cela peut prendre 1 à 3 minutes)');
+
+        const videoElement = await puter.ai.txt2vid(prompt, options);
+
+        setStatus(null);
+        videoElement.controls = true;
+        videoElement.autoplay = true;
+        videoElement.loop = true;
+        videoElement.muted = false;
+        videoElement.playsInline = true;
+
+        $('gallery').classList.add('visible');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'g-item';
+        const label = document.createElement('div');
+        label.className = 'g-label';
+        label.textContent = model.split('/').pop().toUpperCase() + ' · ' + aspect + ' · ' + duration + 's';
+        wrapper.appendChild(videoElement);
+        wrapper.appendChild(label);
+        $('gallery-grid').prepend(wrapper);
+
+        toast('Vidéo générée ✓', 'success');
+    } catch (e) {
+        console.error(e);
+        setStatus(null);
+        const msg = e && e.message ? e.message : 'Erreur inconnue';
+        toast('Erreur : ' + msg, 'error');
+    } finally {
+        $('go-btn').disabled = false;
+        $('go-btn').textContent = '🎬 Générer la vidéo';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+    // Sections repliables
+    document.querySelectorAll('[data-toggle]').forEach(h => {
+        h.addEventListener('click', () => {
+            $(h.dataset.toggle).classList.toggle('open');
+        });
+    });
+
+    // Boutons démo / clear
+    const DEMO = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
+    $('demo-btn').addEventListener('click', () => {
+        $('prompt-input').value = DEMO;
+        updateGo();
+    });
+    $('clear-btn').addEventListener('click', () => {
+        $('prompt-input').value = '';
+        updateGo();
+    });
+
+    // Activer le bouton si texte saisi
+    $('prompt-input').addEventListener('input', updateGo);
+    function updateGo() {
+        $('go-btn').disabled = $('prompt-input').value.trim().length === 0;
+    }
+
+    // Bouton principal
+    $('go-btn').addEventListener('click', generateVideo);
+
+    // Vérifier que Puter.js est chargé
+    if (typeof puter === 'undefined') {
+        toast('Puter.js n\'a pas pu être chargé. Vérifiez votre connexion.', 'error');
+    } else {
+        console.log('[Puter Studio] Puter.js prêt');
+    }
+})();
+</script>
+
+</body>
+</html>
