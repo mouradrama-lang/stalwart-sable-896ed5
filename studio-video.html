@@ -35,7 +35,6 @@
     .subtitle { font-size: 0.78rem; color: var(--ink-dim); letter-spacing: 0.03em; }
     .subtitle em { color: var(--cyan-2); font-style: italic; }
 
-    /* Bouton Agnes */
     .agnes-btn {
         display: flex; align-items: center; justify-content: center;
         gap: 0.5rem; width: 100%; padding: 0.85rem 1rem;
@@ -46,9 +45,7 @@
         letter-spacing: 0.03em; margin-bottom: 1rem;
         transition: all 0.2s;
     }
-    .agnes-btn:active { transform: scale(0.98); background: linear-gradient(135deg, rgba(0,217,255,0.25) 0%, rgba(255,94,180,0.25) 100%); }
-    .agnes-btn .ab-icon { font-size: 1.1rem; }
-    .agnes-btn .ab-arrow { font-size: 0.9rem; opacity: 0.7; }
+    .agnes-btn:active { transform: scale(0.98); }
 
     .panel {
         background: var(--panel); border: 1px solid var(--border);
@@ -118,7 +115,6 @@
 
     .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
 
-    /* API */
     .api-input-wrap { position: relative; margin-bottom: 0.6rem; }
     .api-input-wrap input { padding-right: 3rem; }
     .api-eye {
@@ -155,7 +151,7 @@
     .api-result.err { color: #ff6b5a; border-color: rgba(255,107,90,0.4); background: rgba(192,57,43,0.1); }
     .api-result.warn { color: #ffc84a; border-color: rgba(255,200,74,0.4); background: rgba(212,160,23,0.1); }
 
-    /* Onglets TXT / IMG */
+    /* Tabs */
     .tab-bar {
         display: grid; grid-template-columns: 1fr 1fr;
         gap: 0.4rem; margin-bottom: 1rem;
@@ -169,8 +165,6 @@
         font-size: 0.8rem; font-weight: 700; font-family: inherit;
         cursor: pointer; letter-spacing: 0.03em;
         transition: all 0.15s;
-        display: flex; align-items: center; justify-content: center;
-        gap: 0.4rem;
     }
     .tab.active {
         background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
@@ -179,7 +173,6 @@
     }
     .tab:active { transform: scale(0.97); }
 
-    /* Upload image */
     .upload-zone {
         border: 2px dashed var(--border-2);
         border-radius: 12px; padding: 1.5rem 1rem;
@@ -243,6 +236,118 @@
     }
     .btn-stop.visible { display: block; }
 
+    /* ═══════════════════════════════════════════════════
+       CONSOLE DE SUIVI EN DIRECT (nouveau)
+    ═══════════════════════════════════════════════════ */
+    .console-panel {
+        background: #050508;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.9rem;
+        margin-top: 1rem;
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 0.7rem;
+        line-height: 1.5;
+        max-height: 280px;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+    }
+    .console-panel::-webkit-scrollbar { width: 4px; }
+    .console-panel::-webkit-scrollbar-track { background: transparent; }
+    .console-panel::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+    .console-empty {
+        color: var(--ink-faint);
+        font-style: italic;
+        text-align: center;
+        padding: 1rem;
+        font-size: 0.72rem;
+    }
+
+    .log-line {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.15rem 0;
+        animation: logIn 0.25s ease;
+    }
+    @keyframes logIn {
+        from { opacity: 0; transform: translateX(-4px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .log-time {
+        color: var(--ink-faint);
+        flex-shrink: 0;
+        font-size: 0.68rem;
+        font-variant-numeric: tabular-nums;
+    }
+    .log-msg { flex: 1; word-break: break-word; }
+    .log-info { color: var(--cyan-2); }
+    .log-warn { color: #ffc84a; }
+    .log-success { color: #4ec97a; }
+    .log-error { color: #ff6b5a; }
+    .log-dim { color: var(--ink-dim); }
+    .log-magenta { color: var(--magenta); }
+
+    .console-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .console-title {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--cyan-2);
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .console-live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4ec97a;
+        box-shadow: 0 0 6px #4ec97a;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+    .console-clear {
+        background: transparent;
+        border: 1px solid var(--border-2);
+        color: var(--ink-dim);
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.6rem;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+    }
+    .console-clear:active { background: var(--panel-2); }
+
+    .progress-bar {
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+        margin: 0.5rem 0 0.3rem;
+    }
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--cyan) 0%, var(--magenta) 100%);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+        width: 0%;
+    }
+
+    /* File d'attente */
     .queue { margin-top: 1rem; }
     .q-item {
         display: flex; align-items: center; gap: 0.7rem;
@@ -260,6 +365,7 @@
     .q-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .q-status { font-size: 0.7rem; color: var(--ink-dim); text-align: right; flex-shrink: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+    /* Galerie */
     .gallery { margin-top: 1.5rem; display: none; }
     .gallery.visible { display: block; }
     .gallery-title {
@@ -355,14 +461,13 @@
     <p class="subtitle">Texte & Image → Vidéo · <em>Propulsé par l'API Agnes AI</em></p>
 </header>
 
-<!-- ═══ BOUTON AGNES AI ═══ -->
 <a href="https://platform.agnes-ai.com" target="_blank" rel="noopener" class="agnes-btn">
-    <span class="ab-icon">🌐</span>
+    <span>🌐</span>
     <span>Accéder à Agnes AI — platform.agnes-ai.com</span>
-    <span class="ab-arrow">↗</span>
+    <span>↗</span>
 </a>
 
-<!-- ═══ API ═══ -->
+<!-- API -->
 <div class="panel open" id="panel-api">
     <div class="panel-header no-toggle">
         <div class="panel-title">
@@ -390,7 +495,7 @@
     </div>
 </div>
 
-<!-- ═══ ONGLETS ═══ -->
+<!-- Tabs -->
 <div class="tab-bar">
     <button type="button" class="tab active" id="tab-txt" data-mode="txt">
         ✍️ Texte → Vidéo
@@ -400,7 +505,7 @@
     </button>
 </div>
 
-<!-- ═══ PANNEAU TEXTE ═══ -->
+<!-- Panneau TXT -->
 <div class="panel open" id="panel-txt" style="display:block;">
     <div class="panel-header no-toggle">
         <div class="panel-title">
@@ -411,14 +516,13 @@
     <div class="panel-body" style="max-height:none;">
         <div class="field">
             <label class="field-label">Décrivez votre vidéo</label>
-            <textarea id="prompt-input" placeholder="Exemple : Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides."></textarea>
-            <div class="field-hint">✏️ Décrivez le sujet, le mouvement, la caméra et l'ambiance.</div>
+            <textarea id="prompt-input" placeholder="Exemple : Un dragon majestueux vole à travers les nuages au coucher du soleil..."></textarea>
         </div>
         <button class="tool-btn" id="demo-btn">📖 Charger un exemple</button>
     </div>
 </div>
 
-<!-- ═══ PANNEAU IMAGE ═══ -->
+<!-- Panneau IMG -->
 <div class="panel open" id="panel-img" style="display:none;">
     <div class="panel-header no-toggle">
         <div class="panel-title">
@@ -431,20 +535,18 @@
             <input type="file" id="file-input" accept="image/*">
             <div class="upload-icon">＋</div>
             <div class="upload-text">Charger une image</div>
-            <div class="upload-hint">JPG, PNG · format portrait 9:16 recommandé</div>
+            <div class="upload-hint">JPG, PNG · portrait 9:16 recommandé</div>
         </div>
         <div id="image-preview-container"></div>
-
         <div class="field" style="margin-top:0.8rem;">
             <label class="field-label">Décrivez le mouvement souhaité</label>
-            <textarea id="img-prompt-input" placeholder="Exemple : Anime doucement cette image. Un vent léger fait bouger les cheveux. La lumière devient dorée et chaude. Garde le sujet identique à la photo originale."></textarea>
-            <div class="field-hint">✏️ Décrivez le mouvement. Le sujet doit rester identique à la photo.</div>
+            <textarea id="img-prompt-input" placeholder="Exemple : Anime doucement cette image. Un vent léger fait bouger les cheveux..."></textarea>
         </div>
         <button class="tool-btn" id="img-demo-btn">📖 Charger un exemple</button>
     </div>
 </div>
 
-<!-- ═══ RÉGLAGES ═══ -->
+<!-- Réglages -->
 <div class="panel open" id="panel-settings">
     <div class="panel-header" data-toggle="panel-settings">
         <div class="panel-title">
@@ -473,14 +575,39 @@
                 </select>
             </div>
         </div>
-        <div class="field-hint">
-            💡 La génération est <strong>séquentielle</strong>. Environ 2 min par vidéo.
-        </div>
     </div>
 </div>
 
 <button class="btn-go" id="go-btn" disabled>🎬 Générer</button>
-<button class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+<button class="btn-stop" id="btn-stop">⏹ Arrêter la génération</button>
+
+<!-- ═══════════════════════════════════════════════════
+     CONSOLE DE SUIVI EN DIRECT
+═══════════════════════════════════════════════════ -->
+<div class="panel open" id="panel-console">
+    <div class="panel-header" data-toggle="panel-console">
+        <div class="panel-title">
+            <div class="panel-icon">📡</div>
+            Suivi en direct
+        </div>
+        <div class="panel-chevron">▼</div>
+    </div>
+    <div class="panel-body">
+        <div class="console-header">
+            <div class="console-title">
+                <span class="console-live-dot" id="live-dot" style="display:none;"></span>
+                <span id="console-state">Prêt</span>
+            </div>
+            <button class="console-clear" id="console-clear">🗑️ Effacer</button>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="console-panel" id="console-log">
+            <div class="console-empty">En attente d'une génération…</div>
+        </div>
+    </div>
+</div>
 
 <div class="queue" id="queue"></div>
 
@@ -501,7 +628,7 @@
 
 <script>
 // ══════════════════════════════════════════════════════════════════
-// CONFIGURATION AGNES
+// CONFIG
 // ══════════════════════════════════════════════════════════════════
 const API_BASE = 'https://apihub.agnes-ai.com/v1';
 const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
@@ -512,21 +639,80 @@ const POLL_INTERVAL_SEC = 8;
 const MAX_POLL_ATTEMPTS = 100;
 const MAX_IMAGE_SIZE = 12 * 1024 * 1024;
 const THUMB_MAX_WIDTH = 300;
-
 const API_KEY_STORE = 'agnes_api_key';
 
 // ══════════════════════════════════════════════════════════════════
 // ÉTAT
 // ══════════════════════════════════════════════════════════════════
 const state = {
-    mode: 'txt',           // 'txt' ou 'img'
-    image: null,           // { dataUri, thumbnail }
+    mode: 'txt',
+    image: null,
     running: false,
     stop: false,
     completed: 0,
     failed: 0,
     total: 0
 };
+
+// ══════════════════════════════════════════════════════════════════
+// LOGGER — Console en direct
+// ══════════════════════════════════════════════════════════════════
+const logLines = [];
+
+function logTime() {
+    const d = new Date();
+    const h = String(d.getHours()).padStart(2, '0');
+    const m = String(d.getMinutes()).padStart(2, '0');
+    const s = String(d.getSeconds()).padStart(2, '0');
+    return h + ':' + m + ':' + s;
+}
+
+function addLog(msg, type = 'info') {
+    const time = logTime();
+    logLines.push({ time, msg, type });
+    if (logLines.length > 200) logLines.shift();
+    renderLogs();
+    console.log('[Studio]', msg);
+}
+
+function renderLogs() {
+    const el = document.getElementById('console-log');
+    if (!el) return;
+
+    if (logLines.length === 0) {
+        el.innerHTML = '<div class="console-empty">En attente d\'une génération…</div>';
+        return;
+    }
+
+    el.innerHTML = logLines.map(line =>
+        '<div class="log-line">' +
+            '<span class="log-time">[' + line.time + ']</span>' +
+            '<span class="log-msg log-' + line.type + '">' + esc(line.msg) + '</span>' +
+        '</div>'
+    ).join('');
+
+    // Auto-scroll vers le bas
+    el.scrollTop = el.scrollHeight;
+}
+
+function clearLogs() {
+    logLines.length = 0;
+    renderLogs();
+    updateProgressBar(0);
+    addLog('Console effacée', 'dim');
+}
+
+function updateProgressBar(percent) {
+    const el = document.getElementById('progress-fill');
+    if (el) el.style.width = Math.max(0, Math.min(100, percent)) + '%';
+}
+
+function updateConsoleState(text, live = false) {
+    const stateEl = document.getElementById('console-state');
+    const dotEl = document.getElementById('live-dot');
+    if (stateEl) stateEl.textContent = text;
+    if (dotEl) dotEl.style.display = live ? 'inline-block' : 'none';
+}
 
 // ══════════════════════════════════════════════════════════════════
 // HELPERS
@@ -570,6 +756,7 @@ async function wakeLock() {
     try {
         if ('wakeLock' in navigator) {
             await navigator.wakeLock.request('screen');
+            addLog('Écran maintenu allumé (Wake Lock)', 'success');
             return;
         }
     } catch (e) {}
@@ -588,6 +775,7 @@ async function wakeLock() {
         v.srcObject = canvasStream;
         v.muted = true; v.playsInline = true;
         v.play().catch(() => {});
+        addLog('Anti-veille activé (canvas stream)', 'success');
     } catch (e) {}
 }
 
@@ -609,11 +797,13 @@ function saveKey() {
         try { localStorage.removeItem(API_KEY_STORE); } catch (e) {}
         refreshApi();
         toast('Clé supprimée', 'error');
+        addLog('Clé API supprimée', 'warn');
         return;
     }
     if (k.length < 10) {
         setApiResult('err', 'Clé trop courte', 'La clé doit faire au moins 10 caractères.');
         toast('Clé trop courte', 'error');
+        addLog('Erreur : clé trop courte', 'error');
         return;
     }
     try {
@@ -621,9 +811,11 @@ function saveKey() {
         $('api-input').value = k;
         refreshApi();
         toast('Clé enregistrée ✓');
+        addLog('Clé API enregistrée localement', 'success');
     } catch (e) {
         setApiResult('err', 'Erreur', 'Impossible de sauvegarder.');
         toast('Erreur', 'error');
+        addLog('Erreur : impossible de sauvegarder la clé', 'error');
     }
 }
 function refreshApi() {
@@ -649,7 +841,7 @@ function refreshApi() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GESTION DE L'IMAGE
+// IMAGE
 // ══════════════════════════════════════════════════════════════════
 function fileToDataUri(file) {
     return new Promise((resolve, reject) => {
@@ -682,6 +874,8 @@ async function handleImageFile(file) {
     if (file.size > MAX_IMAGE_SIZE) { toast('Image trop lourde (max 12 Mo)', 'error'); return; }
 
     $('upload-zone').classList.add('loading');
+    addLog('Chargement image : ' + file.name, 'info');
+
     try {
         const dataUri = await fileToDataUri(file);
         const thumbnail = await makeThumb(dataUri);
@@ -689,8 +883,10 @@ async function handleImageFile(file) {
         renderImagePreview();
         updateGo();
         toast('Image chargée ✓', 'success');
+        addLog('Image chargée (' + Math.round(file.size / 1024) + ' Ko)', 'success');
     } catch (e) {
         toast('Erreur de chargement', 'error');
+        addLog('Erreur chargement image', 'error');
     }
     $('upload-zone').classList.remove('loading');
 }
@@ -707,26 +903,28 @@ function renderImagePreview() {
         state.image = null;
         renderImagePreview();
         updateGo();
+        addLog('Image retirée', 'dim');
     });
 }
 
 // ══════════════════════════════════════════════════════════════════
 // API AGNES
 // ══════════════════════════════════════════════════════════════════
-async function apiFetch(url, opts = {}) {
+async function apiFetch(url, opts = {}, label = '') {
     for (let i = 0; i < 7; i++) {
         if (state.stop) throw new Error('stop');
         try {
             const r = await fetch(url, opts);
             if (r.status === 429) {
                 const w = [15, 30, 45, 60, 90, 120, 180][Math.min(i, 6)];
-                setStatus('L\'IA se prépare… (' + w + 's)');
+                addLog(label + ' HTTP 429 → attente ' + w + 's', 'warn');
+                setStatus('Limite atteinte… (' + w + 's)');
                 await sleep(w * 1000);
                 continue;
             }
             if (r.status === 503) {
                 const w = [5, 10, 15, 20, 30, 45][Math.min(i, 5)];
-                setStatus('Préparation… (' + w + 's)');
+                addLog(label + ' HTTP 503 → attente ' + w + 's', 'warn');
                 await sleep(w * 1000);
                 continue;
             }
@@ -734,7 +932,7 @@ async function apiFetch(url, opts = {}) {
         } catch (e) {
             if (e.message === 'stop') throw e;
             const w = [3, 5, 8, 12, 20, 30][Math.min(i, 5)];
-            setStatus('Connexion… (' + w + 's)');
+            addLog(label + ' Erreur réseau → retry ' + w + 's', 'warn');
             await sleep(w * 1000);
         }
     }
@@ -742,17 +940,10 @@ async function apiFetch(url, opts = {}) {
 }
 
 async function createTask(prompt, frames, imageDataUri) {
-    const body = {
-        model: MODEL,
-        prompt: prompt,
-        num_frames: frames,
-        frame_rate: FPS
-    };
-    // Ajout de l'image si présente (image-to-video)
-    if (imageDataUri) {
-        body.image = imageDataUri;
-    }
+    const body = { model: MODEL, prompt, num_frames: frames, frame_rate: FPS };
+    if (imageDataUri) body.image = imageDataUri;
 
+    addLog('Envoi de la requête à l\'API Agnes…', 'info');
     const res = await apiFetch(API_BASE + '/videos', {
         method: 'POST',
         headers: {
@@ -760,18 +951,22 @@ async function createTask(prompt, frames, imageDataUri) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
-    });
+    }, 'Create');
+
     if (!res.ok) {
         const err = await res.text();
+        addLog('Erreur HTTP ' + res.status + ' : ' + err.slice(0, 100), 'error');
         throw new Error('HTTP ' + res.status + ' — ' + err.slice(0, 150));
     }
     const d = await res.json();
     const id = d.video_id || d.id || d.task_id;
     if (!id) throw new Error('Pas de video_id');
+    addLog('Tâche créée — ID : ' + String(id).slice(0, 24) + '…', 'success');
     return id;
 }
 
-async function pollTask(videoId, onProgress) {
+async function pollTask(videoId, onProgress, taskNum) {
+    let lastPct = -1;
     for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
         if (state.stop) throw new Error('stop');
         if (i > 0) {
@@ -787,17 +982,26 @@ async function pollTask(videoId, onProgress) {
         const res = await apiFetch(url, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + getKey() }
-        });
+        }, 'Poll');
+
         const d = await res.json();
         const status = d.status || 'unknown';
         const progress = d.progress || 0;
+
+        if (progress !== lastPct) {
+            addLog('Vérification n°' + (i + 1) + ' : ' + status + ' — ' + progress + '%', 'info');
+            lastPct = progress;
+        }
         onProgress('Création — ' + progress + '%');
+
         if (status === 'completed' || status === 'succeeded' || status === 'done') {
             const url = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
             if (!url) throw new Error('Terminé sans URL');
+            addLog('Vidéo prête ! Récupération de l\'URL…', 'success');
             return url;
         }
         if (status === 'failed' || status === 'error' || status === 'cancelled') {
+            addLog('Échec de la génération : ' + status, 'error');
             throw new Error('Échec (' + status + ')');
         }
     }
@@ -805,7 +1009,7 @@ async function pollTask(videoId, onProgress) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// FILE D'ATTENTE
+// FILE
 // ══════════════════════════════════════════════════════════════════
 const queue = [];
 
@@ -851,28 +1055,50 @@ function addGallery(url, i, prompt, durationSec, mode) {
 // ══════════════════════════════════════════════════════════════════
 async function processOne(item) {
     try {
+        const num = String(item.i + 1).padStart(2, '0');
+        addLog('═══ Vidéo ' + num + ' — Démarrage ═══', 'magenta');
+
         item.s = 'creating';
         renderQueue();
+        addLog('Création de la tâche (mode ' + (item.mode === 'img' ? 'image→vidéo' : 'texte→vidéo') + ')…', 'info');
+
         const id = await createTask(item.prompt, item.frames, item.imageDataUri);
+
         item.s = 'processing';
         renderQueue();
+        addLog('Tâche acceptée. Début du suivi…', 'success');
+
         const url = await pollTask(id, p => {
             item.p = p;
             renderQueue();
-        });
+            // Mise à jour de la barre de progression
+            const match = p.match(/(\d+)%/);
+            if (match) {
+                updateProgressBar(parseInt(match[1], 10));
+            }
+        }, item.i);
+
         item.s = 'done';
         state.completed++;
         renderQueue();
         updateGo();
         addGallery(url, item.i, item.prompt, item.durationSec, item.mode);
+
+        updateProgressBar(100);
+        addLog('✅ Vidéo ' + num + ' terminée avec succès !', 'success');
+        addLog('Lien : ' + url.slice(0, 60) + '…', 'dim');
+
     } catch (e) {
+        const num = String(item.i + 1).padStart(2, '0');
         if (e.message !== 'stop') {
             item.s = 'failed';
             item.p = 'Échec';
             state.failed++;
+            addLog('❌ Vidéo ' + num + ' échouée : ' + e.message, 'error');
         } else {
             item.s = 'failed';
             item.p = 'Arrêté';
+            addLog('⏹ Vidéo ' + num + ' arrêtée par l\'utilisateur', 'warn');
         }
         renderQueue();
         updateGo();
@@ -911,10 +1137,7 @@ async function start() {
     if (!getKey()) { toast('Ajoutez votre clé API', 'error'); return; }
 
     const isTxt = state.mode === 'txt';
-    const prompt = isTxt
-        ? $('prompt-input').value.trim()
-        : $('img-prompt-input').value.trim();
-
+    const prompt = isTxt ? $('prompt-input').value.trim() : $('img-prompt-input').value.trim();
     if (!prompt) { toast('Écrivez une description', 'error'); return; }
     if (!isTxt && !state.image) { toast('Chargez une image', 'error'); return; }
 
@@ -928,6 +1151,16 @@ async function start() {
     state.completed = 0;
     state.failed = 0;
     state.total = count;
+
+    updateProgressBar(0);
+    updateConsoleState('Travail en cours…', true);
+    addLog('════════════════════════════════════', 'magenta');
+    addLog('🚀 Nouvelle session de génération', 'magenta');
+    addLog('Mode : ' + (isTxt ? 'Texte → Vidéo' : 'Image → Vidéo'), 'info');
+    addLog('Vidéos à générer : ' + count + ' × ' + durationSec + 's', 'info');
+    addLog('Prompt : "' + (prompt.length > 80 ? prompt.slice(0, 80) + '…' : prompt) + '"', 'dim');
+    addLog('Intervalle entre les créations : 62s', 'dim');
+    addLog('════════════════════════════════════', 'magenta');
 
     queue.length = 0;
     for (let i = 0; i < count; i++) {
@@ -945,7 +1178,7 @@ async function start() {
 
     $('gallery-grid').innerHTML = '';
     $('gallery').classList.remove('visible');
-    $('stop-btn').classList.add('visible');
+    $('btn-stop').classList.add('visible');
     $('go-btn').disabled = true;
 
     await wakeLock();
@@ -957,9 +1190,10 @@ async function start() {
 
         if (i < queue.length - 1 && !state.stop) {
             const waitSec = Math.ceil(CREATE_INTERVAL_MS / 1000);
+            addLog('⏸ Pause de ' + waitSec + 's avant la prochaine vidéo (limite API Agnes)', 'warn');
             for (let r = waitSec; r > 0; r--) {
                 if (state.stop) break;
-                setStatus('Respiration créative… — Vidéo ' + (i + 2) + '/' + queue.length + ' dans ' + r + 's');
+                setStatus('Prochaine vidéo dans ' + r + 's…');
                 await sleep(1000);
             }
         }
@@ -972,13 +1206,21 @@ async function start() {
     const summary = state.stop
         ? 'Arrêté — ' + state.completed + '/' + queue.length + ' vidéos'
         : '✦ ' + state.completed + '/' + queue.length + ' vidéos créées ✦';
+
     setStatus(summary);
+    addLog('════════════════════════════════════', 'magenta');
+    addLog(summary, state.stop ? 'warn' : 'success');
+    addLog('Réussies : ' + state.completed + ' · Échouées : ' + state.failed, 'info');
+    addLog('════════════════════════════════════', 'magenta');
+
+    updateConsoleState(state.stop ? 'Arrêté' : 'Terminé', false);
+
     await sleep(4000);
     setStatus(null);
 
     state.running = false;
     state.stop = false;
-    $('stop-btn').classList.remove('visible');
+    $('btn-stop').classList.remove('visible');
     updateGo();
 
     if (state.completed > 0) {
@@ -989,7 +1231,9 @@ async function start() {
 function stopAll() {
     if (!state.running) return;
     state.stop = true;
+    addLog('⏹ Arrêt demandé par l\'utilisateur', 'warn');
     setStatus('Arrêt…');
+    updateConsoleState('Arrêt en cours…', false);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -998,9 +1242,6 @@ function stopAll() {
 const DEMO_TXT = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
 const DEMO_IMG = "Anime doucement cette image comme si le temps s'arrêtait. Un vent léger fait bouger les cheveux. La lumière devient chaude et dorée. Garde le sujet exactement identique à la photo originale.";
 
-// ══════════════════════════════════════════════════════════════════
-// CHANGEMENT DE MODE
-// ══════════════════════════════════════════════════════════════════
 function switchMode(mode) {
     state.mode = mode;
     document.querySelectorAll('.tab').forEach(t => {
@@ -1009,13 +1250,13 @@ function switchMode(mode) {
     $('panel-txt').style.display = (mode === 'txt') ? 'block' : 'none';
     $('panel-img').style.display = (mode === 'img') ? 'block' : 'none';
     updateGo();
+    addLog('Mode changé : ' + (mode === 'txt' ? 'Texte → Vidéo' : 'Image → Vidéo'), 'dim');
 }
 
 // ══════════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════════
 (function init() {
-    // Clé API
     $('api-save').addEventListener('click', saveKey);
     $('api-input').addEventListener('keydown', e => {
         if (e.key === 'Enter') { e.preventDefault(); saveKey(); }
@@ -1026,34 +1267,27 @@ function switchMode(mode) {
         else { i.type = 'password'; $('api-eye').textContent = '👁️'; }
     });
 
-    // Sections repliables
     document.querySelectorAll('[data-toggle]').forEach(h => {
         h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
     });
 
-    // Onglets
     $('tab-txt').addEventListener('click', () => switchMode('txt'));
     $('tab-img').addEventListener('click', () => switchMode('img'));
 
-    // Démo texte
     $('demo-btn').addEventListener('click', () => {
         $('prompt-input').value = DEMO_TXT;
         updateGo();
     });
-
-    // Démo image
     $('img-demo-btn').addEventListener('click', () => {
         $('img-prompt-input').value = DEMO_IMG;
         updateGo();
     });
 
-    // Inputs
     $('prompt-input').addEventListener('input', updateGo);
     $('img-prompt-input').addEventListener('input', updateGo);
     $('count-select').addEventListener('change', updateGo);
     $('duration-select').addEventListener('change', updateGo);
 
-    // Upload image
     const uz = $('upload-zone'), fi = $('file-input');
     uz.addEventListener('click', () => fi.click());
     fi.addEventListener('change', e => {
@@ -1061,14 +1295,18 @@ function switchMode(mode) {
         fi.value = '';
     });
 
-    // Boutons
     $('go-btn').addEventListener('click', start);
-    $('stop-btn').addEventListener('click', stopAll);
+    $('btn-stop').addEventListener('click', stopAll);
+    $('console-clear').addEventListener('click', clearLogs);
 
-    // Initialisation
     refreshApi();
     renderQueue();
+    renderLogs();
     updateGo();
+
+    addLog('Studio Vidéo Agnes initialisé', 'success');
+    addLog('Clé API : ' + (getKey() ? 'détectée ✓' : 'absente ✗'), getKey() ? 'success' : 'warn');
+    updateConsoleState('Prêt', false);
 })();
 </script>
 
