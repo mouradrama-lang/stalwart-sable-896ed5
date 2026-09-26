@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Studio Vidéo IA — Générateur gratuit</title>
+<title>Studio Vidéo Agnes — Texte vers Vidéo</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -35,36 +35,16 @@
     .subtitle { font-size: 0.78rem; color: var(--ink-dim); letter-spacing: 0.03em; }
     .subtitle em { color: var(--cyan-2); font-style: italic; }
 
-    .proxy-status {
-        display: flex; align-items: center; gap: 0.5rem;
-        background: var(--panel-2); border: 1px solid var(--border);
-        border-radius: 10px; padding: 0.65rem 0.9rem;
-        font-size: 0.75rem; margin-bottom: 1rem; color: var(--ink-dim);
-    }
-    .proxy-status .dot {
-        width: 8px; height: 8px; border-radius: 50%;
-        background: var(--ink-faint); flex-shrink: 0;
-    }
-    .proxy-status.online .dot { background: #4ec97a; box-shadow: 0 0 8px #4ec97a; }
-    .proxy-status.online { color: #4ec97a; border-color: rgba(78,201,122,0.4); }
-    .proxy-status.offline .dot { background: #ff6b5a; box-shadow: 0 0 8px #ff6b5a; }
-    .proxy-status.offline { color: #ff6b5a; border-color: rgba(255,107,90,0.4); }
-    .proxy-status .spinner {
-        width: 10px; height: 10px;
-        border: 2px solid rgba(0,217,255,0.25);
-        border-top-color: var(--cyan-2); border-radius: 50%;
-        animation: spin 0.8s linear infinite; flex-shrink: 0;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     .panel {
         background: var(--panel); border: 1px solid var(--border);
         border-radius: 16px; padding: 1.1rem; margin-bottom: 0.9rem;
     }
+    .panel.complete { border-color: var(--success); }
     .panel-header {
         display: flex; justify-content: space-between; align-items: center;
         cursor: pointer; user-select: none; margin-bottom: 0.9rem;
     }
+    .panel-header.no-toggle { cursor: default; }
     .panel-title {
         display: flex; align-items: center; gap: 0.6rem;
         font-size: 0.85rem; font-weight: 700;
@@ -77,12 +57,18 @@
         border-radius: 8px; font-size: 1rem;
         box-shadow: 0 4px 12px rgba(0,217,255,0.25);
     }
+    .panel-badge {
+        font-size: 0.62rem; background: var(--cyan); color: #0a0a0f;
+        padding: 0.15rem 0.5rem; border-radius: 10px;
+        font-weight: 800; letter-spacing: 0.05em;
+    }
     .panel-chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s; }
     .panel.open .panel-chevron { transform: rotate(180deg); }
     .panel-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-    .panel.open .panel-body { max-height: 5000px; }
+    .panel.open .panel-body { max-height: 8000px; }
 
     .field { margin-bottom: 0.8rem; }
+    .field:last-child { margin-bottom: 0; }
     .field-label {
         display: block; font-size: 0.68rem; text-transform: uppercase;
         letter-spacing: 0.1em; color: var(--ink-dim);
@@ -93,13 +79,13 @@
         margin-top: 0.35rem; line-height: 1.4; font-style: italic;
     }
 
-    textarea, select {
+    input[type="text"], input[type="password"], textarea, select {
         width: 100%; padding: 0.8rem 1rem; border-radius: 10px;
         border: 1px solid var(--border); background: var(--panel-2);
         color: var(--ink); font-family: inherit; font-size: 0.88rem;
         transition: border-color 0.15s;
     }
-    textarea:focus, select:focus {
+    input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
         outline: none; border-color: var(--cyan);
         box-shadow: 0 0 0 3px rgba(0,217,255,0.12);
     }
@@ -110,6 +96,49 @@
         background-repeat: no-repeat; background-position: right 1rem center;
         background-size: 11px; padding-right: 2.5rem;
     }
+    input[type="password"] {
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+        font-size: 0.8rem;
+    }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+    /* API */
+    .api-input-wrap { position: relative; margin-bottom: 0.6rem; }
+    .api-input-wrap input { padding-right: 3rem; }
+    .api-eye {
+        position: absolute; right: 0.7rem; top: 50%;
+        transform: translateY(-50%);
+        background: transparent; border: none;
+        color: var(--ink-dim); font-size: 1.1rem;
+        cursor: pointer; padding: 0.3rem; line-height: 1;
+    }
+    .api-btn {
+        width: 100%; padding: 0.8rem 1rem;
+        border-radius: 10px; border: none;
+        background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-2) 100%);
+        color: #0a0a0f; font-size: 0.85rem;
+        font-weight: 800; font-family: inherit;
+        cursor: pointer; letter-spacing: 0.03em;
+    }
+    .api-btn:active { transform: scale(0.97); }
+
+    .api-result {
+        margin-top: 0.75rem;
+        padding: 0.75rem 0.9rem;
+        border-radius: 10px;
+        font-size: 0.78rem; line-height: 1.45;
+        display: flex; align-items: flex-start; gap: 0.6rem;
+        background: var(--panel-2); border: 1px solid var(--border);
+    }
+    .api-result .ar-icon { font-size: 1rem; flex-shrink: 0; line-height: 1.2; }
+    .api-result .ar-content { flex: 1; min-width: 0; }
+    .api-result .ar-title { font-weight: 700; margin-bottom: 0.15rem; }
+    .api-result .ar-detail { font-size: 0.7rem; opacity: 0.85; }
+    .api-result.idle { color: var(--ink-dim); }
+    .api-result.ok { color: #4ec97a; border-color: rgba(78,201,122,0.4); background: rgba(45,138,78,0.1); }
+    .api-result.err { color: #ff6b5a; border-color: rgba(255,107,90,0.4); background: rgba(192,57,43,0.1); }
+    .api-result.warn { color: #ffc84a; border-color: rgba(255,200,74,0.4); background: rgba(212,160,23,0.1); }
 
     .tool-btn {
         width: 100%; padding: 0.7rem; margin-top: 0.5rem;
@@ -137,28 +166,42 @@
         box-shadow: none; filter: grayscale(0.7);
     }
 
-    .gen-status {
-        display: none; padding: 1rem; margin-top: 1rem;
-        background: var(--panel-2); border: 1px solid var(--border);
-        border-radius: 12px; font-size: 0.82rem;
+    .btn-stop {
+        width: 100%; padding: 0.75rem;
+        border-radius: 12px; border: 1px solid var(--error);
+        background: transparent; color: var(--error);
+        font-size: 0.82rem; font-weight: 700;
+        font-family: inherit; cursor: pointer;
+        margin-top: 0.5rem; display: none;
     }
-    .gen-status.visible { display: block; }
-    .gen-status .gs-line {
-        display: flex; align-items: center; gap: 0.6rem;
-        margin-bottom: 0.4rem;
-    }
-    .gen-status .gs-line:last-child { margin-bottom: 0; }
-    .gen-status .gs-spinner {
-        width: 14px; height: 14px;
-        border: 2px solid rgba(0,217,255,0.25);
-        border-top-color: var(--cyan-2); border-radius: 50%;
-        animation: spin 0.8s linear infinite; flex-shrink: 0;
-    }
-    .gen-status .gs-time {
+    .btn-stop.visible { display: block; }
+
+    /* Numéro de prompt actif */
+    .prompt-counter {
         font-size: 0.7rem; color: var(--ink-faint);
-        margin-left: auto; font-variant-numeric: tabular-nums;
+        text-align: right; margin-top: 0.3rem;
+        font-variant-numeric: tabular-nums;
     }
 
+    /* File d'attente */
+    .queue { margin-top: 1rem; }
+    .q-item {
+        display: flex; align-items: center; gap: 0.7rem;
+        padding: 0.7rem 0.85rem; border-radius: 10px;
+        border: 1px solid var(--border);
+        margin-bottom: 0.4rem; background: var(--panel);
+        font-size: 0.82rem;
+    }
+    .q-item.pending { opacity: 0.5; }
+    .q-item.creating { border-color: var(--warn); }
+    .q-item.processing { border-color: var(--cyan); }
+    .q-item.done { border-color: var(--success); }
+    .q-item.failed { border-color: var(--error); }
+    .q-icon { font-size: 0.95rem; width: 1.3rem; text-align: center; flex-shrink: 0; }
+    .q-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .q-status { font-size: 0.7rem; color: var(--ink-dim); text-align: right; flex-shrink: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Galerie */
     .gallery { margin-top: 1.5rem; display: none; }
     .gallery.visible { display: block; }
     .gallery-title {
@@ -204,6 +247,24 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Statut bas */
+    .status {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: var(--panel); border-top: 1px solid var(--border);
+        color: var(--ink); padding: 0.8rem 1.1rem;
+        font-size: 0.78rem; display: flex; align-items: center; gap: 0.6rem;
+        transform: translateY(100%); transition: transform 0.3s; z-index: 100;
+    }
+    .status.visible { transform: translateY(0); }
+    .status .spin {
+        width: 13px; height: 13px;
+        border: 2px solid rgba(0,217,255,0.25);
+        border-top-color: var(--cyan-2);
+        border-radius: 50%; animation: spin 0.8s linear infinite;
+        flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     .toast {
         position: fixed; top: 1.2rem; left: 50%;
         transform: translateX(-50%) translateY(-80px);
@@ -217,45 +278,55 @@
     .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.success { background: var(--success); color: #fff; }
     .toast.error { background: var(--error); color: #fff; }
+
+    #noSleepCanvas, #noSleepVideo {
+        position: fixed; top: 0; left: 0;
+        width: 1px; height: 1px; opacity: 0.01;
+        pointer-events: none; z-index: -1;
+    }
+
+    @media (max-width: 420px) {
+        h1 { font-size: 1.6rem; }
+        .row-2 { grid-template-columns: 1fr; }
+    }
 </style>
 </head>
 <body>
 
 <header>
-    <h1>Studio Vidéo IA</h1>
-    <p class="subtitle">Texte → Vidéo · <em>100% gratuit · sans clé API</em></p>
+    <h1>Studio Vidéo Agnes</h1>
+    <p class="subtitle">Texte → Vidéo · <em>Propulsé par l'API Agnes AI</em></p>
 </header>
 
-<div class="proxy-status" id="proxy-status">
-    <div class="spinner"></div>
-    <span id="proxy-text">Connexion au proxy…</span>
-</div>
-
-<div class="panel open" id="panel-model">
-    <div class="panel-header" data-toggle="panel-model">
+<!-- ═══ API ═══ -->
+<div class="panel open" id="panel-api">
+    <div class="panel-header no-toggle">
         <div class="panel-title">
-            <div class="panel-icon">🎥</div>
-            Modèle
+            <div class="panel-icon">🔑</div>
+            Clé API Agnes
         </div>
-        <div class="panel-chevron">▼</div>
+        <div class="panel-badge" id="api-badge">Non configuré</div>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" style="max-height:none;">
         <div class="field">
-            <label class="field-label">Choisir le modèle</label>
-            <select id="model-select">
-                <option value="wan-fast">🚀 Wan Fast (rapide, gratuit)</option>
-                <option value="wan">🎬 Wan (qualité)</option>
-                <option value="kling">🎬 Kling</option>
-                <option value="vidu">🎬 Vidu Q3</option>
-                <option value="pixverse">🎬 PixVerse V6</option>
-            </select>
-            <div class="field-hint">
-                💡 Wan Fast est le plus rapide et gratuit.
+            <label class="field-label">Clé API</label>
+            <div class="api-input-wrap">
+                <input type="password" id="api-input" placeholder="sk-..." autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off">
+                <button type="button" class="api-eye" id="api-eye">👁️</button>
+            </div>
+            <button type="button" class="api-btn" id="api-save">💾 Enregistrer la clé</button>
+        </div>
+        <div class="api-result idle" id="api-result">
+            <span class="ar-icon">ℹ️</span>
+            <div class="ar-content">
+                <div class="ar-title" id="ar-title">Aucune clé enregistrée</div>
+                <div class="ar-detail" id="ar-detail">Collez votre clé puis appuyez sur Enregistrer.</div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ═══ CRÉATION ═══ -->
 <div class="panel open" id="panel-prompt">
     <div class="panel-header" data-toggle="panel-prompt">
         <div class="panel-title">
@@ -274,30 +345,95 @@
     </div>
 </div>
 
-<button class="btn-go" id="go-btn" disabled>🎬 Générer la vidéo</button>
+<!-- ═══ RÉGLAGES ═══ -->
+<div class="panel open" id="panel-settings">
+    <div class="panel-header" data-toggle="panel-settings">
+        <div class="panel-title">
+            <div class="panel-icon">⚙️</div>
+            Réglages
+        </div>
+        <div class="panel-chevron">▼</div>
+    </div>
+    <div class="panel-body">
+        <div class="row-2">
+            <div class="field">
+                <label class="field-label">Durée</label>
+                <select id="duration-select">
+                    <option value="121">5 secondes</option>
+                    <option value="153" selected>6,4 secondes</option>
+                    <option value="241">10 secondes</option>
+                </select>
+            </div>
+            <div class="field">
+                <label class="field-label">Vidéos à générer</label>
+                <select id="count-select">
+                    <option value="1" selected>1 vidéo</option>
+                    <option value="2">2 vidéos</option>
+                    <option value="3">3 vidéos</option>
+                    <option value="5">5 vidéos</option>
+                    <option value="10">10 vidéos</option>
+                </select>
+            </div>
+        </div>
+        <div class="field-hint">
+            💡 La génération est <strong>séquentielle</strong> (1 par 1) pour respecter les limites de l'API. Environ 2 min par vidéo.
+        </div>
+    </div>
+</div>
 
-<div class="gen-status" id="gen-status"></div>
+<button class="btn-go" id="go-btn" disabled>🎬 Générer</button>
+<button class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+
+<div class="queue" id="queue"></div>
 
 <div class="gallery" id="gallery">
     <div class="gallery-title">✨ Vidéos générées</div>
     <div class="gallery-grid" id="gallery-grid"></div>
 </div>
 
+<div class="status" id="status">
+    <div class="spin"></div>
+    <span id="status-text">…</span>
+</div>
+
 <div class="toast" id="toast"></div>
+
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
 
 <script>
 // ══════════════════════════════════════════════════════════════════
-// CONFIGURATION — TON PROXY RENDER
+// CONFIGURATION AGNES
 // ══════════════════════════════════════════════════════════════════
-const PROXY_URL = 'https://inf-renceport-proxy.onrender.com';
-const POLL_INTERVAL_SEC = 10;
-const MAX_POLL_ATTEMPTS = 120;
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL = 'agnes-video-v2.0';
+const FPS = 24;
+const CREATE_INTERVAL_MS = 62000;
+const POLL_INTERVAL_SEC = 8;
+const MAX_POLL_ATTEMPTS = 100;
+
+// ⚠️ Même clé de stockage que tes autres applis
+const API_KEY_STORE = 'agnes_api_key';
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════════
+const state = {
+    running: false,
+    stop: false,
+    completed: 0,
+    failed: 0,
+    total: 0
+};
 
 // ══════════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════════
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s || '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 let toastT;
 function toast(msg, type = 'success') {
@@ -310,173 +446,415 @@ function toast(msg, type = 'success') {
     toastT = setTimeout(() => t.classList.remove('visible'), 3000);
 }
 
-function showGenStatus(html) {
-    const el = $('gen-status');
-    el.classList.add('visible');
-    el.innerHTML = html;
+function setStatus(text) {
+    const s = $('status'), st = $('status-text');
+    if (text) { s.classList.add('visible'); st.textContent = text; }
+    else s.classList.remove('visible');
 }
 
-function hideGenStatus() {
-    $('gen-status').classList.remove('visible');
+function setApiResult(type, title, detail) {
+    const el = $('api-result');
+    el.className = 'api-result ' + type;
+    const icons = { idle: 'ℹ️', ok: '✅', err: '❌', warn: '⚠️' };
+    el.querySelector('.ar-icon').textContent = icons[type] || 'ℹ️';
+    $('ar-title').textContent = title;
+    $('ar-detail').textContent = detail || '';
 }
 
 // ══════════════════════════════════════════════════════════════════
-// VÉRIFICATION DU PROXY
+// ANTI-VEILLE
 // ══════════════════════════════════════════════════════════════════
-async function checkProxy() {
-    const el = $('proxy-status');
-    el.className = 'proxy-status';
-    el.innerHTML = '<div class="spinner"></div><span>Connexion au proxy…</span>';
-
+let canvasStream = null, canvasInterval = null;
+async function wakeLock() {
     try {
-        const r = await fetch(PROXY_URL + '/v1/healthz', { method: 'GET' });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const data = await r.json();
-        if (data.status === 'ok') {
-            el.className = 'proxy-status online';
-            el.innerHTML = '<div class="dot"></div><span>✅ Proxy connecté · ' + (data.upstream ? 'Service amont disponible' : 'Service amont en attente') + '</span>';
-            return true;
+        if ('wakeLock' in navigator) {
+            await navigator.wakeLock.request('screen');
+            return;
         }
-        throw new Error('Proxy hors service');
+    } catch (e) {}
+    try {
+        const c = $('noSleepCanvas'), v = $('noSleepVideo');
+        if (!c || !v || typeof c.captureStream !== 'function') return;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 2, 2);
+        canvasStream = c.captureStream(1);
+        let t = false;
+        canvasInterval = setInterval(() => {
+            t = !t;
+            ctx.fillStyle = t ? '#000' : '#010101';
+            ctx.fillRect(0, 0, 2, 2);
+        }, 1000);
+        v.srcObject = canvasStream;
+        v.muted = true; v.playsInline = true;
+        v.play().catch(() => {});
+    } catch (e) {}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CLÉ API
+// ══════════════════════════════════════════════════════════════════
+function getKey() {
+    try { return (localStorage.getItem(API_KEY_STORE) || '').trim(); }
+    catch (e) { return ''; }
+}
+function saveKey() {
+    const raw = $('api-input').value;
+    let k = String(raw || '').trim()
+        .replace(/^["']|["']$/g, '')
+        .replace(/^Bearer\s+/i, '')
+        .replace(/\s+/g, '');
+
+    if (!k) {
+        try { localStorage.removeItem(API_KEY_STORE); } catch (e) {}
+        refreshApi();
+        toast('Clé supprimée', 'error');
+        return;
+    }
+    if (k.length < 10) {
+        setApiResult('err', 'Clé trop courte', 'La clé doit faire au moins 10 caractères.');
+        toast('Clé trop courte', 'error');
+        return;
+    }
+    try {
+        localStorage.setItem(API_KEY_STORE, k);
+        $('api-input').value = k;
+        refreshApi();
+        toast('Clé enregistrée ✓');
     } catch (e) {
-        el.className = 'proxy-status offline';
-        el.innerHTML = '<div class="dot"></div><span>❌ Impossible de contacter le proxy. Réessayez dans 30 sec (démarrage à froid).</span>';
-        return false;
+        setApiResult('err', 'Erreur', 'Impossible de sauvegarder.');
+        toast('Erreur', 'error');
     }
 }
+function refreshApi() {
+    const k = getKey();
+    const badge = $('api-badge');
+    const panel = $('panel-api');
+    if (k) {
+        panel.classList.add('complete');
+        badge.textContent = 'Configuré';
+        badge.style.background = 'var(--success)';
+        $('api-input').value = k;
+        setApiResult('ok', '✅ Clé enregistrée',
+            'Clé active · ' + k.slice(0, 10) + '…' + k.slice(-4));
+    } else {
+        panel.classList.remove('complete');
+        badge.textContent = 'Non configuré';
+        badge.style.background = 'var(--cyan)';
+        $('api-input').value = '';
+        setApiResult('idle', 'Aucune clé enregistrée',
+            'Collez votre clé puis appuyez sur Enregistrer.');
+    }
+    updateGo();
+}
 
 // ══════════════════════════════════════════════════════════════════
-// GÉNÉRATION
+// API AGNES
 // ══════════════════════════════════════════════════════════════════
-async function generateVideo() {
-    const prompt = $('prompt-input').value.trim();
-    if (!prompt) { toast('Écrivez d\'abord une description', 'error'); return; }
+async function apiFetch(url, opts = {}) {
+    for (let i = 0; i < 7; i++) {
+        if (state.stop) throw new Error('stop');
+        try {
+            const r = await fetch(url, opts);
+            if (r.status === 429) {
+                const w = [15, 30, 45, 60, 90, 120, 180][Math.min(i, 6)];
+                setStatus('L\'IA se prépare… (' + w + 's)');
+                await sleep(w * 1000);
+                continue;
+            }
+            if (r.status === 503) {
+                const w = [5, 10, 15, 20, 30, 45][Math.min(i, 5)];
+                setStatus('Préparation… (' + w + 's)');
+                await sleep(w * 1000);
+                continue;
+            }
+            return r;
+        } catch (e) {
+            if (e.message === 'stop') throw e;
+            const w = [3, 5, 8, 12, 20, 30][Math.min(i, 5)];
+            setStatus('Connexion… (' + w + 's)');
+            await sleep(w * 1000);
+        }
+    }
+    return fetch(url, opts);
+}
 
-    const model = $('model-select').value;
+async function createTask(prompt, frames) {
+    const res = await apiFetch(API_BASE + '/videos', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + getKey(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: MODEL,
+            prompt: prompt,
+            num_frames: frames,
+            frame_rate: FPS
+        })
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error('HTTP ' + res.status + ' — ' + err.slice(0, 150));
+    }
+    const d = await res.json();
+    const id = d.video_id || d.id || d.task_id;
+    if (!id) throw new Error('Pas de video_id');
+    return id;
+}
 
-    $('go-btn').disabled = true;
-    $('go-btn').textContent = '🎬 Génération en cours…';
-
-    showGenStatus(
-        '<div class="gs-line"><div class="gs-spinner"></div><span>Envoi de la demande au proxy…</span></div>'
-    );
-
-    try {
-        const createRes = await fetch(PROXY_URL + '/v1/videos', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: model, prompt: prompt })
+async function pollTask(videoId, onProgress) {
+    for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
+        if (state.stop) throw new Error('stop');
+        if (i > 0) {
+            let r = POLL_INTERVAL_SEC;
+            while (r > 0) {
+                if (state.stop) throw new Error('stop');
+                onProgress('En cours… — ' + r + 's');
+                await sleep(1000);
+                r--;
+            }
+        }
+        const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL);
+        const res = await apiFetch(url, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + getKey() }
         });
-
-        if (!createRes.ok) {
-            const err = await createRes.text();
-            throw new Error('HTTP ' + createRes.status + ' — ' + err.slice(0, 150));
+        const d = await res.json();
+        const status = d.status || 'unknown';
+        const progress = d.progress || 0;
+        onProgress('Création — ' + progress + '%');
+        if (status === 'completed' || status === 'succeeded' || status === 'done') {
+            const url = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+            if (!url) throw new Error('Terminé sans URL');
+            return url;
         }
-
-        const task = await createRes.json();
-        const jobId = task.id || task.job_id || task.task_id;
-        if (!jobId) throw new Error('Pas d\'ID de tâche retourné');
-
-        showGenStatus(
-            '<div class="gs-line"><div class="gs-spinner"></div><span>Rendu en cours…</span></div>' +
-            '<div class="gs-line"><span style="font-size:0.7rem;color:var(--ink-faint)">ID : ' + jobId.slice(0, 20) + '…</span></div>'
-        );
-
-        let videoUrl = null;
-        let attempts = 0;
-        let status = 'pending';
-
-        while (attempts < MAX_POLL_ATTEMPTS && status !== 'completed' && status !== 'failed') {
-            await sleep(POLL_INTERVAL_SEC * 1000);
-            attempts++;
-
-            const statusRes = await fetch(PROXY_URL + '/v1/videos/' + encodeURIComponent(jobId));
-            if (!statusRes.ok) {
-                if (statusRes.status === 404) continue;
-                throw new Error('Erreur statut HTTP ' + statusRes.status);
-            }
-
-            const statusData = await statusRes.json();
-            status = statusData.status || 'pending';
-
-            const elapsed = attempts * POLL_INTERVAL_SEC;
-            const min = Math.floor(elapsed / 60);
-            const sec = elapsed % 60;
-            const timeStr = min + 'm' + (sec < 10 ? '0' : '') + sec + 's';
-
-            showGenStatus(
-                '<div class="gs-line"><div class="gs-spinner"></div><span>Rendu en cours… ' + (statusData.progress ? statusData.progress + '%' : status) + '</span><span class="gs-time">' + timeStr + '</span></div>'
-            );
-
-            if (status === 'completed' || status === 'done' || status === 'succeeded') {
-                videoUrl = PROXY_URL + '/v1/videos/' + encodeURIComponent(jobId) + '/content';
-                break;
-            }
-            if (status === 'failed' || status === 'error') {
-                throw new Error('Génération échouée : ' + (statusData.error || status));
-            }
+        if (status === 'failed' || status === 'error' || status === 'cancelled') {
+            throw new Error('Échec (' + status + ')');
         }
-
-        if (!videoUrl) throw new Error('Délai dépassé (20 minutes)');
-
-        hideGenStatus();
-        addToGallery(videoUrl, model, prompt);
-        toast('Vidéo générée ✓', 'success');
-
-    } catch (e) {
-        console.error(e);
-        hideGenStatus();
-        toast('Erreur : ' + e.message, 'error');
-    } finally {
-        $('go-btn').disabled = false;
-        $('go-btn').textContent = '🎬 Générer la vidéo';
     }
+    throw new Error('Délai dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FILE D'ATTENTE
+// ══════════════════════════════════════════════════════════════════
+const queue = [];
+
+function renderQueue() {
+    const q = $('queue');
+    if (!queue.length) { q.innerHTML = ''; return; }
+    q.innerHTML = queue.map(it => {
+        let icon = '○', txt = 'En attente', cls = 'pending';
+        if (it.s === 'creating') { icon = '◐'; txt = 'Préparation…'; cls = 'creating'; }
+        else if (it.s === 'processing') { icon = '◐'; txt = it.p || '…'; cls = 'processing'; }
+        else if (it.s === 'done') { icon = '●'; txt = 'Terminé'; cls = 'done'; }
+        else if (it.s === 'failed') { icon = '✕'; txt = 'Échec'; cls = 'failed'; }
+        const num = String(it.i + 1).padStart(2, '0');
+        return '<div class="q-item ' + cls + '">' +
+            '<span class="q-icon">' + icon + '</span>' +
+            '<span class="q-name">Vidéo ' + num + '</span>' +
+            '<span class="q-status">' + esc(txt) + '</span>' +
+        '</div>';
+    }).join('');
 }
 
 // ══════════════════════════════════════════════════════════════════
 // GALERIE
 // ══════════════════════════════════════════════════════════════════
-function addToGallery(url, model, prompt) {
+function addGallery(url, i, prompt, duration) {
     $('gallery').classList.add('visible');
     const el = document.createElement('div');
     el.className = 'g-item';
-    const shortPrompt = prompt.length > 60 ? prompt.slice(0, 60) + '…' : prompt;
+    const num = String(i + 1).padStart(2, '0');
+    const shortPrompt = prompt.length > 50 ? prompt.slice(0, 50) + '…' : prompt;
     el.innerHTML =
         '<video controls preload="metadata" playsinline src="' + url + '"></video>' +
-        '<div class="g-label">' + escapeHtml(model.toUpperCase() + ' · ' + shortPrompt) + '</div>' +
+        '<div class="g-label">Vidéo ' + num + ' · ' + duration + 's · ' + esc(shortPrompt) + '</div>' +
         '<div class="g-actions">' +
-            '<a href="' + url + '" download target="_blank">⬇ Télécharger</a>' +
+            '<a href="' + url + '" download="video-' + num + '.mp4" target="_blank">⬇ Télécharger</a>' +
         '</div>';
     $('gallery-grid').prepend(el);
 }
 
-function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c =>
-        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE
+// ══════════════════════════════════════════════════════════════════
+async function processOne(item) {
+    try {
+        item.s = 'creating';
+        renderQueue();
+        const id = await createTask(item.prompt, item.frames);
+        item.s = 'processing';
+        renderQueue();
+        const url = await pollTask(id, p => {
+            item.p = p;
+            renderQueue();
+        });
+        item.s = 'done';
+        state.completed++;
+        renderQueue();
+        updateGo();
+        addGallery(url, item.i, item.prompt, item.durationSec);
+    } catch (e) {
+        if (e.message !== 'stop') {
+            item.s = 'failed';
+            item.p = 'Échec';
+            state.failed++;
+        } else {
+            item.s = 'failed';
+            item.p = 'Arrêté';
+        }
+        renderQueue();
+        updateGo();
+    }
 }
+
+function updateGo() {
+    const b = $('go-btn');
+    const hasKey = !!getKey();
+    const hasPrompt = $('prompt-input').value.trim().length > 0;
+    b.disabled = !hasKey || !hasPrompt || state.running;
+    if (state.running) {
+        b.textContent = '🎬 Génération… (' + (state.completed + state.failed) + '/' + state.total + ')';
+    } else if (!hasKey) {
+        b.textContent = 'Ajoutez votre clé API';
+    } else if (!hasPrompt) {
+        b.textContent = 'Décrivez votre vidéo';
+    } else {
+        const count = parseInt($('count-select').value, 10);
+        b.textContent = '🎬 Générer ' + count + ' vidéo' + (count > 1 ? 's' : '');
+    }
+}
+
+async function start() {
+    if (state.running) return;
+    if (!getKey()) { toast('Ajoutez votre clé API', 'error'); return; }
+
+    const prompt = $('prompt-input').value.trim();
+    if (!prompt) { toast('Décrivez votre vidéo', 'error'); return; }
+
+    const frames = parseInt($('duration-select').value, 10);
+    const count = parseInt($('count-select').value, 10);
+    const durationSec = frames === 121 ? 5 : (frames === 241 ? 10 : 6.4);
+
+    state.running = true;
+    state.stop = false;
+    state.completed = 0;
+    state.failed = 0;
+    state.total = count;
+
+    queue.length = 0;
+    for (let i = 0; i < count; i++) {
+        queue.push({
+            i: i,
+            prompt: prompt,
+            frames: frames,
+            durationSec: durationSec,
+            s: 'pending',
+            p: null
+        });
+    }
+
+    $('gallery-grid').innerHTML = '';
+    $('gallery').classList.remove('visible');
+    $('stop-btn').classList.add('visible');
+    $('go-btn').disabled = true;
+
+    await wakeLock();
+    renderQueue();
+
+    // Lancer la première
+    for (let i = 0; i < queue.length; i++) {
+        if (state.stop) break;
+
+        // Lancer le traitement en arrière-plan (non bloquant)
+        processOne(queue[i]);
+
+        if (i < queue.length - 1 && !state.stop) {
+            // Attendre entre chaque création (intervalle de sécurité Agnes)
+            const waitSec = Math.ceil(CREATE_INTERVAL_MS / 1000);
+            for (let r = waitSec; r > 0; r--) {
+                if (state.stop) break;
+                setStatus('Respiration créative… — Vidéo ' + (i + 2) + '/' + queue.length + ' dans ' + r + 's');
+                await sleep(1000);
+            }
+        }
+    }
+
+    // Attendre la fin de toutes les tâches en cours
+    while (queue.some(q => q.s === 'creating' || q.s === 'processing') && !state.stop) {
+        await sleep(1000);
+    }
+
+    const summary = state.stop
+        ? 'Arrêté — ' + state.completed + '/' + queue.length + ' vidéos'
+        : '✦ ' + state.completed + '/' + queue.length + ' vidéos créées ✦';
+    setStatus(summary);
+    await sleep(4000);
+    setStatus(null);
+
+    state.running = false;
+    state.stop = false;
+    $('stop-btn').classList.remove('visible');
+    updateGo();
+
+    if (state.completed > 0) {
+        toast(state.completed + ' vidéo' + (state.completed > 1 ? 's' : '') + ' générée' + (state.completed > 1 ? 's' : ''), 'success');
+    }
+}
+
+function stopAll() {
+    if (!state.running) return;
+    state.stop = true;
+    setStatus('Arrêt…');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DÉMO
+// ══════════════════════════════════════════════════════════════════
+const DEMO = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
 
 // ══════════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════════
 (function init() {
+    // Clé API
+    $('api-save').addEventListener('click', saveKey);
+    $('api-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); saveKey(); }
+    });
+    $('api-eye').addEventListener('click', () => {
+        const i = $('api-input');
+        if (i.type === 'password') { i.type = 'text'; $('api-eye').textContent = '🙈'; }
+        else { i.type = 'password'; $('api-eye').textContent = '👁️'; }
+    });
+
+    // Sections repliables
     document.querySelectorAll('[data-toggle]').forEach(h => {
         h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
     });
 
-    const DEMO = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
+    // Démo
     $('demo-btn').addEventListener('click', () => {
         $('prompt-input').value = DEMO;
         updateGo();
     });
 
+    // Prompt input
     $('prompt-input').addEventListener('input', updateGo);
-    function updateGo() {
-        $('go-btn').disabled = $('prompt-input').value.trim().length === 0;
-    }
 
-    $('go-btn').addEventListener('click', generateVideo);
+    // Réglages
+    $('count-select').addEventListener('change', updateGo);
+    $('duration-select').addEventListener('change', updateGo);
 
-    checkProxy();
+    // Boutons
+    $('go-btn').addEventListener('click', start);
+    $('stop-btn').addEventListener('click', stopAll);
+
+    // Initialisation
+    refreshApi();
+    renderQueue();
+    updateGo();
 })();
 </script>
 
