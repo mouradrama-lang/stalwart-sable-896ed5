@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Studio Vidéo Agnes — Texte vers Vidéo</title>
+<title>Studio Vidéo Agnes — Texte & Image vers Vidéo</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -25,7 +25,7 @@
         background-attachment: fixed;
     }
 
-    header { text-align: center; margin-bottom: 1.5rem; }
+    header { text-align: center; margin-bottom: 1rem; }
     h1 {
         font-size: 1.9rem; font-weight: 800; letter-spacing: -0.04em;
         background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 50%, var(--magenta) 100%);
@@ -34,6 +34,21 @@
     }
     .subtitle { font-size: 0.78rem; color: var(--ink-dim); letter-spacing: 0.03em; }
     .subtitle em { color: var(--cyan-2); font-style: italic; }
+
+    /* Bouton Agnes */
+    .agnes-btn {
+        display: flex; align-items: center; justify-content: center;
+        gap: 0.5rem; width: 100%; padding: 0.85rem 1rem;
+        background: linear-gradient(135deg, rgba(0,217,255,0.15) 0%, rgba(255,94,180,0.15) 100%);
+        border: 1px solid rgba(0,217,255,0.35);
+        border-radius: 12px; text-decoration: none;
+        color: var(--cyan-2); font-weight: 700; font-size: 0.85rem;
+        letter-spacing: 0.03em; margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    .agnes-btn:active { transform: scale(0.98); background: linear-gradient(135deg, rgba(0,217,255,0.25) 0%, rgba(255,94,180,0.25) 100%); }
+    .agnes-btn .ab-icon { font-size: 1.1rem; }
+    .agnes-btn .ab-arrow { font-size: 0.9rem; opacity: 0.7; }
 
     .panel {
         background: var(--panel); border: 1px solid var(--border);
@@ -89,7 +104,7 @@
         outline: none; border-color: var(--cyan);
         box-shadow: 0 0 0 3px rgba(0,217,255,0.12);
     }
-    textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
+    textarea { min-height: 100px; resize: vertical; line-height: 1.5; }
     select {
         -webkit-appearance: none; appearance: none;
         background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%2300d9ff' d='M6 8L0 0h12z'/></svg>");
@@ -140,6 +155,58 @@
     .api-result.err { color: #ff6b5a; border-color: rgba(255,107,90,0.4); background: rgba(192,57,43,0.1); }
     .api-result.warn { color: #ffc84a; border-color: rgba(255,200,74,0.4); background: rgba(212,160,23,0.1); }
 
+    /* Onglets TXT / IMG */
+    .tab-bar {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 0.4rem; margin-bottom: 1rem;
+        background: var(--panel-2); border-radius: 12px;
+        padding: 0.3rem; border: 1px solid var(--border);
+    }
+    .tab {
+        padding: 0.7rem 0.5rem;
+        border-radius: 9px; border: none;
+        background: transparent; color: var(--ink-dim);
+        font-size: 0.8rem; font-weight: 700; font-family: inherit;
+        cursor: pointer; letter-spacing: 0.03em;
+        transition: all 0.15s;
+        display: flex; align-items: center; justify-content: center;
+        gap: 0.4rem;
+    }
+    .tab.active {
+        background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
+        color: #0a0a0f;
+        box-shadow: 0 4px 12px rgba(0,217,255,0.3);
+    }
+    .tab:active { transform: scale(0.97); }
+
+    /* Upload image */
+    .upload-zone {
+        border: 2px dashed var(--border-2);
+        border-radius: 12px; padding: 1.5rem 1rem;
+        text-align: center; cursor: pointer;
+        background: var(--panel-2); transition: all 0.2s;
+    }
+    .upload-zone:active { border-color: var(--cyan); background: rgba(0,217,255,0.06); }
+    .upload-zone.loading { pointer-events: none; opacity: 0.5; }
+    .upload-zone input { display: none; }
+    .upload-icon { font-size: 1.8rem; margin-bottom: 0.4rem; color: var(--cyan-2); }
+    .upload-text { font-size: 0.88rem; font-weight: 600; }
+    .upload-hint { font-size: 0.7rem; color: var(--ink-faint); margin-top: 0.2rem; }
+
+    .image-preview {
+        position: relative; border-radius: 12px; overflow: hidden;
+        border: 2px solid var(--cyan); background: #000;
+        aspect-ratio: 9/16; max-width: 180px; margin: 0.8rem auto 0;
+    }
+    .image-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .image-preview .remove-btn {
+        position: absolute; top: 6px; right: 6px;
+        background: rgba(192,57,43,0.85); color: #fff; border: none;
+        width: 26px; height: 26px; border-radius: 50%;
+        font-size: 13px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+
     .tool-btn {
         width: 100%; padding: 0.7rem; margin-top: 0.5rem;
         border-radius: 10px; border: 1px solid var(--border-2);
@@ -176,14 +243,6 @@
     }
     .btn-stop.visible { display: block; }
 
-    /* Numéro de prompt actif */
-    .prompt-counter {
-        font-size: 0.7rem; color: var(--ink-faint);
-        text-align: right; margin-top: 0.3rem;
-        font-variant-numeric: tabular-nums;
-    }
-
-    /* File d'attente */
     .queue { margin-top: 1rem; }
     .q-item {
         display: flex; align-items: center; gap: 0.7rem;
@@ -201,7 +260,6 @@
     .q-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .q-status { font-size: 0.7rem; color: var(--ink-dim); text-align: right; flex-shrink: 0; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* Galerie */
     .gallery { margin-top: 1.5rem; display: none; }
     .gallery.visible { display: block; }
     .gallery-title {
@@ -247,7 +305,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Statut bas */
     .status {
         position: fixed; bottom: 0; left: 0; right: 0;
         background: var(--panel); border-top: 1px solid var(--border);
@@ -295,8 +352,15 @@
 
 <header>
     <h1>Studio Vidéo Agnes</h1>
-    <p class="subtitle">Texte → Vidéo · <em>Propulsé par l'API Agnes AI</em></p>
+    <p class="subtitle">Texte & Image → Vidéo · <em>Propulsé par l'API Agnes AI</em></p>
 </header>
+
+<!-- ═══ BOUTON AGNES AI ═══ -->
+<a href="https://platform.agnes-ai.com" target="_blank" rel="noopener" class="agnes-btn">
+    <span class="ab-icon">🌐</span>
+    <span>Accéder à Agnes AI — platform.agnes-ai.com</span>
+    <span class="ab-arrow">↗</span>
+</a>
 
 <!-- ═══ API ═══ -->
 <div class="panel open" id="panel-api">
@@ -326,22 +390,57 @@
     </div>
 </div>
 
-<!-- ═══ CRÉATION ═══ -->
-<div class="panel open" id="panel-prompt">
-    <div class="panel-header" data-toggle="panel-prompt">
+<!-- ═══ ONGLETS ═══ -->
+<div class="tab-bar">
+    <button type="button" class="tab active" id="tab-txt" data-mode="txt">
+        ✍️ Texte → Vidéo
+    </button>
+    <button type="button" class="tab" id="tab-img" data-mode="img">
+        🖼️ Image → Vidéo
+    </button>
+</div>
+
+<!-- ═══ PANNEAU TEXTE ═══ -->
+<div class="panel open" id="panel-txt" style="display:block;">
+    <div class="panel-header no-toggle">
         <div class="panel-title">
             <div class="panel-icon">✍️</div>
             Description
         </div>
-        <div class="panel-chevron">▼</div>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" style="max-height:none;">
         <div class="field">
             <label class="field-label">Décrivez votre vidéo</label>
             <textarea id="prompt-input" placeholder="Exemple : Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides."></textarea>
             <div class="field-hint">✏️ Décrivez le sujet, le mouvement, la caméra et l'ambiance.</div>
         </div>
         <button class="tool-btn" id="demo-btn">📖 Charger un exemple</button>
+    </div>
+</div>
+
+<!-- ═══ PANNEAU IMAGE ═══ -->
+<div class="panel open" id="panel-img" style="display:none;">
+    <div class="panel-header no-toggle">
+        <div class="panel-title">
+            <div class="panel-icon">🖼️</div>
+            Image source
+        </div>
+    </div>
+    <div class="panel-body" style="max-height:none;">
+        <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file-input" accept="image/*">
+            <div class="upload-icon">＋</div>
+            <div class="upload-text">Charger une image</div>
+            <div class="upload-hint">JPG, PNG · format portrait 9:16 recommandé</div>
+        </div>
+        <div id="image-preview-container"></div>
+
+        <div class="field" style="margin-top:0.8rem;">
+            <label class="field-label">Décrivez le mouvement souhaité</label>
+            <textarea id="img-prompt-input" placeholder="Exemple : Anime doucement cette image. Un vent léger fait bouger les cheveux. La lumière devient dorée et chaude. Garde le sujet identique à la photo originale."></textarea>
+            <div class="field-hint">✏️ Décrivez le mouvement. Le sujet doit rester identique à la photo.</div>
+        </div>
+        <button class="tool-btn" id="img-demo-btn">📖 Charger un exemple</button>
     </div>
 </div>
 
@@ -371,12 +470,11 @@
                     <option value="2">2 vidéos</option>
                     <option value="3">3 vidéos</option>
                     <option value="5">5 vidéos</option>
-                    <option value="10">10 vidéos</option>
                 </select>
             </div>
         </div>
         <div class="field-hint">
-            💡 La génération est <strong>séquentielle</strong> (1 par 1) pour respecter les limites de l'API. Environ 2 min par vidéo.
+            💡 La génération est <strong>séquentielle</strong>. Environ 2 min par vidéo.
         </div>
     </div>
 </div>
@@ -412,14 +510,17 @@ const FPS = 24;
 const CREATE_INTERVAL_MS = 62000;
 const POLL_INTERVAL_SEC = 8;
 const MAX_POLL_ATTEMPTS = 100;
+const MAX_IMAGE_SIZE = 12 * 1024 * 1024;
+const THUMB_MAX_WIDTH = 300;
 
-// ⚠️ Même clé de stockage que tes autres applis
 const API_KEY_STORE = 'agnes_api_key';
 
 // ══════════════════════════════════════════════════════════════════
 // ÉTAT
 // ══════════════════════════════════════════════════════════════════
 const state = {
+    mode: 'txt',           // 'txt' ou 'img'
+    image: null,           // { dataUri, thumbnail }
     running: false,
     stop: false,
     completed: 0,
@@ -542,9 +643,71 @@ function refreshApi() {
         badge.style.background = 'var(--cyan)';
         $('api-input').value = '';
         setApiResult('idle', 'Aucune clé enregistrée',
-            'Collez votre clé puis appuyez sur Enregistrer.');
+            'Clé gratuite sur platform.agnes-ai.com');
     }
     updateGo();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GESTION DE L'IMAGE
+// ══════════════════════════════════════════════════════════════════
+function fileToDataUri(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Erreur lecture'));
+        reader.readAsDataURL(file);
+    });
+}
+function makeThumb(dataUri) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+            try {
+                const c = document.createElement('canvas');
+                const ratio = img.height / img.width;
+                c.width = THUMB_MAX_WIDTH;
+                c.height = Math.round(THUMB_MAX_WIDTH * ratio);
+                c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                resolve(c.toDataURL('image/jpeg', 0.8));
+            } catch (e) { resolve(dataUri); }
+        };
+        img.onerror = () => resolve(dataUri);
+        img.src = dataUri;
+    });
+}
+
+async function handleImageFile(file) {
+    if (!file.type.startsWith('image/')) { toast('Fichier non reconnu', 'error'); return; }
+    if (file.size > MAX_IMAGE_SIZE) { toast('Image trop lourde (max 12 Mo)', 'error'); return; }
+
+    $('upload-zone').classList.add('loading');
+    try {
+        const dataUri = await fileToDataUri(file);
+        const thumbnail = await makeThumb(dataUri);
+        state.image = { dataUri, thumbnail };
+        renderImagePreview();
+        updateGo();
+        toast('Image chargée ✓', 'success');
+    } catch (e) {
+        toast('Erreur de chargement', 'error');
+    }
+    $('upload-zone').classList.remove('loading');
+}
+
+function renderImagePreview() {
+    const container = $('image-preview-container');
+    if (!state.image) { container.innerHTML = ''; return; }
+    container.innerHTML =
+        '<div class="image-preview">' +
+            '<img src="' + (state.image.thumbnail || state.image.dataUri) + '" alt="">' +
+            '<button class="remove-btn" id="remove-img">✕</button>' +
+        '</div>';
+    $('remove-img').addEventListener('click', () => {
+        state.image = null;
+        renderImagePreview();
+        updateGo();
+    });
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -578,19 +741,25 @@ async function apiFetch(url, opts = {}) {
     return fetch(url, opts);
 }
 
-async function createTask(prompt, frames) {
+async function createTask(prompt, frames, imageDataUri) {
+    const body = {
+        model: MODEL,
+        prompt: prompt,
+        num_frames: frames,
+        frame_rate: FPS
+    };
+    // Ajout de l'image si présente (image-to-video)
+    if (imageDataUri) {
+        body.image = imageDataUri;
+    }
+
     const res = await apiFetch(API_BASE + '/videos', {
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + getKey(),
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            model: MODEL,
-            prompt: prompt,
-            num_frames: frames,
-            frame_rate: FPS
-        })
+        body: JSON.stringify(body)
     });
     if (!res.ok) {
         const err = await res.text();
@@ -652,7 +821,7 @@ function renderQueue() {
         const num = String(it.i + 1).padStart(2, '0');
         return '<div class="q-item ' + cls + '">' +
             '<span class="q-icon">' + icon + '</span>' +
-            '<span class="q-name">Vidéo ' + num + '</span>' +
+            '<span class="q-name">Vidéo ' + num + ' · ' + (it.mode === 'img' ? 'IMG' : 'TXT') + '</span>' +
             '<span class="q-status">' + esc(txt) + '</span>' +
         '</div>';
     }).join('');
@@ -661,15 +830,16 @@ function renderQueue() {
 // ══════════════════════════════════════════════════════════════════
 // GALERIE
 // ══════════════════════════════════════════════════════════════════
-function addGallery(url, i, prompt, duration) {
+function addGallery(url, i, prompt, durationSec, mode) {
     $('gallery').classList.add('visible');
     const el = document.createElement('div');
     el.className = 'g-item';
     const num = String(i + 1).padStart(2, '0');
-    const shortPrompt = prompt.length > 50 ? prompt.slice(0, 50) + '…' : prompt;
+    const shortPrompt = prompt.length > 45 ? prompt.slice(0, 45) + '…' : prompt;
+    const tag = mode === 'img' ? 'IMG' : 'TXT';
     el.innerHTML =
         '<video controls preload="metadata" playsinline src="' + url + '"></video>' +
-        '<div class="g-label">Vidéo ' + num + ' · ' + duration + 's · ' + esc(shortPrompt) + '</div>' +
+        '<div class="g-label">' + tag + ' ' + num + ' · ' + durationSec + 's · ' + esc(shortPrompt) + '</div>' +
         '<div class="g-actions">' +
             '<a href="' + url + '" download="video-' + num + '.mp4" target="_blank">⬇ Télécharger</a>' +
         '</div>';
@@ -683,7 +853,7 @@ async function processOne(item) {
     try {
         item.s = 'creating';
         renderQueue();
-        const id = await createTask(item.prompt, item.frames);
+        const id = await createTask(item.prompt, item.frames, item.imageDataUri);
         item.s = 'processing';
         renderQueue();
         const url = await pollTask(id, p => {
@@ -694,7 +864,7 @@ async function processOne(item) {
         state.completed++;
         renderQueue();
         updateGo();
-        addGallery(url, item.i, item.prompt, item.durationSec);
+        addGallery(url, item.i, item.prompt, item.durationSec, item.mode);
     } catch (e) {
         if (e.message !== 'stop') {
             item.s = 'failed';
@@ -712,17 +882,27 @@ async function processOne(item) {
 function updateGo() {
     const b = $('go-btn');
     const hasKey = !!getKey();
-    const hasPrompt = $('prompt-input').value.trim().length > 0;
+    const isTxt = state.mode === 'txt';
+    const hasPrompt = isTxt
+        ? $('prompt-input').value.trim().length > 0
+        : ($('img-prompt-input').value.trim().length > 0 && state.image);
+
     b.disabled = !hasKey || !hasPrompt || state.running;
+
     if (state.running) {
         b.textContent = '🎬 Génération… (' + (state.completed + state.failed) + '/' + state.total + ')';
     } else if (!hasKey) {
         b.textContent = 'Ajoutez votre clé API';
-    } else if (!hasPrompt) {
+    } else if (isTxt && !$('prompt-input').value.trim()) {
         b.textContent = 'Décrivez votre vidéo';
+    } else if (!isTxt && !state.image) {
+        b.textContent = 'Chargez une image';
+    } else if (!isTxt && !$('img-prompt-input').value.trim()) {
+        b.textContent = 'Décrivez le mouvement';
     } else {
         const count = parseInt($('count-select').value, 10);
-        b.textContent = '🎬 Générer ' + count + ' vidéo' + (count > 1 ? 's' : '');
+        const modeTag = isTxt ? 'texte' : 'image';
+        b.textContent = '🎬 Générer ' + count + ' vidéo' + (count > 1 ? 's' : '') + ' (' + modeTag + ')';
     }
 }
 
@@ -730,12 +910,18 @@ async function start() {
     if (state.running) return;
     if (!getKey()) { toast('Ajoutez votre clé API', 'error'); return; }
 
-    const prompt = $('prompt-input').value.trim();
-    if (!prompt) { toast('Décrivez votre vidéo', 'error'); return; }
+    const isTxt = state.mode === 'txt';
+    const prompt = isTxt
+        ? $('prompt-input').value.trim()
+        : $('img-prompt-input').value.trim();
+
+    if (!prompt) { toast('Écrivez une description', 'error'); return; }
+    if (!isTxt && !state.image) { toast('Chargez une image', 'error'); return; }
 
     const frames = parseInt($('duration-select').value, 10);
     const count = parseInt($('count-select').value, 10);
     const durationSec = frames === 121 ? 5 : (frames === 241 ? 10 : 6.4);
+    const imageDataUri = isTxt ? null : state.image.dataUri;
 
     state.running = true;
     state.stop = false;
@@ -750,6 +936,8 @@ async function start() {
             prompt: prompt,
             frames: frames,
             durationSec: durationSec,
+            imageDataUri: imageDataUri,
+            mode: state.mode,
             s: 'pending',
             p: null
         });
@@ -763,15 +951,11 @@ async function start() {
     await wakeLock();
     renderQueue();
 
-    // Lancer la première
     for (let i = 0; i < queue.length; i++) {
         if (state.stop) break;
-
-        // Lancer le traitement en arrière-plan (non bloquant)
         processOne(queue[i]);
 
         if (i < queue.length - 1 && !state.stop) {
-            // Attendre entre chaque création (intervalle de sécurité Agnes)
             const waitSec = Math.ceil(CREATE_INTERVAL_MS / 1000);
             for (let r = waitSec; r > 0; r--) {
                 if (state.stop) break;
@@ -781,7 +965,6 @@ async function start() {
         }
     }
 
-    // Attendre la fin de toutes les tâches en cours
     while (queue.some(q => q.s === 'creating' || q.s === 'processing') && !state.stop) {
         await sleep(1000);
     }
@@ -812,7 +995,21 @@ function stopAll() {
 // ══════════════════════════════════════════════════════════════════
 // DÉMO
 // ══════════════════════════════════════════════════════════════════
-const DEMO = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
+const DEMO_TXT = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
+const DEMO_IMG = "Anime doucement cette image comme si le temps s'arrêtait. Un vent léger fait bouger les cheveux. La lumière devient chaude et dorée. Garde le sujet exactement identique à la photo originale.";
+
+// ══════════════════════════════════════════════════════════════════
+// CHANGEMENT DE MODE
+// ══════════════════════════════════════════════════════════════════
+function switchMode(mode) {
+    state.mode = mode;
+    document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.mode === mode);
+    });
+    $('panel-txt').style.display = (mode === 'txt') ? 'block' : 'none';
+    $('panel-img').style.display = (mode === 'img') ? 'block' : 'none';
+    updateGo();
+}
 
 // ══════════════════════════════════════════════════════════════════
 // INIT
@@ -834,18 +1031,35 @@ const DEMO = "Un dragon majestueux vole à travers les nuages au coucher du sole
         h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
     });
 
-    // Démo
+    // Onglets
+    $('tab-txt').addEventListener('click', () => switchMode('txt'));
+    $('tab-img').addEventListener('click', () => switchMode('img'));
+
+    // Démo texte
     $('demo-btn').addEventListener('click', () => {
-        $('prompt-input').value = DEMO;
+        $('prompt-input').value = DEMO_TXT;
         updateGo();
     });
 
-    // Prompt input
-    $('prompt-input').addEventListener('input', updateGo);
+    // Démo image
+    $('img-demo-btn').addEventListener('click', () => {
+        $('img-prompt-input').value = DEMO_IMG;
+        updateGo();
+    });
 
-    // Réglages
+    // Inputs
+    $('prompt-input').addEventListener('input', updateGo);
+    $('img-prompt-input').addEventListener('input', updateGo);
     $('count-select').addEventListener('change', updateGo);
     $('duration-select').addEventListener('change', updateGo);
+
+    // Upload image
+    const uz = $('upload-zone'), fi = $('file-input');
+    uz.addEventListener('click', () => fi.click());
+    fi.addEventListener('change', e => {
+        if (e.target.files[0]) handleImageFile(e.target.files[0]);
+        fi.value = '';
+    });
 
     // Boutons
     $('go-btn').addEventListener('click', start);
