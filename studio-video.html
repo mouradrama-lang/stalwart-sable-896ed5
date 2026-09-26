@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Studio Vidéo IA — Générateur gratuit</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+        --bg: #0a0a0f; --panel: #16161f; --panel-2: #1c1c28;
+        --border: #2a2a38; --border-2: #35354a;
+        --ink: #f5f5f7; --ink-dim: #8888a0; --ink-faint: #555565;
+        --cyan: #00d9ff; --cyan-2: #5eeeff; --magenta: #ff5eb4;
+        --success: #2d8a4e; --error: #c0392b; --warn: #d4a017;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        background: var(--bg); color: var(--ink);
+        min-height: 100vh; padding: 1.2rem 1rem 5rem;
+        font-size: 15px; line-height: 1.5;
+        max-width: 640px; margin: 0 auto;
+        background-image:
+            radial-gradient(circle at 20% 5%, rgba(0,217,255,0.09) 0%, transparent 45%),
+            radial-gradient(circle at 80% 95%, rgba(255,94,180,0.07) 0%, transparent 45%);
+        background-attachment: fixed;
+    }
+
+    header { text-align: center; margin-bottom: 1.5rem; }
+    h1 {
+        font-size: 1.9rem; font-weight: 800; letter-spacing: -0.04em;
+        background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 50%, var(--magenta) 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text; margin-bottom: 0.35rem;
+    }
+    .subtitle { font-size: 0.78rem; color: var(--ink-dim); letter-spacing: 0.03em; }
+    .subtitle em { color: var(--cyan-2); font-style: italic; }
+
+    /* Statut du proxy */
+    .proxy-status {
+        display: flex; align-items: center; gap: 0.5rem;
+        background: var(--panel-2); border: 1px solid var(--border);
+        border-radius: 10px; padding: 0.65rem 0.9rem;
+        font-size: 0.75rem; margin-bottom: 1rem; color: var(--ink-dim);
+    }
+    .proxy-status .dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--ink-faint); flex-shrink: 0;
+    }
+    .proxy-status.online .dot { background: #4ec97a; box-shadow: 0 0 8px #4ec97a; }
+    .proxy-status.online { color: #4ec97a; border-color: rgba(78,201,122,0.4); }
+    .proxy-status.offline .dot { background: #ff6b5a; box-shadow: 0 0 8px #ff6b5a; }
+    .proxy-status.offline { color: #ff6b5a; border-color: rgba(255,107,90,0.4); }
+    .proxy-status .spinner {
+        width: 10px; height: 10px;
+        border: 2px solid rgba(0,217,255,0.25);
+        border-top-color: var(--cyan-2); border-radius: 50%;
+        animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .panel {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: 16px; padding: 1.1rem; margin-bottom: 0.9rem;
+    }
+    .panel-header {
+        display: flex; justify-content: space-between; align-items: center;
+        cursor: pointer; user-select: none; margin-bottom: 0.9rem;
+    }
+    .panel-title {
+        display: flex; align-items: center; gap: 0.6rem;
+        font-size: 0.85rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .panel-icon {
+        width: 30px; height: 30px;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
+        border-radius: 8px; font-size: 1rem;
+        box-shadow: 0 4px 12px rgba(0,217,255,0.25);
+    }
+    .panel-chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s; }
+    .panel.open .panel-chevron { transform: rotate(180deg); }
+    .panel-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .panel.open .panel-body { max-height: 5000px; }
+
+    .field { margin-bottom: 0.8rem; }
+    .field-label {
+        display: block; font-size: 0.68rem; text-transform: uppercase;
+        letter-spacing: 0.1em; color: var(--ink-dim);
+        font-weight: 700; margin-bottom: 0.45rem;
+    }
+    .field-hint {
+        font-size: 0.7rem; color: var(--ink-faint);
+        margin-top: 0.35rem; line-height: 1.4; font-style: italic;
+    }
+
+    textarea, select {
+        width: 100%; padding: 0.8rem 1rem; border-radius: 10px;
+        border: 1px solid var(--border); background: var(--panel-2);
+        color: var(--ink); font-family: inherit; font-size: 0.88rem;
+        transition: border-color 0.15s;
+    }
+    textarea:focus, select:focus {
+        outline: none; border-color: var(--cyan);
+        box-shadow: 0 0 0 3px rgba(0,217,255,0.12);
+    }
+    textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
+    select {
+        -webkit-appearance: none; appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%2300d9ff' d='M6 8L0 0h12z'/></svg>");
+        background-repeat: no-repeat; background-position: right 1rem center;
+        background-size: 11px; padding-right: 2.5rem;
+    }
+
+    .tool-btn {
+        width: 100%; padding: 0.7rem; margin-top: 0.5rem;
+        border-radius: 10px; border: 1px solid var(--border-2);
+        background: var(--panel-2); color: var(--ink);
+        font-size: 0.75rem; font-weight: 700;
+        font-family: inherit; cursor: pointer;
+        transition: all 0.15s;
+    }
+    .tool-btn:active { transform: scale(0.97); }
+
+    .btn-go {
+        width: 100%; padding: 1.15rem; border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 100%);
+        color: #0a0a0f; font-size: 1.02rem;
+        font-weight: 800; font-family: inherit;
+        cursor: pointer; letter-spacing: 0.04em;
+        margin-top: 0.8rem;
+        box-shadow: 0 8px 30px rgba(0,217,255,0.35);
+    }
+    .btn-go:active:not(:disabled) { transform: scale(0.98); }
+    .btn-go:disabled {
+        opacity: 0.3; cursor: not-allowed;
+        box-shadow: none; filter: grayscale(0.7);
+    }
+
+    /* Statut de génération */
+    .gen-status {
+        display: none; padding: 1rem; margin-top: 1rem;
+        background: var(--panel-2); border: 1px solid var(--border);
+        border-radius: 12px; font-size: 0.82rem;
+    }
+    .gen-status.visible { display: block; }
+    .gen-status .gs-line {
+        display: flex; align-items: center; gap: 0.6rem;
+        margin-bottom: 0.4rem;
+    }
+    .gen-status .gs-line:last-child { margin-bottom: 0; }
+    .gen-status .gs-spinner {
+        width: 14px; height: 14px;
+        border: 2px solid rgba(0,217,255,0.25);
+        border-top-color: var(--cyan-2); border-radius: 50%;
+        animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    .gen-status .gs-time {
+        font-size: 0.7rem; color: var(--ink-faint);
+        margin-left: auto; font-variant-numeric: tabular-nums;
+    }
+
+    .gallery { margin-top: 1.5rem; display: none; }
+    .gallery.visible { display: block; }
+    .gallery-title {
+        font-size: 0.72rem; text-transform: uppercase;
+        letter-spacing: 0.12em; color: var(--cyan-2);
+        font-weight: 800; margin-bottom: 0.8rem;
+    }
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 0.8rem;
+    }
+    .g-item {
+        border-radius: 12px; overflow: hidden;
+        border: 1px solid var(--border);
+        background: #000; animation: fadeIn 0.4s ease;
+        position: relative;
+    }
+    .g-item video {
+        width: 100%; display: block;
+        aspect-ratio: 9/16; object-fit: cover;
+    }
+    .g-item .g-label {
+        padding: 0.5rem 0.7rem; background: var(--panel);
+        font-size: 0.68rem; color: var(--ink-dim);
+        border-top: 1px solid var(--border);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .g-item .g-actions {
+        display: flex; gap: 0.3rem; padding: 0.4rem 0.6rem 0.6rem;
+        background: var(--panel);
+    }
+    .g-item .g-actions a {
+        flex: 1; padding: 0.4rem; text-align: center;
+        background: var(--panel-2); color: var(--cyan-2);
+        border: 1px solid var(--border); border-radius: 6px;
+        font-size: 0.65rem; text-decoration: none; font-weight: 700;
+    }
+    .g-item .g-actions a:active { transform: scale(0.95); }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .toast {
+        position: fixed; top: 1.2rem; left: 50%;
+        transform: translateX(-50%) translateY(-80px);
+        background: var(--cyan); color: #0a0a0f;
+        padding: 0.8rem 1.4rem; border-radius: 12px;
+        font-size: 0.82rem; font-weight: 700;
+        opacity: 0; transition: all 0.35s; z-index: 1000;
+        max-width: 85vw; text-align: center;
+        box-shadow: 0 6px 30px rgba(0,217,255,0.45);
+    }
+    .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); color: #fff; }
+    .toast.error { background: var(--error); color: #fff; }
+
+    .empty-state {
+        text-align: center; padding: 1.5rem 1rem;
+        color: var(--ink-faint); font-size: 0.82rem; font-style: italic;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Studio Vidéo IA</h1>
+    <p class="subtitle">Texte → Vidéo · <em>100% gratuit · sans clé API</em></p>
+</header>
+
+<!-- Statut du proxy -->
+<div class="proxy-status" id="proxy-status">
+    <div class="spinner"></div>
+    <span id="proxy-text">Connexion au proxy…</span>
+</div>
+
+<!-- Modèle -->
+<div class="panel open" id="panel-model">
+    <div class="panel-header" data-toggle="panel-model">
+        <div class="panel-title">
+            <div class="panel-icon">🎥</div>
+            Modèle
+        </div>
+        <div class="panel-chevron">▼</div>
+    </div>
+    <div class="panel-body">
+        <div class="field">
+            <label class="field-label">Choisir le modèle</label>
+            <select id="model-select">
+                <option value="wan-fast">🚀 Wan Fast (rapide, gratuit)</option>
+                <option value="wan">🎬 Wan (qualité)</option>
+                <option value="kling">🎬 Kling</option>
+                <option value="vidu">🎬 Vidu Q3</option>
+                <option value="pixverse">🎬 PixVerse V6</option>
+            </select>
+            <div class="field-hint">
+                💡 Wan Fast est le plus rapide et gratuit. Les autres modèles peuvent être plus lents.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prompt -->
+<div class="panel open" id="panel-prompt">
+    <div class="panel-header" data-toggle="panel-prompt">
+        <div class="panel-title">
+            <div class="panel-icon">✍️</div>
+            Description
+        </div>
+        <div class="panel-chevron">▼</div>
+    </div>
+    <div class="panel-body">
+        <div class="field">
+            <label class="field-label">Décrivez votre vidéo</label>
+            <textarea id="prompt-input" placeholder="Exemple : Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes."></textarea>
+            <div class="field-hint">✏️ Décrivez le sujet, le mouvement, la caméra et l'ambiance. Plus c'est précis, mieux c'est.</div>
+        </div>
+        <button class="tool-btn" id="demo-btn">📖 Charger un exemple</button>
+    </div>
+</div>
+
+<!-- Bouton -->
+<button class="btn-go" id="go-btn" disabled>🎬 Générer la vidéo</button>
+
+<!-- Statut de génération -->
+<div class="gen-status" id="gen-status"></div>
+
+<!-- Galerie -->
+<div class="gallery" id="gallery">
+    <div class="gallery-title">✨ Vidéos générées</div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIGURATION — TON PROXY RENDER
+// ══════════════════════════════════════════════════════════════════
+const PROXY_URL = 'https://inf-renceport-proxy.onrender.com';
+const POLL_INTERVAL_SEC = 10;
+const MAX_POLL_ATTEMPTS = 120; // 20 minutes max
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+let toastT;
+function toast(msg, type = 'success') {
+    const t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast';
+    void t.offsetWidth;
+    t.classList.add(type, 'visible');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('visible'), 3000);
+}
+
+function showGenStatus(html) {
+    const el = $('gen-status');
+    el.classList.add('visible');
+    el.innerHTML = html;
+}
+
+function hideGenStatus() {
+    $('gen-status').classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VÉRIFICATION DU PROXY
+// ══════════════════════════════════════════════════════════════════
+async function checkProxy() {
+    const el = $('proxy-status');
+    const txt = $('proxy-text');
+    el.className = 'proxy-status';
+    el.innerHTML = '<div class="spinner"></div><span>Connexion au proxy…</span>';
+
+    try {
+        const r = await fetch(PROXY_URL + '/v1/healthz', {
+            method: 'GET',
+            mode: 'cors'
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const data = await r.json();
+        if (data.status === 'ok') {
+            el.className = 'proxy-status online';
+            el.innerHTML = '<div class="dot"></div><span>✅ Proxy connecté · ' + (data.upstream ? 'Service amont disponible' : 'Service amont en attente') + '</span>';
+            return true;
+        } else {
+            throw new Error('Proxy hors service');
+        }
+    } catch (e) {
+        el.className = 'proxy-status offline';
+        el.innerHTML = '<div class="dot"></div><span>❌ Impossible de contacter le proxy. Réessayez dans 30 sec (démarrage à froid).</span>';
+        return false;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION
+// ══════════════════════════════════════════════════════════════════
+async function generateVideo() {
+    const prompt = $('prompt-input').value.trim();
+    if (!prompt) { toast('Écrivez d\'abord une description', 'error'); return; }
+
+    const model = $('model-select').value;
+
+    // Désactiver le bouton
+    $('go-btn').disabled = true;
+    $('go-btn').textContent = '🎬 Génération en cours…';
+
+    showGenStatus(
+        '<div class="gs-line"><div class="gs-spinner"></div><span>Envoi de la demande au proxy…</span></div>'
+    );
+
+    try {
+        // 1. Créer la tâche
+        const createRes = await fetch(PROXY_URL + '/v1/videos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: model, prompt: prompt })
+        });
+
+        if (!createRes.ok) {
+            const err = await createRes.text();
+            throw new Error('HTTP ' + createRes.status + ' — ' + err.slice(0, 150));
+        }
+
+        const task = await createRes.json();
+        const jobId = task.id || task.job_id || task.task_id;
+        if (!jobId) throw new Error('Pas d\'ID de tâche retourné');
+
+        showGenStatus(
+            '<div class="gs-line"><div class="gs-spinner"></div><span>Rendu en cours…</span></div>' +
+            '<div class="gs-line"><span style="font-size:0.7rem;color:var(--ink-faint)">ID : ' + jobId.slice(0, 20) + '…</span></div>'
+        );
+
+        // 2. Poller le statut
+        let videoUrl = null;
+        let attempts = 0;
+        let status = 'pending';
+
+        while (attempts < MAX_POLL_ATTEMPTS && status !== 'completed' && status !== 'failed') {
+            await sleep(POLL_INTERVAL_SEC * 1000);
+            attempts++;
+
+            const statusRes = await fetch(PROXY_URL + '/v1/videos/' + encodeURIComponent(jobId));
+            if (!statusRes.ok) {
+                if (statusRes.status === 404) {
+                    // Pas encore prêt, on continue
+                    continue;
+                }
+                throw new Error('Erreur statut HTTP ' + statusRes.status);
+            }
+
+            const statusData = await statusRes.json();
+            status = statusData.status || 'pending';
+
+            const elapsed = attempts * POLL_INTERVAL_SEC;
+            const min = Math.floor(elapsed / 60);
+            const sec = elapsed % 60;
+            const timeStr = min + 'm' + (sec < 10 ? '0' : '') + sec + 's';
+
+            showGenStatus(
+                '<div class="gs-line"><div class="gs-spinner"></div><span>Rendu en cours… ' + (statusData.progress ? statusData.progress + '%' : status) + '</span><span class="gs-time">' + timeStr + '</span></div>'
+            );
+
+            if (status === 'completed' || status === 'done' || status === 'succeeded') {
+                videoUrl = PROXY_URL + '/v1/videos/' + encodeURIComponent(jobId) + '/content';
+                break;
+            }
+            if (status === 'failed' || status === 'error') {
+                throw new Error('Génération échouée : ' + (statusData.error || status));
+            }
+        }
+
+        if (!videoUrl) throw new Error('Délai dépassé (20 minutes)');
+
+        // 3. Afficher la vidéo
+        hideGenStatus();
+        addToGallery(videoUrl, model, prompt);
+        toast('Vidéo générée ✓', 'success');
+
+    } catch (e) {
+        console.error(e);
+        hideGenStatus();
+        toast('Erreur : ' + e.message, 'error');
+    } finally {
+        $('go-btn').disabled = false;
+        $('go-btn').textContent = '🎬 Générer la vidéo';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GALERIE
+// ══════════════════════════════════════════════════════════════════
+function addToGallery(url, model, prompt) {
+    $('gallery').classList.add('visible');
+    const el = document.createElement('div');
+    el.className = 'g-item';
+    const shortPrompt = prompt.length > 60 ? prompt.slice(0, 60) + '…' : prompt;
+    el.innerHTML =
+        '<video controls preload="metadata" playsinline src="' + url + '"></video>' +
+        '<div class="g-label">' + escapeHtml(model.toUpperCase() + ' · ' + shortPrompt) + '</div>' +
+        '<div class="g-actions">' +
+            '<a href="' + url + '" download target="_blank">⬇ Télécharger</a>' +
+        '</div>';
+    $('gallery-grid').prepend(el);
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+    // Sections repliables
+    document.querySelectorAll('[data-toggle]').forEach(h => {
+        h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
+    });
+
+    // Bouton démo
+    const DEMO = "Un dragon majestueux vole à travers les nuages au coucher du soleil, éclairage cinématographique, qualité 4K, mouvements de caméra fluides, écailles dorées scintillantes.";
+    $('demo-btn').addEventListener('click', () => {
+        $('prompt-input').value = DEMO;
+        updateGo();
+    });
+
+    // Activer/désactiver le bouton
+    $('prompt-input').addEventListener('input', updateGo);
+    function updateGo() {
+        $('go-btn').disabled = $('prompt-input').value.trim().length === 0;
+    }
+
+    // Générer
+    $('go-btn').addEventListener('click', generateVideo);
+
+    // Vérifier le proxy au chargement
+    checkProxy();
+})();
+</script>
+
+</body>
+</html>
