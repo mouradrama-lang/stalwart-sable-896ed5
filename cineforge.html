@@ -3,89 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CinéForge Studio — Mini-Films IA</title>
+<title>CinéForge Studio v3.0 — Mini-Films IA</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
 --bg:#08080c;--panel:#111118;--panel-2:#181822;--panel-3:#1e1e2c;
 --border:#252535;--border-2:#33334a;--border-gold:#8b7535;
 --ink:#f0f0f5;--ink-dim:#8888a0;--ink-faint:#555565;
---gold:#d4a853;--gold-2:#f0d078;--gold-dim:#6b5a2a;
+--gold:#d4a853;--gold-2:#f0d078;
 --cyan:#00d9ff;--cyan-2:#5eeeff;--magenta:#ff5eb4;
 --green:#4ec97a;--orange:#ff9d3d;--red:#ff5a5a;--purple:#a855f7;
---success:#2d8a4e;--error:#c0392b;--warn:#d4a017;
 }
 body{
 font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;
 background:var(--bg);color:var(--ink);
-min-height:100vh;padding:0 0 6rem;
-font-size:14px;line-height:1.5;
+min-height:100vh;padding:0 0 6rem;font-size:14px;line-height:1.5;
 max-width:680px;margin:0 auto;
 background-image:
 radial-gradient(ellipse at 15% 0%,rgba(212,168,83,0.06) 0%,transparent 50%),
 radial-gradient(ellipse at 85% 100%,rgba(168,85,247,0.05) 0%,transparent 50%);
 background-attachment:fixed;
 }
-
-.hero{
-text-align:center;padding:1.8rem 1rem 1rem;
-border-bottom:1px solid var(--border);
-background:linear-gradient(180deg,rgba(212,168,83,0.04) 0%,transparent 100%);
-}
-.hero-badge{
-display:inline-flex;align-items:center;gap:0.4rem;
-padding:0.25rem 0.7rem;border-radius:20px;
-background:rgba(212,168,83,0.12);border:1px solid var(--border-gold);
-font-size:0.6rem;font-weight:800;color:var(--gold);
-letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.7rem;
-}
+.hero{text-align:center;padding:1.8rem 1rem 1rem;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(212,168,83,0.04) 0%,transparent 100%)}
+.hero-badge{display:inline-flex;align-items:center;gap:0.4rem;padding:0.25rem 0.7rem;border-radius:20px;background:rgba(212,168,83,0.12);border:1px solid var(--border-gold);font-size:0.6rem;font-weight:800;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.7rem}
 .hero-badge .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
-h1{
-font-size:1.9rem;font-weight:900;letter-spacing:-0.04em;
-background:linear-gradient(135deg,#fff 0%,var(--gold) 40%,var(--gold-2) 70%,#fff 100%);
--webkit-background-clip:text;-webkit-text-fill-color:transparent;
-background-clip:text;margin-bottom:0.25rem;
-}
+h1{font-size:1.9rem;font-weight:900;letter-spacing:-0.04em;background:linear-gradient(135deg,#fff 0%,var(--gold) 40%,var(--gold-2) 70%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.25rem}
 .subtitle{font-size:0.72rem;color:var(--ink-dim);letter-spacing:0.04em}
-
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 
-.panel{
-background:var(--panel);border:1px solid var(--border);
-border-radius:14px;padding:1rem;margin:0.7rem 0.8rem;
-transition:border-color 0.3s;
-}
-.panel.complete{border-color:var(--success)}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1rem;margin:0.7rem 0.8rem;transition:border-color 0.3s}
+.panel.complete{border-color:var(--green)}
 .panel.active{border-color:var(--gold);box-shadow:0 0 25px rgba(212,168,83,0.1)}
-.panel-header{
-display:flex;justify-content:space-between;align-items:center;
-cursor:pointer;user-select:none;margin-bottom:0.7rem;
-}
+.panel-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;margin-bottom:0.7rem}
 .panel-header.no-toggle{cursor:default}
-.panel-title{
-display:flex;align-items:center;gap:0.55rem;
-font-size:0.75rem;font-weight:800;
-text-transform:uppercase;letter-spacing:0.08em;
-}
-.panel-icon{
-width:30px;height:30px;
-display:flex;align-items:center;justify-content:center;
-border-radius:8px;font-size:0.95rem;
-}
+.panel-title{display:flex;align-items:center;gap:0.55rem;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em}
+.panel-icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:0.95rem}
 .icon-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2))}
 .icon-purple{background:linear-gradient(135deg,#6b35ff,#b47cff)}
 .icon-cyan{background:linear-gradient(135deg,#0099cc,var(--cyan))}
 .icon-red{background:linear-gradient(135deg,#cc3344,#ff5a5a)}
 .icon-green{background:linear-gradient(135deg,#2d8a4e,var(--green))}
 .icon-orange{background:linear-gradient(135deg,#cc7722,var(--orange))}
-.panel-badge{
-font-size:0.58rem;padding:0.15rem 0.5rem;border-radius:10px;
-font-weight:800;letter-spacing:0.05em;
-}
+.panel-badge{font-size:0.58rem;padding:0.15rem 0.5rem;border-radius:10px;font-weight:800;letter-spacing:0.05em}
 .badge-gray{background:var(--ink-faint);color:#fff}
 .badge-green{background:var(--green);color:#0a0a0f}
 .badge-gold{background:var(--gold);color:#0a0a0f}
-.badge-red{background:var(--red);color:#fff}
 .panel-chevron{font-size:0.65rem;color:var(--ink-faint);transition:transform 0.25s}
 .panel.open .panel-chevron{transform:rotate(180deg)}
 .panel-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
@@ -93,255 +55,89 @@ font-weight:800;letter-spacing:0.05em;
 
 .field{margin-bottom:0.8rem}
 .field:last-child{margin-bottom:0}
-.field-label{
-display:flex;align-items:center;justify-content:space-between;
-font-size:0.62rem;text-transform:uppercase;
-letter-spacing:0.1em;color:var(--ink-dim);
-font-weight:700;margin-bottom:0.4rem;
-}
-.field-hint{
-font-size:0.65rem;color:var(--ink-faint);
-margin-top:0.3rem;line-height:1.4;font-style:italic;
-}
+.field-label{display:flex;align-items:center;justify-content:space-between;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-dim);font-weight:700;margin-bottom:0.4rem}
+.field-hint{font-size:0.65rem;color:var(--ink-faint);margin-top:0.3rem;line-height:1.4;font-style:italic}
 .field-hint a{color:var(--gold);text-decoration:none}
 
-input[type="text"],input[type="password"],input[type="number"],textarea,select{
-width:100%;padding:0.7rem 0.85rem;border-radius:10px;
-border:1px solid var(--border);background:var(--panel-2);
-color:var(--ink);font-family:inherit;font-size:0.82rem;
-transition:border-color 0.15s;
-}
-input:focus,textarea:focus,select:focus{
-outline:none;border-color:var(--gold);
-box-shadow:0 0 0 3px rgba(212,168,83,0.12);
-}
+input[type="text"],input[type="password"],textarea,select{width:100%;padding:0.7rem 0.85rem;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.82rem;transition:border-color 0.15s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,0.12)}
 textarea{min-height:80px;resize:vertical;line-height:1.45}
-select{
--webkit-appearance:none;appearance:none;
-background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23d4a853' d='M6 8L0 0h12z'/></svg>");
-background-repeat:no-repeat;background-position:right 0.9rem center;
-background-size:11px;padding-right:2.4rem;
-}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23d4a853' d='M6 8L0 0h12z'/></svg>");background-repeat:no-repeat;background-position:right 0.9rem center;background-size:11px;padding-right:2.4rem}
 input[type="password"]{font-family:ui-monospace,monospace;font-size:0.72rem}
 
-.key-row{display:grid;grid-template-columns:1fr auto auto;gap:0.5rem;align-items:stretch}
-.key-save-btn,.key-test-btn{
-padding:0 0.9rem;border-radius:10px;border:none;
-background:var(--gold);color:#0a0a0f;
-font-size:0.72rem;font-weight:800;font-family:inherit;
-cursor:pointer;letter-spacing:0.03em;white-space:nowrap;
-}
-.key-test-btn{background:var(--cyan);color:#0a0a0f}
-.key-save-btn:active,.key-test-btn:active{transform:scale(0.97)}
-.key-test-btn:disabled{opacity:0.5;cursor:not-allowed}
-.key-status{
-font-size:0.7rem;margin-top:0.45rem;
-padding:0.4rem 0.65rem;border-radius:8px;
-background:var(--panel-2);color:var(--ink-dim);
-display:flex;align-items:center;gap:0.4rem;
-}
+.key-row{display:grid;grid-template-columns:1fr auto;gap:0.5rem;align-items:stretch}
+.key-save-btn{padding:0 1rem;border-radius:10px;border:none;background:var(--gold);color:#0a0a0f;font-size:0.72rem;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:0.03em;white-space:nowrap}
+.key-save-btn:active{transform:scale(0.97)}
+.key-status{font-size:0.7rem;margin-top:0.45rem;padding:0.4rem 0.65rem;border-radius:8px;background:var(--panel-2);color:var(--ink-dim);display:flex;align-items:center;gap:0.4rem}
 .key-status.ok{background:rgba(78,201,122,0.1);color:var(--green)}
-.key-status.err{background:rgba(255,90,90,0.1);color:var(--red)}
-.key-status.testing{background:rgba(0,217,255,0.1);color:var(--cyan-2)}
 .key-status .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
 
 .genre-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.45rem}
-.genre-card{
-position:relative;
-padding:0.7rem 0.5rem;border-radius:10px;
-border:1px solid var(--border);background:var(--panel-2);
-cursor:pointer;text-align:center;
-transition:all 0.2s;overflow:hidden;
-}
+.genre-card{position:relative;padding:0.7rem 0.5rem;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);cursor:pointer;text-align:center;transition:all 0.2s;overflow:hidden}
 .genre-card:active{transform:scale(0.97)}
-.genre-card.selected{
-border-color:var(--gold);
-background:linear-gradient(135deg,rgba(212,168,83,0.12),rgba(212,168,83,0.04));
-box-shadow:0 0 15px rgba(212,168,83,0.1);
-}
-.genre-card.selected::after{
-content:'✓';position:absolute;top:4px;right:6px;
-font-size:0.6rem;color:var(--gold);font-weight:900;
-}
+.genre-card.selected{border-color:var(--gold);background:linear-gradient(135deg,rgba(212,168,83,0.12),rgba(212,168,83,0.04));box-shadow:0 0 15px rgba(212,168,83,0.1)}
+.genre-card.selected::after{content:'✓';position:absolute;top:4px;right:6px;font-size:0.6rem;color:var(--gold);font-weight:900}
 .genre-emoji{font-size:1.3rem;display:block;margin-bottom:0.2rem}
 .genre-name{font-size:0.65rem;font-weight:700;color:var(--ink);letter-spacing:0.02em}
 .genre-sub{font-size:0.55rem;color:var(--ink-faint);margin-top:0.1rem}
 
-.preset-row{
-display:flex;gap:0.4rem;overflow-x:auto;
-padding-bottom:0.3rem;scrollbar-width:none;
-}
+.preset-row{display:flex;gap:0.4rem;overflow-x:auto;padding-bottom:0.3rem;scrollbar-width:none}
 .preset-row::-webkit-scrollbar{display:none}
-.preset-chip{
-flex-shrink:0;
-padding:0.5rem 0.8rem;border-radius:20px;
-border:1px solid var(--border);background:var(--panel-2);
-font-size:0.68rem;font-weight:700;color:var(--ink-dim);
-cursor:pointer;transition:all 0.15s;white-space:nowrap;
-}
+.preset-chip{flex-shrink:0;padding:0.5rem 0.8rem;border-radius:20px;border:1px solid var(--border);background:var(--panel-2);font-size:0.68rem;font-weight:700;color:var(--ink-dim);cursor:pointer;transition:all 0.15s;white-space:nowrap}
 .preset-chip:active{transform:scale(0.97)}
-.preset-chip.selected{
-border-color:var(--gold);background:rgba(212,168,83,0.12);
-color:var(--gold);
-}
+.preset-chip.selected{border-color:var(--gold);background:rgba(212,168,83,0.12);color:var(--gold)}
 
-.scenes-header{
-display:flex;justify-content:space-between;align-items:center;
-margin-bottom:0.6rem;
-}
+.scenes-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem}
 .scene-count{font-size:0.65rem;color:var(--ink-faint)}
-.add-scene-btn{
-padding:0.35rem 0.7rem;border-radius:8px;
-border:1px dashed var(--border-2);background:transparent;
-color:var(--gold);font-size:0.68rem;font-weight:700;
-font-family:inherit;cursor:pointer;
-}
+.add-scene-btn{padding:0.35rem 0.7rem;border-radius:8px;border:1px dashed var(--border-2);background:transparent;color:var(--gold);font-size:0.68rem;font-weight:700;font-family:inherit;cursor:pointer}
 .add-scene-btn:active{transform:scale(0.97)}
-.scene-card{
-background:var(--panel-2);border:1px solid var(--border);
-border-radius:12px;padding:0.8rem;margin-bottom:0.6rem;
-position:relative;transition:border-color 0.2s;
-}
-.scene-card.active-scene{border-color:var(--gold)}
-.scene-card-header{
-display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;
-}
-.scene-number{
-width:24px;height:24px;border-radius:6px;
-background:var(--gold);color:#0a0a0f;
-font-size:0.65rem;font-weight:900;
-display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.scene-title-input{
-flex:1;background:transparent;border:none;color:var(--ink);
-font-size:0.78rem;font-weight:700;font-family:inherit;
-padding:0.2rem 0;
-}
+.scene-card{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:0.8rem;margin-bottom:0.6rem;position:relative;transition:border-color 0.2s}
+.scene-card-header{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem}
+.scene-number{width:24px;height:24px;border-radius:6px;background:var(--gold);color:#0a0a0f;font-size:0.65rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.scene-title-input{flex:1;background:transparent;border:none;color:var(--ink);font-size:0.78rem;font-weight:700;font-family:inherit;padding:0.2rem 0}
 .scene-title-input:focus{outline:none;border-bottom:1px solid var(--gold)}
-.scene-remove{
-background:transparent;border:none;color:var(--ink-faint);
-font-size:0.85rem;cursor:pointer;padding:0.2rem;
-}
-.scene-textarea{
-width:100%;min-height:60px;padding:0.6rem;
-border-radius:8px;border:1px solid var(--border);
-background:var(--panel-3);color:var(--ink);
-font-family:inherit;font-size:0.75rem;line-height:1.45;
-resize:vertical;
-}
+.scene-remove{background:transparent;border:none;color:var(--ink-faint);font-size:0.85rem;cursor:pointer;padding:0.2rem}
+.scene-textarea{width:100%;min-height:60px;padding:0.6rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-3);color:var(--ink);font-family:inherit;font-size:0.75rem;line-height:1.45;resize:vertical}
 .scene-textarea:focus{outline:none;border-color:var(--gold)}
 .scene-meta{display:flex;gap:0.4rem;margin-top:0.5rem;flex-wrap:wrap}
-.scene-meta select{
-padding:0.35rem 0.6rem;font-size:0.65rem;
-border-radius:6px;flex:1;min-width:0;
-}
+.scene-meta select{padding:0.35rem 0.6rem;font-size:0.65rem;border-radius:6px;flex:1;min-width:0}
 
 .camera-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem}
-.camera-btn{
-padding:0.55rem 0.3rem;border-radius:8px;
-border:1px solid var(--border);background:var(--panel-2);
-cursor:pointer;text-align:center;transition:all 0.15s;
-}
+.camera-btn{padding:0.55rem 0.3rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);cursor:pointer;text-align:center;transition:all 0.15s}
 .camera-btn:active{transform:scale(0.97)}
-.camera-btn.selected{
-border-color:var(--gold);
-background:rgba(212,168,83,0.1);
-}
+.camera-btn.selected{border-color:var(--gold);background:rgba(212,168,83,0.1)}
 .camera-btn .cam-icon{font-size:1rem;display:block;margin-bottom:0.15rem}
 .camera-btn .cam-label{font-size:0.55rem;color:var(--ink-dim);font-weight:600}
 
-.tab-bar{
-display:grid;grid-template-columns:1fr 1fr 1fr;
-gap:0.3rem;margin:0.7rem 0.8rem;
-background:var(--panel);border-radius:12px;
-padding:0.3rem;border:1px solid var(--border);
-}
-.tab{
-padding:0.6rem 0.3rem;border-radius:9px;border:none;
-background:transparent;color:var(--ink-dim);
-font-size:0.68rem;font-weight:700;font-family:inherit;
-cursor:pointer;transition:all 0.15s;
-}
-.tab.active{
-background:linear-gradient(135deg,var(--gold),var(--gold-2));
-color:#0a0a0f;
-}
+.tab-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.3rem;margin:0.7rem 0.8rem;background:var(--panel);border-radius:12px;padding:0.3rem;border:1px solid var(--border)}
+.tab{padding:0.6rem 0.3rem;border-radius:9px;border:none;background:transparent;color:var(--ink-dim);font-size:0.68rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f}
 
-.upload-zone{
-border:2px dashed var(--border-2);
-border-radius:12px;padding:1.2rem 1rem;
-text-align:center;cursor:pointer;
-background:var(--panel-2);transition:all 0.2s;
-}
+.upload-zone{border:2px dashed var(--border-2);border-radius:12px;padding:1.2rem 1rem;text-align:center;cursor:pointer;background:var(--panel-2);transition:all 0.2s}
 .upload-zone:active{border-color:var(--gold)}
 .upload-zone input{display:none}
 .upload-icon{font-size:1.5rem;margin-bottom:0.2rem;color:var(--gold)}
 .upload-text{font-size:0.8rem;font-weight:600}
 .upload-hint{font-size:0.62rem;color:var(--ink-faint);margin-top:0.1rem}
 
-.image-preview{
-position:relative;border-radius:10px;overflow:hidden;
-border:2px solid var(--gold);background:#000;
-aspect-ratio:9/16;max-width:140px;margin:0.6rem auto 0;
-}
+.image-preview{position:relative;border-radius:10px;overflow:hidden;border:2px solid var(--gold);background:#000;aspect-ratio:9/16;max-width:140px;margin:0.6rem auto 0}
 .image-preview img{width:100%;height:100%;object-fit:cover;display:block}
-.image-preview .remove-btn{
-position:absolute;top:4px;right:4px;
-background:rgba(192,57,43,0.9);color:#fff;border:none;
-width:22px;height:22px;border-radius:50%;
-font-size:11px;cursor:pointer;
-}
+.image-preview .remove-btn{position:absolute;top:4px;right:4px;background:rgba(192,57,43,0.9);color:#fff;border:none;width:22px;height:22px;border-radius:50%;font-size:11px;cursor:pointer}
 
-.btn-go{
-display:flex;align-items:center;justify-content:center;gap:0.5rem;
-width:calc(100% - 1.6rem);margin:0.8rem auto;
-padding:1.1rem;border-radius:14px;border:none;
-background:linear-gradient(135deg,var(--gold),var(--gold-2),var(--gold));
-background-size:200% 200%;
-color:#0a0a0f;font-size:0.95rem;
-font-weight:900;font-family:inherit;
-cursor:pointer;letter-spacing:0.04em;
-box-shadow:0 8px 30px rgba(212,168,83,0.3);
-animation:shimmer 3s ease infinite;
-}
+.btn-go{display:flex;align-items:center;justify-content:center;gap:0.5rem;width:calc(100% - 1.6rem);margin:0.8rem auto;padding:1.1rem;border-radius:14px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold-2),var(--gold));background-size:200% 200%;color:#0a0a0f;font-size:0.95rem;font-weight:900;font-family:inherit;cursor:pointer;letter-spacing:0.04em;box-shadow:0 8px 30px rgba(212,168,83,0.3);animation:shimmer 3s ease infinite}
 @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .btn-go:active:not(:disabled){transform:scale(0.98)}
 .btn-go:disabled{opacity:0.3;cursor:not-allowed;box-shadow:none;animation:none}
-
-.btn-stop{
-width:calc(100% - 1.6rem);margin:0 auto;
-padding:0.65rem;border-radius:12px;
-border:1px solid var(--error);background:transparent;
-color:var(--error);font-size:0.78rem;font-weight:700;
-font-family:inherit;cursor:pointer;display:none;
-}
+.btn-stop{width:calc(100% - 1.6rem);margin:0 auto;padding:0.65rem;border-radius:12px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:0.78rem;font-weight:700;font-family:inherit;cursor:pointer;display:none}
 .btn-stop.visible{display:block}
-
-.tool-btn{
-width:100%;padding:0.6rem;margin-top:0.4rem;
-border-radius:10px;border:1px solid var(--border-2);
-background:var(--panel-2);color:var(--ink);
-font-size:0.7rem;font-weight:700;
-font-family:inherit;cursor:pointer;
-}
+.tool-btn{width:100%;padding:0.6rem;margin-top:0.4rem;border-radius:10px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--ink);font-size:0.7rem;font-weight:700;font-family:inherit;cursor:pointer}
 .tool-btn:active{transform:scale(0.97)}
-
 .row-2{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
-.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem}
 
-.console-panel{
-background:#050508;border:1px solid var(--border);
-border-radius:10px;padding:0.75rem;margin-top:0.5rem;
-font-family:ui-monospace,'SF Mono',monospace;
-font-size:0.64rem;line-height:1.5;
-max-height:280px;overflow-y:auto;
-}
+.console-panel{background:#050508;border:1px solid var(--border);border-radius:10px;padding:0.75rem;margin-top:0.5rem;font-family:ui-monospace,monospace;font-size:0.64rem;line-height:1.5;max-height:280px;overflow-y:auto}
 .console-panel::-webkit-scrollbar{width:3px}
 .console-panel::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:2px}
-.console-empty{
-color:var(--ink-faint);font-style:italic;
-text-align:center;padding:0.7rem;font-size:0.68rem;
-}
+.console-empty{color:var(--ink-faint);font-style:italic;text-align:center;padding:0.7rem;font-size:0.68rem}
 .log-line{display:flex;gap:0.35rem;padding:0.08rem 0}
 .log-time{color:var(--ink-faint);flex-shrink:0;font-size:0.6rem}
 .log-msg{flex:1;word-break:break-word}
@@ -351,139 +147,47 @@ text-align:center;padding:0.7rem;font-size:0.68rem;
 .log-error{color:var(--red)}
 .log-dim{color:var(--ink-dim)}
 .log-gold{color:var(--gold)}
-.log-purple{color:var(--purple)}
-
-.console-header{
-display:flex;justify-content:space-between;align-items:center;
-margin-bottom:0.35rem;padding-bottom:0.3rem;
-border-bottom:1px solid var(--border);
-}
-.console-title{
-font-size:0.62rem;text-transform:uppercase;
-letter-spacing:0.1em;color:var(--gold);
-font-weight:800;display:flex;align-items:center;gap:0.35rem;
-}
-.console-live-dot{
-width:6px;height:6px;border-radius:50%;
-background:var(--green);box-shadow:0 0 6px var(--green);
-animation:pulse 1.5s ease-in-out infinite;
-}
-.console-clear{
-background:transparent;border:1px solid var(--border-2);
-color:var(--ink-dim);padding:0.12rem 0.4rem;
-border-radius:6px;font-size:0.55rem;cursor:pointer;
-font-family:inherit;font-weight:700;
-}
-
-.progress-bar{
-height:4px;background:var(--border);
-border-radius:2px;overflow:hidden;margin:0.35rem 0;
-}
-.progress-fill{
-height:100%;
-background:linear-gradient(90deg,var(--gold),var(--gold-2),var(--gold));
-background-size:200% 100%;
-border-radius:2px;transition:width 0.3s ease;width:0%;
-animation:progressShimmer 2s linear infinite;
-}
+.console-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;padding-bottom:0.3rem;border-bottom:1px solid var(--border)}
+.console-title{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:800;display:flex;align-items:center;gap:0.35rem}
+.console-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s ease-in-out infinite}
+.console-clear{background:transparent;border:1px solid var(--border-2);color:var(--ink-dim);padding:0.12rem 0.4rem;border-radius:6px;font-size:0.55rem;cursor:pointer;font-family:inherit;font-weight:700}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:0.35rem 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-2),var(--gold));background-size:200% 100%;border-radius:2px;transition:width 0.3s ease;width:0%;animation:progressShimmer 2s linear infinite}
 @keyframes progressShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
 .scene-progress{display:flex;gap:3px;margin:0.4rem 0}
-.scene-dot{
-flex:1;height:4px;border-radius:2px;
-background:var(--border);transition:background 0.3s;
-}
+.scene-dot{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background 0.3s}
 .scene-dot.done{background:var(--green)}
 .scene-dot.active{background:var(--gold);animation:pulse 1s infinite}
 .scene-dot.failed{background:var(--red)}
 
-.result-box{
-display:none;padding:0.9rem;border-radius:14px;
-background:var(--panel);border:1px solid var(--gold);
-margin:0.7rem 0.8rem;
-box-shadow:0 0 30px rgba(212,168,83,0.1);
-}
+.result-box{display:none;padding:0.9rem;border-radius:14px;background:var(--panel);border:1px solid var(--gold);margin:0.7rem 0.8rem;box-shadow:0 0 30px rgba(212,168,83,0.1)}
 .result-box.visible{display:block}
-.result-header{
-display:flex;justify-content:space-between;align-items:center;
-margin-bottom:0.6rem;
-}
-.result-title{
-font-size:0.75rem;font-weight:800;color:var(--gold);
-text-transform:uppercase;letter-spacing:0.08em;
-}
-.result-provider{
-padding:0.2rem 0.6rem;border-radius:10px;
-font-size:0.6rem;font-weight:800;
-background:var(--gold);color:#0a0a0f;
-}
-.result-box video{
-width:100%;border-radius:10px;
-aspect-ratio:9/16;object-fit:cover;background:#000;
-max-height:50vh;
-}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem}
+.result-title{font-size:0.75rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em}
+.result-provider{padding:0.2rem 0.6rem;border-radius:10px;font-size:0.6rem;font-weight:800;background:var(--gold);color:#0a0a0f}
+.result-box video{width:100%;border-radius:10px;aspect-ratio:9/16;object-fit:cover;background:#000;max-height:50vh}
 .result-actions{display:flex;gap:0.5rem;margin-top:0.6rem}
-.result-actions a{
-flex:1;padding:0.55rem;text-align:center;
-background:var(--panel-2);color:var(--gold);
-border:1px solid var(--border);border-radius:8px;
-font-size:0.7rem;text-decoration:none;font-weight:700;
-}
+.result-actions a{flex:1;padding:0.55rem;text-align:center;background:var(--panel-2);color:var(--gold);border:1px solid var(--border);border-radius:8px;font-size:0.7rem;text-decoration:none;font-weight:700}
 
-.status{
-position:fixed;bottom:0;left:0;right:0;
-background:var(--panel);border-top:1px solid var(--border);
-color:var(--ink);padding:0.7rem 1rem;
-font-size:0.72rem;display:flex;align-items:center;gap:0.5rem;
-transform:translateY(100%);transition:transform 0.3s;z-index:100;
-}
+.status{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);color:var(--ink);padding:0.7rem 1rem;font-size:0.72rem;display:flex;align-items:center;gap:0.5rem;transform:translateY(100%);transition:transform 0.3s;z-index:100}
 .status.visible{transform:translateY(0)}
-.status .spin{
-width:12px;height:12px;
-border:2px solid rgba(212,168,83,0.25);
-border-top-color:var(--gold);border-radius:50%;
-animation:spin 0.8s linear infinite;flex-shrink:0;
-}
+.status .spin{width:12px;height:12px;border:2px solid rgba(212,168,83,0.25);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.toast{
-position:fixed;top:1rem;left:50%;
-transform:translateX(-50%) translateY(-80px);
-background:var(--gold);color:#0a0a0f;
-padding:0.7rem 1.2rem;border-radius:12px;
-font-size:0.75rem;font-weight:700;
-opacity:0;transition:all 0.35s;z-index:1000;
-max-width:85vw;text-align:center;
-}
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--gold);color:#0a0a0f;padding:0.7rem 1.2rem;border-radius:12px;font-size:0.75rem;font-weight:700;opacity:0;transition:all 0.35s;z-index:1000;max-width:85vw;text-align:center}
 .toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{background:var(--green);color:#0a0a0f}
+.toast.success{background:var(--green)}
 .toast.error{background:var(--red);color:#fff}
-
-.film-strip{
-display:flex;justify-content:center;gap:4px;
-margin:0.5rem 0;opacity:0.3;
-}
-.film-hole{
-width:8px;height:6px;border-radius:2px;
-background:var(--ink-faint);
-}
-
-@media(max-width:420px){
-h1{font-size:1.5rem}
-.genre-grid{grid-template-columns:repeat(3,1fr)}
-.camera-grid{grid-template-columns:repeat(3,1fr)}
-.row-2,.row-3{grid-template-columns:1fr}
-.key-row{grid-template-columns:1fr auto;grid-template-rows:auto auto}
-.key-test-btn{grid-column:1/-1}
-}
+.film-strip{display:flex;justify-content:center;gap:4px;margin:0.5rem 0;opacity:0.3}
+.film-hole{width:8px;height:6px;border-radius:2px;background:var(--ink-faint)}
+@media(max-width:420px){h1{font-size:1.5rem}.genre-grid{grid-template-columns:repeat(3,1fr)}.camera-grid{grid-template-columns:repeat(3,1fr)}.row-2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <div class="hero">
-<div class="hero-badge"><span class="dot"></span> CinéForge Studio v2.1</div>
+<div class="hero-badge"><span class="dot"></span> CinéForge Studio v3.0</div>
 <h1>🎬 CinéForge Studio</h1>
-<p class="subtitle">Production de Mini-Films Cinéma — Propulsé par Agnes AI</p>
+<p class="subtitle">Mini-Films Cinéma — Replicate 🔥 + Agnes 💜</p>
 <div class="film-strip">
 <span class="film-hole"></span><span class="film-hole"></span><span class="film-hole"></span>
 <span class="film-hole"></span><span class="film-hole"></span><span class="film-hole"></span>
@@ -498,15 +202,12 @@ h1{font-size:1.5rem}
 <button type="button" class="tab" data-tab="config">⚙️ Config</button>
 </div>
 
-<!-- ═══ TAB CRÉER ═══ -->
+<!-- ═══ CRÉER ═══ -->
 <div id="tab-create">
 
 <div class="panel open" id="panel-genre">
 <div class="panel-header" data-toggle="panel-genre">
-<div class="panel-title">
-<div class="panel-icon icon-gold">🎭</div>
-Genre Cinématographique
-</div>
+<div class="panel-title"><div class="panel-icon icon-gold">🎭</div>Genre Cinématographique</div>
 <div class="panel-badge badge-gold" id="genre-badge">Non sélectionné</div>
 <div class="panel-chevron">▼</div>
 </div>
@@ -521,10 +222,7 @@ Genre Cinématographique
 
 <div class="panel open" id="panel-style">
 <div class="panel-header" data-toggle="panel-style">
-<div class="panel-title">
-<div class="panel-icon icon-purple">🎨</div>
-Style Visuel
-</div>
+<div class="panel-title"><div class="panel-icon icon-purple">🎨</div>Style Visuel</div>
 <div class="panel-chevron">▼</div>
 </div>
 <div class="panel-body">
@@ -537,41 +235,24 @@ Style Visuel
 <div class="preset-row" id="lighting-row"></div>
 </div>
 <div class="field">
-<label class="field-label">Palette de couleurs</label>
+<label class="field-label">Palette</label>
 <div class="preset-row" id="palette-row"></div>
-</div>
-<div class="field">
-<label class="field-label">Ambiance sonore suggérée</label>
-<select id="mood-select">
-<option value="">— Aucune —</option>
-<option value="epic orchestral">🎻 Orchestrale épique</option>
-<option value="dark ambient">🌑 Ambient sombre</option>
-<option value="jazz noir">🎷 Jazz noir</option>
-<option value="electronic synth">🎹 Synthwave électronique</option>
-<option value="acoustic folk">🎸 Folk acoustique</option>
-<option value="hip hop urban">🎤 Hip-hop urbain</option>
-<option value="classical piano">🎹 Piano classique</option>
-<option value="silence with foley">🔇 Silence + bruitages</option>
-</select>
 </div>
 </div>
 </div>
 
 <div class="panel open" id="panel-camera">
 <div class="panel-header" data-toggle="panel-camera">
-<div class="panel-title">
-<div class="panel-icon icon-cyan">📷</div>
-Mouvements de Caméra
-</div>
+<div class="panel-title"><div class="panel-icon icon-cyan">📷</div>Caméra</div>
 <div class="panel-chevron">▼</div>
 </div>
 <div class="panel-body">
 <div class="field">
-<label class="field-label">Type de plan principal</label>
+<label class="field-label">Type de plan</label>
 <div class="camera-grid" id="shot-grid"></div>
 </div>
 <div class="field">
-<label class="field-label">Mouvement de caméra</label>
+<label class="field-label">Mouvement</label>
 <div class="camera-grid" id="move-grid"></div>
 </div>
 </div>
@@ -579,21 +260,15 @@ Mouvements de Caméra
 
 <div class="panel open" id="panel-prompt">
 <div class="panel-header no-toggle">
-<div class="panel-title">
-<div class="panel-icon icon-gold">✍️</div>
-Synopsis du Film
-</div>
+<div class="panel-title"><div class="panel-icon icon-gold">✍️</div>Synopsis du Film</div>
 </div>
 <div class="panel-body" style="max-height:none">
 <div class="field">
-<label class="field-label">
-<span>Histoire principale</span>
-<span style="color:var(--ink-faint);text-transform:none;letter-spacing:0;font-weight:400;font-size:0.6rem">Optionnel si scènes</span>
-</label>
-<textarea id="main-prompt" placeholder="Décrivez l'histoire de votre mini-film… Les personnages, le lieu, l'action, l'émotion." rows="5"></textarea>
+<label class="field-label">Histoire principale</label>
+<textarea id="main-prompt" placeholder="Décrivez l'histoire de votre mini-film…" rows="5"></textarea>
 </div>
 <div class="field">
-<label class="field-label">Titre du film</label>
+<label class="field-label">Titre</label>
 <input type="text" id="film-title" placeholder="Ex: Les Ombres de Minuit">
 </div>
 <button class="tool-btn" id="demo-btn">📖 Charger un exemple de film noir</button>
@@ -602,15 +277,11 @@ Synopsis du Film
 
 </div>
 
-<!-- ═══ TAB SCÈNES ═══ -->
+<!-- ═══ SCÈNES ═══ -->
 <div id="tab-scenes" style="display:none">
-
 <div class="panel open" id="panel-scenes">
 <div class="scenes-header">
-<div class="panel-title">
-<div class="panel-icon icon-gold">📋</div>
-Storyboard
-</div>
+<div class="panel-title"><div class="panel-icon icon-gold">📋</div>Storyboard</div>
 <div style="display:flex;align-items:center;gap:0.5rem">
 <span class="scene-count" id="scene-count">0 scènes</span>
 <button class="add-scene-btn" id="add-scene-btn">＋ Scène</button>
@@ -618,52 +289,54 @@ Storyboard
 </div>
 <div class="panel-body" style="max-height:none">
 <div id="scenes-list"></div>
-<div class="field-hint" style="margin-top:0.5rem">
-Chaque scène sera générée séparément puis à assembler dans CapCut.
 </div>
 </div>
 </div>
 
-</div>
-
-<!-- ═══ TAB CONFIG ═══ -->
+<!-- ═══ CONFIG ═══ -->
 <div id="tab-config" style="display:none">
 
-<div class="panel open" id="panel-agnes">
-<div class="panel-header" data-toggle="panel-agnes">
-<div class="panel-title">
-<div class="panel-icon icon-purple">💜</div>
-Clé API Agnes.ai
-</div>
-<div class="panel-badge badge-gray" id="agnes-badge">Non configuré</div>
+<div class="panel open" id="panel-strategy">
+<div class="panel-header" data-toggle="panel-strategy">
+<div class="panel-title"><div class="panel-icon icon-cyan">🎯</div>Stratégie</div>
+<div class="panel-badge badge-gold" id="strategy-badge">Auto</div>
 <div class="panel-chevron">▼</div>
 </div>
 <div class="panel-body">
 <div class="field">
-<label class="field-label">Clé API</label>
+<label class="field-label">Ordre de priorité</label>
+<select id="strategy-select">
+<option value="auto" selected>🤖 Auto (Replicate → Agnes)</option>
+<option value="replicate">🔥 Replicate uniquement (rapide)</option>
+<option value="agnes">💜 Agnes uniquement (gratuit)</option>
+</select>
+<div class="field-hint">Auto : Replicate d'abord, Agnes en fallback.</div>
+</div>
+</div>
+</div>
+
+<div class="panel open" id="panel-agnes">
+<div class="panel-header" data-toggle="panel-agnes">
+<div class="panel-title"><div class="panel-icon icon-purple">💜</div>Clé API Agnes</div>
+<div class="panel-badge badge-gray" id="agnes-badge">Optionnel</div>
+<div class="panel-chevron">▼</div>
+</div>
+<div class="panel-body">
+<div class="field">
+<label class="field-label">Clé API (fallback)</label>
 <div class="key-row">
-<input type="password" id="agnes-key" placeholder="sk-..." autocomplete="off">
+<input type="password" id="agnes-key" placeholder="sk-...">
 <button class="key-save-btn" id="agnes-save">💾</button>
-<button class="key-test-btn" id="agnes-test">🔬</button>
 </div>
-<div class="field-hint">
-Votre clé sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a>
-— partagée avec vos autres applications
-</div>
-<div class="key-status" id="agnes-status">
-<span class="dot"></span>
-<span>Aucune clé enregistrée</span>
-</div>
+<div class="field-hint">Utilisée uniquement si Replicate échoue. <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a></div>
+<div class="key-status" id="agnes-status"><span class="dot"></span><span>Aucune clé</span></div>
 </div>
 </div>
 </div>
 
 <div class="panel open" id="panel-settings">
 <div class="panel-header" data-toggle="panel-settings">
-<div class="panel-title">
-<div class="panel-icon icon-cyan">⚙️</div>
-Paramètres de Rendu
-</div>
+<div class="panel-title"><div class="panel-icon icon-cyan">⚙️</div>Rendu</div>
 <div class="panel-chevron">▼</div>
 </div>
 <div class="panel-body">
@@ -674,7 +347,6 @@ Paramètres de Rendu
 <option value="9:16" selected>📱 9:16 Portrait</option>
 <option value="16:9">🖥️ 16:9 Cinéma</option>
 <option value="1:1">⬛ 1:1 Carré</option>
-<option value="4:3">📺 4:3 Classique</option>
 </select>
 </div>
 <div class="field">
@@ -686,12 +358,6 @@ Paramètres de Rendu
 </select>
 </div>
 </div>
-<div class="field">
-<label class="field-label">Modèle vidéo</label>
-<select id="model-select">
-<option value="agnes-video-v2.0" selected>Agnes Video v2.0 (recommandé)</option>
-</select>
-</div>
 </div>
 </div>
 
@@ -702,70 +368,51 @@ Paramètres de Rendu
 
 <div class="panel open" id="panel-console">
 <div class="panel-header" data-toggle="panel-console">
-<div class="panel-title">
-<div class="panel-icon icon-green">📡</div>
-Suivi de Production
-</div>
+<div class="panel-title"><div class="panel-icon icon-green">📡</div>Suivi de Production</div>
 <div class="panel-chevron">▼</div>
 </div>
 <div class="panel-body">
 <div class="console-header">
-<div class="console-title">
-<span class="console-live-dot" id="live-dot" style="display:none"></span>
-<span id="console-state">Prêt</span>
-</div>
+<div class="console-title"><span class="console-live-dot" id="live-dot" style="display:none"></span><span id="console-state">Prêt</span></div>
 <button class="console-clear" id="console-clear">🗑️ Effacer</button>
 </div>
 <div class="scene-progress" id="scene-progress"></div>
-<div class="progress-bar">
-<div class="progress-fill" id="progress-fill"></div>
-</div>
-<div class="console-panel" id="console-log">
-<div class="console-empty">En attente d'une production…</div>
-</div>
+<div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="console-panel" id="console-log"><div class="console-empty">En attente d'une production…</div></div>
 </div>
 </div>
 
 <div class="result-box" id="result-box">
 <div class="result-header">
 <div class="result-title" id="result-title">🎬 Film Généré</div>
-<div class="result-provider" id="result-provider">💜 AGNES</div>
+<div class="result-provider" id="result-provider">—</div>
 </div>
 <div id="result-videos"></div>
-<div class="result-actions">
-<a id="result-download" href="#" download="film.mp4" target="_blank">⬇ Télécharger</a>
-<a id="result-open" href="#" target="_blank">↗ Ouvrir</a>
-</div>
 </div>
 
-<div class="status" id="status">
-<div class="spin"></div>
-<span id="status-text">…</span>
-</div>
-
+<div class="status" id="status"><div class="spin"></div><span id="status-text">…</span></div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // CONFIG
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+const PROXY_URL = 'https://replicate-proxy-6eab.onrender.com';
+const REPLICATE_MODEL = 'minimax/video-01';
 const AGNES_API = 'https://apihub.agnes-ai.com/v1';
 const AGNES_POLL = 'https://apihub.agnes-ai.com/agnesapi';
 const AGNES_MODEL = 'agnes-video-v2.0';
-
-// ✅ CORRECTION 1 : même clé que les autres applis
 const API_KEY_STORE = 'agnes_api_key';
+const POLL_INTERVAL = 6;
+const MAX_POLL = 250;
 
-const POLL_INTERVAL = 8000;
-const MAX_POLL = 240;
-
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // DATA
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 const GENRES = [
-{ id:'drama', emoji:'🎭', name:'Drame', sub:'Émotion profonde' },
-{ id:'action', emoji:'💥', name:'Action', sub:'Intense & rapide' },
-{ id:'scifi', emoji:'🚀', name:'Sci-Fi', sub:'Futur & espace' },
+{ id:'drama', emoji:'🎭', name:'Drame', sub:'Émotion' },
+{ id:'action', emoji:'💥', name:'Action', sub:'Intense' },
+{ id:'scifi', emoji:'🚀', name:'Sci-Fi', sub:'Futur' },
 { id:'thriller', emoji:'🔪', name:'Thriller', sub:'Suspense' },
 { id:'horror', emoji:'👻', name:'Horreur', sub:'Frissons' },
 { id:'comedy', emoji:'😂', name:'Comédie', sub:'Rire' },
@@ -839,48 +486,39 @@ const MOVES = [
 { id:'steadicam', icon:'🎯', label:'Steadicam' },
 ];
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // STATE
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 const state = {
 genre: null, subgenre: '', aesthetic: 'cinematic', lighting: 'natural',
-palette: 'warm', mood: '', shot: 'medium', move: 'static',
-title: '', mainPrompt: '', image: null, scenes: [],
-running: false, stop: false,
+palette: 'warm', shot: 'medium', move: 'static',
+title: '', mainPrompt: '', scenes: [],
+running: false, stop: false, strategy: 'auto',
 };
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // HELPERS
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 let toastT;
 function toast(msg, type='success') {
-const t = $('toast');
-t.textContent = msg;
-t.className = 'toast';
-void t.offsetWidth;
-t.classList.add(type, 'visible');
-clearTimeout(toastT);
+const t = $('toast'); t.textContent = msg; t.className = 'toast'; void t.offsetWidth;
+t.classList.add(type, 'visible'); clearTimeout(toastT);
 toastT = setTimeout(() => t.classList.remove('visible'), 3000);
 }
-
 function setStatus(text) {
 const s = $('status'), st = $('status-text');
-if (text) { s.classList.add('visible'); st.textContent = text; }
-else s.classList.remove('visible');
+if (text) { s.classList.add('visible'); st.textContent = text; } else s.classList.remove('visible');
 }
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // LOGGER
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 const logLines = [];
-function logTime() {
-const d = new Date();
-return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
-}
+function logTime() { const d = new Date(); return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':'); }
 function addLog(msg, type='info') {
 logLines.push({ time: logTime(), msg, type });
 if (logLines.length > 400) logLines.shift();
@@ -889,514 +527,291 @@ renderLogs();
 function renderLogs() {
 const el = $('console-log');
 if (!el) return;
-if (logLines.length === 0) {
-el.innerHTML = '<div class="console-empty">En attente d\'une production…</div>';
-return;
-}
-el.innerHTML = logLines.map(l =>
-'<div class="log-line"><span class="log-time">['+l.time+']</span><span class="log-msg log-'+l.type+'">'+esc(l.msg)+'</span></div>'
-).join('');
+if (logLines.length === 0) { el.innerHTML = '<div class="console-empty">En attente…</div>'; return; }
+el.innerHTML = logLines.map(l => '<div class="log-line"><span class="log-time">['+l.time+']</span><span class="log-msg log-'+l.type+'">'+esc(l.msg)+'</span></div>').join('');
 el.scrollTop = el.scrollHeight;
 }
-function clearLogs() {
-logLines.length = 0;
-renderLogs();
-updateProgress(0);
-addLog('Console effacée', 'dim');
-}
-function updateProgress(pct) {
-const el = $('progress-fill');
-if (el) el.style.width = Math.max(0, Math.min(100, pct)) + '%';
-}
-function updateConsoleState(text, live=false) {
-$('console-state').textContent = text;
-$('live-dot').style.display = live ? 'inline-block' : 'none';
-}
+function clearLogs() { logLines.length = 0; renderLogs(); updateProgress(0); addLog('Console effacée', 'dim'); }
+function updateProgress(p) { const el = $('progress-fill'); if (el) el.style.width = Math.max(0, Math.min(100, p)) + '%'; }
+function updateConsoleState(t, live=false) { $('console-state').textContent = t; $('console-live-dot').style.display = live ? 'inline-block' : 'none'; }
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // GENRE GRID
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 function buildGenreGrid() {
 const g = $('genre-grid');
-g.innerHTML = GENRES.map(genre =>
-'<div class="genre-card" data-genre="'+genre.id+'">' +
-'<span class="genre-emoji">'+genre.emoji+'</span>' +
-'<span class="genre-name">'+genre.name+'</span>' +
-'<span class="genre-sub">'+genre.sub+'</span>' +
-'</div>'
-).join('');
+g.innerHTML = GENRES.map(gr => '<div class="genre-card" data-genre="'+gr.id+'"><span class="genre-emoji">'+gr.emoji+'</span><span class="genre-name">'+gr.name+'</span><span class="genre-sub">'+gr.sub+'</span></div>').join('');
 g.querySelectorAll('.genre-card').forEach(card => {
 card.addEventListener('click', () => {
 g.querySelectorAll('.genre-card').forEach(c => c.classList.remove('selected'));
 card.classList.add('selected');
 state.genre = card.dataset.genre;
-const gData = GENRES.find(x => x.id === state.genre);
-$('genre-badge').textContent = gData ? gData.emoji + ' ' + gData.name : 'Non sélectionné';
+const gr = GENRES.find(x => x.id === state.genre);
+$('genre-badge').textContent = gr ? gr.emoji + ' ' + gr.name : 'Non sélectionné';
 $('panel-genre').classList.add('complete');
-addLog('Genre : ' + (gData ? gData.emoji + ' ' + gData.name : ''), 'gold');
-updateGo();
+addLog('Genre : ' + (gr ? gr.emoji + ' ' + gr.name : ''), 'gold');
 });
 });
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PRESET ROWS
-// ══════════════════════════════════════════════════════════════════
-function buildPresetRow(containerId, items, stateKey) {
-const row = $(containerId);
-row.innerHTML = items.map(it =>
-'<div class="preset-chip'+(state[stateKey]===it.id?' selected':'')+'" data-id="'+it.id+'">'+it.label+'</div>'
-).join('');
+function buildPresetRow(cid, items, key) {
+const row = $(cid);
+row.innerHTML = items.map(it => '<div class="preset-chip'+(state[key]===it.id?' selected':'')+'" data-id="'+it.id+'">'+it.label+'</div>').join('');
 row.querySelectorAll('.preset-chip').forEach(chip => {
 chip.addEventListener('click', () => {
 row.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('selected'));
 chip.classList.add('selected');
-state[stateKey] = chip.dataset.id;
+state[key] = chip.dataset.id;
 });
 });
 }
 
-function buildCameraGrid(containerId, items, stateKey) {
-const g = $(containerId);
-g.innerHTML = items.map(it =>
-'<div class="camera-btn'+(state[stateKey]===it.id?' selected':'')+'" data-id="'+it.id+'">' +
-'<span class="cam-icon">'+it.icon+'</span>' +
-'<span class="cam-label">'+it.label+'</span>' +
-'</div>'
-).join('');
+function buildCameraGrid(cid, items, key) {
+const g = $(cid);
+g.innerHTML = items.map(it => '<div class="camera-btn'+(state[key]===it.id?' selected':'')+'" data-id="'+it.id+'"><span class="cam-icon">'+it.icon+'</span><span class="cam-label">'+it.label+'</span></div>').join('');
 g.querySelectorAll('.camera-btn').forEach(btn => {
 btn.addEventListener('click', () => {
 g.querySelectorAll('.camera-btn').forEach(b => b.classList.remove('selected'));
 btn.classList.add('selected');
-state[stateKey] = btn.dataset.id;
+state[key] = btn.dataset.id;
 });
 });
 }
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // SCENES
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 let sceneIdCounter = 0;
-
 function addScene(data = {}) {
 const id = ++sceneIdCounter;
-const scene = {
+state.scenes.push({
 id,
 title: data.title || 'Scène ' + (state.scenes.length + 1),
 description: data.description || '',
 shot: data.shot || state.shot || 'medium',
 move: data.move || state.move || 'static',
 duration: data.duration || '5',
-};
-state.scenes.push(scene);
+});
 renderScenes();
-updateGo();
 }
-
-function removeScene(id) {
-state.scenes = state.scenes.filter(s => s.id !== id);
-renderScenes();
-updateGo();
-}
-
+function removeScene(id) { state.scenes = state.scenes.filter(s => s.id !== id); renderScenes(); }
 function renderScenes() {
 const list = $('scenes-list');
 $('scene-count').textContent = state.scenes.length + ' scène' + (state.scenes.length !== 1 ? 's' : '');
-
 if (state.scenes.length === 0) {
-list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--ink-faint);font-size:0.75rem;font-style:italic">Aucune scène. Cliquez sur "+ Scène" pour commencer votre storyboard.</div>';
-renderSceneProgress();
-return;
+list.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--ink-faint);font-size:0.75rem;font-style:italic">Aucune scène. Cliquez sur "+ Scène".</div>';
+renderSceneProgress(); return;
 }
-
 list.innerHTML = state.scenes.map((sc, idx) =>
-'<div class="scene-card" data-scene-id="'+sc.id+'">' +
-'<div class="scene-card-header">' +
+'<div class="scene-card"><div class="scene-card-header">' +
 '<div class="scene-number">'+(idx+1)+'</div>' +
 '<input class="scene-title-input" type="text" value="'+esc(sc.title)+'" data-field="title" data-scene-id="'+sc.id+'">' +
-'<button class="scene-remove" data-remove="'+sc.id+'">✕</button>' +
-'</div>' +
-'<textarea class="scene-textarea" data-field="description" data-scene-id="'+sc.id+'" placeholder="Décrivez l\'action, les personnages, l\'ambiance…">'+esc(sc.description)+'</textarea>' +
+'<button class="scene-remove" data-remove="'+sc.id+'">✕</button></div>' +
+'<textarea class="scene-textarea" data-field="description" data-scene-id="'+sc.id+'" placeholder="Décrivez l\'action…">'+esc(sc.description)+'</textarea>' +
 '<div class="scene-meta">' +
-'<select data-field="shot" data-scene-id="'+sc.id+'">' +
-SHOTS.map(s => '<option value="'+s.id+'"'+(sc.shot===s.id?' selected':'')+'>'+s.icon+' '+s.label+'</option>').join('') +
-'</select>' +
-'<select data-field="move" data-scene-id="'+sc.id+'">' +
-MOVES.map(m => '<option value="'+m.id+'"'+(sc.move===m.id?' selected':'')+'>'+m.icon+' '+m.label+'</option>').join('') +
-'</select>' +
-'<select data-field="duration" data-scene-id="'+sc.id+'">' +
-['5','8','10'].map(d => '<option value="'+d+'"'+(sc.duration===d?' selected':'')+'>'+d+'s</option>').join('') +
-'</select>' +
-'</div>' +
-'</div>'
+'<select data-field="shot" data-scene-id="'+sc.id+'">'+SHOTS.map(s => '<option value="'+s.id+'"'+(sc.shot===s.id?' selected':'')+'>'+s.icon+' '+s.label+'</option>').join('')+'</select>' +
+'<select data-field="move" data-scene-id="'+sc.id+'">'+MOVES.map(m => '<option value="'+m.id+'"'+(sc.move===m.id?' selected':'')+'>'+m.icon+' '+m.label+'</option>').join('')+'</select>' +
+'<select data-field="duration" data-scene-id="'+sc.id+'">'+['5','8','10'].map(d => '<option value="'+d+'"'+(sc.duration===d?' selected':'')+'>'+d+'s</option>').join('')+'</select>' +
+'</div></div>'
 ).join('');
-
 list.querySelectorAll('.scene-title-input, .scene-textarea').forEach(el => {
-el.addEventListener('input', () => {
-const sc = state.scenes.find(s => s.id === parseInt(el.dataset.sceneId));
-if (sc) sc[el.dataset.field] = el.value;
-});
+el.addEventListener('input', () => { const sc = state.scenes.find(s => s.id === parseInt(el.dataset.sceneId)); if (sc) sc[el.dataset.field] = el.value; });
 });
 list.querySelectorAll('.scene-meta select').forEach(el => {
-el.addEventListener('change', () => {
-const sc = state.scenes.find(s => s.id === parseInt(el.dataset.sceneId));
-if (sc) sc[el.dataset.field] = el.value;
+el.addEventListener('change', () => { const sc = state.scenes.find(s => s.id === parseInt(el.dataset.sceneId)); if (sc) sc[el.dataset.field] = el.value; });
 });
-});
-list.querySelectorAll('.scene-remove').forEach(btn => {
-btn.addEventListener('click', () => removeScene(parseInt(btn.dataset.remove)));
-});
-
+list.querySelectorAll('.scene-remove').forEach(btn => btn.addEventListener('click', () => removeScene(parseInt(btn.dataset.remove))));
 renderSceneProgress();
 }
-
 function renderSceneProgress() {
-const container = $('scene-progress');
-if (state.scenes.length <= 1) {
-container.innerHTML = '';
-return;
+const c = $('scene-progress');
+if (state.scenes.length <= 1) { c.innerHTML = ''; return; }
+c.innerHTML = state.scenes.map((sc, i) => '<div class="scene-dot" data-scene-idx="'+i+'" title="Scène '+(i+1)+'"></div>').join('');
 }
-container.innerHTML = state.scenes.map((sc, i) =>
-'<div class="scene-dot" data-scene-idx="'+i+'" title="Scène '+(i+1)+'"></div>'
-).join('');
-}
-
 function updateSceneDot(idx, status) {
 const dots = $('scene-progress').querySelectorAll('.scene-dot');
 if (dots[idx]) dots[idx].className = 'scene-dot ' + status;
 }
 
-// ══════════════════════════════════════════════════════════════════
-// IMAGE
-// ══════════════════════════════════════════════════════════════════
-function fileToDataUri(file) {
-return new Promise((res, rej) => {
-const r = new FileReader();
-r.onload = e => res(e.target.result);
-r.onerror = rej;
-r.readAsDataURL(file);
-});
-}
-async function handleImageFile(file) {
-if (!file.type.startsWith('image/')) return;
-addLog('Chargement image : ' + file.name, 'info');
-try {
-const dataUri = await fileToDataUri(file);
-state.image = { dataUri, name: file.name };
-renderImagePreview();
-updateGo();
-addLog('Image chargée (' + Math.round(file.size/1024) + ' Ko)', 'success');
-} catch(e) { addLog('Erreur image', 'error'); }
-}
-function renderImagePreview() {
-const c = $('image-preview-container');
-if (!state.image) { c.innerHTML = ''; return; }
-c.innerHTML = '<div class="image-preview"><img src="'+state.image.dataUri+'"><button class="remove-btn" id="remove-img">✕</button></div>';
-$('remove-img').onclick = () => {
-state.image = null;
-renderImagePreview();
-updateGo();
-};
-}
-
-// ══════════════════════════════════════════════════════════════════
-// CLÉ API — CORRIGÉE
-// ══════════════════════════════════════════════════════════════════
-function getKey() {
-try { return (localStorage.getItem(API_KEY_STORE) || '').trim(); } catch(e) { return ''; }
-}
+// ═══════════════════════════════════════════════════════════════
+// CLÉ AGNES
+// ═══════════════════════════════════════════════════════════════
+function getKey() { try { return (localStorage.getItem(API_KEY_STORE) || '').trim(); } catch(e) { return ''; } }
 function saveKey() {
 const input = $('agnes-key');
 let k = String(input.value||'').trim().replace(/^["']|["']$/g,'').replace(/^Bearer\s+/i,'').replace(/\s+/g,'');
-if (!k) {
-try { localStorage.removeItem(API_KEY_STORE); } catch(e) {}
-refreshKeyUI();
-toast('Clé supprimée', 'error');
-addLog('Clé supprimée', 'warn');
-return;
+if (!k) { try { localStorage.removeItem(API_KEY_STORE); } catch(e) {} refreshKeyUI(); toast('Clé supprimée','error'); return; }
+try { localStorage.setItem(API_KEY_STORE, k); input.value = k; refreshKeyUI(); toast('Clé Agnes ✓'); addLog('Clé Agnes enregistrée', 'success'); } catch(e) { toast('Erreur','error'); }
 }
-if (k.length < 10) {
-toast('Clé trop courte', 'error');
-addLog('Clé trop courte (min 10 caractères)', 'error');
-return;
-}
-try {
-localStorage.setItem(API_KEY_STORE, k);
-input.value = k;
-refreshKeyUI();
-toast('Clé Agnes enregistrée ✓');
-addLog('Clé Agnes enregistrée ('+k.slice(0,8)+'…)', 'success');
-} catch(e) { toast('Erreur sauvegarde', 'error'); }
-}
-
 function refreshKeyUI() {
-const input = $('agnes-key');
-const status = $('agnes-status');
-const badge = $('agnes-badge');
-const panel = $('panel-agnes');
+const input = $('agnes-key'), status = $('agnes-status'), badge = $('agnes-badge'), panel = $('panel-agnes');
 const k = getKey();
 if (k) {
-panel.classList.add('complete');
-badge.textContent = '✓ Configuré';
-badge.className = 'panel-badge badge-green';
-input.value = k;
-status.className = 'key-status ok';
+panel.classList.add('complete'); badge.textContent = '✓ Prêt'; badge.className = 'panel-badge badge-green';
+input.value = k; status.className = 'key-status ok';
 status.innerHTML = '<span class="dot"></span><span>✓ '+k.slice(0,10)+'…'+k.slice(-4)+'</span>';
 } else {
-panel.classList.remove('complete');
-badge.textContent = 'Non configuré';
-badge.className = 'panel-badge badge-gray';
-input.value = '';
-status.className = 'key-status';
-status.innerHTML = '<span class="dot"></span><span>Aucune clé enregistrée</span>';
+panel.classList.remove('complete'); badge.textContent = 'Optionnel'; badge.className = 'panel-badge badge-gray';
+input.value = ''; status.className = 'key-status';
+status.innerHTML = '<span class="dot"></span><span>Aucune clé (fallback désactivé)</span>';
 }
 updateGo();
 }
 
-// ✅ NOUVEAU : test de la clé Agnes
-async function testKey() {
-const k = getKey();
-if (!k) { toast('Enregistrez d\'abord votre clé', 'error'); return; }
-const btn = $('agnes-test');
-btn.disabled = true;
-const status = $('agnes-status');
-status.className = 'key-status testing';
-status.innerHTML = '<span class="dot"></span><span>🔬 Test en cours…</span>';
-addLog('🔬 Test de la clé Agnes…', 'info');
-try {
-const r = await fetch(AGNES_API + '/models', {
-headers: { 'Authorization': 'Bearer ' + k }
-});
-if (r.ok) {
-const d = await r.json();
-const count = d.data ? d.data.length : '?';
-status.className = 'key-status ok';
-status.innerHTML = '<span class="dot"></span><span>✅ Clé valide · ' + count + ' modèles</span>';
-addLog('✅ Clé valide (' + count + ' modèles disponibles)', 'success');
-toast('Clé valide ✓');
-} else if (r.status === 401) {
-status.className = 'key-status err';
-status.innerHTML = '<span class="dot"></span><span>❌ Clé refusée (401)</span>';
-addLog('❌ Clé refusée par l\'API (401)', 'error');
-toast('Clé refusée', 'error');
-} else {
-status.className = 'key-status err';
-status.innerHTML = '<span class="dot"></span><span>❌ HTTP ' + r.status + '</span>';
-addLog('❌ Erreur HTTP ' + r.status, 'error');
-}
-} catch(e) {
-status.className = 'key-status err';
-status.innerHTML = '<span class="dot"></span><span>❌ Erreur réseau</span>';
-addLog('❌ Erreur réseau : ' + e.message, 'error');
-}
-btn.disabled = false;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// PROMPT BUILDER — AMÉLIORÉ
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// PROMPT BUILDER
+// ═══════════════════════════════════════════════════════════════
 function buildCinematicPrompt(sceneData) {
 const parts = [];
-
-// Titre du film
 if (state.title) parts.push('Scene from "' + state.title + '"');
-
-// Genre
-if (state.genre) {
-const g = GENRES.find(x => x.id === state.genre);
-if (g) parts.push(g.name + ' film');
-}
+if (state.genre) { const g = GENRES.find(x => x.id === state.genre); if (g) parts.push(g.name + ' film'); }
 if (state.subgenre) parts.push(state.subgenre);
-
-// Aesthetic
 const aes = AESTHETICS.find(a => a.id === state.aesthetic);
 if (aes) parts.push(aes.label.replace(/^[^\s]+\s/, '') + ' aesthetic');
-
-// Lighting
 const lit = LIGHTING.find(l => l.id === state.lighting);
 if (lit) parts.push(lit.label.replace(/^[^\s]+\s/, '') + ' lighting');
-
-// Palette
 const pal = PALETTES.find(p => p.id === state.palette);
 if (pal) parts.push(pal.label.replace(/^[^\s]+\s/, '') + ' color palette');
-
-// Shot
 const shot = SHOTS.find(s => s.id === (sceneData?.shot || state.shot));
 if (shot) parts.push(shot.label + ' shot');
-
-// Camera move
 const move = MOVES.find(m => m.id === (sceneData?.move || state.move));
 if (move) parts.push(move.label + ' camera movement');
-
-// ✅ Mood / ambiance
-if (state.mood) parts.push('suggested musical ambiance: ' + state.mood);
-
-// Scene description
 const desc = sceneData?.description || state.mainPrompt;
 if (desc) parts.push(desc);
-
-// Cinematic boosters
 parts.push('cinematic composition, film grain, shallow depth of field, professional color grading, movie scene');
-
 return parts.filter(Boolean).join('. ');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// AGNES API — CORRIGÉE
-// ══════════════════════════════════════════════════════════════════
-async function generateWithAgnes(prompt, imageDataUri, aspect, duration) {
-const key = getKey();
-if (!key) throw new Error('Pas de clé Agnes configurée');
+// ═══════════════════════════════════════════════════════════════
+// REPLICATE — via proxy Render
+// ═══════════════════════════════════════════════════════════════
+async function generateWithReplicate(prompt, aspect, duration) {
+addLog('🔥 [Replicate] Envoi via proxy Render…', 'gold');
+const numFrames = duration * 24;
+const body = { model: REPLICATE_MODEL, prompt, aspect_ratio: aspect, num_frames: numFrames, fps: 24 };
 
-addLog('💜 [Agnes] Envoi — ' + prompt.slice(0, 80) + '…', 'gold');
-
-const frames = duration === 5 ? 121 : (duration === 10 ? 241 : 193);
-
-// ✅ CORRECTION : body simplifié, uniquement les paramètres valides
-const body = {
-model: AGNES_MODEL,
-prompt: prompt,
-num_frames: frames,
-frame_rate: 24,
-ratio: aspect,
-resolution: '480p'
-};
-if (imageDataUri) body.image = imageDataUri;
-
-const res1 = await fetch(AGNES_API + '/videos', {
+const r = await fetch(PROXY_URL + '/v1/videos', {
 method: 'POST',
-headers: {
-'Authorization': 'Bearer ' + key,
-'Content-Type': 'application/json'
-},
+headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(body)
 });
-
-if (!res1.ok) {
-const err = await res1.text();
-throw new Error('Agnes HTTP ' + res1.status + ' : ' + err.slice(0, 200));
-}
-
-const d = await res1.json();
-const id = d.video_id || d.id || d.task_id;
-if (!id) throw new Error('Pas de video_id Agnes');
-addLog('💜 [Agnes] Tâche : ' + String(id).slice(0, 14) + '…', 'success');
+if (!r.ok) { const err = await r.text(); throw new Error('Proxy HTTP ' + r.status + ' : ' + err.slice(0,150)); }
+const d = await r.json();
+const id = d.id;
+if (!id) throw new Error('Pas d\'ID Replicate');
+addLog('🔥 [Replicate] Tâche : ' + id.slice(0, 14) + '…', 'success');
 
 const start = Date.now();
 for (let i = 0; i < MAX_POLL; i++) {
 if (state.stop) throw new Error('stop');
-
-const elapsed = Math.floor((Date.now() - start) / 1000);
-if (elapsed > 1500) throw new Error('Timeout Agnes (25 min)');
-
-await sleep(POLL_INTERVAL);
-
-const pollUrl = AGNES_POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=' + encodeURIComponent(AGNES_MODEL);
-const pollRes = await fetch(pollUrl, {
-headers: { 'Authorization': 'Bearer ' + key }
-});
-const p = await pollRes.json();
-const status = p.status || 'unknown';
-const progress = p.progress || p.internal_progress || 0;
-const internal = p.internal_status || '';
-
-addLog('💜 ' + status + ' · ' + internal + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
-
-if (status === 'completed' || status === 'succeeded' || status === 'done') {
-const url = (p.metadata && p.metadata.url) || p.url || (p.output && p.output.url);
-if (!url) throw new Error('Terminé sans URL');
-addLog('💜 ✅ Vidéo prête !', 'success');
+const elapsed = Math.floor((Date.now()-start)/1000);
+if (elapsed > 900) throw new Error('Timeout Replicate (15 min)');
+await sleep(POLL_INTERVAL * 1000);
+const sr = await fetch(PROXY_URL + '/v1/videos/' + encodeURIComponent(id));
+const sd = await sr.json();
+const status = sd.status || 'unknown';
+const progress = sd.progress || 0;
+addLog('🔥 [Replicate] ' + status + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
+updateProgress(progress);
+if (status === 'succeeded' || status === 'completed') {
+const url = sd.video_url;
+if (!url) throw new Error('Pas d\'URL Replicate');
+addLog('🔥 [Replicate] ✅ Vidéo prête !', 'success');
 return url;
 }
-if (status === 'failed' || status === 'error' || status === 'cancelled') {
-throw new Error('Agnes ' + status + ' : ' + (p.error || p.message || 'inconnu'));
+if (status === 'failed' || status === 'canceled') throw new Error('Replicate ' + status + ' : ' + (sd.error || 'inconnu'));
 }
+throw new Error('Replicate timeout');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AGNES — direct
+// ═══════════════════════════════════════════════════════════════
+async function generateWithAgnes(prompt, aspect, duration) {
+const key = getKey();
+if (!key) throw new Error('Pas de clé Agnes');
+addLog('💜 [Agnes] Envoi direct…', 'gold');
+const frames = duration === 5 ? 121 : (duration === 10 ? 241 : 193);
+const body = { model: AGNES_MODEL, prompt, num_frames: frames, frame_rate: 24, ratio: aspect, resolution: '480p' };
+
+const r = await fetch(AGNES_API + '/videos', {
+method: 'POST',
+headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+body: JSON.stringify(body)
+});
+if (!r.ok) { const err = await r.text(); throw new Error('Agnes HTTP ' + r.status + ' : ' + err.slice(0,150)); }
+const d = await r.json();
+const id = d.video_id || d.id || d.task_id;
+if (!id) throw new Error('Pas de video_id Agnes');
+addLog('💜 [Agnes] Tâche : ' + String(id).slice(0,14) + '…', 'success');
+
+const start = Date.now();
+for (let i = 0; i < MAX_POLL; i++) {
+if (state.stop) throw new Error('stop');
+const elapsed = Math.floor((Date.now()-start)/1000);
+if (elapsed > 1200) throw new Error('Timeout Agnes (20 min)');
+await sleep(POLL_INTERVAL * 1000);
+const url = AGNES_POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=' + encodeURIComponent(AGNES_MODEL);
+const sr = await fetch(url, { headers: { 'Authorization': 'Bearer ' + key } });
+const sd = await sr.json();
+const status = sd.status || 'unknown';
+const progress = sd.progress || sd.internal_progress || 0;
+addLog('💜 [Agnes] ' + status + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
+updateProgress(progress);
+if (status === 'completed' || status === 'succeeded' || status === 'done') {
+const videoUrl = (sd.metadata && sd.metadata.url) || sd.url || (sd.output && sd.output.url);
+if (!videoUrl) throw new Error('Pas d\'URL Agnes');
+addLog('💜 [Agnes] ✅ Vidéo prête !', 'success');
+return videoUrl;
+}
+if (status === 'failed' || status === 'error' || status === 'cancelled') throw new Error('Agnes ' + status);
 }
 throw new Error('Agnes timeout');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PRODUCTION
-// ══════════════════════════════════════════════════════════════════
-async function produceFilm() {
-const hasScenes = state.scenes.length > 0;
-const hasMainPrompt = state.mainPrompt.trim().length > 0;
+// ═══════════════════════════════════════════════════════════════
+// ORCHESTRATEUR
+// ═══════════════════════════════════════════════════════════════
+async function generateVideo(prompt, aspect, duration) {
+const providers = [];
+if (state.strategy === 'auto' || state.strategy === 'replicate') {
+providers.push({ name:'Replicate', emoji:'🔥', fn: generateWithReplicate });
+}
+if ((state.strategy === 'auto' || state.strategy === 'agnes') && getKey()) {
+providers.push({ name:'Agnes', emoji:'💜', fn: generateWithAgnes });
+}
+if (providers.length === 0) throw new Error('Aucun provider disponible');
 
-if (!hasScenes && !hasMainPrompt) throw new Error('Écrivez un synopsis ou ajoutez des scènes');
-
-const aspect = $('aspect-select').value;
-const duration = parseInt($('duration-select').value, 10);
-
-const results = [];
-
-if (hasScenes) {
-addLog('🎬 Production multi-scènes : ' + state.scenes.length + ' scènes', 'gold');
-const total = state.scenes.length;
-
-for (let i = 0; i < total; i++) {
+let lastError = null;
+for (const p of providers) {
 if (state.stop) throw new Error('stop');
-
-const sc = state.scenes[i];
-updateSceneDot(i, 'active');
-updateConsoleState('Scène ' + (i+1) + '/' + total + ' — ' + sc.title, true);
-addLog('───────────────────────────────', 'gold');
-addLog('🎬 Scène ' + (i+1) + '/' + total + ' : ' + sc.title, 'gold');
-
-const prompt = buildCinematicPrompt(sc);
-const scDuration = parseInt(sc.duration, 10) || duration;
-
 try {
-const url = await generateWithAgnes(prompt, null, aspect, scDuration);
-results.push({ url, title: sc.title, scene: i+1 });
-updateSceneDot(i, 'done');
-addLog('✅ Scène ' + (i+1) + ' terminée', 'success');
+addLog('▶️ Tentative : ' + p.emoji + ' ' + p.name, 'gold');
+updateConsoleState('Génération via ' + p.name + '…', true);
+const url = await p.fn(prompt, aspect, duration);
+return { url, provider: p.name, emoji: p.emoji };
 } catch(e) {
 if (e.message === 'stop') throw e;
-updateSceneDot(i, 'failed');
-addLog('❌ Scène ' + (i+1) + ' échouée : ' + e.message, 'error');
-results.push({ url: null, title: sc.title, scene: i+1, error: e.message });
+lastError = e;
+addLog('❌ ' + p.name + ' échoué : ' + e.message, 'error');
+updateProgress(0);
+await sleep(1500);
+}
+}
+throw new Error('Tous échoués : ' + (lastError?.message || 'inconnu'));
 }
 
-updateProgress(((i+1) / total) * 100);
-
-if (i < total - 1) {
-addLog('⏳ Pause avant la scène suivante…', 'dim');
-await sleep(2000);
-}
-}
-} else {
-updateConsoleState('Production en cours…', true);
-const prompt = buildCinematicPrompt(null);
-addLog('🎬 Prompt cinématique : ' + prompt.slice(0, 100) + '…', 'gold');
-const url = await generateWithAgnes(prompt, state.image?.dataUri || null, aspect, duration);
-results.push({ url, title: state.title || 'Film', scene: 1 });
-updateProgress(100);
-}
-return results;
-}
-
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // UI
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 function updateGo() {
 const b = $('go-btn');
-const hasKey = !!getKey();
 const hasScenes = state.scenes.length > 0;
 const hasPrompt = state.mainPrompt.trim().length > 0;
-const canGo = hasKey && (hasScenes || hasPrompt) && !state.running;
-
-b.disabled = !canGo;
-
-if (state.running) {
-b.textContent = '🎬 Production en cours…';
-} else if (!hasKey) {
-b.textContent = '💜 Configurez votre clé Agnes';
-} else if (!hasScenes && !hasPrompt) {
-b.textContent = '✍️ Décrivez votre film ou ajoutez des scènes';
-} else {
-const count = hasScenes ? state.scenes.length + ' scène' + (state.scenes.length>1?'s':'') : '1 film';
-b.textContent = '🎬 Produire — ' + count;
-}
+b.disabled = (!hasScenes && !hasPrompt) || state.running;
+if (state.running) b.textContent = '🎬 Production…';
+else if (!hasScenes && !hasPrompt) b.textContent = '✍️ Décrivez votre film ou ajoutez des scènes';
+else b.textContent = '🎬 Produire — ' + (hasScenes ? state.scenes.length + ' scène' + (state.scenes.length>1?'s':'') : '1 film');
 }
 
 function switchTab(tab) {
@@ -1407,110 +822,110 @@ $('tab-config').style.display = tab === 'config' ? 'block' : 'none';
 }
 
 function showResults(results) {
-const box = $('result-box');
-const videos = $('result-videos');
+const box = $('result-box'), videos = $('result-videos');
 box.classList.add('visible');
-
-const title = state.title || 'Film';
-$('result-title').textContent = '🎬 ' + title;
+$('result-title').textContent = '🎬 ' + (state.title || 'Film');
+$('result-provider').textContent = results[0]?.provider?.toUpperCase() || '—';
 
 if (results.length === 1 && results[0].url) {
-videos.innerHTML = '<video controls playsinline src="'+results[0].url+'" style="width:100%;border-radius:10px;aspect-ratio:9/16;object-fit:cover;background:#000;max-height:50vh"></video>';
-$('result-download').href = results[0].url;
-$('result-open').href = results[0].url;
+videos.innerHTML = '<video controls playsinline src="'+results[0].url+'" style="width:100%;border-radius:10px;aspect-ratio:9/16;object-fit:cover;background:#000;max-height:60vh"></video>';
 } else {
 videos.innerHTML = results.map((r, i) => {
-if (r.url) {
-return '<div style="margin-bottom:0.7rem">' +
-'<div style="font-size:0.7rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">Scène '+(i+1)+' : '+esc(r.title)+'</div>' +
-'<video controls playsinline src="'+r.url+'" style="width:100%;border-radius:8px;aspect-ratio:9/16;object-fit:cover;background:#000;max-height:35vh"></video>' +
-'</div>';
-} else {
-return '<div style="margin-bottom:0.7rem;padding:0.6rem;background:rgba(255,90,90,0.1);border-radius:8px;border:1px solid var(--error)">' +
-'<div style="font-size:0.7rem;font-weight:700;color:var(--red)">Scène '+(i+1)+' : '+esc(r.title)+' — Échouée</div>' +
-'<div style="font-size:0.65rem;color:var(--ink-faint);margin-top:0.2rem">'+esc(r.error||'Erreur inconnue')+'</div>' +
-'</div>';
-}
+if (r.url) return '<div style="margin-bottom:0.7rem"><div style="font-size:0.7rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem">Scène '+(i+1)+' : '+esc(r.title)+'</div><video controls playsinline src="'+r.url+'" style="width:100%;border-radius:8px;aspect-ratio:9/16;object-fit:cover;background:#000;max-height:35vh"></video></div>';
+return '<div style="margin-bottom:0.7rem;padding:0.6rem;background:rgba(255,90,90,0.1);border-radius:8px;border:1px solid var(--red)"><div style="font-size:0.7rem;font-weight:700;color:var(--red)">Scène '+(i+1)+' : '+esc(r.title)+' — Échouée</div><div style="font-size:0.65rem;color:var(--ink-faint);margin-top:0.2rem">'+esc(r.error||'')+'</div></div>';
 }).join('');
-
-const firstUrl = results.find(r => r.url);
-$('result-download').href = firstUrl ? firstUrl.url : '#';
-$('result-open').href = firstUrl ? firstUrl.url : '#';
 }
 }
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // DEMO
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 function loadDemo() {
 const noirCard = document.querySelector('[data-genre="noir"]');
 if (noirCard) noirCard.click();
-
 $('subgenre-input').value = 'Néo-noir urbain';
 state.subgenre = 'Néo-noir urbain';
 
-// Style
-[['aesthetic-row','cinematic','aesthetic'],['lighting-row','low-key','lighting'],['palette-row','teal-orange','palette']].forEach(([rowId, val, key]) => {
-const row = $(rowId);
-if (row) {
-row.querySelectorAll('.preset-chip').forEach(c => {
-c.classList.toggle('selected', c.dataset.id === val);
+[['aesthetic-row','cinematic','aesthetic'],['lighting-row','low-key','lighting'],['palette-row','teal-orange','palette']].forEach(([rid, val, key]) => {
+const row = $(rid);
+if (row) { row.querySelectorAll('.preset-chip').forEach(c => c.classList.toggle('selected', c.dataset.id === val)); state[key] = val; }
 });
-state[key] = val;
-}
-});
-
-// Caméra
 $('shot-grid').querySelectorAll('.camera-btn').forEach(b => b.classList.toggle('selected', b.dataset.id === 'close'));
 state.shot = 'close';
 $('move-grid').querySelectorAll('.camera-btn').forEach(b => b.classList.toggle('selected', b.dataset.id === 'dolly'));
 state.move = 'dolly';
 
-$('mood-select').value = 'jazz noir';
-state.mood = 'jazz noir';
-
 $('film-title').value = 'Les Ombres de Minuit';
 state.title = 'Les Ombres de Minuit';
-
 $('main-prompt').value = 'Un détective privé marche seul dans les rues mouillées d\'une ville futuriste sous la pluie.';
 state.mainPrompt = $('main-prompt').value;
 
-state.scenes = [];
-sceneIdCounter = 0;
-addScene({ title: 'Introduction — La ville', description: 'Vue aérienne de la ville futuriste sous la pluie nocturne. Gratte-ciels immenses, néons partout. La caméra descend lentement vers une ruelle sombre.', shot: 'extreme-wide', move: 'crane', duration: '8' });
-addScene({ title: 'Le détective', description: 'Un homme en manteau sombre marche seul dans la ruelle. Pluie fine, flaques au sol reflétant les néons.', shot: 'medium', move: 'steadicam', duration: '5' });
-addScene({ title: 'Gros plan — Visage', description: 'Gros plan sur le visage du détective. Ombres dures sur ses traits. Il allume une cigarette.', shot: 'ecu', move: 'static', duration: '5' });
-addScene({ title: 'La porte', description: 'Il s\'arrête devant une porte métallique entrouverte. Lumière bleue qui s\'échappe.', shot: 'over-shoulder', move: 'dolly', duration: '5' });
+state.scenes = []; sceneIdCounter = 0;
+addScene({ title:'Introduction — La ville', description:'Vue aérienne de la ville futuriste sous la pluie nocturne. Gratte-ciels immenses, néons partout. La caméra descend lentement vers une ruelle sombre.', shot:'extreme-wide', move:'crane', duration:'8' });
+addScene({ title:'Le détective', description:'Un homme en manteau sombre marche seul dans la ruelle. Pluie fine, flaques au sol reflétant les néons.', shot:'medium', move:'steadicam', duration:'5' });
+addScene({ title:'Gros plan — Visage', description:'Gros plan sur le visage du détective. Ombres dures sur ses traits. Il allume une cigarette.', shot:'ecu', move:'static', duration:'5' });
+addScene({ title:'La porte', description:'Il s\'arrête devant une porte métallique entrouverte. Lumière bleue qui s\'échappe.', shot:'over-shoulder', move:'dolly', duration:'5' });
 
 updateGo();
 toast('Exemple chargé ✓');
 addLog('📖 Exemple "Les Ombres de Minuit" chargé', 'gold');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// LANCEMENT
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// PRODUCTION
+// ═══════════════════════════════════════════════════════════════
+async function produceFilm() {
+const hasScenes = state.scenes.length > 0;
+const aspect = $('aspect-select').value;
+const duration = parseInt($('duration-select').value, 10);
+const results = [];
+
+if (hasScenes) {
+const total = state.scenes.length;
+addLog('🎬 Production multi-scènes : ' + total + ' scènes', 'gold');
+for (let i = 0; i < total; i++) {
+if (state.stop) throw new Error('stop');
+const sc = state.scenes[i];
+updateSceneDot(i, 'active');
+updateConsoleState('Scène ' + (i+1) + '/' + total + ' — ' + sc.title, true);
+addLog('───────────────────', 'gold');
+addLog('🎬 Scène ' + (i+1) + '/' + total + ' : ' + sc.title, 'gold');
+const prompt = buildCinematicPrompt(sc);
+const scDuration = parseInt(sc.duration, 10) || duration;
+try {
+const r = await generateVideo(prompt, aspect, scDuration);
+results.push({ url: r.url, title: sc.title, provider: r.provider });
+updateSceneDot(i, 'done');
+addLog('✅ Scène ' + (i+1) + ' terminée via ' + r.emoji, 'success');
+} catch(e) {
+if (e.message === 'stop') throw e;
+updateSceneDot(i, 'failed');
+addLog('❌ Scène ' + (i+1) + ' échouée : ' + e.message, 'error');
+results.push({ url: null, title: sc.title, error: e.message });
+}
+updateProgress(((i+1) / total) * 100);
+if (i < total - 1) await sleep(2000);
+}
+} else {
+updateConsoleState('Production en cours…', true);
+const prompt = buildCinematicPrompt(null);
+const r = await generateVideo(prompt, aspect, duration);
+results.push({ url: r.url, title: state.title || 'Film', provider: r.provider });
+updateProgress(100);
+}
+return results;
+}
+
 async function start() {
 if (state.running) return;
-
-state.running = true;
-state.stop = false;
-
-updateProgress(0);
-updateConsoleState('Initialisation…', true);
-
-addLog('═══════════════════════════════════════', 'gold');
+state.running = true; state.stop = false;
+updateProgress(0); updateConsoleState('Initialisation…', true);
+addLog('═══════════════════════════', 'gold');
 addLog('🎬 NOUVELLE PRODUCTION', 'gold');
-addLog('═══════════════════════════════════════', 'gold');
-
 if (state.title) addLog('Titre : ' + state.title, 'gold');
-if (state.genre) {
-const g = GENRES.find(x => x.id === state.genre);
-if (g) addLog('Genre : ' + g.emoji + ' ' + g.name, 'info');
-}
 addLog('Scènes : ' + state.scenes.length, 'info');
-addLog('═══════════════════════════════════════', 'gold');
-
+addLog('Stratégie : ' + state.strategy, 'info');
+addLog('═══════════════════════════', 'gold');
 $('result-box').classList.remove('visible');
 $('btn-stop').classList.add('visible');
 $('go-btn').disabled = true;
@@ -1518,47 +933,33 @@ $('go-btn').disabled = true;
 try {
 const results = await produceFilm();
 showResults(results);
-
 const successCount = results.filter(r => r.url).length;
 const totalCount = results.length;
-
-addLog('═══════════════════════════════════════', 'gold');
-addLog('🎉 PRODUCTION TERMINÉE — ' + successCount + '/' + totalCount + ' scènes réussies', 'success');
-addLog('═══════════════════════════════════════', 'gold');
-
-updateConsoleState('✅ Terminé — ' + successCount + '/' + totalCount, false);
-toast(successCount === totalCount ? 'Film produit ✓' : successCount + '/' + totalCount + ' scènes', successCount === totalCount ? 'success' : 'error');
-
+addLog('═══════════════════════════', 'gold');
+addLog('🎉 TERMINÉ — ' + successCount + '/' + totalCount + ' scènes', 'success');
+addLog('═══════════════════════════', 'gold');
+updateConsoleState('✅ Terminé ' + successCount + '/' + totalCount, false);
+toast(successCount === totalCount ? 'Film produit ✓' : successCount + '/' + totalCount, successCount === totalCount ? 'success' : 'error');
 } catch(e) {
 if (e.message !== 'stop') {
-addLog('═══════════════════════════════════════', 'gold');
 addLog('❌ ÉCHEC : ' + e.message, 'error');
-addLog('═══════════════════════════════════════', 'gold');
 toast('Échec : ' + e.message, 'error');
 updateConsoleState('Échec', false);
 } else {
-addLog('⏹ Production arrêtée', 'warn');
+addLog('⏹ Arrêté', 'warn');
 updateConsoleState('Arrêté', false);
 }
 }
-
 setStatus(null);
-state.running = false;
-state.stop = false;
+state.running = false; state.stop = false;
 $('btn-stop').classList.remove('visible');
 updateGo();
 }
+function stopAll() { if (!state.running) return; state.stop = true; addLog('⏹ Arrêt…', 'warn'); setStatus('Arrêt…'); }
 
-function stopAll() {
-if (!state.running) return;
-state.stop = true;
-addLog('⏹ Arrêt demandé…', 'warn');
-setStatus('Arrêt en cours…');
-}
-
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // INIT
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 (function init() {
 buildGenreGrid();
 buildPresetRow('aesthetic-row', AESTHETICS, 'aesthetic');
@@ -1567,40 +968,24 @@ buildPresetRow('palette-row', PALETTES, 'palette');
 buildCameraGrid('shot-grid', SHOTS, 'shot');
 buildCameraGrid('move-grid', MOVES, 'move');
 
-document.querySelectorAll('.tab').forEach(t => {
-t.addEventListener('click', () => switchTab(t.dataset.tab));
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+document.querySelectorAll('[data-toggle]').forEach(h => h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open')));
+
+$('strategy-select').addEventListener('change', e => {
+state.strategy = e.target.value;
+const labels = { auto:'Auto', replicate:'Replicate', agnes:'Agnes' };
+$('strategy-badge').textContent = labels[state.strategy];
+addLog('Stratégie : ' + labels[state.strategy], 'dim');
 });
 
-document.querySelectorAll('[data-toggle]').forEach(h => {
-h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
-});
-
-// ✅ CORRECTION : ligne unique, pas de bug 'annes-key'
 $('agnes-save').addEventListener('click', saveKey);
-$('agnes-test').addEventListener('click', testKey);
-$('agnes-key').addEventListener('keydown', e => {
-if (e.key === 'Enter') { e.preventDefault(); saveKey(); }
-});
+$('agnes-key').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveKey(); } });
 
 $('subgenre-input').addEventListener('input', e => { state.subgenre = e.target.value; });
-$('mood-select').addEventListener('change', e => { state.mood = e.target.value; });
-
 $('main-prompt').addEventListener('input', e => { state.mainPrompt = e.target.value; updateGo(); });
 $('film-title').addEventListener('input', e => { state.title = e.target.value; });
-
 $('demo-btn').addEventListener('click', loadDemo);
-
-const uz = $('upload-zone'), fi = $('file-input');
-if (uz) {
-uz.addEventListener('click', () => fi.click());
-fi.addEventListener('change', e => {
-if (e.target.files[0]) handleImageFile(e.target.files[0]);
-fi.value = '';
-});
-}
-
 $('add-scene-btn').addEventListener('click', () => addScene());
-
 $('go-btn').addEventListener('click', start);
 $('btn-stop').addEventListener('click', stopAll);
 $('console-clear').addEventListener('click', clearLogs);
@@ -1610,8 +995,9 @@ renderScenes();
 renderLogs();
 updateGo();
 
-addLog('🎬 CinéForge Studio v2.1 initialisé', 'success');
-addLog('💜 Agnes : ' + (getKey() ? '✓ Connecté' : '✗ Non configuré'), getKey() ? 'success' : 'warn');
+addLog('🎬 CinéForge Studio v3.0 initialisé', 'success');
+addLog('🔥 Replicate : ' + REPLICATE_MODEL + ' via proxy', 'dim');
+addLog('💜 Agnes : ' + (getKey() ? '✓' : '✗ (fallback)'), getKey() ? 'success' : 'dim');
 updateConsoleState('Prêt', false);
 })();
 </script>
