@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TexteVersVoix — 4 langues</title>
+<title>TexteVersVoix Pro — TTS Multilingue</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0a0d14;--panel:#141820;--panel-2:#1a2230;--border:#2a3447;--ink:#f0f0f5;--ink-dim:#a5afc0;--gold:#d4a853;--gold-2:#f0d078;--green:#4ec97a;--red:#ff5a5a;--purple:#a855f7}
+:root{--bg:#0a0d14;--panel:#141820;--panel-2:#1a2230;--border:#2a3447;--ink:#f0f0f5;--ink-dim:#a5afc0;--gold:#d4a853;--gold-2:#f0d078;--green:#4ec97a;--red:#ff5a5a;--cyan:#00d9ff}
 body{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:16px;font-size:14px;line-height:1.5;max-width:560px;margin:0 auto;background-image:radial-gradient(ellipse at 15% 0%,rgba(212,168,83,0.06) 0%,transparent 50%),radial-gradient(ellipse at 85% 100%,rgba(168,85,247,0.05) 0%,transparent 50%);background-attachment:fixed}
 header{text-align:center;margin-bottom:16px}
-h1{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#fff 0%,#d4a853 60%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+h1{font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,#fff 0%,#d4a853 60%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
 .subtitle{font-size:0.72rem;color:var(--ink-dim);font-style:italic}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
 label{display:block;font-size:11px;text-transform:uppercase;color:var(--ink-dim);margin-bottom:6px;letter-spacing:0.08em;font-weight:700}
-textarea{width:100%;min-height:140px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:15px;line-height:1.5;resize:vertical;outline:none}
+textarea{width:100%;min-height:120px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:15px;line-height:1.5;resize:vertical;outline:none}
 textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,0.12)}
 textarea.rtl{direction:rtl;text-align:right}
 .lang-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
@@ -21,42 +21,35 @@ textarea.rtl{direction:rtl;text-align:right}
 .lang-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f;border-color:var(--gold)}
 .lang-tab:active{transform:scale(0.97)}
 .lang-tab.dz.active{background:linear-gradient(135deg,#009a44,#ffffff 50%,#d21034);color:#0a0a0f}
-select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-size:0.85rem;font-family:inherit;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23d4a853' d='M6 8L0 0h12z'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:11px;padding-right:36px}
-select:focus{outline:none;border-color:var(--gold)}
-.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.slider-row label{margin:0;flex-shrink:0;min-width:70px}
-.slider-row input[type="range"]{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none}
-.slider-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));cursor:pointer;border:2px solid var(--bg)}
-.slider-row .val{min-width:38px;text-align:right;font-size:0.75rem;color:var(--gold);font-weight:700}
-.btn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.voice-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.voice-tab{padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink-dim);font-size:0.75rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.voice-tab.active{background:rgba(212,168,83,0.15);color:var(--gold);border-color:var(--gold)}
+.voice-tab:active{transform:scale(0.97)}
+.btn-row{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:8px}
 .btn{padding:14px 10px;border-radius:12px;border:none;font-size:0.9rem;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.15s;letter-spacing:0.03em}
 .btn:active:not(:disabled){transform:scale(0.97)}
 .btn:disabled{opacity:0.35;cursor:not-allowed}
 .btn-play{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f}
-.btn-pause{background:var(--panel-2);color:var(--ink);border:1px solid var(--border)}
-.btn-stop{background:rgba(255,90,90,0.15);color:var(--red);border:1px solid var(--red)}
-.status{font-size:0.72rem;color:var(--ink-dim);text-align:center;padding:8px;font-style:italic}
+.btn-dl{background:var(--panel-2);color:var(--gold);border:1px solid var(--gold)}
+.status{font-size:0.72rem;color:var(--ink-dim);text-align:center;padding:10px;font-style:italic;line-height:1.4}
 .status.playing{color:var(--green)}
 .status.warn{color:#ff9d3d}
+.status.err{color:var(--red)}
 .quick-phrases{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .quick-btn{padding:6px 12px;border-radius:16px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink-dim);font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s}
 .quick-btn:active{transform:scale(0.96);background:rgba(212,168,83,0.12);color:var(--gold)}
-.warn-box{background:rgba(255,157,61,0.1);border:1px solid rgba(255,157,61,0.3);color:#ff9d3d;padding:10px;border-radius:8px;font-size:0.72rem;line-height:1.45;margin-bottom:12px;display:none}
-.warn-box.visible{display:block}
-.voice-info{font-size:0.68rem;color:var(--ink-faint);margin-top:6px;font-style:italic}
+.info{font-size:0.68rem;color:var(--ink-faint);margin-top:6px;font-style:italic;line-height:1.4}
+audio{width:100%;margin-top:10px;border-radius:8px;display:none}
+audio.visible{display:block}
+.engine-badge{display:inline-block;font-size:0.6rem;padding:2px 8px;border-radius:10px;background:rgba(78,201,122,0.15);color:var(--green);font-weight:700;margin-left:6px}
 </style>
 </head>
 <body>
 
 <header>
-<h1>🎙️ TexteVersVoix</h1>
-<p class="subtitle">🇫🇷 · 🇬🇧 · 🇩🇿 · 🇸🇦</p>
+<h1>🎙️ TexteVersVoix Pro</h1>
+<p class="subtitle">Google TTS + StreamElements · 🇫🇷 🇬🇧 🇩🇿 🇸🇦</p>
 </header>
-
-<div class="warn-box" id="warn">
-⚠️ <strong>Ton navigateur ne supporte pas la synthèse vocale.</strong><br>
-Essaie Chrome ou Safari sur mobile.
-</div>
 
 <!-- LANGUE -->
 <div class="lang-tabs">
@@ -75,37 +68,18 @@ Essaie Chrome ou Safari sur mobile.
 
 <!-- VOIX -->
 <div class="card">
-<label>Voix</label>
-<select id="voice"></select>
-<div class="voice-info" id="voice-info"></div>
-</div>
-
-<!-- RÉGLAGES -->
-<div class="card">
-<label>Réglages</label>
-<div class="slider-row">
-<label style="font-size:10px">Vitesse</label>
-<input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
-<span class="val" id="rate-val">1.0</span>
-</div>
-<div class="slider-row">
-<label style="font-size:10px">Tonalité</label>
-<input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
-<span class="val" id="pitch-val">1.0</span>
-</div>
-<div class="slider-row">
-<label style="font-size:10px">Volume</label>
-<input type="range" id="volume" min="0" max="1" step="0.05" value="1">
-<span class="val" id="volume-val">100%</span>
-</div>
+<label>Voix <span id="engine-badge" class="engine-badge">Google</span></label>
+<div class="voice-tabs" id="voice-tabs"></div>
+<div class="info" id="voice-info"></div>
 </div>
 
 <!-- BOUTONS -->
 <div class="btn-row">
-<button class="btn btn-play" id="play-btn">▶️ Lire</button>
-<button class="btn btn-pause" id="pause-btn">⏸️ Pause</button>
-<button class="btn btn-stop" id="stop-btn">⏹️ Stop</button>
+<button class="btn btn-play" id="play-btn">▶️ Écouter</button>
+<button class="btn btn-dl" id="dl-btn">⬇️ MP3</button>
 </div>
+
+<audio id="audio" controls></audio>
 
 <div class="status" id="status">Prêt</div>
 
@@ -113,16 +87,13 @@ Essaie Chrome ou Safari sur mobile.
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-
-// Pour la Daridja, on essaie plusieurs locales par ordre de préférence
-const LANG_CONFIG = {
-  fr: { codes: ['fr-FR', 'fr-CA', 'fr-BE'], rtl: false, label: 'Français' },
-  en: { codes: ['en-US', 'en-GB', 'en-AU'], rtl: false, label: 'English' },
-  dz: { codes: ['ar-DZ', 'ar-MA', 'ar-TN', 'ar-EG', 'ar-SA'], rtl: true, label: 'Daridja' },
-  ar: { codes: ['ar-SA', 'ar-EG', 'ar-AE'], rtl: true, label: 'العربية' }
+const LANG_MAP = {
+  fr: { google: 'fr', streamVoice: 'Celine', label: 'Français', rtl: false },
+  en: { google: 'en', streamVoice: 'Brian', label: 'English', rtl: false },
+  dz: { google: 'ar', streamVoice: 'Zeina', label: 'Daridja', rtl: true },
+  ar: { google: 'ar', streamVoice: 'Hala', label: 'العربية', rtl: true }
 };
 
-// Exemples Daridja (écriture arabe + phonétique latine)
 const DEMOS = {
   fr: [
     { label: '📖 Bonjour', text: 'Bonjour, ceci est un test de synthèse vocale en français.' },
@@ -136,20 +107,17 @@ const DEMOS = {
     { label: '🇩🇿 Salam', text: 'السلام عليكم، كيفاش راك؟ راني مليح، الحمد لله.' },
     { label: '🇩🇿 Kifach', text: 'واش راك تدير؟ راني جاي من الخدمة، راني عيان شوية.' },
     { label: '🇩🇿 Merci', text: 'يعطيك الصحة، ربي يحفظك، بسلامة، نشوفوك غدوة إن شاء الله.' },
-    { label: '🇩🇿 Pharase latine', text: 'Salam, kifach rak? Rani mlih, hamdoullah. Wach rak tdir?' },
-    { label: '🇩🇿 Famille', text: 'كيفاش حال الوالدة والوالد؟ ربي يطول في عمرهم ويحفظهم.' }
+    { label: '🇩🇿 Phrase latine', text: 'Salam, kifach rak? Rani mlih, hamdoullah.' }
   ],
   ar: [
-    { label: '📖 ترحيب', text: 'مرحبًا بكم، هذا اختبار تحويل النص إلى كلام باللغة العربية الفصحى.' },
-    { label: '📖 مقدمة', text: 'اسمي مراد، وأنا أتعلم إنشاء تطبيقات الويب.' }
+    { label: '📖 ترحيب', text: 'مرحبًا بكم، هذا اختبار تحويل النص إلى كلام باللغة العربية.' }
   ]
 };
 
-let state = {
+const state = {
   lang: 'fr',
-  voices: [],
-  langVoices: [],
-  speaking: false
+  engine: 'google', // 'google' ou 'stream'
+  audioUrl: null
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -157,86 +125,152 @@ let state = {
 // ═══════════════════════════════════════════════════════════
 const $ = id => document.getElementById(id);
 const textEl = $('text');
-const voiceEl = $('voice');
-const voiceInfoEl = $('voice-info');
-const rateEl = $('rate');
-const pitchEl = $('pitch');
-const volumeEl = $('volume');
-const statusEl = $('status');
 const quickEl = $('quick');
+const voiceTabsEl = $('voice-tabs');
+const voiceInfoEl = $('voice-info');
+const audioEl = $('audio');
+const statusEl = $('status');
 
 // ═══════════════════════════════════════════════════════════
-// SUPPORT
+// URL GOOGLE TRANSLATE TTS
 // ═══════════════════════════════════════════════════════════
-if (!('speechSynthesis' in window)) {
-  $('warn').classList.add('visible');
+function getGoogleTTSUrl(text, langCode) {
+  const encoded = encodeURIComponent(text.slice(0, 200)); // limite ~200 chars
+  // client=tw-ob contourne certaines restrictions
+  return 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encoded +
+         '&tl=' + langCode + '&client=tw-ob&ttsspeed=1';
 }
 
 // ═══════════════════════════════════════════════════════════
-// CHARGER VOIX
+// URL STREAMELEMENTS TTS (fallback)
 // ═══════════════════════════════════════════════════════════
-function loadVoices() {
-  state.voices = speechSynthesis.getVoices();
-  filterVoices();
+function getStreamUrl(text, voice) {
+  const encoded = encodeURIComponent(text.slice(0, 300));
+  return 'https://api.streamelements.com/kappa/v2/speech?voice=' + voice + '&text=' + encoded;
 }
 
-function filterVoices() {
-  const config = LANG_CONFIG[state.lang];
-  const found = [];
-  const foundLocales = [];
-  
-  // Chercher les voix en respectant la priorité
-  for (const code of config.codes) {
-    const matches = state.voices.filter(v => v.lang === code);
-    for (const m of matches) {
-      if (!found.includes(m)) {
-        found.push(m);
-        foundLocales.push(code);
-      }
-    }
-  }
-  
-  // Si rien trouvé, chercher par préfixe
-  if (found.length === 0) {
-    const prefix = config.codes[0].split('-')[0];
-    const fallback = state.voices.filter(v => v.lang.startsWith(prefix));
-    for (const v of fallback) {
-      found.push(v);
-      foundLocales.push(v.lang);
-    }
-  }
-  
-  state.langVoices = found;
-  
-  voiceEl.innerHTML = found.map((voice, i) => 
-    '<option value="' + i + '">' + voice.name + ' (' + voice.lang + ')</option>'
-  ).join('');
-  
-  if (found.length === 0) {
-    voiceEl.innerHTML = '<option value="">Aucune voix disponible pour cette langue</option>';
-    voiceInfoEl.textContent = '⚠️ Installe une voix dans les paramètres de ton téléphone';
-  } else {
-    // Info sur la locale détectée
-    const detected = foundLocales[0];
-    const native = config.codes[0];
-    
+// ═══════════════════════════════════════════════════════════
+// UI - VOIX
+// ═══════════════════════════════════════════════════════════
+function renderVoiceTabs() {
+  voiceTabsEl.innerHTML =
+    '<div class="voice-tab' + (state.engine === 'google' ? ' active' : '') + '" data-engine="google">🌐 Google TTS</div>' +
+    '<div class="voice-tab' + (state.engine === 'stream' ? ' active' : '') + '" data-engine="stream">🎙️ StreamElements</div>';
+
+  voiceTabsEl.querySelectorAll('.voice-tab').forEach(tab => {
+    tab.onclick = () => {
+      state.engine = tab.dataset.engine;
+      renderVoiceTabs();
+      updateVoiceInfo();
+    };
+  });
+}
+
+function updateVoiceInfo() {
+  const cfg = LANG_MAP[state.lang];
+  const badge = $('engine-badge');
+  badge.textContent = state.engine === 'google' ? 'Google' : 'Stream';
+
+  if (state.engine === 'google') {
     if (state.lang === 'dz') {
-      if (detected === 'ar-DZ') {
-        voiceInfoEl.textContent = '🇩🇿 Voix algérienne native détectée !';
-      } else if (detected === 'ar-MA' || detected === 'ar-TN') {
-        voiceInfoEl.textContent = '🇲🇦🇹🇳 Voix ' + detected + ' (proche du Daridja)';
-      } else {
-        voiceInfoEl.textContent = '🇸🇦 Voix arabe standard (essaie de prononcer le Daridja)';
-      }
+      voiceInfoEl.textContent = '🇩🇿 Prononciation arabe (compréhensible en Daridja)';
+    } else if (state.lang === 'ar') {
+      voiceInfoEl.textContent = '🇸🇦 Voix arabe standard (فصحى)';
+    } else if (state.lang === 'fr') {
+      voiceInfoEl.textContent = '🇫🇷 Voix française naturelle';
     } else {
-      voiceInfoEl.textContent = 'Voix : ' + detected;
+      voiceInfoEl.textContent = '🇬🇧 Natural English voice';
+    }
+  } else {
+    if (state.lang === 'dz' || state.lang === 'ar') {
+      voiceInfoEl.textContent = '🎙️ Voix arabe ' + cfg.streamVoice + ' (StreamElements)';
+    } else if (state.lang === 'fr') {
+      voiceInfoEl.textContent = '🎙️ Voix française ' + cfg.streamVoice;
+    } else {
+      voiceInfoEl.textContent = '🎙️ English voice ' + cfg.streamVoice;
     }
   }
 }
 
-loadVoices();
-if (typeof speechSynthesis.onvoiceschanged !== 'undefined') {
-  speechSynthesis.onvoiceschanged = loadVoices;
+// ═══════════════════════════════════════════════════════════
+// UI - BOUTONS RAPIDES
+// ═══════════════════════════════════════════════════════════
+function buildQuickButtons() {
+  const demos = DEMOS[state.lang] || [];
+  quickEl.innerHTML = demos.map((d, i) =>
+    '<button class="quick-btn" data-idx="' + i + '">' + d.label + '</button>'
+  ).join('') + '<button class="quick-btn" id="clear-btn">🗑️ Effacer</button>';
+
+  quickEl.querySelectorAll('.quick-btn[data-idx]').forEach(btn => {
+    btn.onclick = () => {
+      textEl.value = demos[parseInt(btn.dataset.idx)].text;
+      updateStatus('Exemple chargé');
+    };
+  });
+
+  const cb = $('clear-btn');
+  if (cb) cb.onclick = () => { textEl.value = ''; updateStatus('Effacé'); };
+}
+
+// ═══════════════════════════════════════════════════════════
+// LECTURE
+// ═══════════════════════════════════════════════════════════
+function play() {
+  const text = textEl.value.trim();
+  if (!text) { updateStatus('⚠️ Écris du texte', 'warn'); return; }
+
+  const cfg = LANG_MAP[state.lang];
+  let url;
+
+  if (state.engine === 'google') {
+    url = getGoogleTTSUrl(text, cfg.google);
+  } else {
+    url = getStreamUrl(text, cfg.streamVoice);
+  }
+
+  state.audioUrl = url;
+
+  updateStatus('⏳ Chargement audio (' + (state.engine === 'google' ? 'Google' : 'Stream') + ')...');
+
+  audioEl.src = url;
+  audioEl.classList.add('visible');
+
+  audioEl.oncanplay = () => {
+    updateStatus('▶️ Lecture en cours (' + cfg.label + ')', 'playing');
+    audioEl.play().catch(err => {
+      updateStatus('⚠️ Erreur lecture : ' + err.message, 'err');
+    });
+  };
+
+  audioEl.onerror = () => {
+    updateStatus('❌ Échec. Essaie l\'autre moteur.', 'err');
+  };
+
+  audioEl.onended = () => {
+    updateStatus('✓ Terminé');
+  };
+
+  audioEl.load();
+}
+
+function download() {
+  if (!state.audioUrl) {
+    updateStatus('⚠️ Lance d\'abord la lecture', 'warn');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = state.audioUrl;
+  a.download = 'audio-' + state.lang + '-' + Date.now() + '.mp3';
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  updateStatus('⬇️ Téléchargement lancé');
+}
+
+function updateStatus(msg, cls = '') {
+  statusEl.textContent = msg;
+  statusEl.className = 'status ' + cls;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -246,132 +280,29 @@ document.querySelectorAll('.lang-tab').forEach(tab => {
   tab.onclick = () => {
     state.lang = tab.dataset.lang;
     document.querySelectorAll('.lang-tab').forEach(t => t.classList.toggle('active', t === tab));
-    
-    // Direction du texte
-    if (LANG_CONFIG[state.lang].rtl) {
-      textEl.classList.add('rtl');
-    } else {
-      textEl.classList.remove('rtl');
-    }
-    
-    filterVoices();
+
+    if (LANG_MAP[state.lang].rtl) textEl.classList.add('rtl');
+    else textEl.classList.remove('rtl');
+
     buildQuickButtons();
-    updateStatus('Langue : ' + LANG_CONFIG[state.lang].label);
+    updateVoiceInfo();
+    updateStatus('Langue : ' + LANG_MAP[state.lang].label);
   };
 });
 
 // ═══════════════════════════════════════════════════════════
-// BOUTONS RAPIDES
+// BOUTONS
 // ═══════════════════════════════════════════════════════════
-function buildQuickButtons() {
-  const demos = DEMOS[state.lang] || [];
-  quickEl.innerHTML = demos.map((d, i) => 
-    '<button class="quick-btn" data-idx="' + i + '">' + d.label + '</button>'
-  ).join('') + '<button class="quick-btn" id="clear-btn">🗑️ Effacer</button>';
-  
-  quickEl.querySelectorAll('.quick-btn[data-idx]').forEach(btn => {
-    btn.onclick = () => {
-      const idx = parseInt(btn.dataset.idx);
-      textEl.value = demos[idx].text;
-      updateStatus('Exemple chargé');
-    };
-  });
-  
-  const clearBtn = $('clear-btn');
-  if (clearBtn) {
-    clearBtn.onclick = () => {
-      textEl.value = '';
-      updateStatus('Texte effacé');
-    };
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-// SLIDERS
-// ═══════════════════════════════════════════════════════════
-rateEl.oninput = () => $('rate-val').textContent = parseFloat(rateEl.value).toFixed(1);
-pitchEl.oninput = () => $('pitch-val').textContent = parseFloat(pitchEl.value).toFixed(1);
-volumeEl.oninput = () => $('volume-val').textContent = Math.round(volumeEl.value * 100) + '%';
-
-// ═══════════════════════════════════════════════════════════
-// SYNTHÈSE
-// ═══════════════════════════════════════════════════════════
-function speak() {
-  const text = textEl.value.trim();
-  if (!text) {
-    updateStatus('⚠️ Écris du texte d\'abord', 'warn');
-    return;
-  }
-  
-  speechSynthesis.cancel();
-  
-  const utter = new SpeechSynthesisUtterance(text);
-  const idx = parseInt(voiceEl.value);
-  const config = LANG_CONFIG[state.lang];
-  
-  // Voix (si dispo)
-  if (state.langVoices[idx]) {
-    utter.voice = state.langVoices[idx];
-  }
-  
-  // Langue : utilise la locale de la voix si dispo, sinon la 1ère du config
-  utter.lang = state.langVoices[idx] ? state.langVoices[idx].lang : config.codes[0];
-  
-  // Réglages
-  utter.rate = parseFloat(rateEl.value);
-  utter.pitch = parseFloat(pitchEl.value);
-  utter.volume = parseFloat(volumeEl.value);
-  
-  utter.onstart = () => {
-    state.speaking = true;
-    updateStatus('🔊 Lecture en cours (' + utter.lang + ')...', 'playing');
-    $('play-btn').disabled = true;
-  };
-  utter.onend = () => {
-    state.speaking = false;
-    updateStatus('✓ Terminé');
-    $('play-btn').disabled = false;
-  };
-  utter.onerror = (e) => {
-    state.speaking = false;
-    updateStatus('⚠️ Erreur : ' + e.error, 'warn');
-    $('play-btn').disabled = false;
-  };
-  
-  speechSynthesis.speak(utter);
-}
-
-function pause() {
-  if (speechSynthesis.speaking && !speechSynthesis.paused) {
-    speechSynthesis.pause();
-    updateStatus('⏸️ En pause');
-  } else if (speechSynthesis.paused) {
-    speechSynthesis.resume();
-    updateStatus('🔊 Reprise...', 'playing');
-  }
-}
-
-function stop() {
-  speechSynthesis.cancel();
-  state.speaking = false;
-  updateStatus('⏹️ Arrêté');
-  $('play-btn').disabled = false;
-}
-
-function updateStatus(msg, cls = '') {
-  statusEl.textContent = msg;
-  statusEl.className = 'status ' + cls;
-}
-
-$('play-btn').onclick = speak;
-$('pause-btn').onclick = pause;
-$('stop-btn').onclick = stop;
+$('play-btn').onclick = play;
+$('dl-btn').onclick = download;
 
 // ═══════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════
+renderVoiceTabs();
 buildQuickButtons();
-updateStatus('Prêt');
+updateVoiceInfo();
+updateStatus('Prêt · Google TTS actif');
 </script>
 
 </body>
