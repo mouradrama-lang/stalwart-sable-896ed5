@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TexteVersVoix — TTS Multilingue</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0d14;--panel:#141820;--panel-2:#1a2230;--border:#2a3447;--ink:#f0f0f5;--ink-dim:#a5afc0;--ink-faint:#6a7484;--gold:#d4a853;--gold-2:#f0d078;--green:#4ec97a;--red:#ff5a5a;--cyan:#00d9ff;--purple:#a855f7}
+body{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:16px;font-size:14px;line-height:1.5;max-width:560px;margin:0 auto;background-image:radial-gradient(ellipse at 15% 0%,rgba(212,168,83,0.06) 0%,transparent 50%),radial-gradient(ellipse at 85% 100%,rgba(168,85,247,0.05) 0%,transparent 50%);background-attachment:fixed}
+header{text-align:center;margin-bottom:16px}
+h1{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#fff 0%,#d4a853 60%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.subtitle{font-size:0.72rem;color:var(--ink-dim);font-style:italic}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:11px;text-transform:uppercase;color:var(--ink-dim);margin-bottom:6px;letter-spacing:0.08em;font-weight:700}
+textarea{width:100%;min-height:140px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:15px;line-height:1.5;resize:vertical;outline:none}
+textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,0.12)}
+.lang-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px}
+.lang-tab{padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink-dim);font-size:0.8rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.lang-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f;border-color:var(--gold)}
+.lang-tab:active{transform:scale(0.97)}
+select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-size:0.85rem;font-family:inherit;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23d4a853' d='M6 8L0 0h12z'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:11px;padding-right:36px}
+select:focus{outline:none;border-color:var(--gold)}
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.slider-row label{margin:0;flex-shrink:0;min-width:70px}
+.slider-row input[type="range"]{flex:1;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none}
+.slider-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));cursor:pointer;border:2px solid var(--bg)}
+.slider-row .val{min-width:38px;text-align:right;font-size:0.75rem;color:var(--gold);font-weight:700}
+.btn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.btn{padding:14px 10px;border-radius:12px;border:none;font-size:0.9rem;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.15s;letter-spacing:0.03em}
+.btn:active:not(:disabled){transform:scale(0.97)}
+.btn:disabled{opacity:0.35;cursor:not-allowed}
+.btn-play{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f}
+.btn-pause{background:var(--panel-2);color:var(--ink);border:1px solid var(--border)}
+.btn-stop{background:rgba(255,90,90,0.15);color:var(--red);border:1px solid var(--red)}
+.btn-clear{width:100%;padding:10px;margin-top:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--ink-dim);font-size:0.78rem;font-weight:700;font-family:inherit;cursor:pointer}
+.status{font-size:0.72rem;color:var(--ink-dim);text-align:center;padding:8px;font-style:italic}
+.status.playing{color:var(--green)}
+.quick-phrases{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick-btn{padding:6px 12px;border-radius:16px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink-dim);font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.quick-btn:active{transform:scale(0.96);background:rgba(212,168,83,0.12);color:var(--gold)}
+.warn{background:rgba(255,157,61,0.1);border:1px solid rgba(255,157,61,0.3);color:#ff9d3d;padding:10px;border-radius:8px;font-size:0.72rem;line-height:1.45;margin-bottom:12px;display:none}
+.warn.visible{display:block}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🎙️ TexteVersVoix</h1>
+<p class="subtitle">Arabe · Français · Anglais</p>
+</header>
+
+<div class="warn" id="warn">
+⚠️ <strong>Ton navigateur ne supporte pas la synthèse vocale.</strong><br>
+Essaie Chrome ou Safari sur mobile.
+</div>
+
+<!-- LANGUE -->
+<div class="lang-tabs">
+<button class="lang-tab active" data-lang="fr">🇫🇷 Français</button>
+<button class="lang-tab" data-lang="en">🇬🇧 English</button>
+<button class="lang-tab" data-lang="ar">🇸🇦 العربية</button>
+</div>
+
+<!-- TEXTE -->
+<div class="card">
+<label>Texte à prononcer</label>
+<textarea id="text" placeholder="Écris ou colle ton texte ici..."></textarea>
+<div class="quick-phrases">
+<button class="quick-btn" data-fr="Bonjour, ceci est un test de synthèse vocale en français." data-en="Hello, this is a text-to-speech test in English." data-ar="مرحبًا، هذا اختبار تحويل النص إلى كلام باللغة العربية.">📖 Exemple</button>
+<button class="quick-btn" id="clear-btn">🗑️ Effacer</button>
+</div>
+</div>
+
+<!-- VOIX -->
+<div class="card">
+<label>Voix</label>
+<select id="voice"></select>
+</div>
+
+<!-- RÉGLAGES -->
+<div class="card">
+<label>Réglages</label>
+<div class="slider-row">
+<label style="font-size:10px">Vitesse</label>
+<input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+<span class="val" id="rate-val">1.0</span>
+</div>
+<div class="slider-row">
+<label style="font-size:10px">Tonalité</label>
+<input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
+<span class="val" id="pitch-val">1.0</span>
+</div>
+<div class="slider-row">
+<label style="font-size:10px">Volume</label>
+<input type="range" id="volume" min="0" max="1" step="0.05" value="1">
+<span class="val" id="volume-val">100%</span>
+</div>
+</div>
+
+<!-- BOUTONS -->
+<div class="btn-row">
+<button class="btn btn-play" id="play-btn">▶️ Lire</button>
+<button class="btn btn-pause" id="pause-btn">⏸️ Pause</button>
+<button class="btn btn-stop" id="stop-btn">⏹️ Stop</button>
+</div>
+
+<div class="status" id="status">Prêt</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const LANG_CODES = {
+  fr: 'fr-FR',
+  en: 'en-US',
+  ar: 'ar-SA'
+};
+
+let state = {
+  lang: 'fr',
+  voices: [],
+  langVoices: [],
+  speaking: false,
+  paused: false
+};
+
+// ═══════════════════════════════════════════════════════════
+// RÉFÉRENCES
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const textEl = $('text');
+const voiceEl = $('voice');
+const rateEl = $('rate');
+const pitchEl = $('pitch');
+const volumeEl = $('volume');
+const statusEl = $('status');
+
+// ═══════════════════════════════════════════════════════════
+// VÉRIFICATION SUPPORT
+// ═══════════════════════════════════════════════════════════
+if (!('speechSynthesis' in window)) {
+  $('warn').classList.add('visible');
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHARGER LES VOIX
+// ═══════════════════════════════════════════════════════════
+function loadVoices() {
+  state.voices = speechSynthesis.getVoices();
+  filterVoices();
+}
+
+function filterVoices() {
+  const code = LANG_CODES[state.lang];
+  const prefix = code.split('-')[0];
+  
+  // Voix exactes pour la langue
+  let v = state.voices.filter(voice => voice.lang === code);
+  // Sinon voix du même préfixe (ex: fr-CA pour fr)
+  if (v.length === 0) v = state.voices.filter(voice => voice.lang.startsWith(prefix));
+  // Sinon tout
+  if (v.length === 0) v = state.voices;
+  
+  state.langVoices = v;
+  
+  voiceEl.innerHTML = v.map((voice, i) => 
+    '<option value="' + i + '">' + voice.name + ' (' + voice.lang + ')</option>'
+  ).join('');
+  
+  if (v.length === 0) {
+    voiceEl.innerHTML = '<option value="">Aucune voix disponible pour cette langue</option>';
+  }
+}
+
+// Charger les voix (peut être asynchrone sur certains navigateurs)
+loadVoices();
+if (typeof speechSynthesis.onvoiceschanged !== 'undefined') {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHANGEMENT DE LANGUE
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.lang-tab').forEach(tab => {
+  tab.onclick = () => {
+    state.lang = tab.dataset.lang;
+    document.querySelectorAll('.lang-tab').forEach(t => t.classList.toggle('active', t === tab));
+    filterVoices();
+    
+    // Direction du texte pour l'arabe
+    if (state.lang === 'ar') {
+      textEl.style.direction = 'rtl';
+      textEl.style.textAlign = 'right';
+    } else {
+      textEl.style.direction = 'ltr';
+      textEl.style.textAlign = 'left';
+    }
+    
+    updateStatus('Langue : ' + tab.textContent.trim());
+  };
+});
+
+// ═══════════════════════════════════════════════════════════
+// SLIDERS
+// ═══════════════════════════════════════════════════════════
+rateEl.oninput = () => $('rate-val').textContent = parseFloat(rateEl.value).toFixed(1);
+pitchEl.oninput = () => $('pitch-val').textContent = parseFloat(pitchEl.value).toFixed(1);
+volumeEl.oninput = () => $('volume-val').textContent = Math.round(volumeEl.value * 100) + '%';
+
+// ═══════════════════════════════════════════════════════════
+// PHRASE EXEMPLE
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.quick-btn[data-fr]').forEach(btn => {
+  btn.onclick = () => {
+    textEl.value = btn.dataset[state.lang] || btn.dataset.fr;
+    updateStatus('Exemple chargé');
+  };
+});
+
+$('clear-btn').onclick = () => {
+  textEl.value = '';
+  updateStatus('Texte effacé');
+};
+
+// ═══════════════════════════════════════════════════════════
+// SYNTHÈSE VOCALE
+// ═══════════════════════════════════════════════════════════
+function speak() {
+  const text = textEl.value.trim();
+  if (!text) {
+    updateStatus('⚠️ Écris du texte d\'abord', 'warn');
+    return;
+  }
+  
+  // Arrêter toute lecture en cours
+  speechSynthesis.cancel();
+  
+  const utter = new SpeechSynthesisUtterance(text);
+  
+  // Voix
+  const idx = parseInt(voiceEl.value);
+  if (state.langVoices[idx]) utter.voice = state.langVoices[idx];
+  
+  // Langue
+  utter.lang = LANG_CODES[state.lang];
+  
+  // Réglages
+  utter.rate = parseFloat(rateEl.value);
+  utter.pitch = parseFloat(pitchEl.value);
+  utter.volume = parseFloat(volumeEl.value);
+  
+  // Événements
+  utter.onstart = () => {
+    state.speaking = true;
+    state.paused = false;
+    updateStatus('🔊 Lecture en cours...', 'playing');
+    $('play-btn').disabled = true;
+  };
+  utter.onend = () => {
+    state.speaking = false;
+    state.paused = false;
+    updateStatus('✓ Terminé');
+    $('play-btn').disabled = false;
+  };
+  utter.onerror = (e) => {
+    state.speaking = false;
+    updateStatus('⚠️ Erreur : ' + e.error, 'warn');
+    $('play-btn').disabled = false;
+  };
+  
+  speechSynthesis.speak(utter);
+}
+
+function pause() {
+  if (speechSynthesis.speaking && !speechSynthesis.paused) {
+    speechSynthesis.pause();
+    state.paused = true;
+    updateStatus('⏸️ En pause');
+  } else if (speechSynthesis.paused) {
+    speechSynthesis.resume();
+    state.paused = false;
+    updateStatus('🔊 Reprise...', 'playing');
+  }
+}
+
+function stop() {
+  speechSynthesis.cancel();
+  state.speaking = false;
+  state.paused = false;
+  updateStatus('⏹️ Arrêté');
+  $('play-btn').disabled = false;
+}
+
+function updateStatus(msg, cls = '') {
+  statusEl.textContent = msg;
+  statusEl.className = 'status ' + cls;
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOUTONS
+// ═══════════════════════════════════════════════════════════
+$('play-btn').onclick = speak;
+$('pause-btn').onclick = pause;
+$('stop-btn').onclick = stop;
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+updateStatus('Prêt');
+</script>
+
+</body>
+</html>
