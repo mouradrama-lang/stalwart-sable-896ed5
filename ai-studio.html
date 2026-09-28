@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Créateur IA — Tous les concepts en une app</title>
+<title>Créateur IA Pro — Tous les concepts en une app</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -18,10 +18,20 @@
         padding: 1.5rem 1rem 8rem; font-size: 15px; line-height: 1.5;
         max-width: 1000px; margin: 0 auto;
     }
-    header { margin-bottom: 1.5rem; text-align: center; }
+    header { margin-bottom: 1rem; text-align: center; }
     h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.3rem;
          background: linear-gradient(135deg, #e94560, #4a6cf7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { font-size: 0.85rem; color: var(--ink-dim); }
+
+    .toolbar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+    .toolbar button {
+        padding: 0.7rem 0.5rem; border-radius: 8px;
+        border: 1px solid var(--border); background: var(--panel);
+        color: var(--ink); font-family: inherit; font-size: 0.72rem;
+        font-weight: 700; cursor: pointer;
+    }
+    .toolbar button:active { background: var(--panel-2); }
+    .toolbar button.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
 
     .toast {
         position: fixed; top: 1.5rem; left: 50%;
@@ -88,7 +98,7 @@
         border-radius: 8px; border: none;
         background: var(--accent); color: #fff;
         font-size: 0.9rem; font-weight: 700; font-family: inherit;
-        cursor: pointer; transition: opacity 0.2s;
+        cursor: pointer;
         margin-bottom: 0.6rem;
     }
     .api-save-btn:active { opacity: 0.7; }
@@ -165,7 +175,7 @@
         width: 100%; padding: 1.1rem; border-radius: var(--radius);
         border: none; background: linear-gradient(135deg, #e94560, #4a6cf7);
         color: #fff; font-size: 1rem; font-weight: 700; font-family: inherit;
-        cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+        cursor: pointer;
         margin-bottom: 1rem;
     }
     .btn-primary:active:not(:disabled) { transform: scale(0.98); }
@@ -200,8 +210,9 @@
     .limit-bar {
         width: 80px; height: 6px; background: var(--panel-2);
         border-radius: 3px; overflow: hidden; margin-left: 0.5rem;
+        display: inline-block; vertical-align: middle;
     }
-    .limit-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    .limit-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; display: block; }
     .limit-bar-fill.ok { background: var(--success); }
     .limit-bar-fill.warn { background: var(--warn); }
     .limit-bar-fill.danger { background: var(--error); }
@@ -290,6 +301,18 @@
         border-top: 1px solid var(--border);
         font-family: ui-monospace, monospace;
     }
+    .gen-video-card .gen-actions {
+        display: flex; gap: 0.3rem; padding: 0.4rem;
+        background: var(--panel);
+        border-top: 1px solid var(--border);
+    }
+    .gen-video-card .gen-actions button {
+        flex: 1; padding: 0.4rem; border-radius: 6px;
+        border: 1px solid var(--border); background: var(--panel-2);
+        color: var(--ink); font-family: inherit; font-size: 0.62rem;
+        font-weight: 700; cursor: pointer;
+    }
+    .gen-video-card .gen-actions button:active { background: var(--border); }
 
     .pending-video-card {
         border-radius: 8px; overflow: hidden;
@@ -394,6 +417,19 @@
     }
     .hidden { display: none !important; }
 
+    .music-selector {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;
+    }
+    .music-card {
+        padding: 0.6rem 0.4rem; border-radius: 8px;
+        border: 1px solid var(--border); background: var(--panel-2);
+        cursor: pointer; text-align: center;
+        font-size: 0.68rem; font-weight: 600;
+        transition: all 0.15s;
+    }
+    .music-card.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .music-card .music-emoji { display: block; font-size: 1.1rem; margin-bottom: 0.2rem; }
+
     #noSleepCanvas { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
     #noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
 </style>
@@ -401,9 +437,16 @@
 <body>
 
 <header>
-    <h1>Créateur IA</h1>
-    <p class="subtitle">Un seul outil. Tous les concepts. Du texte à l'écran.</p>
+    <h1>Créateur IA Pro</h1>
+    <p class="subtitle">Du texte à l'écran — film, pub, clip, docu et plus</p>
 </header>
+
+<!-- BARRE D'OUTILS -->
+<div class="toolbar">
+    <button type="button" id="save-project-btn">💾 Sauvegarder</button>
+    <button type="button" id="load-project-btn">📂 Restaurer</button>
+    <button type="button" id="export-all-btn" class="accent">📦 Tout exporter</button>
+</div>
 
 <div class="api-panel" id="api-panel">
     <input type="password" class="api-key-input" id="api-key-input"
@@ -484,6 +527,18 @@
     </div>
 </div>
 
+<div class="section" id="section-music">
+    <div class="section-header" data-toggle="section-music">
+        <span class="section-title">🎵 Ambiance musicale <span class="badge soft">optionnel</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+        <div class="section-content">
+            <div class="music-selector" id="music-selector"></div>
+        </div>
+    </div>
+</div>
+
 <div class="section" id="section-tech">
     <div class="section-header" data-toggle="section-tech">
         <span class="section-title">📷 Paramètres techniques</span>
@@ -492,12 +547,16 @@
     <div class="section-body">
         <div class="section-content">
             <div class="control-row">
-                <label class="control-label">Nombre de scènes</label>
+                <label class="control-label">Nombre de clips à générer</label>
                 <select id="scene-count-select">
-                    <option value="3">3 scènes (court)</option>
-                    <option value="5" selected>5 scènes (recommandé)</option>
-                    <option value="8">8 scènes (long)</option>
+                    <option value="3">3 clips (court)</option>
+                    <option value="5" selected>5 clips (recommandé)</option>
+                    <option value="8">8 clips (long)</option>
+                    <option value="10">10 clips (épique)</option>
                 </select>
+                <div style="font-size:0.68rem;color:var(--ink-dim);margin-top:0.3rem;font-style:italic">
+                    ⓘ L'IA générera automatiquement N+1 images pour produire N clips.
+                </div>
             </div>
             <div class="control-row">
                 <label class="control-label">Durée par clip</label>
@@ -616,6 +675,7 @@ const CREATE_INTERVAL_MS = 62000;
 const INITIAL_WAIT_SECONDS = 105;
 const POLL_INTERVAL_SECONDS = 5;
 const SAFETY_MARGIN = 1.10;
+const MAX_POLL_MINUTES = 15;
 
 const LIMITS = {
     textRpm: 30,
@@ -638,7 +698,7 @@ let measuredSpeed = { value: null, usedForEstimate: null, sampleCount: 0 };
 function loadMeasuredSpeed() {
     try {
         const raw = localStorage.getItem('agnes_measured_speed');
-        if (raw) { measuredSpeed = JSON.parse(raw); }
+        if (raw) measuredSpeed = JSON.parse(raw);
     } catch (e) {}
 }
 function saveMeasuredSpeed() {
@@ -656,7 +716,19 @@ function getEstimatedWaitSeconds() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// MODES — 10 catégories intégrées
+// MUSIQUES (ambiances pour montage CapCut)
+// ══════════════════════════════════════════════════════════════════
+const MUSIC_STYLES = [
+    { id: 'none', name: 'Aucune', emoji: '🔇', hint: 'Silence (tu ajoutes après)' },
+    { id: 'epic', name: 'Épique', emoji: '🎻', hint: 'Orchestre puissant' },
+    { id: 'emotional', name: 'Émotion', emoji: '🎹', hint: 'Piano mélancolique' },
+    { id: 'action', name: 'Action', emoji: '🥁', hint: 'Percussions rapides' },
+    { id: 'ambient', name: 'Ambient', emoji: '🌌', hint: 'Nappe sonore' },
+    { id: 'mystery', name: 'Mystère', emoji: '🌫️', hint: 'Tension douce' }
+];
+
+// ══════════════════════════════════════════════════════════════════
+// MODES
 // ══════════════════════════════════════════════════════════════════
 const MODES = [
     { id: 'film', name: 'Film complet', emoji: '🎬', desc: 'Long métrage narratif',
@@ -715,7 +787,9 @@ const state = {
     idea: '',
     selectedStyle: STYLES[0],
     selectedMode: MODES[0],
+    selectedMusic: MUSIC_STYLES[0],
     sceneCount: 5,
+    imagesNeeded: 6,
     numFrames: 241,
     aspect: 'portrait',
     scenario: null,
@@ -897,7 +971,10 @@ function updateGenerateBtn() {
     if (state.isRunning) btn.textContent = 'Génération en cours…';
     else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
     else if (!hasIdea) btn.textContent = 'Décrivez votre idée';
-    else btn.textContent = '🎬 Générer';
+    else {
+        const clips = parseInt(document.getElementById('scene-count-select').value);
+        btn.textContent = '🎬 Générer ' + clips + ' clip' + (clips > 1 ? 's' : '');
+    }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -987,9 +1064,6 @@ async function callImageAPI(prompt, size = '768x1024') {
     return url;
 }
 
-// ══════════════════════════════════════════════════════════════════
-// CRÉATION TÂCHE VIDÉO
-// ══════════════════════════════════════════════════════════════════
 async function createVideoTaskOnly(item) {
     const now = Date.now();
     if (counters.videoRequestsThisMinute >= LIMITS.videoRpm) {
@@ -1042,13 +1116,10 @@ async function createVideoTaskOnly(item) {
     return videoId;
 }
 
-// ══════════════════════════════════════════════════════════════════
-// POLLING VIDÉO
-// ══════════════════════════════════════════════════════════════════
 async function pollVideoForItem(item) {
     const startTime = Date.now();
     const waitBeforeFirstPoll = getEstimatedWaitSeconds();
-    const isFirstClip = (item.index === 0 && measuredSpeed.value === null);
+    const maxPollTime = MAX_POLL_MINUTES * 60;
 
     logConsole('Clip ' + (item.index + 1) + ' — attente initiale de ' + Math.round(waitBeforeFirstPoll) + 's', 'info');
 
@@ -1072,6 +1143,12 @@ async function pollVideoForItem(item) {
 
     for (let attempt = 0; attempt < 400; attempt++) {
         if (state.stopRequested) throw new Error('Arrêt demandé');
+
+        const elapsedTotal = (Date.now() - startTime) / 1000;
+        if (elapsedTotal > maxPollTime) {
+            throw new Error('Timeout après ' + MAX_POLL_MINUTES + ' min');
+        }
+
         pollCount++;
         const url = POLL_BASE + '?video_id=' + encodeURIComponent(item.videoId) +
                     '&model_name=' + encodeURIComponent(MODEL_VIDEO);
@@ -1118,7 +1195,7 @@ async function pollVideoForItem(item) {
             }
         } catch (e) {
             if (e.message === 'Arrêt demandé') throw e;
-            if (e.message.startsWith('Échec') || e.message === 'Terminé mais pas d\'URL') throw e;
+            if (e.message.startsWith('Échec') || e.message === 'Terminé mais pas d\'URL' || e.message.startsWith('Timeout')) throw e;
             consecutiveErrors++;
             if (consecutiveErrors >= 15) { await sleep(20000); consecutiveErrors = 0; }
         }
@@ -1128,7 +1205,7 @@ async function pollVideoForItem(item) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PIPELINE
+// PIPELINE PRINCIPAL
 // ══════════════════════════════════════════════════════════════════
 async function runFullPipeline() {
     if (state.isRunning) return;
@@ -1140,6 +1217,10 @@ async function runFullPipeline() {
     state.stopRequested = false;
     state.idea = idea;
     state.sceneCount = parseInt(document.getElementById('scene-count-select').value);
+
+    // ✅ CORRECTION : N+1 images pour N clips
+    state.imagesNeeded = state.sceneCount + 1;
+
     state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
     state.aspect = document.getElementById('aspect-select').value;
     state.images = [];
@@ -1157,13 +1238,15 @@ async function runFullPipeline() {
     document.getElementById('section-videos').classList.add('hidden');
     document.getElementById('section-player').classList.add('hidden');
 
-    logConsole('Mode : ' + state.selectedMode.name + ' · Style : ' + state.selectedStyle.name, 'info');
+    logConsole('🎬 Mode : ' + state.selectedMode.name + ' · Style : ' + state.selectedStyle.name, 'info');
+    logConsole('🎵 Musique : ' + state.selectedMusic.name, 'info');
+    logConsole('📊 ' + state.sceneCount + ' clips → ' + state.imagesNeeded + ' images à générer', 'info');
 
     await activateWakeLock();
     setStatus('Initialisation…');
 
     try {
-        // ÉTAPE 1 : SCÉNARIO
+        // ═══ ÉTAPE 1 : SCÉNARIO ═══
         setStatus('L\'IA écrit le scénario…');
         const modeInstruction = state.selectedMode.scenario;
         const visualHint = state.selectedMode.visual;
@@ -1174,8 +1257,10 @@ Instruction : ${modeInstruction}
 Style visuel : ${state.selectedStyle.prompt}
 Format : ${aspectLabel}
 Idée de l'utilisateur : "${idea}"
-Nombre de scènes : ${state.sceneCount}
 Durée par scène : ${state.numFrames / 24} secondes
+
+IMPORTANT : Génère EXACTEMENT ${state.imagesNeeded} scènes dans le tableau "scenes".
+(Chaque clip vidéo utilise 2 scènes consécutives en keyframes. Donc ${state.imagesNeeded} images → ${state.imagesNeeded - 1} clips.)
 
 Génère un JSON avec :
 {
@@ -1201,15 +1286,23 @@ Réponds UNIQUEMENT en JSON valide.`;
         try { scenario = JSON.parse(scenarioRaw.replace(/```json/g, '').replace(/```/g, '').trim()); }
         catch (e) { throw new Error('JSON invalide'); }
 
+        // ✅ Vérification : ajuster si l'IA en a généré trop ou pas assez
+        if (scenario.scenes.length > state.imagesNeeded) {
+            scenario.scenes = scenario.scenes.slice(0, state.imagesNeeded);
+            logConsole('⚠ Tronqué à ' + state.imagesNeeded + ' scènes', 'warn');
+        } else if (scenario.scenes.length < state.imagesNeeded) {
+            logConsole('⚠ L\'IA a généré seulement ' + scenario.scenes.length + ' scènes (au lieu de ' + state.imagesNeeded + ')', 'warn');
+        }
+
         state.scenario = scenario;
         state.femaleCharacters = scenario.characters
             .filter(c => c.gender === 'femme')
             .map(c => c.name.toLowerCase());
 
-        logConsole('Scénario : « ' + scenario.title + ' »', 'success');
+        logConsole('Scénario : « ' + scenario.title + ' » (' + scenario.scenes.length + ' scènes)', 'success');
         displayScenario(scenario);
 
-        // ÉTAPE 2 : IMAGES
+        // ═══ ÉTAPE 2 : IMAGES ═══
         setStatus('L\'IA dessine…');
         const charDesc = scenario.characters.map(c => c.name + ' (' + c.gender + ') : ' + c.appearance).join('. ');
         const imgSize = state.aspect === 'portrait' ? '768x1024' : state.aspect === 'landscape' ? '1024x576' : '768x768';
@@ -1235,7 +1328,7 @@ Réponds UNIQUEMENT en JSON valide.`;
 
         if (state.images.length < 2) throw new Error('Pas assez d\'images');
 
-        // ÉTAPE 3 : VIDÉOS
+        // ═══ ÉTAPE 3 : VIDÉOS ═══
         logConsole('ÉTAPE 3 — Clips vidéo', 'success');
         const totalClips = state.images.length - 1;
         for (let i = 0; i < totalClips; i++) createPendingVideoCard(i, totalClips);
@@ -1406,7 +1499,8 @@ function updatePendingVideoCard(index, label, progress, elapsed) {
         const remaining = Math.max(0, estWait - elapsed);
         etaEl.textContent = remaining > 0 ? '≈ ' + formatTime(remaining) + ' restantes' : 'Bientôt terminé…';
     }
-    if (fillEl && progress > 0) fillEl.style.width = progress + '%';
+    if (fillEl && progress > 0) fillEl.style.fill.width = progress + '%';
+    if (fillEl) fillEl.style.width = progress + '%';
 }
 
 function replacePendingWithVideo(index, videoUrl, dialogue, sceneNumber, actualDuration) {
@@ -1419,8 +1513,15 @@ function replacePendingWithVideo(index, videoUrl, dialogue, sceneNumber, actualD
         '<video src="' + videoUrl + '" controls playsinline preload="metadata"></video>' +
         '<div class="gen-label">🎬 Clip ' + sceneNumber + '</div>' +
         (actualDuration ? '<div class="gen-timing">⚡ ' + actualDuration + 's</div>' : '') +
-        (dialogue && dialogue.text ? '<div class="gen-dialogue">💬 ' + esc(dialogue.character) + ' : « ' + esc(dialogue.text) + ' »</div>' : '');
+        (dialogue && dialogue.text ? '<div class="gen-dialogue">💬 ' + esc(dialogue.character) + ' : « ' + esc(dialogue.text) + ' »</div>' : '') +
+        '<div class="gen-actions">' +
+            '<button data-dl="' + index + '">⬇ Télécharger</button>' +
+        '</div>';
     pending.parentNode.replaceChild(card, pending);
+    const dlBtn = card.querySelector('[data-dl]');
+    if (dlBtn) {
+        dlBtn.addEventListener('click', () => downloadVideo(videoUrl, 'clip-' + sceneNumber + '.mp4'));
+    }
     setTimeout(() => card.classList.remove('newly-added'), 3000);
     document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
 }
@@ -1432,6 +1533,159 @@ function markPendingFailed(index, errorMessage) {
         '<div style="color:var(--error);font-size:2rem;">✕</div>' +
         '<div class="pending-label" style="color:var(--error);">Échec</div>' +
         '<div class="pending-progress-text">' + esc(errorMessage.slice(0, 80)) + '</div>';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TÉLÉCHARGEMENT
+// ══════════════════════════════════════════════════════════════════
+async function downloadVideo(url, filename) {
+    try {
+        showToast('Téléchargement…', 'warn', 1500);
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        showToast('✓ Téléchargé : ' + filename, 'success');
+    } catch (e) {
+        showToast('Erreur téléchargement', 'error');
+    }
+}
+
+async function downloadAllClips() {
+    const readyVideos = state.videos.filter(v => v && v.url);
+    if (!readyVideos.length) {
+        showToast('Aucun clip à télécharger', 'warn');
+        return;
+    }
+    showToast('Téléchargement de ' + readyVideos.length + ' clip(s)…', 'warn', 2000);
+    for (let i = 0; i < readyVideos.length; i++) {
+        const v = readyVideos[i];
+        await downloadVideo(v.url, 'clip-' + (i + 1) + '.mp4');
+        await sleep(800);
+    }
+    showToast('✓ Tous les clips téléchargés', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SAUVEGARDE / RESTAURATION
+// ══════════════════════════════════════════════════════════════════
+function saveProject() {
+    try {
+        const project = {
+            savedAt: new Date().toISOString(),
+            idea: document.getElementById('idea-input').value,
+            modeId: state.selectedMode.id,
+            styleId: state.selectedStyle.id,
+            musicId: state.selectedMusic.id,
+            sceneCount: document.getElementById('scene-count-select').value,
+            clipDuration: document.getElementById('clip-duration-select').value,
+            aspect: document.getElementById('aspect-select').value,
+            scenario: state.scenario,
+            images: state.images,
+            videos: state.videos.map(v => v ? { url: v.url, sceneNumber: v.sceneNumber, dialogue: v.dialogue, actualDuration: v.actualDuration } : null),
+            counters: counters,
+            measuredSpeed: measuredSpeed
+        };
+        localStorage.setItem('createur_ia_project', JSON.stringify(project));
+        showToast('✓ Projet sauvegardé', 'success');
+        logConsole('Projet sauvegardé (' + new Date().toLocaleString('fr-FR') + ')', 'success');
+    } catch (e) {
+        showToast('Erreur sauvegarde : ' + e.message, 'error');
+    }
+}
+
+function loadProject() {
+    try {
+        const raw = localStorage.getItem('createur_ia_project');
+        if (!raw) { showToast('Aucun projet sauvegardé', 'warn'); return; }
+        const project = JSON.parse(raw);
+
+        if (!confirm('Restaurer le projet du ' + new Date(project.savedAt).toLocaleString('fr-FR') + ' ?\n\nTitre : ' + (project.scenario?.title || '—') + '\nClips : ' + (project.videos?.filter(v => v).length || 0) + '\n\nCela remplacera l\'état actuel.')) return;
+
+        // Restaurer les sélections
+        if (project.idea) document.getElementById('idea-input').value = project.idea;
+        if (project.modeId) {
+            const m = MODES.find(x => x.id === project.modeId);
+            if (m) {
+                state.selectedMode = m;
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.toggle('selected', c.textContent.includes(m.name)));
+            }
+        }
+        if (project.styleId) {
+            const s = STYLES.find(x => x.id === project.styleId);
+            if (s) {
+                state.selectedStyle = s;
+                document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('selected', c.textContent.includes(s.name)));
+            }
+        }
+        if (project.musicId) {
+            const mu = MUSIC_STYLES.find(x => x.id === project.musicId);
+            if (mu) {
+                state.selectedMusic = mu;
+                document.querySelectorAll('.music-card').forEach(c => c.classList.toggle('selected', c.textContent.includes(mu.name)));
+            }
+        }
+        if (project.sceneCount) document.getElementById('scene-count-select').value = project.sceneCount;
+        if (project.clipDuration) document.getElementById('clip-duration-select').value = project.clipDuration;
+        if (project.aspect) document.getElementById('aspect-select').value = project.aspect;
+
+        // Restaurer scénario + images + vidéos
+        state.scenario = project.scenario || null;
+        state.images = project.images || [];
+        state.videos = (project.videos || []).map(v => v ? { url: v.url, sceneNumber: v.sceneNumber, dialogue: v.dialogue, actualDuration: v.actualDuration } : null);
+
+        // Afficher scénario
+        if (state.scenario) {
+            displayScenario(state.scenario);
+        }
+
+        // Afficher images
+        const grid = document.getElementById('generated-images');
+        grid.innerHTML = '';
+        state.images.forEach((img, i) => {
+            const card = document.createElement('div');
+            card.className = 'gen-image-card';
+            card.innerHTML = '<img src="' + img.url + '" loading="lazy"><div class="gen-label">Scène ' + (img.scene?.scene_number || i + 1) + '</div>';
+            grid.appendChild(card);
+        });
+        document.getElementById('images-badge').textContent = state.images.length;
+        if (state.images.length > 0) document.getElementById('section-images').classList.remove('hidden');
+
+        // Afficher vidéos
+        const vgrid = document.getElementById('generated-videos');
+        vgrid.innerHTML = '';
+        state.videos.forEach((v, i) => {
+            if (!v) return;
+            const card = document.createElement('div');
+            card.className = 'gen-video-card';
+            card.innerHTML =
+                '<video src="' + v.url + '" controls playsinline preload="metadata"></video>' +
+                '<div class="gen-label">🎬 Clip ' + (v.sceneNumber || i + 1) + '</div>' +
+                (v.actualDuration ? '<div class="gen-timing">⚡ ' + v.actualDuration + 's</div>' : '') +
+                (v.dialogue && v.dialogue.text ? '<div class="gen-dialogue">💬 ' + esc(v.dialogue.character) + ' : « ' + esc(v.dialogue.text) + ' »</div>' : '') +
+                '<div class="gen-actions"><button data-dl-idx="' + i + '">⬇ Télécharger</button></div>';
+            vgrid.appendChild(card);
+            const btn = card.querySelector('[data-dl-idx]');
+            if (btn) btn.addEventListener('click', () => downloadVideo(v.url, 'clip-' + (v.sceneNumber || i + 1) + '.mp4'));
+        });
+        document.getElementById('videos-badge').textContent = state.videos.filter(v => v).length;
+        if (state.videos.filter(v => v).length > 0) {
+            document.getElementById('section-videos').classList.remove('hidden');
+            document.getElementById('section-player').classList.remove('hidden');
+        }
+
+        updateGenerateBtn();
+        showToast('✓ Projet restauré', 'success');
+        logConsole('Projet restauré du ' + new Date(project.savedAt).toLocaleString('fr-FR'), 'success');
+    } catch (e) {
+        showToast('Erreur restauration : ' + e.message, 'error');
+    }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1553,6 +1807,22 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
         styleGrid.appendChild(card);
     });
 
+    // Musiques
+    const musicSel = document.getElementById('music-selector');
+    MUSIC_STYLES.forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.className = 'music-card' + (idx === 0 ? ' selected' : '');
+        card.innerHTML = '<span class="music-emoji">' + m.emoji + '</span>' + m.name +
+            '<div style="font-size:0.55rem;opacity:0.7;margin-top:0.2rem">' + m.hint + '</div>';
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.music-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            state.selectedMusic = m;
+            logConsole('Musique : ' + m.name, 'info');
+        });
+        musicSel.appendChild(card);
+    });
+
     document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
     document.getElementById('api-key-input').addEventListener('keydown', e => {
         if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); }
@@ -1564,22 +1834,30 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
         setStatus('Arrêt en cours…');
     });
     document.getElementById('idea-input').addEventListener('input', updateGenerateBtn);
+    document.getElementById('scene-count-select').addEventListener('change', updateGenerateBtn);
+
     document.querySelectorAll('[data-toggle]').forEach(header => {
         header.addEventListener('click', () => {
             document.getElementById(header.dataset.toggle).classList.toggle('open');
         });
     });
+
     document.getElementById('play-all-btn').addEventListener('click', () => {
         if (state.isPlayingSequence) stopAllVideos(); else playAllVideos();
     });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
+
+    // Toolbar
+    document.getElementById('save-project-btn').addEventListener('click', saveProject);
+    document.getElementById('load-project-btn').addEventListener('click', loadProject);
+    document.getElementById('export-all-btn').addEventListener('click', downloadAllClips);
 
     updateApiPanel();
     updateLimitsPanel();
     updateGenerateBtn();
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('api-key-input').value = savedKey;
-    logConsole('Application prête.', 'info');
+    logConsole('Application prête (v2.1 - corrigée)', 'info');
 })();
 </script>
 
