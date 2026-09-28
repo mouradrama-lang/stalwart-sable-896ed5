@@ -2,148 +2,308 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test API Agnes — Diagnostic</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TexteVersVoix Pro — TTS Multilingue</title>
 <style>
-    body { font-family: monospace; background: #0a0a0f; color: #fff; padding: 1rem; max-width: 700px; margin: 0 auto; }
-    h1 { font-size: 1.2rem; color: #00d9ff; margin-bottom: 1rem; }
-    input, button { width: 100%; padding: 0.7rem; margin: 0.4rem 0; border-radius: 8px; font-family: inherit; font-size: 0.85rem; border: 1px solid #2a2a38; background: #1c1c28; color: #fff; }
-    button { background: linear-gradient(135deg, #00d9ff, #ff5eb4); color: #000; font-weight: 800; cursor: pointer; border: none; padding: 0.9rem; }
-    pre { background: #000; padding: 0.8rem; border-radius: 8px; overflow: auto; font-size: 0.7rem; max-height: 400px; border: 1px solid #2a2a38; color: #4ec97a; white-space: pre-wrap; word-break: break-all; margin-top: 0.5rem; }
-    .label { color: #8888a0; font-size: 0.75rem; margin-top: 1rem; display: block; }
-    .status { padding: 0.5rem; border-radius: 6px; font-size: 0.75rem; margin-top: 0.5rem; }
-    .ok { background: rgba(78,201,122,0.15); color: #4ec97a; }
-    .err { background: rgba(192,57,43,0.15); color: #ff6b5a; }
-    .warn { background: rgba(212,160,23,0.15); color: #ffc84a; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0d14;--panel:#141820;--panel-2:#1a2230;--border:#2a3447;--ink:#f0f0f5;--ink-dim:#a5afc0;--gold:#d4a853;--gold-2:#f0d078;--green:#4ec97a;--red:#ff5a5a;--cyan:#00d9ff}
+body{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:16px;font-size:14px;line-height:1.5;max-width:560px;margin:0 auto;background-image:radial-gradient(ellipse at 15% 0%,rgba(212,168,83,0.06) 0%,transparent 50%),radial-gradient(ellipse at 85% 100%,rgba(168,85,247,0.05) 0%,transparent 50%);background-attachment:fixed}
+header{text-align:center;margin-bottom:16px}
+h1{font-size:1.4rem;font-weight:900;background:linear-gradient(135deg,#fff 0%,#d4a853 60%,#a855f7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.subtitle{font-size:0.72rem;color:var(--ink-dim);font-style:italic}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:11px;text-transform:uppercase;color:var(--ink-dim);margin-bottom:6px;letter-spacing:0.08em;font-weight:700}
+textarea{width:100%;min-height:120px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:15px;line-height:1.5;resize:vertical;outline:none}
+textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,0.12)}
+textarea.rtl{direction:rtl;text-align:right}
+.lang-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.lang-tab{padding:12px 6px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink-dim);font-size:0.82rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.lang-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f;border-color:var(--gold)}
+.lang-tab:active{transform:scale(0.97)}
+.lang-tab.dz.active{background:linear-gradient(135deg,#009a44,#ffffff 50%,#d21034);color:#0a0a0f}
+.voice-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.voice-tab{padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink-dim);font-size:0.75rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.voice-tab.active{background:rgba(212,168,83,0.15);color:var(--gold);border-color:var(--gold)}
+.voice-tab:active{transform:scale(0.97)}
+.btn-row{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:8px}
+.btn{padding:14px 10px;border-radius:12px;border:none;font-size:0.9rem;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.15s;letter-spacing:0.03em}
+.btn:active:not(:disabled){transform:scale(0.97)}
+.btn:disabled{opacity:0.35;cursor:not-allowed}
+.btn-play{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f}
+.btn-dl{background:var(--panel-2);color:var(--gold);border:1px solid var(--gold)}
+.status{font-size:0.72rem;color:var(--ink-dim);text-align:center;padding:10px;font-style:italic;line-height:1.4}
+.status.playing{color:var(--green)}
+.status.warn{color:#ff9d3d}
+.status.err{color:var(--red)}
+.quick-phrases{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick-btn{padding:6px 12px;border-radius:16px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink-dim);font-size:0.7rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s}
+.quick-btn:active{transform:scale(0.96);background:rgba(212,168,83,0.12);color:var(--gold)}
+.info{font-size:0.68rem;color:var(--ink-faint);margin-top:6px;font-style:italic;line-height:1.4}
+audio{width:100%;margin-top:10px;border-radius:8px;display:none}
+audio.visible{display:block}
+.engine-badge{display:inline-block;font-size:0.6rem;padding:2px 8px;border-radius:10px;background:rgba(78,201,122,0.15);color:var(--green);font-weight:700;margin-left:6px}
 </style>
 </head>
 <body>
-<h1>🔬 Test API Agnes — Diagnostic</h1>
 
-<input type="password" id="key" placeholder="Collez votre clé API sk-...">
-<button id="btn-test">1️⃣ Tester la clé</button>
-<div id="r1"></div>
+<header>
+<h1>🎙️ TexteVersVoix Pro</h1>
+<p class="subtitle">Google TTS + StreamElements · 🇫🇷 🇬🇧 🇩🇿 🇸🇦</p>
+</header>
 
-<input type="text" id="prompt" value="Un chat dans un jardin" placeholder="Prompt">
-<button id="btn-create">2️⃣ Créer une tâche</button>
-<div id="r2"></div>
+<!-- LANGUE -->
+<div class="lang-tabs">
+<button class="lang-tab active" data-lang="fr">🇫🇷 Français</button>
+<button class="lang-tab" data-lang="en">🇬🇧 English</button>
+<button class="lang-tab dz" data-lang="dz">🇩🇿 Daridja</button>
+<button class="lang-tab" data-lang="ar">🇸🇦 العربية</button>
+</div>
 
-<input type="text" id="taskid" placeholder="ID de la tâche (auto-rempli)">
-<button id="btn-poll">3️⃣ Vérifier le statut</button>
-<div id="r3"></div>
+<!-- TEXTE -->
+<div class="card">
+<label>Texte à prononcer</label>
+<textarea id="text" placeholder="Écris ou colle ton texte ici..."></textarea>
+<div class="quick-phrases" id="quick"></div>
+</div>
 
-<button id="btn-auto">🔄 Auto-poll (toutes les 8 sec)</button>
-<div id="r4"></div>
+<!-- VOIX -->
+<div class="card">
+<label>Voix <span id="engine-badge" class="engine-badge">Google</span></label>
+<div class="voice-tabs" id="voice-tabs"></div>
+<div class="info" id="voice-info"></div>
+</div>
 
-<label class="label">📋 Réponse brute de l'API :</label>
-<pre id="raw">En attente…</pre>
+<!-- BOUTONS -->
+<div class="btn-row">
+<button class="btn btn-play" id="play-btn">▶️ Écouter</button>
+<button class="btn btn-dl" id="dl-btn">⬇️ MP3</button>
+</div>
+
+<audio id="audio" controls></audio>
+
+<div class="status" id="status">Prêt</div>
 
 <script>
-const API = 'https://apihub.agnes-ai.com/v1';
-const POLL = 'https://apihub.agnes-ai.com/agnesapi';
-let autoTimer = null;
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const LANG_MAP = {
+  fr: { google: 'fr', streamVoice: 'Celine', label: 'Français', rtl: false },
+  en: { google: 'en', streamVoice: 'Brian', label: 'English', rtl: false },
+  dz: { google: 'ar', streamVoice: 'Zeina', label: 'Daridja', rtl: true },
+  ar: { google: 'ar', streamVoice: 'Hala', label: 'العربية', rtl: true }
+};
 
-function show(id, cls, txt) {
-    document.getElementById(id).innerHTML = '<div class="status ' + cls + '">' + txt + '</div>';
+const DEMOS = {
+  fr: [
+    { label: '📖 Bonjour', text: 'Bonjour, ceci est un test de synthèse vocale en français.' },
+    { label: '📖 Présentation', text: 'Bonjour, je m\'appelle Mourad et j\'apprends à créer des applications.' }
+  ],
+  en: [
+    { label: '📖 Hello', text: 'Hello, this is a text-to-speech test in English.' },
+    { label: '📖 Intro', text: 'My name is Mourad and I am learning to build web applications.' }
+  ],
+  dz: [
+    { label: '🇩🇿 Salam', text: 'السلام عليكم، كيفاش راك؟ راني مليح، الحمد لله.' },
+    { label: '🇩🇿 Kifach', text: 'واش راك تدير؟ راني جاي من الخدمة، راني عيان شوية.' },
+    { label: '🇩🇿 Merci', text: 'يعطيك الصحة، ربي يحفظك، بسلامة، نشوفوك غدوة إن شاء الله.' },
+    { label: '🇩🇿 Phrase latine', text: 'Salam, kifach rak? Rani mlih, hamdoullah.' }
+  ],
+  ar: [
+    { label: '📖 ترحيب', text: 'مرحبًا بكم، هذا اختبار تحويل النص إلى كلام باللغة العربية.' }
+  ]
+};
+
+const state = {
+  lang: 'fr',
+  engine: 'google', // 'google' ou 'stream'
+  audioUrl: null
+};
+
+// ═══════════════════════════════════════════════════════════
+// RÉFÉRENCES
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const textEl = $('text');
+const quickEl = $('quick');
+const voiceTabsEl = $('voice-tabs');
+const voiceInfoEl = $('voice-info');
+const audioEl = $('audio');
+const statusEl = $('status');
+
+// ═══════════════════════════════════════════════════════════
+// URL GOOGLE TRANSLATE TTS
+// ═══════════════════════════════════════════════════════════
+function getGoogleTTSUrl(text, langCode) {
+  const encoded = encodeURIComponent(text.slice(0, 200)); // limite ~200 chars
+  // client=tw-ob contourne certaines restrictions
+  return 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encoded +
+         '&tl=' + langCode + '&client=tw-ob&ttsspeed=1';
 }
-function raw(obj) {
-    document.getElementById('raw').textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+
+// ═══════════════════════════════════════════════════════════
+// URL STREAMELEMENTS TTS (fallback)
+// ═══════════════════════════════════════════════════════════
+function getStreamUrl(text, voice) {
+  const encoded = encodeURIComponent(text.slice(0, 300));
+  return 'https://api.streamelements.com/kappa/v2/speech?voice=' + voice + '&text=' + encoded;
 }
 
-document.getElementById('btn-test').onclick = async () => {
-    const k = document.getElementById('key').value.trim();
-    if (!k) return;
-    raw('Test en cours...');
-    try {
-        const r = await fetch(API + '/models', { headers: { 'Authorization': 'Bearer ' + k } });
-        const d = await r.json();
-        if (r.ok) show('r1', 'ok', '✅ Clé valide · ' + (d.data ? d.data.length + ' modèles' : 'OK'));
-        else show('r1', 'err', '❌ HTTP ' + r.status);
-        raw(d);
-    } catch (e) {
-        show('r1', 'err', '❌ Erreur : ' + e.message);
-        raw(e.message);
-    }
-};
+// ═══════════════════════════════════════════════════════════
+// UI - VOIX
+// ═══════════════════════════════════════════════════════════
+function renderVoiceTabs() {
+  voiceTabsEl.innerHTML =
+    '<div class="voice-tab' + (state.engine === 'google' ? ' active' : '') + '" data-engine="google">🌐 Google TTS</div>' +
+    '<div class="voice-tab' + (state.engine === 'stream' ? ' active' : '') + '" data-engine="stream">🎙️ StreamElements</div>';
 
-document.getElementById('btn-create').onclick = async () => {
-    const k = document.getElementById('key').value.trim();
-    const p = document.getElementById('prompt').value.trim();
-    if (!k || !p) return;
-    raw('Création de la tâche...');
-    try {
-        const r = await fetch(API + '/videos', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + k, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'agnes-video-v2.0', prompt: p, num_frames: 121, frame_rate: 24 })
-        });
-        const d = await r.json();
-        if (r.ok) {
-            const id = d.video_id || d.id || d.task_id;
-            show('r2', 'ok', '✅ Tâche créée · ID : ' + id);
-            document.getElementById('taskid').value = id;
-        } else {
-            show('r2', 'err', '❌ HTTP ' + r.status);
-        }
-        raw(d);
-    } catch (e) {
-        show('r2', 'err', '❌ ' + e.message);
-        raw(e.message);
-    }
-};
-
-document.getElementById('btn-poll').onclick = async () => {
-    const k = document.getElementById('key').value.trim();
-    const id = document.getElementById('taskid').value.trim();
-    if (!k || !id) return;
-    raw('Vérification...');
-    try {
-        const r = await fetch(POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=agnes-video-v2.0', {
-            headers: { 'Authorization': 'Bearer ' + k }
-        });
-        const d = await r.json();
-        if (r.ok) show('r3', 'ok', '📊 Statut : ' + (d.status || '?') + ' · Progression : ' + (d.progress || '?') + '%');
-        else show('r3', 'err', '❌ HTTP ' + r.status);
-        raw(d);
-    } catch (e) {
-        show('r3', 'err', '❌ ' + e.message);
-        raw(e.message);
-    }
-};
-
-document.getElementById('btn-auto').onclick = () => {
-    if (autoTimer) {
-        clearInterval(autoTimer);
-        autoTimer = null;
-        document.getElementById('btn-auto').textContent = '🔄 Auto-poll (toutes les 8 sec)';
-        return;
-    }
-    document.getElementById('btn-auto').textContent = '⏸ Arrêter l\'auto-poll';
-    let n = 0;
-    const tick = async () => {
-        n++;
-        const k = document.getElementById('key').value.trim();
-        const id = document.getElementById('taskid').value.trim();
-        if (!k || !id) return;
-        try {
-            const r = await fetch(POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=agnes-video-v2.0', {
-                headers: { 'Authorization': 'Bearer ' + k }
-            });
-            const d = await r.json();
-            const s = d.status || '?';
-            const p = d.progress || 0;
-            let cls = 'warn';
-            if (s === 'completed' || s === 'succeeded' || s === 'done') cls = 'ok';
-            if (s === 'failed' || s === 'error') cls = 'err';
-            show('r4', cls, '#' + n + ' · ' + s + ' · ' + p + '%');
-            raw(d);
-        } catch (e) {
-            show('r4', 'err', '#' + n + ' · Erreur : ' + e.message);
-        }
+  voiceTabsEl.querySelectorAll('.voice-tab').forEach(tab => {
+    tab.onclick = () => {
+      state.engine = tab.dataset.engine;
+      renderVoiceTabs();
+      updateVoiceInfo();
     };
-    tick();
-    autoTimer = setInterval(tick, 8000);
-};
+  });
+}
+
+function updateVoiceInfo() {
+  const cfg = LANG_MAP[state.lang];
+  const badge = $('engine-badge');
+  badge.textContent = state.engine === 'google' ? 'Google' : 'Stream';
+
+  if (state.engine === 'google') {
+    if (state.lang === 'dz') {
+      voiceInfoEl.textContent = '🇩🇿 Prononciation arabe (compréhensible en Daridja)';
+    } else if (state.lang === 'ar') {
+      voiceInfoEl.textContent = '🇸🇦 Voix arabe standard (فصحى)';
+    } else if (state.lang === 'fr') {
+      voiceInfoEl.textContent = '🇫🇷 Voix française naturelle';
+    } else {
+      voiceInfoEl.textContent = '🇬🇧 Natural English voice';
+    }
+  } else {
+    if (state.lang === 'dz' || state.lang === 'ar') {
+      voiceInfoEl.textContent = '🎙️ Voix arabe ' + cfg.streamVoice + ' (StreamElements)';
+    } else if (state.lang === 'fr') {
+      voiceInfoEl.textContent = '🎙️ Voix française ' + cfg.streamVoice;
+    } else {
+      voiceInfoEl.textContent = '🎙️ English voice ' + cfg.streamVoice;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI - BOUTONS RAPIDES
+// ═══════════════════════════════════════════════════════════
+function buildQuickButtons() {
+  const demos = DEMOS[state.lang] || [];
+  quickEl.innerHTML = demos.map((d, i) =>
+    '<button class="quick-btn" data-idx="' + i + '">' + d.label + '</button>'
+  ).join('') + '<button class="quick-btn" id="clear-btn">🗑️ Effacer</button>';
+
+  quickEl.querySelectorAll('.quick-btn[data-idx]').forEach(btn => {
+    btn.onclick = () => {
+      textEl.value = demos[parseInt(btn.dataset.idx)].text;
+      updateStatus('Exemple chargé');
+    };
+  });
+
+  const cb = $('clear-btn');
+  if (cb) cb.onclick = () => { textEl.value = ''; updateStatus('Effacé'); };
+}
+
+// ═══════════════════════════════════════════════════════════
+// LECTURE
+// ═══════════════════════════════════════════════════════════
+function play() {
+  const text = textEl.value.trim();
+  if (!text) { updateStatus('⚠️ Écris du texte', 'warn'); return; }
+
+  const cfg = LANG_MAP[state.lang];
+  let url;
+
+  if (state.engine === 'google') {
+    url = getGoogleTTSUrl(text, cfg.google);
+  } else {
+    url = getStreamUrl(text, cfg.streamVoice);
+  }
+
+  state.audioUrl = url;
+
+  updateStatus('⏳ Chargement audio (' + (state.engine === 'google' ? 'Google' : 'Stream') + ')...');
+
+  audioEl.src = url;
+  audioEl.classList.add('visible');
+
+  audioEl.oncanplay = () => {
+    updateStatus('▶️ Lecture en cours (' + cfg.label + ')', 'playing');
+    audioEl.play().catch(err => {
+      updateStatus('⚠️ Erreur lecture : ' + err.message, 'err');
+    });
+  };
+
+  audioEl.onerror = () => {
+    updateStatus('❌ Échec. Essaie l\'autre moteur.', 'err');
+  };
+
+  audioEl.onended = () => {
+    updateStatus('✓ Terminé');
+  };
+
+  audioEl.load();
+}
+
+function download() {
+  if (!state.audioUrl) {
+    updateStatus('⚠️ Lance d\'abord la lecture', 'warn');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = state.audioUrl;
+  a.download = 'audio-' + state.lang + '-' + Date.now() + '.mp3';
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  updateStatus('⬇️ Téléchargement lancé');
+}
+
+function updateStatus(msg, cls = '') {
+  statusEl.textContent = msg;
+  statusEl.className = 'status ' + cls;
+}
+
+// ═══════════════════════════════════════════════════════════
+// ONGLETS LANGUE
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.lang-tab').forEach(tab => {
+  tab.onclick = () => {
+    state.lang = tab.dataset.lang;
+    document.querySelectorAll('.lang-tab').forEach(t => t.classList.toggle('active', t === tab));
+
+    if (LANG_MAP[state.lang].rtl) textEl.classList.add('rtl');
+    else textEl.classList.remove('rtl');
+
+    buildQuickButtons();
+    updateVoiceInfo();
+    updateStatus('Langue : ' + LANG_MAP[state.lang].label);
+  };
+});
+
+// ═══════════════════════════════════════════════════════════
+// BOUTONS
+// ═══════════════════════════════════════════════════════════
+$('play-btn').onclick = play;
+$('dl-btn').onclick = download;
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+renderVoiceTabs();
+buildQuickButtons();
+updateVoiceInfo();
+updateStatus('Prêt · Google TTS actif');
 </script>
+
 </body>
 </html>
