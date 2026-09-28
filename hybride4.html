@@ -1,251 +1,3 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Studio Hybride 4.0 — fal.ai + Replicate + Agnes</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#08080c;--panel:#111118;--panel-2:#181822;--panel-3:#1e1e2c;--border:#252535;--border-2:#33334a;--ink:#f0f0f5;--ink-dim:#8888a0;--ink-faint:#555565;--gold:#d4a853;--gold-2:#f0d078;--cyan:#00d9ff;--cyan-2:#5eeeff;--magenta:#ff5eb4;--green:#4ec97a;--orange:#ff9d3d;--red:#ff5a5a;--purple:#a855f7}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:0 0 6rem;font-size:14px;line-height:1.5;max-width:640px;margin:0 auto;background-image:radial-gradient(ellipse at 15% 0%,rgba(212,168,83,0.06) 0%,transparent 50%),radial-gradient(ellipse at 85% 100%,rgba(168,85,247,0.05) 0%,transparent 50%);background-attachment:fixed}
-header{text-align:center;padding:1.5rem 1rem 1rem;border-bottom:1px solid var(--border)}
-.badge{display:inline-flex;align-items:center;gap:0.4rem;padding:0.25rem 0.7rem;border-radius:20px;background:rgba(212,168,83,0.12);border:1px solid #8b7535;font-size:0.6rem;font-weight:800;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.7rem}
-.badge .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-h1{font-size:1.7rem;font-weight:900;letter-spacing:-0.04em;background:linear-gradient(135deg,#fff 0%,var(--gold) 40%,var(--gold-2) 70%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.25rem}
-.subtitle{font-size:0.72rem;color:var(--ink-dim)}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1rem;margin:0.7rem 0.8rem}
-.panel.complete{border-color:var(--green)}
-.panel-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;margin-bottom:0.7rem}
-.panel-header.no-toggle{cursor:default}
-.panel-title{display:flex;align-items:center;gap:0.55rem;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em}
-.panel-icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:0.95rem;background:linear-gradient(135deg,#6b35ff,#b47cff)}
-.panel-icon.cyan{background:linear-gradient(135deg,#0099cc,var(--cyan))}
-.panel-icon.gold{background:linear-gradient(135deg,var(--gold),var(--gold-2))}
-.panel-icon.green{background:linear-gradient(135deg,#2d8a4e,var(--green))}
-.panel-icon.orange{background:linear-gradient(135deg,#cc7722,var(--orange))}
-.panel-badge{font-size:0.58rem;padding:0.15rem 0.5rem;border-radius:10px;font-weight:800}
-.badge-gray{background:var(--ink-faint);color:#fff}
-.badge-green{background:var(--green);color:#0a0a0f}
-.badge-gold{background:var(--gold);color:#0a0a0f}
-.panel-chevron{font-size:0.65rem;color:var(--ink-faint);transition:transform 0.25s}
-.panel.open .panel-chevron{transform:rotate(180deg)}
-.panel-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
-.panel.open .panel-body{max-height:10000px}
-.field{margin-bottom:0.8rem}.field:last-child{margin-bottom:0}
-.field-label{display:block;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-dim);font-weight:700;margin-bottom:0.4rem}
-.field-hint{font-size:0.65rem;color:var(--ink-faint);margin-top:0.3rem;line-height:1.4;font-style:italic}
-.field-hint a{color:var(--gold);text-decoration:none}
-input,textarea,select{width:100%;padding:0.7rem 0.85rem;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.82rem}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,0.12)}
-textarea{min-height:80px;resize:vertical;line-height:1.45}
-select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%23d4a853' d='M6 8L0 0h12z'/></svg>");background-repeat:no-repeat;background-position:right 0.9rem center;background-size:11px;padding-right:2.4rem}
-.key-row{display:grid;grid-template-columns:1fr auto;gap:0.5rem}
-.key-save-btn{padding:0 1rem;border-radius:10px;border:none;background:var(--gold);color:#0a0a0f;font-size:0.72rem;font-weight:800;font-family:inherit;cursor:pointer}
-.key-save-btn:active{transform:scale(0.97)}
-.key-status{font-size:0.7rem;margin-top:0.45rem;padding:0.4rem 0.65rem;border-radius:8px;background:var(--panel-2);color:var(--ink-dim);display:flex;align-items:center;gap:0.4rem}
-.key-status.ok{background:rgba(78,201,122,0.1);color:var(--green)}
-.key-status .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-.tab-bar{display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin:0.7rem 0.8rem;background:var(--panel);border-radius:12px;padding:0.3rem;border:1px solid var(--border)}
-.tab{padding:0.6rem 0.3rem;border-radius:9px;border:none;background:transparent;color:var(--ink-dim);font-size:0.72rem;font-weight:700;font-family:inherit;cursor:pointer}
-.tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#0a0a0f}
-.upload-zone{border:2px dashed var(--border-2);border-radius:12px;padding:1.2rem 1rem;text-align:center;cursor:pointer;background:var(--panel-2)}
-.upload-zone:active{border-color:var(--gold)}
-.upload-zone input{display:none}
-.upload-icon{font-size:1.5rem;margin-bottom:0.2rem;color:var(--gold)}
-.upload-text{font-size:0.8rem;font-weight:600}
-.upload-hint{font-size:0.62rem;color:var(--ink-faint);margin-top:0.1rem}
-.image-preview{position:relative;border-radius:10px;overflow:hidden;border:2px solid var(--gold);background:#000;aspect-ratio:9/16;max-width:140px;margin:0.6rem auto 0}
-.image-preview img{width:100%;height:100%;object-fit:cover;display:block}
-.image-preview .remove-btn{position:absolute;top:4px;right:4px;background:rgba(192,57,43,0.9);color:#fff;border:none;width:22px;height:22px;border-radius:50%;font-size:11px;cursor:pointer}
-.tool-btn{width:100%;padding:0.6rem;margin-top:0.4rem;border-radius:10px;border:1px solid var(--border-2);background:var(--panel-2);color:var(--ink);font-size:0.7rem;font-weight:700;font-family:inherit;cursor:pointer}
-.tool-btn:active{transform:scale(0.97)}
-.btn-go{display:flex;align-items:center;justify-content:center;gap:0.5rem;width:calc(100% - 1.6rem);margin:0.8rem auto;padding:1.1rem;border-radius:14px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold-2),var(--gold));background-size:200% 200%;color:#0a0a0f;font-size:0.95rem;font-weight:900;font-family:inherit;cursor:pointer;letter-spacing:0.04em;box-shadow:0 8px 30px rgba(212,168,83,0.3);animation:shimmer 3s ease infinite}
-@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.btn-go:active:not(:disabled){transform:scale(0.98)}
-.btn-go:disabled{opacity:0.3;cursor:not-allowed;box-shadow:none;animation:none}
-.btn-stop{width:calc(100% - 1.6rem);margin:0 auto;padding:0.65rem;border-radius:12px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:0.78rem;font-weight:700;font-family:inherit;cursor:pointer;display:none}
-.btn-stop.visible{display:block}
-.row-2{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
-.console-panel{background:#050508;border:1px solid var(--border);border-radius:10px;padding:0.75rem;margin-top:0.5rem;font-family:ui-monospace,monospace;font-size:0.64rem;line-height:1.5;max-height:280px;overflow-y:auto}
-.console-panel::-webkit-scrollbar{width:3px}
-.console-panel::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:2px}
-.console-empty{color:var(--ink-faint);font-style:italic;text-align:center;padding:0.7rem;font-size:0.68rem}
-.log-line{display:flex;gap:0.35rem;padding:0.08rem 0}
-.log-time{color:var(--ink-faint);flex-shrink:0;font-size:0.6rem}
-.log-msg{flex:1;word-break:break-word}
-.log-info{color:var(--cyan-2)}.log-warn{color:var(--orange)}.log-success{color:var(--green)}.log-error{color:var(--red)}.log-dim{color:var(--ink-dim)}.log-gold{color:var(--gold)}
-.console-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;padding-bottom:0.3rem;border-bottom:1px solid var(--border)}
-.console-title{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);font-weight:800;display:flex;align-items:center;gap:0.35rem}
-.console-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s ease-in-out infinite}
-.console-clear{background:transparent;border:1px solid var(--border-2);color:var(--ink-dim);padding:0.12rem 0.4rem;border-radius:6px;font-size:0.55rem;cursor:pointer;font-family:inherit;font-weight:700}
-.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:0.35rem 0}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-2),var(--gold));background-size:200% 100%;border-radius:2px;transition:width 0.3s ease;width:0%;animation:progressShimmer 2s linear infinite}
-@keyframes progressShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.result-box{display:none;padding:0.9rem;border-radius:14px;background:var(--panel);border:1px solid var(--gold);margin:0.7rem 0.8rem}
-.result-box.visible{display:block}
-.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem}
-.result-title{font-size:0.75rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em}
-.result-provider{padding:0.2rem 0.6rem;border-radius:10px;font-size:0.6rem;font-weight:800;background:var(--gold);color:#0a0a0f}
-.result-box video{width:100%;border-radius:10px;aspect-ratio:9/16;object-fit:cover;background:#000;max-height:60vh}
-.result-actions{display:flex;gap:0.5rem;margin-top:0.6rem}
-.result-actions a{flex:1;padding:0.55rem;text-align:center;background:var(--panel-2);color:var(--gold);border:1px solid var(--border);border-radius:8px;font-size:0.7rem;text-decoration:none;font-weight:700}
-.status{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);color:var(--ink);padding:0.7rem 1rem;font-size:0.72rem;display:flex;align-items:center;gap:0.5rem;transform:translateY(100%);transition:transform 0.3s;z-index:100}
-.status.visible{transform:translateY(0)}
-.status .spin{width:12px;height:12px;border:2px solid rgba(212,168,83,0.25);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--gold);color:#0a0a0f;padding:0.7rem 1.2rem;border-radius:12px;font-size:0.75rem;font-weight:700;opacity:0;transition:all 0.35s;z-index:1000;max-width:85vw;text-align:center}
-.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{background:var(--green)}
-.toast.error{background:var(--red);color:#fff}
-@media(max-width:420px){h1{font-size:1.5rem}.row-2{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-
-<header>
-<div class="badge"><span class="dot"></span> Studio Hybride 4.0</div>
-<h1>🎬 Studio Vidéo Hybride</h1>
-<p class="subtitle">fal.ai ⚡ · Replicate 🔥 · Agnes 💜</p>
-</header>
-
-<div class="panel open">
-<div class="panel-header" data-toggle="p1">
-<div class="panel-title"><div class="panel-icon gold">🎯</div>Stratégie</div>
-<div class="panel-badge badge-gold" id="strategy-badge">Auto</div>
-<div class="panel-chevron">▼</div>
-</div>
-<div class="panel-body" id="p1">
-<div class="field">
-<label class="field-label">Ordre de priorité</label>
-<select id="strategy-select">
-<option value="auto" selected>🤖 Auto (fal → Replicate → Agnes)</option>
-<option value="fal">⚡ fal.ai uniquement (5/jour)</option>
-<option value="replicate">🔥 Replicate uniquement</option>
-<option value="agnes">💜 Agnes uniquement</option>
-</select>
-<div class="field-hint">Auto : fal.ai d'abord (rapide + 5 gratuit/jour), puis Replicate, puis Agnes.</div>
-</div>
-</div>
-</div>
-
-<div class="panel open">
-<div class="panel-header" data-toggle="p2">
-<div class="panel-title"><div class="panel-icon">💜</div>Clé Agnes (fallback)</div>
-<div class="panel-badge badge-gray" id="agnes-badge">Optionnel</div>
-<div class="panel-chevron">▼</div>
-</div>
-<div class="panel-body" id="p2">
-<div class="field">
-<label class="field-label">Clé API</label>
-<div class="key-row">
-<input type="password" id="agnes-key" placeholder="sk-...">
-<button class="key-save-btn" id="agnes-save">💾</button>
-</div>
-<div class="field-hint">Utilisée si fal.ai et Replicate échouent. <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a></div>
-<div class="key-status" id="agnes-status"><span class="dot"></span><span>Aucune clé</span></div>
-</div>
-</div>
-</div>
-
-<div class="tab-bar">
-<button class="tab active" id="tab-txt">✍️ Texte → Vidéo</button>
-<button class="tab" id="tab-img">🖼️ Image → Vidéo</button>
-</div>
-
-<div class="panel open" id="panel-txt">
-<div class="panel-header no-toggle">
-<div class="panel-title"><div class="panel-icon cyan">✍️</div>Description</div>
-</div>
-<div class="panel-body" style="max-height:none">
-<div class="field">
-<label class="field-label">Décrivez votre vidéo</label>
-<textarea id="prompt-input" placeholder="Exemple : Un chat marchant dans un jardin ensoleillé, cinématographique"></textarea>
-</div>
-<button class="tool-btn" id="demo-btn">📖 Charger un exemple</button>
-</div>
-</div>
-
-<div class="panel open" id="panel-img" style="display:none">
-<div class="panel-header no-toggle">
-<div class="panel-title"><div class="panel-icon orange">🖼️</div>Image source</div>
-</div>
-<div class="panel-body" style="max-height:none">
-<div class="upload-zone" id="upload-zone">
-<input type="file" id="file-input" accept="image/*">
-<div class="upload-icon">🎞️</div>
-<div class="upload-text">Charger une image</div>
-<div class="upload-hint">Portrait 9:16 recommandé</div>
-</div>
-<div id="image-preview-container"></div>
-<div class="field" style="margin-top:0.7rem">
-<label class="field-label">Décrivez le mouvement</label>
-<textarea id="img-prompt-input" placeholder="Ex: Anime doucement cette image..."></textarea>
-</div>
-<button class="tool-btn" id="img-demo-btn">📖 Charger un exemple</button>
-</div>
-</div>
-
-<div class="panel open">
-<div class="panel-header" data-toggle="p3">
-<div class="panel-title"><div class="panel-icon cyan">⚙️</div>Réglages</div>
-<div class="panel-chevron">▼</div>
-</div>
-<div class="panel-body" id="p3">
-<div class="row-2">
-<div class="field">
-<label class="field-label">Format</label>
-<select id="aspect-select">
-<option value="9:16" selected>📱 9:16 Portrait</option>
-<option value="16:9">🖥️ 16:9 Paysage</option>
-<option value="1:1">⬛ 1:1 Carré</option>
-</select>
-</div>
-<div class="field">
-<label class="field-label">Durée</label>
-<select id="duration-select">
-<option value="5" selected>5 secondes</option>
-<option value="6">6 secondes</option>
-<option value="10">10 secondes</option>
-</select>
-</div>
-</div>
-</div>
-</div>
-
-<button class="btn-go" id="go-btn" disabled>🎬 Générer la vidéo</button>
-<button class="btn-stop" id="btn-stop">⏹ Arrêter</button>
-
-<div class="panel open">
-<div class="panel-header" data-toggle="p4">
-<div class="panel-title"><div class="panel-icon green">📡</div>Suivi en direct</div>
-<div class="panel-chevron">▼</div>
-</div>
-<div class="panel-body" id="p4">
-<div class="console-header">
-<div class="console-title"><span class="console-live-dot" id="live-dot" style="display:none"></span><span id="console-state">Prêt</span></div>
-<button class="console-clear" id="console-clear">🗑️ Effacer</button>
-</div>
-<div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-<div class="console-panel" id="console-log"><div class="console-empty">En attente d'une génération…</div></div>
-</div>
-</div>
-
-<div class="result-box" id="result-box">
-<div class="result-header">
-<div class="result-title">🎬 Vidéo générée</div>
-<div class="result-provider" id="result-provider">—</div>
-</div>
-<video id="result-video" controls playsinline></video>
-<div class="result-actions">
-<a id="result-download" href="#" download="video.mp4" target="_blank">⬇ Télécharger</a>
-<a id="result-open" href="#" target="_blank">↗ Ouvrir</a>
-</div>
-</div>
-
-<div class="status" id="status"><div class="spin"></div><span id="status-text">…</span></div>
-<div class="toast" id="toast"></div>
-
 <script>
 const FAL_PROXY = 'https://fal-proxy-bwph.onrender.com';
 const REPLICATE_PROXY = 'https://replicate-proxy-6eab.onrender.com';
@@ -255,334 +7,556 @@ const AGNES_MODEL = 'agnes-video-v2.0';
 const FAL_MODEL = 'fal-ai/minimax/video-01';
 const REPLICATE_MODEL = 'minimax/video-01';
 const API_KEY_STORE = 'agnes_api_key';
-const POLL_INTERVAL = 6;
-const MAX_POLL = 250;
 
-const state = { mode:'txt', image:null, running:false, stop:false, strategy:'auto' };
+const POLL_INTERVAL = 2;
+const MAX_POLL = 70;
+
+const AGNES_TIMEOUT = 600;
+const FAL_TIMEOUT = 360;
+const REPLICATE_TIMEOUT = 360;
+
+const state = { mode:'txt', image:null, running:false, stop:false, strategy:'fal' };
 
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const normalizeStatus = v => String(v ?? 'unknown').toLowerCase();
+const progressFrom = d => {
+  const val = Number(d?.progress ?? d?.percent ?? d?.percentage ?? d?.internal_progress ?? d?.completion ?? 0);
+  if (!Number.isFinite(val)) return 0;
+  return Math.max(0, Math.min(100, val));
+};
 
 let toastT;
 function toast(msg, type='success') {
-const t = $('toast'); t.textContent = msg; t.className = 'toast'; void t.offsetWidth;
-t.classList.add(type, 'visible'); clearTimeout(toastT);
-toastT = setTimeout(() => t.classList.remove('visible'), 3000);
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast';
+  void t.offsetWidth;
+  t.classList.add(type, 'visible');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('visible'), 3000);
 }
 function setStatus(text) {
-const s = $('status'), st = $('status-text');
-if (text) { s.classList.add('visible'); st.textContent = text; } else s.classList.remove('visible');
+  const s = $('status'), st = $('status-text');
+  if (text) { s.classList.add('visible'); st.textContent = text; }
+  else s.classList.remove('visible');
 }
 
 const logLines = [];
-function logTime() { const d = new Date(); return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':'); }
+function logTime() {
+  const d = new Date();
+  return [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
+}
 function addLog(msg, type='info') {
-logLines.push({ time: logTime(), msg, type });
-if (logLines.length > 300) logLines.shift();
-renderLogs();
+  logLines.push({ time: logTime(), msg, type });
+  if (logLines.length > 300) logLines.shift();
+  renderLogs();
 }
 function renderLogs() {
-const el = $('console-log');
-if (!el) return;
-if (logLines.length === 0) { el.innerHTML = '<div class="console-empty">En attente…</div>'; return; }
-el.innerHTML = logLines.map(l => '<div class="log-line"><span class="log-time">['+l.time+']</span><span class="log-msg log-'+l.type+'">'+esc(l.msg)+'</span></div>').join('');
-el.scrollTop = el.scrollHeight;
+  const el = $('console-log');
+  if (!el) return;
+  if (logLines.length === 0) {
+    el.innerHTML = '<div class="console-empty">En attente…</div>';
+    return;
+  }
+  el.innerHTML = logLines.map(l =>
+    '<div class="log-line"><span class="log-time">[' + l.time + ']</span><span class="log-msg log-' + l.type + '">' + esc(l.msg) + '</span></div>'
+  ).join('');
+  el.scrollTop = el.scrollHeight;
 }
-function clearLogs() { logLines.length = 0; renderLogs(); updateProgress(0); addLog('Console effacée', 'dim'); }
-function updateProgress(p) { const el = $('progress-fill'); if (el) el.style.width = Math.max(0, Math.min(100, p)) + '%'; }
-function updateConsoleState(t, live=false) { $('console-state').textContent = t; $('live-dot').style.display = live ? 'inline-block' : 'none'; }
+function clearLogs() {
+  logLines.length = 0;
+  renderLogs();
+  updateProgress(0);
+  addLog('Console effacée', 'dim');
+}
+function updateProgress(p) {
+  const el = $('progress-fill');
+  if (el) el.style.width = Math.max(0, Math.min(100, p)) + '%';
+}
+function updateConsoleState(t, live=false) {
+  $('console-state').textContent = t;
+  $('live-dot').style.display = live ? 'inline-block' : 'none';
+}
 
 async function wakeLock() {
-try { if ('wakeLock' in navigator) await navigator.wakeLock.request('screen'); } catch(e) {}
+  try {
+    if ('wakeLock' in navigator) await navigator.wakeLock.request('screen');
+  } catch(e) {}
 }
 
-function getKey() { try { return (localStorage.getItem(API_KEY_STORE) || '').trim(); } catch(e) { return ''; } }
+function getKey() {
+  try { return (localStorage.getItem(API_KEY_STORE) || '').trim(); } catch(e) { return ''; }
+}
 function saveKey() {
-const input = $('agnes-key');
-let k = String(input.value||'').trim().replace(/^["']|["']$/g,'').replace(/^Bearer\s+/i,'').replace(/\s+/g,'');
-if (!k) { try { localStorage.removeItem(API_KEY_STORE); } catch(e) {} refreshKeyUI(); toast('Clé supprimée','error'); return; }
-try { localStorage.setItem(API_KEY_STORE, k); input.value = k; refreshKeyUI(); toast('Clé Agnes ✓'); addLog('Clé Agnes enregistrée', 'success'); } catch(e) { toast('Erreur','error'); }
-}
-function refreshKeyUI() {
-const k = getKey();
-if (k) {
-$('panel-agnes').classList.add('complete');
-$('agnes-badge').textContent = '✓ Prêt';
-$('agnes-badge').className = 'panel-badge badge-green';
-$('agnes-key').value = k;
-$('agnes-status').className = 'key-status ok';
-$('agnes-status').innerHTML = '<span class="dot"></span><span>✓ '+k.slice(0,10)+'…'+k.slice(-4)+'</span>';
-} else {
-$('panel-agnes').classList.remove('complete');
-$('agnes-badge').textContent = 'Optionnel';
-$('agnes-badge').className = 'panel-badge badge-gray';
-$('agnes-key').value = '';
-$('agnes-status').className = 'key-status';
-$('agnes-status').innerHTML = '<span class="dot"></span><span>Aucune clé (fallback désactivé)</span>';
-}
-updateGo();
+  const input = $('agnes-key');
+  let k = String(input.value || '').trim()
+    .replace(/^["']|["']$/g, '')
+    .replace(/^Bearer\s+/i, '')
+    .replace(/\s+/g, '');
+
+  if (!k) {
+    try { localStorage.removeItem(API_KEY_STORE); } catch(e) {}
+    refreshKeyUI();
+    toast('Clé supprimée', 'error');
+    return;
+  }
+
+  try {
+    localStorage.setItem(API_KEY_STORE, k);
+    input.value = k;
+    refreshKeyUI();
+    toast('Clé Agnes ✓');
+    addLog('Clé Agnes enregistrée', 'success');
+  } catch(e) {
+    toast('Erreur', 'error');
+  }
 }
 
-function fileToDataUri(f) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsDataURL(f); }); }
-async function handleImageFile(file) {
-if (!file.type.startsWith('image/')) return;
-try { state.image = { dataUri: await fileToDataUri(file) }; renderImagePreview(); updateGo(); addLog('Image chargée ('+Math.round(file.size/1024)+' Ko)', 'success'); }
-catch(e) { addLog('Erreur image', 'error'); }
+function refreshKeyUI() {
+  const k = getKey();
+  const panel = $('panel-agnes');
+  if (panel) {
+    if (k) panel.classList.add('complete');
+    else panel.classList.remove('complete');
+  }
+
+  if (k) {
+    $('agnes-badge').textContent = '✓ Prêt';
+    $('agnes-badge').className = 'panel-badge badge-green';
+    $('agnes-key').value = k;
+    $('agnes-status').className = 'key-status ok';
+    $('agnes-status').innerHTML = '<span class="dot"></span><span>✓ ' + k.slice(0,10) + '…' + k.slice(-4) + '</span>';
+  } else {
+    $('agnes-badge').textContent = 'Optionnel';
+    $('agnes-badge').className = 'panel-badge badge-gray';
+    $('agnes-key').value = '';
+    $('agnes-status').className = 'key-status';
+    $('agnes-status').innerHTML = '<span class="dot"></span><span>Aucune clé (fallback désactivé)</span>';
+  }
+  updateGo();
 }
+
+function fileToDataUri(f) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(f);
+  });
+}
+
+async function handleImageFile(file) {
+  if (!file.type.startsWith('image/')) return;
+  try {
+    state.image = { dataUri: await fileToDataUri(file) };
+    renderImagePreview();
+    updateGo();
+    addLog('Image chargée (' + Math.round(file.size/1024) + ' Ko)', 'success');
+  } catch(e) {
+    addLog('Erreur image', 'error');
+  }
+}
+
 function renderImagePreview() {
-const c = $('image-preview-container');
-if (!state.image) { c.innerHTML = ''; return; }
-c.innerHTML = '<div class="image-preview"><img src="'+state.image.dataUri+'"><button class="remove-btn" id="remove-img">✕</button></div>';
-$('remove-img').onclick = () => { state.image = null; renderImagePreview(); updateGo(); };
+  const c = $('image-preview-container');
+  if (!state.image) { c.innerHTML = ''; return; }
+
+  c.innerHTML = '<div class="image-preview"><img src="' + state.image.dataUri + '"><button class="remove-btn" id="remove-img">✕</button></div>';
+  $('remove-img').onclick = () => {
+    state.image = null;
+    renderImagePreview();
+    updateGo();
+  };
 }
 
 async function generateWithFal(prompt, aspect, duration) {
-addLog('⚡ [fal.ai] Envoi via proxy Render…', 'gold');
-const body = { model: FAL_MODEL, prompt: prompt, aspect_ratio: aspect, duration: duration };
+  addLog('⚡ [fal.ai] Envoi via proxy Render…', 'gold');
 
-const r = await fetch(FAL_PROXY + '/v1/videos', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(body)
-});
-if (!r.ok) { const err = await r.text(); throw new Error('fal HTTP ' + r.status + ' : ' + err.slice(0,150)); }
-const d = await r.json();
-const requestId = d.request_id;
-if (!requestId) throw new Error('Pas de request_id fal');
-addLog('⚡ [fal.ai] Tâche : ' + String(requestId).slice(0, 14) + '…', 'success');
+  const body = { model: FAL_MODEL, prompt, aspect_ratio: aspect, duration };
 
-const start = Date.now();
-for (let i = 0; i < MAX_POLL; i++) {
-if (state.stop) throw new Error('stop');
-const elapsed = Math.floor((Date.now()-start)/1000);
-if (elapsed > 900) throw new Error('Timeout fal.ai (15 min)');
-await sleep(POLL_INTERVAL * 1000);
-const sr = await fetch(FAL_PROXY + '/v1/videos/' + encodeURIComponent(requestId));
-const sd = await sr.json();
-const status = sd.status || sd.request_status || 'unknown';
-addLog('⚡ [fal.ai] ' + status + ' · ' + elapsed + 's', 'dim');
-updateProgress(Math.min(90, 20 + i * 4));
-if (status === 'COMPLETED' || status === 'completed' || status === 'OK') {
-const videoUrl = (sd.video && sd.video.url) || sd.video_url || (sd.response && sd.response.video && sd.response.video.url);
-if (!videoUrl) throw new Error('Pas d\'URL fal');
-addLog('⚡ [fal.ai] ✅ Vidéo prête !', 'success');
-return videoUrl;
-}
-if (status === 'FAILED' || status === 'failed' || status === 'ERROR') throw new Error('fal.ai a échoué');
-}
-throw new Error('fal.ai timeout');
+  const r = await fetch(FAL_PROXY + '/v1/videos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error('fal HTTP ' + r.status + ' : ' + err.slice(0,150));
+  }
+
+  const d = await r.json();
+  const requestId = d.request_id;
+  if (!requestId) throw new Error('Pas de request_id fal');
+
+  addLog('⚡ [fal.ai] Tâche : ' + String(requestId).slice(0,14) + '…', 'success');
+
+  const start = Date.now();
+  for (let i = 0; i < MAX_POLL; i++) {
+    if (state.stop) throw new Error('stop');
+
+    const elapsed = Math.floor((Date.now()-start)/1000);
+    if (elapsed > FAL_TIMEOUT) throw new Error('Timeout fal.ai (' + FAL_TIMEOUT + 's)');
+
+    await sleep(POLL_INTERVAL * 1000);
+
+    const sr = await fetch(FAL_PROXY + '/v1/videos/' + encodeURIComponent(requestId));
+    const sd = await sr.json();
+    const status = normalizeStatus(sd.status || sd.request_status || sd.state || sd.state_name || 'unknown');
+    const progress = progressFrom(sd);
+
+    addLog('⚡ [fal.ai] ' + status + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
+    updateProgress(progress);
+
+    if (status === 'completed' || status === 'succeeded' || status === 'ok') {
+      const videoUrl = (sd.video && sd.video.url) || sd.video_url || (sd.response && sd.response.video && sd.response.video.url);
+      if (!videoUrl) throw new Error('Pas d\'URL fal');
+      addLog('⚡ [fal.ai] ✅ Vidéo prête !', 'success');
+      return videoUrl;
+    }
+
+    if (status === 'failed' || status === 'error' || status === 'cancelled' || status === 'canceled') {
+      throw new Error('fal.ai a échoué');
+    }
+  }
+
+  throw new Error('fal.ai timeout');
 }
 
 async function generateWithReplicate(prompt, aspect, duration) {
-addLog('🔥 [Replicate] Envoi via proxy Render…', 'gold');
-const numFrames = duration * 24;
-const body = { model: REPLICATE_MODEL, prompt, aspect_ratio: aspect, num_frames: numFrames, fps: 24 };
+  addLog('🔥 [Replicate] Envoi via proxy Render…', 'gold');
 
-const r = await fetch(REPLICATE_PROXY + '/v1/videos', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(body)
-});
-if (!r.ok) { const err = await r.text(); throw new Error('Proxy HTTP ' + r.status + ' : ' + err.slice(0,150)); }
-const d = await r.json();
-const id = d.id;
-if (!id) throw new Error('Pas d\'ID Replicate');
-addLog('🔥 [Replicate] Tâche : ' + String(id).slice(0, 14) + '…', 'success');
+  const numFrames = duration * 24;
+  const body = {
+    model: REPLICATE_MODEL,
+    prompt,
+    aspect_ratio: aspect,
+    num_frames: numFrames,
+    fps: 24
+  };
 
-const start = Date.now();
-for (let i = 0; i < MAX_POLL; i++) {
-if (state.stop) throw new Error('stop');
-const elapsed = Math.floor((Date.now()-start)/1000);
-if (elapsed > 900) throw new Error('Timeout Replicate (15 min)');
-await sleep(POLL_INTERVAL * 1000);
-const sr = await fetch(REPLICATE_PROXY + '/v1/videos/' + encodeURIComponent(id));
-const sd = await sr.json();
-const status = sd.status || 'unknown';
-const progress = sd.progress || 0;
-addLog('🔥 [Replicate] ' + status + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
-updateProgress(progress);
-if (status === 'succeeded' || status === 'completed') {
-const url = sd.video_url;
-if (!url) throw new Error('Pas d\'URL Replicate');
-addLog('🔥 [Replicate] ✅ Vidéo prête !', 'success');
-return url;
-}
-if (status === 'failed' || status === 'canceled') throw new Error('Replicate ' + status);
-}
-throw new Error('Replicate timeout');
+  const r = await fetch(REPLICATE_PROXY + '/v1/videos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error('Proxy HTTP ' + r.status + ' : ' + err.slice(0,150));
+  }
+
+  const d = await r.json();
+  const id = d.id;
+  if (!id) throw new Error('Pas d\'ID Replicate');
+
+  addLog('🔥 [Replicate] Tâche : ' + String(id).slice(0,14) + '…', 'success');
+
+  const start = Date.now();
+  for (let i = 0; i < MAX_POLL; i++) {
+    if (state.stop) throw new Error('stop');
+
+    const elapsed = Math.floor((Date.now()-start)/1000);
+    if (elapsed > REPLICATE_TIMEOUT) throw new Error('Timeout Replicate (' + REPLICATE_TIMEOUT + 's)');
+
+    await sleep(POLL_INTERVAL * 1000);
+
+    const sr = await fetch(REPLICATE_PROXY + '/v1/videos/' + encodeURIComponent(id));
+    const sd = await sr.json();
+
+    const status = normalizeStatus(sd.status || sd.state || sd.state_name || 'unknown');
+    const progress = progressFrom(sd);
+
+    addLog('🔥 [Replicate] ' + status + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
+    updateProgress(progress);
+
+    if (status === 'succeeded' || status === 'completed' || status === 'done') {
+      const url = sd.video_url || sd.output_url || sd.output?.url;
+      if (!url) throw new Error('Pas d\'URL Replicate');
+      addLog('🔥 [Replicate] ✅ Vidéo prête !', 'success');
+      return url;
+    }
+
+    if (status === 'failed' || status === 'canceled' || status === 'cancelled') {
+      throw new Error('Replicate ' + status);
+    }
+  }
+
+  throw new Error('Replicate timeout');
 }
 
 async function generateWithAgnes(prompt, aspect, duration) {
-const key = getKey();
-if (!key) throw new Error('Pas de clé Agnes');
-addLog('💜 [Agnes] Envoi direct…', 'gold');
-const frames = duration === 5 ? 121 : (duration === 10 ? 241 : 153);
-const body = { model: AGNES_MODEL, prompt, num_frames: frames, frame_rate: 24, ratio: aspect, resolution: '480p' };
+  const key = getKey();
+  if (!key) throw new Error('Pas de clé Agnes');
 
-const r = await fetch(AGNES_API + '/videos', {
-method: 'POST',
-headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-body: JSON.stringify(body)
-});
-if (!r.ok) { const err = await r.text(); throw new Error('Agnes HTTP ' + r.status + ' : ' + err.slice(0,150)); }
-const d = await r.json();
-const id = d.video_id || d.id || d.task_id;
-if (!id) throw new Error('Pas de video_id Agnes');
-addLog('💜 [Agnes] Tâche : ' + String(id).slice(0,14) + '…', 'success');
+  addLog('💜 [Agnes] Envoi direct…', 'gold');
 
-const start = Date.now();
-for (let i = 0; i < MAX_POLL; i++) {
-if (state.stop) throw new Error('stop');
-const elapsed = Math.floor((Date.now()-start)/1000);
-if (elapsed > 1200) throw new Error('Timeout Agnes (20 min)');
-await sleep(POLL_INTERVAL * 1000);
-const url = AGNES_POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=' + encodeURIComponent(AGNES_MODEL);
-const sr = await fetch(url, { headers: { 'Authorization': 'Bearer ' + key } });
-const sd = await sr.json();
-const status = sd.status || 'unknown';
-const progress = sd.progress || sd.internal_progress || 0;
-addLog('💜 [Agnes] ' + status + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
-updateProgress(progress);
-if (status === 'completed' || status === 'succeeded' || status === 'done') {
-const videoUrl = (sd.metadata && sd.metadata.url) || sd.url || (sd.output && sd.output.url);
-if (!videoUrl) throw new Error('Pas d\'URL Agnes');
-addLog('💜 [Agnes] ✅ Vidéo prête !', 'success');
-return videoUrl;
-}
-if (status === 'failed' || status === 'error' || status === 'cancelled') throw new Error('Agnes ' + status);
-}
-throw new Error('Agnes timeout');
+  const frames = duration === 5 ? 121 : (duration === 10 ? 241 : 153);
+  const body = {
+    model: AGNES_MODEL,
+    prompt,
+    num_frames: frames,
+    frame_rate: 24,
+    ratio: aspect,
+    resolution: '480p'
+  };
+
+  const r = await fetch(AGNES_API + '/videos', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + key,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error('Agnes HTTP ' + r.status + ' : ' + err.slice(0,150));
+  }
+
+  const d = await r.json();
+  const id = d.video_id || d.id || d.task_id || d.data?.video_id || d.data?.id || d.task?.id;
+  if (!id) throw new Error('Pas de video_id Agnes');
+
+  addLog('💜 [Agnes] Tâche : ' + String(id).slice(0,14) + '…', 'success');
+
+  const start = Date.now();
+  for (let i = 0; i < MAX_POLL; i++) {
+    if (state.stop) throw new Error('stop');
+
+    const elapsed = Math.floor((Date.now()-start)/1000);
+    if (elapsed > AGNES_TIMEOUT) throw new Error('Timeout Agnes (' + AGNES_TIMEOUT + 's)');
+
+    await sleep(POLL_INTERVAL * 1000);
+
+    const url = AGNES_POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=' + encodeURIComponent(AGNES_MODEL);
+    const sr = await fetch(url, { headers: { 'Authorization': 'Bearer ' + key } });
+    const sd = await sr.json();
+
+    console.log('[Agnes status]', sd);
+
+    const status = normalizeStatus(sd.status || sd.state || sd.state_name || sd.job_status || 'unknown');
+    const progress = progressFrom(sd);
+
+    addLog('💜 [Agnes] ' + status + ' · ' + progress + '% · ' + elapsed + 's', 'dim');
+    updateProgress(progress);
+
+    if (status === 'completed' || status === 'succeeded' || status === 'done' || status === 'success') {
+      const videoUrl = (sd.metadata && sd.metadata.url) || sd.url || (sd.output && sd.output.url) || sd.result?.url || sd.data?.url;
+      if (!videoUrl) throw new Error('Pas d\'URL Agnes');
+      addLog('💜 [Agnes] ✅ Vidéo prête !', 'success');
+      return videoUrl;
+    }
+
+    if (status === 'failed' || status === 'error' || status === 'cancelled' || status === 'canceled') {
+      throw new Error('Agnes ' + status);
+    }
+  }
+
+  throw new Error('Agnes timeout');
 }
 
 async function generateVideo(prompt, aspect, duration) {
-const providers = [];
-if (state.strategy === 'auto' || state.strategy === 'fal') providers.push({ name:'fal.ai', emoji:'⚡', fn: generateWithFal });
-if (state.strategy === 'auto' || state.strategy === 'replicate') providers.push({ name:'Replicate', emoji:'🔥', fn: generateWithReplicate });
-if ((state.strategy === 'auto' || state.strategy === 'agnes') && getKey()) providers.push({ name:'Agnes', emoji:'💜', fn: generateWithAgnes });
-if (providers.length === 0) throw new Error('Aucun provider disponible');
+  const providers = [];
 
-addLog('📋 Providers : ' + providers.map(p => p.emoji + ' ' + p.name).join(' → '), 'dim');
-let lastError = null;
-for (const p of providers) {
-if (state.stop) throw new Error('stop');
-try {
-addLog('▶️ Tentative : ' + p.emoji + ' ' + p.name, 'gold');
-updateConsoleState('Génération via ' + p.name + '…', true);
-const url = await p.fn(prompt, aspect, duration);
-return { url, provider: p.name, emoji: p.emoji };
-} catch(e) {
-if (e.message === 'stop') throw e;
-lastError = e;
-addLog('❌ ' + p.name + ' échoué : ' + e.message, 'error');
-addLog('→ Bascule vers le provider suivant…', 'warn');
-updateProgress(0);
-await sleep(1500);
-}
-}
-throw new Error('Tous les providers ont échoué');
+  if (state.strategy === 'auto' || state.strategy === 'fal') {
+    providers.push({ name: 'fal.ai', emoji: '⚡', fn: generateWithFal });
+  }
+  if (state.strategy === 'auto' || state.strategy === 'replicate') {
+    providers.push({ name: 'Replicate', emoji: '🔥', fn: generateWithReplicate });
+  }
+  if ((state.strategy === 'auto' || state.strategy === 'agnes') && getKey()) {
+    providers.push({ name: 'Agnes', emoji: '💜', fn: generateWithAgnes });
+  }
+
+  if (providers.length === 0) throw new Error('Aucun provider disponible');
+
+  addLog('📋 Providers : ' + providers.map(p => p.emoji + ' ' + p.name).join(' → '), 'dim');
+
+  for (const p of providers) {
+    if (state.stop) throw new Error('stop');
+
+    try {
+      addLog('▶️ Tentative : ' + p.emoji + ' ' + p.name, 'gold');
+      updateConsoleState('Génération via ' + p.name + '…', true);
+
+      const url = await p.fn(prompt, aspect, duration);
+      return { url, provider: p.name, emoji: p.emoji };
+    } catch(e) {
+      if (e.message === 'stop') throw e;
+
+      addLog('❌ ' + p.name + ' échoué : ' + e.message, 'error');
+      addLog('→ Bascule vers le provider suivant…', 'warn');
+      updateProgress(0);
+      await sleep(1500);
+    }
+  }
+
+  throw new Error('Tous les providers ont échoué');
 }
 
 function updateGo() {
-const b = $('go-btn');
-const isTxt = state.mode === 'txt';
-const hasPrompt = isTxt ? $('prompt-input').value.trim().length > 0 : ($('img-prompt-input').value.trim().length > 0 && state.image);
-b.disabled = !hasPrompt || state.running;
-if (state.running) b.textContent = '🎬 Génération en cours…';
-else if (!hasPrompt) b.textContent = isTxt ? 'Décrivez votre vidéo' : 'Chargez une image et décrivez le mouvement';
-else b.textContent = '🎬 Générer la vidéo';
+  const b = $('go-btn');
+  const isTxt = state.mode === 'txt';
+  const hasPrompt = isTxt
+    ? $('prompt-input').value.trim().length > 0
+    : ($('img-prompt-input').value.trim().length > 0 && state.image);
+
+  b.disabled = !hasPrompt || state.running;
+
+  if (state.running) b.textContent = '🎬 Génération en cours…';
+  else if (!hasPrompt) b.textContent = isTxt ? 'Décrivez votre vidéo' : 'Chargez une image et décrivez le mouvement';
+  else b.textContent = '🎬 Générer la vidéo';
 }
 
 function switchMode(mode) {
-state.mode = mode;
-$('tab-txt').classList.toggle('active', mode === 'txt');
-$('tab-img').classList.toggle('active', mode === 'img');
-$('panel-txt').style.display = (mode === 'txt') ? 'block' : 'none';
-$('panel-img').style.display = (mode === 'img') ? 'block' : 'none';
-updateGo();
+  state.mode = mode;
+  $('tab-txt').classList.toggle('active', mode === 'txt');
+  $('tab-img').classList.toggle('active', mode === 'img');
+  $('panel-txt').style.display = (mode === 'txt') ? 'block' : 'none';
+  $('panel-img').style.display = (mode === 'img') ? 'block' : 'none';
+  updateGo();
 }
 
 function showResult(url, provider, emoji) {
-$('result-box').classList.add('visible');
-$('result-provider').textContent = emoji + ' ' + provider.toUpperCase();
-$('result-video').src = url;
-$('result-download').href = url;
-$('result-open').href = url;
+  $('result-box').classList.add('visible');
+  $('result-provider').textContent = emoji + ' ' + provider.toUpperCase();
+  $('result-video').src = url;
+  $('result-download').href = url;
+  $('result-open').href = url;
 }
 
 const DEMO_TXT = "Un chat marchant dans un jardin ensoleillé avec des fleurs, cinématographique, qualité 4K";
 const DEMO_IMG = "Anime doucement cette image, mouvement subtil, la lumière devient dorée";
 
 async function start() {
-if (state.running) return;
-const isTxt = state.mode === 'txt';
-const prompt = isTxt ? $('prompt-input').value.trim() : $('img-prompt-input').value.trim();
-if (!prompt) { toast('Écrivez une description', 'error'); return; }
-if (!isTxt && !state.image) { toast('Chargez une image', 'error'); return; }
+  if (state.running) return;
 
-const aspect = $('aspect-select').value;
-const duration = parseInt($('duration-select').value, 10);
+  const isTxt = state.mode === 'txt';
+  const prompt = isTxt ? $('prompt-input').value.trim() : $('img-prompt-input').value.trim();
 
-state.running = true; state.stop = false;
-updateProgress(0); updateConsoleState('Travail…', true);
-addLog('═══════════════════════════', 'gold');
-addLog('🚀 Nouvelle génération', 'gold');
-addLog('Mode : ' + (isTxt ? 'Texte → Vidéo' : 'Image → Vidéo') + ' · ' + aspect + ' · ' + duration + 's', 'info');
-addLog('═══════════════════════════', 'gold');
+  if (!prompt) {
+    toast('Écrivez une description', 'error');
+    return;
+  }
 
-$('result-box').classList.remove('visible');
-$('btn-stop').classList.add('visible');
-$('go-btn').disabled = true;
-await wakeLock();
+  if (!isTxt && !state.image) {
+    toast('Chargez une image', 'error');
+    return;
+  }
 
-try {
-const r = await generateVideo(prompt, aspect, duration);
-showResult(r.url, r.provider, r.emoji);
-updateConsoleState('✅ Terminé via ' + r.provider, false);
-addLog('🎉 Succès via ' + r.emoji + ' ' + r.provider, 'success');
-toast('Vidéo générée ✓');
-} catch(e) {
-if (e.message !== 'stop') { addLog('❌ Échec total : ' + e.message, 'error'); toast('Échec : ' + e.message, 'error'); updateConsoleState('Échec', false); }
-else { addLog('⏹ Arrêté', 'warn'); updateConsoleState('Arrêté', false); }
+  const aspect = $('aspect-select').value;
+  const duration = parseInt($('duration-select').value, 10);
+
+  state.running = true;
+  state.stop = false;
+
+  updateProgress(0);
+  updateConsoleState('Travail…', true);
+
+  addLog('═══════════════════════════', 'gold');
+  addLog('🚀 Nouvelle génération', 'gold');
+  addLog('Mode : ' + (isTxt ? 'Texte → Vidéo' : 'Image → Vidéo') + ' · ' + aspect + ' · ' + duration + 's', 'info');
+  addLog('═══════════════════════════', 'gold');
+
+  $('result-box').classList.remove('visible');
+  $('btn-stop').classList.add('visible');
+  $('go-btn').disabled = true;
+  await wakeLock();
+
+  try {
+    const r = await generateVideo(prompt, aspect, duration);
+    showResult(r.url, r.provider, r.emoji);
+
+    updateConsoleState('✅ Terminé via ' + r.provider, false);
+    addLog('🎉 Succès via ' + r.emoji + ' ' + r.provider, 'success');
+    toast('Vidéo générée ✓');
+  } catch(e) {
+    if (e.message !== 'stop') {
+      addLog('❌ Échec total : ' + e.message, 'error');
+      toast('Échec : ' + e.message, 'error');
+      updateConsoleState('Échec', false);
+    } else {
+      addLog('⏹ Arrêté', 'warn');
+      updateConsoleState('Arrêté', false);
+    }
+  }
+
+  setStatus(null);
+  state.running = false;
+  state.stop = false;
+  $('btn-stop').classList.remove('visible');
+  updateGo();
 }
-setStatus(null);
-state.running = false; state.stop = false;
-$('btn-stop').classList.remove('visible');
-updateGo();
-}
 
-function stopAll() { if (!state.running) return; state.stop = true; addLog('⏹ Arrêt…', 'warn'); setStatus('Arrêt…'); }
+function stopAll() {
+  if (!state.running) return;
+  state.stop = true;
+  addLog('⏹ Arrêt…', 'warn');
+  setStatus('Arrêt…');
+}
 
 (function init() {
-$('agnes-save').addEventListener('click', saveKey);
-$('agnes-key').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveKey(); } });
-document.querySelectorAll('[data-toggle]').forEach(h => h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open')));
-$('strategy-select').addEventListener('change', e => {
-state.strategy = e.target.value;
-const labels = { auto:'Auto', fal:'fal.ai', replicate:'Replicate', agnes:'Agnes' };
-$('strategy-badge').textContent = labels[state.strategy];
-addLog('Stratégie : ' + labels[state.strategy], 'dim');
-});
-$('tab-txt').addEventListener('click', () => switchMode('txt'));
-$('tab-img').addEventListener('click', () => switchMode('img'));
-$('demo-btn').addEventListener('click', () => { $('prompt-input').value = DEMO_TXT; updateGo(); });
-$('img-demo-btn').addEventListener('click', () => { $('img-prompt-input').value = DEMO_IMG; updateGo(); });
-$('prompt-input').addEventListener('input', updateGo);
-$('img-prompt-input').addEventListener('input', updateGo);
-const uz = $('upload-zone'), fi = $('file-input');
-uz.addEventListener('click', () => fi.click());
-fi.addEventListener('change', e => { if (e.target.files[0]) handleImageFile(e.target.files[0]); fi.value = ''; });
-$('go-btn').addEventListener('click', start);
-$('btn-stop').addEventListener('click', stopAll);
-$('console-clear').addEventListener('click', clearLogs);
-refreshKeyUI(); renderLogs(); updateGo();
-addLog('🎬 Studio Hybride 4.0 initialisé', 'success');
-addLog('⚡ fal.ai : ' + FAL_PROXY, 'dim');
-addLog('🔥 Replicate : ' + REPLICATE_PROXY, 'dim');
-addLog('💜 Agnes : ' + (getKey() ? '✓ configuré' : '✗ non configuré'), getKey() ? 'success' : 'dim');
-updateConsoleState('Prêt', false);
+  $('agnes-save').addEventListener('click', saveKey);
+  $('agnes-key').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveKey();
+    }
+  });
+
+  document.querySelectorAll('[data-toggle]').forEach(h =>
+    h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'))
+  );
+
+  $('strategy-select').addEventListener('change', e => {
+    state.strategy = e.target.value;
+    const labels = { auto:'Auto', fal:'Fal', replicate:'Replicate', agnes:'Agnes' };
+    $('strategy-badge').textContent = labels[state.strategy];
+    addLog('Stratégie : ' + labels[state.strategy], 'dim');
+  });
+
+  $('strategy-select').value = state.strategy;
+  $('strategy-badge').textContent = 'Fal';
+
+  $('tab-txt').addEventListener('click', () => switchMode('txt'));
+  $('tab-img').addEventListener('click', () => switchMode('img'));
+
+  $('demo-btn').addEventListener('click', () => {
+    $('prompt-input').value = DEMO_TXT;
+    updateGo();
+  });
+
+  $('img-demo-btn').addEventListener('click', () => {
+    $('img-prompt-input').value = DEMO_IMG;
+    updateGo();
+  });
+
+  $('prompt-input').addEventListener('input', updateGo);
+  $('img-prompt-input').addEventListener('input', updateGo);
+
+  const uz = $('upload-zone'), fi = $('file-input');
+  uz.addEventListener('click', () => fi.click());
+  fi.addEventListener('change', e => {
+    if (e.target.files[0]) handleImageFile(e.target.files[0]);
+    fi.value = '';
+  });
+
+  $('go-btn').addEventListener('click', start);
+  $('btn-stop').addEventListener('click', stopAll);
+  $('console-clear').addEventListener('click', clearLogs);
+
+  refreshKeyUI();
+  renderLogs();
+  updateGo();
+
+  addLog('🎬 Studio Hybride 4.0 initialisé', 'success');
+  addLog('⚡ fal.ai : ' + FAL_PROXY, 'dim');
+  addLog('🔥 Replicate : ' + REPLICATE_PROXY, 'dim');
+  addLog('💜 Agnes : ' + (getKey() ? '✓ configuré' : '✗ non configuré'), getKey() ? 'success' : 'dim');
+  updateConsoleState('Prêt', false);
 })();
 </script>
-
-</body>
-</html>
