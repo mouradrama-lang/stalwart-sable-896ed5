@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Agnes Studio Lite</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background: #0a0d14;
+    color: white;
+    padding: 16px;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .container { max-width: 520px; margin: 0 auto; padding-bottom: 80px; }
+
+  h2 {
+    text-align: center;
+    margin: 8px 0 16px;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, #fff 0%, #d4a853 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    background: #141820;
+    border: 1px solid #2a3447;
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 12px;
+  }
+  .tab {
+    padding: 10px 6px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #a5afc0;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, #d4a853, #f0d078);
+    color: #000;
+  }
+
+  .card {
+    background: #141820;
+    border: 1px solid #2a3447;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #a5afc0;
+    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #2a3447;
+    background: #1a2230;
+    color: white;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: #d4a853; }
+  textarea { min-height: 90px; resize: vertical; line-height: 1.45; }
+
+  .upload-zone {
+    border: 2px dashed #2a3447;
+    border-radius: 10px;
+    padding: 20px 12px;
+    text-align: center;
+    cursor: pointer;
+    background: #1a2230;
+    transition: all 0.2s;
+  }
+  .upload-zone:active { border-color: #d4a853; }
+  .upload-zone input { display: none; }
+  .upload-icon { font-size: 28px; margin-bottom: 6px; color: #d4a853; }
+  .upload-text { font-size: 13px; font-weight: 600; }
+  .upload-hint { font-size: 11px; color: #6a7484; margin-top: 3px; }
+
+  .preview {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #d4a853;
+    background: #000;
+    aspect-ratio: 9/16;
+    max-width: 140px;
+    margin: 10px auto 0;
+  }
+  .preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .preview .x {
+    position: absolute;
+    top: 4px; right: 4px;
+    background: rgba(192,57,43,0.9);
+    color: #fff;
+    border: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  button.primary {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #d4a853, #f0d078);
+    color: #000;
+    font-weight: 800;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: 0.03em;
+  }
+  button.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  button.secondary {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #2a3447;
+    background: transparent;
+    color: #a5afc0;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 6px;
+    font-weight: 700;
+  }
+
+  .log {
+    background: #0a0d14;
+    border: 1px solid #2a3447;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: #b5c1d6;
+    max-height: 180px;
+    overflow-y: auto;
+    font-family: ui-monospace, monospace;
+  }
+  .log-line { margin: 2px 0; }
+  .log-ok { color: #4ec97a; }
+  .log-err { color: #ff6b7a; }
+  .log-warn { color: #ffb55a; }
+
+  .result {
+    display: none;
+    margin-top: 12px;
+    background: #0f1420;
+    border: 1px solid #d4a853;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .result.visible { display: block; }
+  .result-title {
+    font-size: 12px;
+    color: #d4a853;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  video {
+    width: 100%;
+    border-radius: 8px;
+    background: #000;
+    aspect-ratio: 9/16;
+    object-fit: cover;
+    display: block;
+  }
+  .dl-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    text-align: center;
+    background: #1a2230;
+    color: #d4a853;
+    border: 1px solid #2a3447;
+    border-radius: 8px;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .hidden { display: none !important; }
+
+  .hint {
+    font-size: 11px;
+    color: #6a7484;
+    margin-top: 6px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h2>🎬 Agnes Studio Lite</h2>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-mode="txt">✍️ Texte</button>
+    <button class="tab" data-mode="img">🖼️ Image</button>
+    <button class="tab" data-mode="avatar">🗣️ Avatar</button>
+  </div>
+
+  <!-- Clé API -->
+  <div class="card">
+    <label>Clé API Agnes</label>
+    <input id="key" type="password" placeholder="sk-..." autocomplete="off" />
+  </div>
+
+  <!-- ===== MODE TEXTE ===== -->
+  <div id="mode-txt">
+    <div class="card">
+      <label>Description</label>
+      <textarea id="txt-prompt" placeholder="Un chat dans un jardin ensoleillé, cinématographique..."></textarea>
+      <button class="secondary" id="demo-txt">📖 Charger un exemple</button>
+    </div>
+  </div>
+
+  <!-- ===== MODE IMAGE ===== -->
+  <div id="mode-img" class="hidden">
+    <div class="card">
+      <label>Image source</label>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept="image/*" />
+        <div class="upload-icon">＋</div>
+        <div class="upload-text">Charger une image</div>
+        <div class="upload-hint">Portrait 9:16 recommandé</div>
+      </div>
+      <div id="img-preview-container"></div>
+    </div>
+    <div class="card">
+      <label>Mouvement souhaité</label>
+      <textarea id="img-prompt" placeholder="Anime doucement cette image, vent léger, lumière dorée..."></textarea>
+      <button class="secondary" id="demo-img">📖 Charger un exemple</button>
+    </div>
+  </div>
+
+  <!-- ===== MODE AVATAR ===== -->
+  <div id="mode-avatar" class="hidden">
+    <div class="card">
+      <label>Portrait de l'avatar</label>
+      <div class="upload-zone" id="avatar-upload-zone">
+        <input type="file" id="avatar-file-input" accept="image/*" />
+        <div class="upload-icon">👤</div>
+        <div class="upload-text">Charger un portrait</div>
+        <div class="upload-hint">Visage bien visible, face caméra</div>
+      </div>
+      <div id="avatar-preview-container"></div>
+    </div>
+    <div class="card">
+      <label>Script à dire (guide les expressions)</label>
+      <textarea id="avatar-script" placeholder="Bonjour, aujourd'hui je vais vous expliquer les 3 étapes clés pour réussir votre projet..."></textarea>
+    </div>
+    <div class="card">
+      <label>Style d'avatar</label>
+      <select id="avatar-style">
+        <option value="realistic">Réaliste — personne naturelle</option>
+        <option value="professional">Professionnel — présentateur sérieux</option>
+        <option value="friendly">Amical — youtubeur décontracté</option>
+        <option value="cartoon">Cartoon — dessin animé</option>
+        <option value="anime">Anime — style japonais</option>
+        <option value="3d">3D — Pixar</option>
+      </select>
+    </div>
+    <div class="card">
+      <label>Ton du discours</label>
+      <select id="avatar-tone">
+        <option value="informative">Informatif — neutre et clair</option>
+        <option value="enthusiastic">Enthousiaste — énergique</option>
+        <option value="calm">Calme — posé</option>
+        <option value="serious">Sérieux — professionnel</option>
+        <option value="warm">Chaleureux — amical</option>
+      </select>
+    </div>
+    <div class="card">
+      <label>Durée de la vidéo</label>
+      <select id="avatar-duration">
+        <option value="5">5 secondes</option>
+        <option value="6" selected>6 secondes</option>
+        <option value="10">10 secondes</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Bouton principal -->
+  <button class="primary" id="btn">Générer la vidéo</button>
+
+  <!-- Logs -->
+  <div class="log" id="log"><div class="log-line">Prêt.</div></div>
+
+  <!-- Résultat -->
+  <div class="result" id="result">
+    <div class="result-title">✨ Vidéo générée</div>
+    <video id="video" controls playsinline></video>
+    <a id="dl" class="dl-btn" href="#" download="video.mp4" target="_blank">⬇ Télécharger</a>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG AGNES
+// ═══════════════════════════════════════════════════════════
+const AGNES_API = 'https://apihub.agnes-ai.com/v1';
+const AGNES_POLL = 'https://apihub.agnes-ai.com/agnesapi';
+const AGNES_MODEL = 'agnes-video-v2.0';
+const KEY_STORE = 'agnes_api_key'; // partagé avec les autres applis
+
+// ═══════════════════════════════════════════════════════════
+// RÉFÉRENCES DOM
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const keyInput = $('key');
+const btn = $('btn');
+const logEl = $('log');
+const resultEl = $('result');
+const videoEl = $('video');
+const dlEl = $('dl');
+
+// ═══════════════════════════════════════════════════════════
+// ÉTAT
+// ═══════════════════════════════════════════════════════════
+const state = {
+  mode: 'txt',
+  imgData: null,
+  avatarData: null,
+  running: false,
+};
+
+// ═══════════════════════════════════════════════════════════
+// LOGGER
+// ═══════════════════════════════════════════════════════════
+const logs = [];
+function addLog(msg, type = 'info') {
+  const time = new Date().toLocaleTimeString();
+  const line = '<div class="log-line log-' + type + '">[' + time + '] ' + msg + '</div>';
+  logs.push(line);
+  if (logs.length > 25) logs.shift();
+  logEl.innerHTML = logs.join('');
+  logEl.scrollTop = logEl.scrollHeight;
+  console.log(msg);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANTI-VEILLE
+// ═══════════════════════════════════════════════════════════
+async function wakeLock() {
+  try {
+    if ('wakeLock' in navigator) await navigator.wakeLock.request('screen');
+  } catch (e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// GESTION CLÉ API
+// ═══════════════════════════════════════════════════════════
+function getKey() {
+  try { return (localStorage.getItem(KEY_STORE) || '').trim(); } catch (e) { return ''; }
+}
+function saveKey(k) {
+  try { localStorage.setItem(KEY_STORE, k); } catch (e) {}
+}
+
+// Pré-remplir
+const savedKey = getKey();
+if (savedKey) keyInput.value = savedKey;
+keyInput.addEventListener('change', () => saveKey(keyInput.value.trim()));
+
+// ═══════════════════════════════════════════════════════════
+// ONGLETS
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    state.mode = tab.dataset.mode;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+    $('mode-txt').classList.toggle('hidden', state.mode !== 'txt');
+    $('mode-img').classList.toggle('hidden', state.mode !== 'img');
+    $('mode-avatar').classList.toggle('hidden', state.mode !== 'avatar');
+    updateBtn();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// GESTION IMAGES
+// ═══════════════════════════════════════════════════════════
+function fileToDataUri(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Upload image mode IMG
+const uploadZone = $('upload-zone');
+const fileInput = $('file-input');
+uploadZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', async e => {
+  if (!e.target.files[0]) return;
+  addLog('Chargement image...', 'warn');
+  try {
+    state.imgData = await fileToDataUri(e.target.files[0]);
+    renderPreview('img-preview-container', state.imgData, () => {
+      state.imgData = null;
+      updateBtn();
+    });
+    addLog('Image chargée', 'ok');
+    updateBtn();
+  } catch (err) { addLog('Erreur image: ' + err.message, 'err'); }
+  fileInput.value = '';
+});
+
+// Upload avatar
+const avatarUploadZone = $('avatar-upload-zone');
+const avatarFileInput = $('avatar-file-input');
+avatarUploadZone.addEventListener('click', () => avatarFileInput.click());
+avatarFileInput.addEventListener('change', async e => {
+  if (!e.target.files[0]) return;
+  addLog('Chargement avatar...', 'warn');
+  try {
+    state.avatarData = await fileToDataUri(e.target.files[0]);
+    renderPreview('avatar-preview-container', state.avatarData, () => {
+      state.avatarData = null;
+      updateBtn();
+    });
+    addLog('Avatar chargé', 'ok');
+    updateBtn();
+  } catch (err) { addLog('Erreur avatar: ' + err.message, 'err'); }
+  avatarFileInput.value = '';
+});
+
+function renderPreview(containerId, dataUri, onRemove) {
+  const c = $(containerId);
+  c.innerHTML = '<div class="preview"><img src="' + dataUri + '"><button class="x">✕</button></div>';
+  c.querySelector('.x').onclick = onRemove;
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOUTON PRINCIPAL
+// ═══════════════════════════════════════════════════════════
+function updateBtn() {
+  const hasKey = !!keyInput.value.trim();
+  let ok = false;
+  if (state.mode === 'txt') ok = $('txt-prompt').value.trim().length > 0;
+  else if (state.mode === 'img') ok = !!state.imgData && $('img-prompt').value.trim().length > 0;
+  else if (state.mode === 'avatar') ok = !!state.avatarData;
+  btn.disabled = !hasKey || !ok || state.running;
+}
+['txt-prompt', 'img-prompt', 'avatar-script'].forEach(id => {
+  $(id).addEventListener('input', updateBtn);
+});
+keyInput.addEventListener('input', updateBtn);
+
+// ═══════════════════════════════════════════════════════════
+// DÉMOS
+// ═══════════════════════════════════════════════════════════
+$('demo-txt').addEventListener('click', () => {
+  $('txt-prompt').value = "Un chat marchant dans un jardin ensoleillé avec des fleurs, cinématographique, qualité 4K";
+  updateBtn();
+});
+$('demo-img').addEventListener('click', () => {
+  $('img-prompt').value = "Anime doucement cette image. Un vent léger fait bouger les cheveux. La lumière devient dorée et chaude. Garde le sujet exactement identique à la photo originale.";
+  updateBtn();
+});
+
+// ═══════════════════════════════════════════════════════════
+// BUILDER PROMPT
+// ═══════════════════════════════════════════════════════════
+function buildPrompt() {
+  if (state.mode === 'txt') {
+    return $('txt-prompt').value.trim();
+  }
+  if (state.mode === 'img') {
+    const p = $('img-prompt').value.trim();
+    return 'Animate this exact image as the starting frame. ' +
+           'The subject must remain IDENTICAL: same face, same identity, same composition. ' +
+           'This is a CONTINUATION of the source image. ' + p +
+           ' Cinematic 24fps, no text, no watermark.';
+  }
+  if (state.mode === 'avatar') {
+    const style = $('avatar-style').value;
+    const tone = $('avatar-tone').value;
+    const script = $('avatar-script').value.trim();
+
+    const styleMap = {
+      realistic: 'photorealistic human avatar, natural features',
+      professional: 'professional business presenter, formal',
+      friendly: 'friendly casual presenter, warm smile',
+      cartoon: 'cartoon avatar, bold outlines',
+      anime: 'anime character, cel-shaded, expressive eyes',
+      '3d': '3D animated character, Pixar-style rendering'
+    };
+    const toneMap = {
+      informative: 'informative neutral delivery',
+      enthusiastic: 'enthusiastic energetic delivery',
+      calm: 'calm peaceful delivery',
+      serious: 'serious formal delivery',
+      warm: 'warm friendly delivery'
+    };
+
+    let prompt = 'Animate this portrait as a talking avatar. ' +
+      'Face and identity must remain IDENTICAL. ' +
+      'Style: ' + styleMap[style] + '. ' +
+      'Delivery: ' + toneMap[tone] + '. ' +
+      'The subject is speaking directly to the camera. ' +
+      'Mouth articulates naturally, eyebrows move, eyes blink, head nods gently. ' +
+      'Natural breathing, small head movements. ' +
+      'Medium shot, chest up, professional studio lighting. ' +
+      'No audio, portrait 9:16, no text, no watermark.';
+
+    if (script) prompt += ' The subject is saying: "' + script.slice(0, 400) + '"';
+    return prompt;
+  }
+  return '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// GÉNÉRATION AGNES
+// ═══════════════════════════════════════════════════════════
+async function generate() {
+  if (state.running) return;
+
+  const k = keyInput.value.trim();
+  if (!k) { addLog('Clé API manquante', 'err'); return; }
+  saveKey(k);
+
+  const prompt = buildPrompt();
+  if (!prompt) { addLog('Description manquante', 'err'); return; }
+
+  let duration = 6;
+  if (state.mode === 'avatar') duration = Number($('avatar-duration').value);
+
+  let imageData = null;
+  if (state.mode === 'img') imageData = state.imgData;
+  if (state.mode === 'avatar') imageData = state.avatarData;
+
+  state.running = true;
+  btn.disabled = true;
+  resultEl.classList.remove('visible');
+  logs.length = 0;
+  logEl.innerHTML = '';
+
+  addLog('🚀 Démarrage (' + state.mode + ')', 'warn');
+  await wakeLock();
+
+  try {
+    const frames = duration === 5 ? 121 : (duration === 10 ? 241 : 153);
+    const body = {
+      model: AGNES_MODEL,
+      prompt: prompt,
+      num_frames: frames,
+      frame_rate: 24,
+      ratio: '9:16',
+      resolution: '480p'
+    };
+    if (imageData) body.image = imageData;
+
+    addLog('📤 POST → /videos (frames: ' + frames + ')', 'info');
+
+    const createRes = await fetch(AGNES_API + '/videos', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + k,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!createRes.ok) {
+      const errText = await createRes.text();
+      throw new Error('HTTP ' + createRes.status + ': ' + errText.slice(0, 120));
+    }
+
+    const createData = await createRes.json();
+    const id = createData.video_id || createData.id || createData.task_id ||
+               (createData.data && (createData.data.video_id || createData.data.id));
+
+    if (!id) throw new Error('Pas d\'ID retourné');
+    addLog('✅ Tâche créée: ' + String(id).slice(0, 20) + '...', 'ok');
+    addLog('⏳ Polling...', 'warn');
+
+    let url = null;
+    const startTime = Date.now();
+    let lastStatus = '';
+
+    for (let attempt = 0; attempt < 200; attempt++) {
+      if (Date.now() - startTime > 600000) throw new Error('Timeout 10 min');
+      await new Promise(r => setTimeout(r, 3000));
+
+      const pollUrl = AGNES_POLL + '?video_id=' + encodeURIComponent(id) +
+                      '&model_name=' + encodeURIComponent(AGNES_MODEL);
+      const pollRes = await fetch(pollUrl, {
+        headers: { 'Authorization': 'Bearer ' + k }
+      });
+
+      if (!pollRes.ok) {
+        addLog('Poll HTTP ' + pollRes.status + ' → retry', 'warn');
+        continue;
+      }
+
+      const d = await pollRes.json();
+      const status = String(d.status || d.state || 'unknown').toLowerCase();
+      const progress = d.progress || d.internal_progress || 0;
+      const internal = d.internal_status || '';
+
+      if (internal !== lastStatus) {
+        addLog('📊 ' + status + ' · ' + internal + ' · ' + progress + '%', 'info');
+        lastStatus = internal;
+      }
+
+      url = (d.metadata && d.metadata.url) || d.url ||
+            (d.output && d.output.url) || (d.data && d.data.url);
+
+      if (status === 'completed' || status === 'succeeded' || status === 'done' || status === 'success') {
+        if (!url) throw new Error('Pas d\'URL dans la réponse');
+        addLog('🎉 Succès ! Vidéo prête', 'ok');
+        break;
+      }
+      if (status === 'failed' || status === 'error' || status === 'cancelled') {
+        throw new Error('Échec Agnes: ' + status);
+      }
+    }
+
+    if (!url) throw new Error('Délai dépassé');
+
+    videoEl.src = url;
+    dlEl.href = url;
+    resultEl.classList.add('visible');
+    addLog('✅ Vidéo affichée', 'ok');
+
+  } catch (err) {
+    addLog('❌ ERREUR : ' + err.message, 'err');
+  } finally {
+    state.running = false;
+    btn.disabled = false;
+    updateBtn();
+  }
+}
+
+btn.addEventListener('click', generate);
+
+// Init
+updateBtn();
+addLog('✨ Agnes Studio Lite prêt', 'ok');
+</script>
+
+</body>
+</html>
