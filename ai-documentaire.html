@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Réalisateur Documentaire IA — v4</title>
+<title>Réalisateur Documentaire IA — v5</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -248,6 +248,18 @@
         margin-bottom: 0.4rem; background: var(--panel);
         border-radius: 0 6px 6px 0; font-size: 0.78rem;
     }
+    .master-style-block {
+        padding: 0.6rem 0.8rem; border-left: 3px solid var(--warn);
+        margin-bottom: 0.4rem; background: var(--panel);
+        border-radius: 0 6px 6px 0; font-size: 0.78rem;
+        font-family: ui-monospace, monospace;
+    }
+    .final-frame-block {
+        padding: 0.6rem 0.8rem; border-left: 3px solid var(--ink-faint);
+        margin-bottom: 0.4rem; background: var(--panel);
+        border-radius: 0 6px 6px 0; font-size: 0.78rem;
+        color: var(--ink-dim);
+    }
 
     .generated-images {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -263,6 +275,8 @@
         padding: 0.3rem 0.5rem; font-size: 0.65rem;
         color: var(--ink-dim); text-align: center;
     }
+    .gen-image-card.final-frame { border-color: var(--ink-faint); }
+    .gen-image-card.final-frame .gen-label { color: var(--ink-faint); font-style: italic; }
 
     .generated-videos {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -445,7 +459,6 @@
     <p class="subtitle">Décrivez un sujet. L'IA réalise le documentaire.</p>
 </header>
 
-<!-- BARRE DE PROJET -->
 <div class="project-bar">
     <input type="text" id="project-name" placeholder="Nom du projet..." value="Mon documentaire">
     <button type="button" id="save-project-btn" class="primary">💾 Sauvegarder</button>
@@ -601,7 +614,7 @@
     <div class="section-body">
         <div class="section-content">
             <div class="control-row">
-                <label class="control-label">🎬 Nombre de clips à générer</label>
+                <label class="control-label">🎬 Nombre de clips vidéo</label>
                 <select id="scene-count-select">
                     <option value="3">3 clips (court)</option>
                     <option value="4">4 clips</option>
@@ -611,7 +624,7 @@
                     <option value="10">10 clips (long format)</option>
                     <option value="12">12 clips (série)</option>
                 </select>
-                <div style="font-size:0.68rem;color:var(--ink-dim);margin-top:0.35rem;">💡 L'app génère automatiquement N+1 images-clés pour produire N clips.</div>
+                <div style="font-size:0.68rem;color:var(--ink-dim);margin-top:0.35rem;">💡 Chaque clip a sa propre narration. L'app génère 1 image-clé supplémentaire (sans narration) pour fermer le dernier clip.</div>
             </div>
             <div class="control-row">
                 <label class="control-label">Durée par clip</label>
@@ -782,49 +795,49 @@ function getEstimatedWaitSeconds() {
 // ══════════════════════════════════════════════════════════════════
 const DOC_TYPES = [
     { id: 'nature', name: 'Nature & Faune', emoji: '🦁', desc: 'Vie sauvage, écosystèmes',
-      narration: 'Narration à la David Attenborough, contemplative et respectueuse. Décrivez les comportements animaux avec précision et émerveillement.',
+      narration: 'Narration à la David Attenborough, contemplative et respectueuse.',
       visual: 'nature documentary cinematography, telephoto lens, golden hour lighting, shallow depth of field, natural colors' },
     { id: 'histoire', name: 'Histoire', emoji: '🏛️', desc: 'Événements, civilisations',
-      narration: 'Narration historique rigoureuse, avec dates et faits vérifiés. Contexte géopolitique et social.',
+      narration: 'Narration historique rigoureuse, avec dates et faits vérifiés.',
       visual: 'historical documentary style, archival aesthetic, period-accurate details, sepia and muted tones' },
     { id: 'science', name: 'Science & Tech', emoji: '🔬', desc: 'Découvertes, innovations',
-      narration: 'Narration scientifique accessible, explications claires de concepts complexes, métaphores pédagogiques.',
-      visual: 'scientific documentary, macro photography, clean laboratory aesthetic, precise lighting, technical detail' },
+      narration: 'Narration scientifique accessible, explications claires.',
+      visual: 'scientific documentary, macro photography, clean laboratory aesthetic, precise lighting' },
     { id: 'societe', name: 'Société & Culture', emoji: '🌍', desc: 'Peuples, traditions',
-      narration: 'Narration anthropologique, respectueuse des cultures, témoignages authentiques, regard immersif.',
-      visual: 'anthropological documentary, candid moments, natural light, authentic textures, cultural details' },
+      narration: 'Narration anthropologique, respectueuse des cultures.',
+      visual: 'anthropological documentary, candid moments, natural light, authentic textures' },
     { id: 'environnement', name: 'Environnement', emoji: '🌱', desc: 'Climat, écologie',
-      narration: 'Narration engagée mais factuelle, données climatiques, solutions concrètes, ton urgent et inspirant.',
-      visual: 'environmental documentary, sweeping landscapes, dramatic contrast, aerial shots, impact imagery' },
+      narration: 'Narration engagée mais factuelle, données climatiques.',
+      visual: 'environmental documentary, sweeping landscapes, dramatic contrast, aerial shots' },
     { id: 'biographie', name: 'Biographie', emoji: '👤', desc: 'Vies, destins',
-      narration: 'Narration intime et chronologique, moments clés de la vie, citations et témoignages, émotion contenue.',
+      narration: 'Narration intime et chronologique, moments clés de la vie.',
       visual: 'biographical documentary, intimate portraits, archival footage aesthetic, warm natural light' },
     { id: 'enquete', name: 'Enquête', emoji: '🔍', desc: 'Investigations, vérités',
-      narration: 'Narration journalistique, présentation des faits, contradictions, preuves, ton neutre mais tendu.',
-      visual: 'investigative documentary, handheld camera, stark lighting, high contrast, raw authentic footage' },
+      narration: 'Narration journalistique, présentation des faits.',
+      visual: 'investigative documentary, handheld camera, stark lighting, high contrast' },
     { id: 'art', name: 'Art & Création', emoji: '🎨', desc: 'Artistes, œuvres',
-      narration: 'Narration sensible et évocatrice, connexion entre l\'œuvre et l\'artiste, processus créatif, inspiration.',
-      visual: 'art documentary, beautiful composition, museum lighting, rich textures, vibrant colors, artistic framing' },
+      narration: 'Narration sensible et évocatrice.',
+      visual: 'art documentary, beautiful composition, museum lighting, rich textures' },
     { id: 'voyage', name: 'Voyage & Découverte', emoji: '✈️', desc: 'Lieux, explorations',
-      narration: 'Narration immersive à la première personne, découvertes sensorielles, rencontres, émerveillement.',
-      visual: 'travel documentary, sweeping drone shots, golden hour, vibrant landscapes, authentic local life' },
+      narration: 'Narration immersive à la première personne.',
+      visual: 'travel documentary, sweeping drone shots, golden hour, vibrant landscapes' },
     { id: 'sport', name: 'Sport & Performance', emoji: '🏅', desc: 'Athlètes, exploits',
-      narration: 'Narration dynamique, focus sur l\'effort, la discipline, les moments de triomphe et de défaite.',
-      visual: 'sports documentary, slow motion, dramatic lighting, sweat and determination, arena atmosphere' }
+      narration: 'Narration dynamique, focus sur l\'effort et la discipline.',
+      visual: 'sports documentary, slow motion, dramatic lighting, sweat and determination' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
-// STYLES VISUELS DOCUMENTAIRES
+// STYLES VISUELS
 // ══════════════════════════════════════════════════════════════════
 const DOC_STYLES = [
-    { id: 'cinema-verite', name: 'Cinéma Vérité', emoji: '📹', prompt: 'Cinéma vérité documentary style, handheld camera, natural available light, candid moments, raw authenticity, Jean Rouch aesthetic' },
-    { id: 'bbc-nature', name: 'BBC Nature', emoji: '🦁', prompt: 'BBC nature documentary style, breathtaking landscapes, telephoto wildlife shots, golden hour, David Attenborough aesthetic' },
-    { id: 'netflix', name: 'Netflix Doc', emoji: '🎬', prompt: 'Netflix documentary cinematography, cinematic anamorphic lenses, dramatic lighting, high production value, interview setups' },
-    { id: 'archival', name: 'Archives & Histoire', emoji: '📜', prompt: 'Historical documentary style, archival footage aesthetic, sepia and muted tones, film grain, aged photograph texture' },
-    { id: 'poetic', name: 'Poétique', emoji: '🌙', prompt: 'Poetic documentary style, Terrence Malick aesthetic, natural light, contemplative pacing, beautiful compositions, magic hour' },
-    { id: 'investigative', name: 'Investigatif', emoji: '🔍', prompt: 'Investigative documentary, stark contrasts, shadows, tense atmosphere, handheld urgency, Louis Theroux style' },
-    { id: '4k-aerial', name: '4K Aérien', emoji: '🚁', prompt: '4K aerial documentary cinematography, drone shots, sweeping vistas, epic scale, HDR, crystal clear detail' },
-    { id: 'intimate', name: 'Portrait Intime', emoji: '👤', prompt: 'Intimate documentary portrait, shallow depth of field, close-ups, emotional connection, warm tones, vérité style' }
+    { id: 'cinema-verite', name: 'Cinéma Vérité', emoji: '📹', prompt: 'Cinéma vérité documentary style, handheld camera, natural available light, candid moments, raw authenticity' },
+    { id: 'bbc-nature', name: 'BBC Nature', emoji: '🦁', prompt: 'BBC nature documentary style, breathtaking landscapes, telephoto wildlife shots, golden hour' },
+    { id: 'netflix', name: 'Netflix Doc', emoji: '🎬', prompt: 'Netflix documentary cinematography, cinematic anamorphic lenses, dramatic lighting, high production value' },
+    { id: 'archival', name: 'Archives & Histoire', emoji: '📜', prompt: 'Historical documentary style, archival footage aesthetic, sepia and muted tones, film grain' },
+    { id: 'poetic', name: 'Poétique', emoji: '🌙', prompt: 'Poetic documentary style, natural light, contemplative pacing, beautiful compositions, magic hour' },
+    { id: 'investigative', name: 'Investigatif', emoji: '🔍', prompt: 'Investigative documentary, stark contrasts, shadows, tense atmosphere, handheld urgency' },
+    { id: '4k-aerial', name: '4K Aérien', emoji: '🚁', prompt: '4K aerial documentary cinematography, drone shots, sweeping vistas, epic scale, HDR' },
+    { id: 'intimate', name: 'Portrait Intime', emoji: '👤', prompt: 'Intimate documentary portrait, shallow depth of field, close-ups, emotional connection, warm tones' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
@@ -851,7 +864,7 @@ const LANGUAGES = {
     },
     'ar-dz': {
         label: 'Daridja algérienne', ttsLang: 'ar-DZ', ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'],
-        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en daridja algérienne (الدارجة الجزائرية), en utilisant l\'alphabet arabe. Utilise des expressions typiquement algériennes.'
+        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en daridja algérienne (الدارجة الجزائرية), en alphabet arabe. Utilise des expressions typiquement algériennes.'
     }
 };
 
@@ -1062,7 +1075,6 @@ function saveProject() {
     const name = document.getElementById('project-name').value.trim() || 'Sans nom';
     const projects = getProjects();
 
-    // On sauvegarde tout l'état, y compris les URLs des vidéos et images
     const projectData = {
         name: name,
         savedAt: Date.now(),
@@ -1087,7 +1099,7 @@ function saveProject() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
         showToast('Projet « ' + name + ' » sauvegardé ✓', 'success');
-        logConsole('Projet sauvegardé : ' + name + ' (' + state.videos.filter(v => v && v.url).length + ' clips)', 'success');
+        logConsole('Projet sauvegardé : ' + name, 'success');
     } catch (e) {
         showToast('Erreur de sauvegarde : ' + e.message, 'error');
         logConsole('Erreur sauvegarde : ' + e.message, 'error');
@@ -1118,13 +1130,11 @@ function loadProject() {
     state.images = p.images || [];
     state.videos = p.videos || [];
 
-    // Restaurer le type et le style
     const dt = DOC_TYPES.find(d => d.id === p.selectedDocTypeId);
     if (dt) state.selectedDocType = dt;
     const st = DOC_STYLES.find(s => s.id === p.selectedStyleId);
     if (st) state.selectedStyle = st;
 
-    // Remplir l'interface
     document.getElementById('idea-input').value = state.idea;
     document.getElementById('language-select').value = state.narrationLanguage;
     document.getElementById('narrator-select').value = state.narratorVoice;
@@ -1136,7 +1146,6 @@ function loadProject() {
     document.getElementById('aspect-select').value = state.aspect;
     document.getElementById('rhythm-select').value = state.rhythm;
 
-    // Mettre à jour les cartes visuelles
     document.querySelectorAll('.doc-card').forEach(c => {
         c.classList.toggle('selected', c.dataset.id === state.selectedDocType.id);
     });
@@ -1144,10 +1153,12 @@ function loadProject() {
         c.classList.toggle('selected', c.dataset.id === state.selectedStyle.id);
     });
 
-    // Restaurer l'affichage
     document.getElementById('generated-images').innerHTML = '';
     document.getElementById('generated-videos').innerHTML = '';
-    state.images.forEach(img => displayGeneratedImage(img.url, 'Plan ' + (img.scene?.scene_number || img.sceneIndex + 1)));
+    state.images.forEach((img, idx) => {
+        const isFinal = state.scenario && state.scenario.final_frame && idx === state.images.length - 1;
+        displayGeneratedImage(img.url, isFinal ? 'Image finale' : 'Plan ' + (img.scene?.scene_number || idx + 1), isFinal);
+    });
     state.videos.filter(v => v && v.url).forEach(v => {
         replacePendingWithVideo(v.sceneIndex, v.url, v.narration, v.sceneNumber, v.actualDuration);
     });
@@ -1487,7 +1498,9 @@ async function runDocPipeline() {
     state.images = [];
     state.videos = [];
 
-    const scenesToGenerate = state.clipCount + 1;
+    // ✅ CORRECTION : N scènes narratives (= N clips) + 1 image finale muette
+    const narrativeScenes = state.clipCount;
+    const totalImagesNeeded = state.clipCount + 1;
 
     document.getElementById('stop-btn').classList.add('visible');
     document.getElementById('generate-btn').disabled = true;
@@ -1505,14 +1518,14 @@ async function runDocPipeline() {
     const narratorInfo = NARRATORS[state.narratorVoice];
 
     logConsole('Type : ' + state.selectedDocType.name + ' · Style : ' + state.selectedStyle.name, 'info');
-    logConsole('Langue narration : ' + langInfo.label + ' · Narrateur : ' + narratorInfo.label, 'info');
-    logConsole('Clips à générer : ' + state.clipCount + ' → Images-clés : ' + scenesToGenerate, 'info');
+    logConsole('Langue : ' + langInfo.label + ' · Narrateur : ' + narratorInfo.label, 'info');
+    logConsole('📐 Config : ' + state.clipCount + ' clips · ' + narrativeScenes + ' narrations · ' + totalImagesNeeded + ' images-clés', 'success');
 
     await activateWakeLock();
     setStatus('Initialisation…');
 
     try {
-        // ═══ ÉTAPE 1 : SCRIPT + CHARACTER BIBLE ═══
+        // ═══ ÉTAPE 1 : SCRIPT + CHARACTER BIBLE + MASTER STYLE ═══
         logConsole('══════════════════════════════', 'text');
         logConsole('ÉTAPE 1/4 — Script + Character Bible', 'success');
         logConsole('══════════════════════════════', 'text');
@@ -1528,76 +1541,71 @@ async function runDocPipeline() {
 "${idea}"
 
 Contraintes :
-- Type de documentaire : ${state.selectedDocType.name} — ${state.selectedDocType.narration}
+- Type : ${state.selectedDocType.name} — ${state.selectedDocType.narration}
 - Style visuel : ${state.selectedStyle.name} — ${state.selectedStyle.prompt}
-- Style de narration : ${state.narrationStyle}
+- Narration : ${state.narrationStyle}
 - Ton : ${toneLabel}
 - Public : ${audienceLabel}
 - Rythme : ${rhythmLabel}
 - Nombre de clips vidéo à produire : ${state.clipCount}
-- Nombre de scènes/plans à décrire : ${scenesToGenerate} (chaque clip utilise 2 images-clés consécutives)
-- Durée par clip : ${state.numFrames / 24} secondes
 - Format : ${aspectLabel}
+- Durée par clip : ${state.numFrames / 24} secondes
 
 ${langInfo.promptInstruction}
 
-RÈGLES ABSOLUES POUR LE FORMAT JSON :
-1. Tu dois répondre UNIQUEMENT avec un objet JSON valide.
-2. N'utilise PAS de balises Markdown (\`\`\`json). Commence directement par { et termine par }.
-3. Tu dois ÉCHAPPER les guillemets à l'intérieur des textes (ex: \\").
-4. Ne mets PAS de sauts de ligne à l'intérieur des chaînes de caractères.
-5. Le JSON doit être parfaitement lisible par un ordinateur.
-6. Le champ "narration" DOIT respecter la consigne de langue ci-dessus.
+═══ STRUCTURE REQUISE ═══
+Tu dois générer EXACTEMENT ${narrativeScenes} scènes narratives (= ${state.clipCount} clips).
+Chaque scène → 1 clip vidéo → 1 narration.
+Puis UNE SEULE image finale muette (sans narration) qui servira de plan de fermeture du dernier clip.
 
-═══ CRUCIAL : CRÉATION DE LA "CHARACTER BIBLE" ═══
-Avant de décrire les scènes, tu DOIS créer une fiche d'identité ultra-précise pour CHAQUE personnage qui apparaîtra dans le documentaire. Cette fiche sera répétée MOT POUR MOT dans chaque prompt d'image pour garantir la cohérence visuelle.
+RÈGLES ABSOLUES JSON :
+1. Réponds UNIQUEMENT avec un objet JSON valide.
+2. PAS de balises Markdown (\`\`\`json). Commence par { et termine par }.
+3. ÉCHAPPE les guillemets internes (\\").
+4. PAS de sauts de ligne dans les chaînes.
 
-Pour chaque personnage, décris avec une précision absolue :
-- Genre et âge
-- Coiffure (longueur, couleur, texture, style)
-- Couleur de peau et traits du visage (forme du visage, yeux, nez, bouche)
-- Morphologie (taille, corpulence, posture)
-- Tenue vestimentaire EXACTE (couleurs, matières, accessoires, chaussures)
-- Marques distinctives (cicatrices, lunettes, barbe, tatouages, etc.)
+═══ COHÉRENCE VISUELLE — CRUCIAL ═══
+Pour garantir que TOUS les plans aient le même style et les mêmes personnages :
 
-Si le documentaire ne met pas en scène de personnage humain (ex: nature, environnement), tu peux ignorer cette étape ou décrire un narrateur/guide récurrent.
+1. Crée d'abord un "master_style_prompt" : UNE phrase en anglais, très précise, qui décrit l'ambiance visuelle globale, la palette de couleurs, l'éclairage, le grain de l'image, l'époque visuelle. Ce texte sera copié MOT POUR MOT au début de chaque prompt d'image.
 
-═══ FIN DE LA CHARACTER BIBLE ═══
+2. Crée ensuite une "character bible" : pour CHAQUE personnage (humain ou animal identifié), décris avec précision chirurgicale : âge, coiffure (longueur/couleur/texture), couleur de peau/poils, traits du visage, morphologie, tenue vestimentaire EXACTE (couleurs, matières, accessoires), marques distinctives (lunettes, cicatrices, barbe, etc.). Cette description sera copiée MOT POUR MOT dans chaque prompt d'image où le personnage apparaît.
 
-Règles documentaires :
-- Chaque séquence doit avoir une narration (voix-off) qui accompagne les images.
-- Les mouvements de caméra doivent être LENTS et FLUIDES.
-- Les compositions doivent respecter la règle des tiers.
+3. Dans chaque "image_prompt", tu DOIS inclure la fiche complète des personnages présents dans la scène, copiée mot pour mot depuis "characters".
 
-Génère un script complet en JSON avec cette structure exacte :
+═══ STRUCTURE JSON ═══
 {
-  "title": "Titre du documentaire",
+  "title": "Titre",
   "logline": "Résumé en une phrase",
   "subject": "Sujet principal",
-  "narration_style": "Description du style de narration",
+  "master_style_prompt": "Fixed English visual style anchor: color palette, lighting, lens, film grain, atmosphere — to be prepended to EVERY image",
   "characters": [
-    {
-      "name": "Nom du personnage",
-      "identity_block": "Fiche d'identité ultra-précise et complète, à répéter mot pour mot dans chaque prompt d'image"
-    }
+    { "name": "Nom", "identity_block": "Fiche d'identité ultra-précise en anglais, à répéter mot pour mot dans chaque image_prompt où le personnage apparaît" }
   ],
   "scenes": [
     {
       "scene_number": 1,
       "sequence_title": "Titre de la séquence",
-      "description": "Description visuelle détaillée",
-      "image_prompt": "Prompt en anglais pour générer l'image. Tu DOIS y inclure la fiche d'identité COMPLÈTE de chaque personnage présent dans cette scène, mot pour mot.",
-      "narration": "Texte de la voix-off (DANS LA LANGUE CHOISIE, 2-4 phrases)",
-      "camera_movement": "Mouvement de caméra lent et fluide",
-      "sound_design": "Ambiance sonore suggérée"
+      "description": "Description visuelle détaillée (en français, pour affichage)",
+      "image_prompt": "English prompt for image generation. MUST include master style anchor + verbatim identity_block of every character present.",
+      "narration": "Texte voix-off (DANS LA LANGUE CHOISIE, 2-4 phrases)",
+      "camera_movement": "Slow camera movement (ex: slow dolly in, gentle pan right)",
+      "sound_design": "Ambiance sonore"
     }
-  ]
+  ],
+  "final_frame": {
+    "description": "Description du plan final (fermeture)",
+    "image_prompt": "English prompt for the closing frame (no characters needed, or same characters in a resolved pose). MUST include master style anchor."
+  }
 }
 
-Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON valide.`;
+⚠️ Vérifications finales :
+- "scenes" doit contenir exactement ${narrativeScenes} entrées.
+- Le JSON doit être valide et parseable.
+Réponds UNIQUEMENT en JSON.`;
 
         const scriptRaw = await callTextAPI([
-            { role: 'system', content: 'Tu es un réalisateur documentaire primé. Tu réponds UNIQUEMENT en JSON valide, sans texte avant ou après.' },
+            { role: 'system', content: 'Tu es un réalisateur documentaire primé. Tu réponds UNIQUEMENT en JSON valide.' },
             { role: 'user', content: scriptPrompt }
         ], { temperature: 0.7, maxTokens: 4096 });
 
@@ -1606,64 +1614,107 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
             const cleanJson = extractJsonFromString(scriptRaw);
             scenario = JSON.parse(cleanJson);
         } catch (e) {
-            logConsole('Erreur de parsing JSON. Extrait : ' + scriptRaw.slice(0, 300), 'warn');
-            throw new Error('JSON invalide. L\'IA a renvoyé un format inattendu.');
+            logConsole('Erreur parsing JSON. Extrait : ' + scriptRaw.slice(0, 300), 'warn');
+            throw new Error('JSON invalide.');
+        }
+
+        // Validation
+        if (!scenario.scenes || scenario.scenes.length === 0) {
+            throw new Error('Aucune scène générée.');
+        }
+        if (!scenario.characters) scenario.characters = [];
+        if (!scenario.master_style_prompt) {
+            scenario.master_style_prompt = state.selectedStyle.prompt;
+            logConsole('Master style manquant → utilisation du style par défaut', 'warn');
+        }
+        if (!scenario.final_frame) {
+            scenario.final_frame = {
+                description: 'Plan de fermeture',
+                image_prompt: scenario.scenes[scenario.scenes.length - 1].image_prompt + ' Closing shot, fade to distance.'
+            };
+            logConsole('Image finale manquante → génération depuis la dernière scène', 'warn');
         }
 
         state.scenario = scenario;
-        if (!scenario.characters) scenario.characters = [];
 
         logConsole('Script : « ' + scenario.title + ' »', 'success');
-        logConsole('Scènes générées : ' + scenario.scenes.length, 'success');
+        logConsole('Scènes narratives : ' + scenario.scenes.length + ' · Image finale : ' + (scenario.final_frame ? 'oui' : 'non'), 'success');
         if (scenario.characters.length > 0) {
-            logConsole('Character Bible créée : ' + scenario.characters.length + ' personnage(s)', 'success');
+            logConsole('Character Bible : ' + scenario.characters.length + ' personnage(s)', 'success');
         }
         displayScript(scenario);
 
-        // ═══ ÉTAPE 2 : IMAGES AVEC CHARACTER BIBLE ═══
+        // ═══ ÉTAPE 2 : IMAGES AVEC MASTER STYLE + CHARACTER BIBLE ═══
         logConsole('══════════════════════════════', 'text');
-        logConsole('ÉTAPE 2/4 — Plans documentaires (' + scenario.scenes.length + ' images-clés)', 'success');
+        logConsole('ÉTAPE 2/4 — Images-clés (' + totalImagesNeeded + ')', 'success');
         logConsole('══════════════════════════════', 'text');
         setStatus('L\'IA compose les plans…');
 
         const imgSize = state.aspect === 'landscape' ? '1024x576' : state.aspect === 'portrait' ? '576x1024' : '768x768';
 
-        // Construire le bloc de cohérence à répéter dans chaque prompt
-        const characterConsistencyBlock = scenario.characters && scenario.characters.length > 0
-            ? ' CRITICAL CHARACTER CONSISTENCY: ' + scenario.characters.map(c => c.name + ' — ' + c.identity_block).join(' | ') + '. '
+        // Préfixe fixe répété au début de chaque prompt
+        const masterAnchor = 'STYLE ANCHOR: ' + scenario.master_style_prompt + '. ';
+
+        // Bloc de cohérence des personnages répété
+        const characterConsistencyBlock = scenario.characters.length > 0
+            ? ' CHARACTERS: ' + scenario.characters.map(c => c.name + ' — ' + c.identity_block).join(' || ') + '. '
             : ' ';
 
+        // ── Générer les N images des scènes ──
         for (let i = 0; i < scenario.scenes.length; i++) {
             if (state.stopRequested) break;
             const scene = scenario.scenes[i];
-            setStatus('Plan ' + (i + 1) + '/' + scenario.scenes.length + '…');
+            setStatus('Plan ' + (i + 1) + '/' + totalImagesNeeded + '…');
 
-            // ⚠️ On répète le character bible COMPLET dans CHAQUE prompt
-            const imagePrompt = scene.image_prompt + '.' +
+            const imagePrompt =
+                masterAnchor +
                 characterConsistencyBlock +
+                scene.image_prompt + '. ' +
                 state.selectedStyle.prompt + '. ' +
                 'Documentary cinematography, rule of thirds composition, natural lighting, ' +
                 'no text, no watermarks, high quality, 4K.';
 
             try {
                 const imageUrl = await callImageAPI(imagePrompt, imgSize);
-                state.images.push({ sceneIndex: i, url: imageUrl, scene: scene });
+                state.images.push({ sceneIndex: i, url: imageUrl, scene: scene, isFinal: false });
                 logConsole('Plan ' + (i + 1) + ' ✓', 'success');
-                displayGeneratedImage(imageUrl, 'Plan ' + scene.scene_number);
+                displayGeneratedImage(imageUrl, 'Plan ' + scene.scene_number, false);
             } catch (e) {
                 logConsole('Erreur plan ' + (i + 1) + ' : ' + e.message, 'error');
             }
             await sleep(1500);
         }
 
-        if (state.images.length < 2) throw new Error('Pas assez de plans');
+        // ── Générer l'image finale muette ──
+        if (scenario.final_frame && !state.stopRequested) {
+            setStatus('Image finale…');
+            const finalPrompt =
+                masterAnchor +
+                characterConsistencyBlock +
+                scenario.final_frame.image_prompt + '. ' +
+                state.selectedStyle.prompt + '. ' +
+                'Documentary cinematography, rule of thirds composition, closing shot, ' +
+                'no text, no watermarks, high quality, 4K.';
 
+            try {
+                const imageUrl = await callImageAPI(finalPrompt, imgSize);
+                state.images.push({ sceneIndex: scenario.scenes.length, url: imageUrl, scene: null, isFinal: true });
+                logConsole('Image finale ✓', 'success');
+                displayGeneratedImage(imageUrl, 'Image finale', true);
+            } catch (e) {
+                logConsole('Erreur image finale : ' + e.message, 'error');
+            }
+        }
+
+        if (state.images.length < 2) throw new Error('Pas assez d\'images.');
+
+        // ✅ Total clips = images - 1 (l'image finale sert de fermeture)
         const totalClips = state.images.length - 1;
-        logConsole('Images-clés : ' + state.images.length + ' → Clips à générer : ' + totalClips, 'success');
+        logConsole('✅ ' + state.images.length + ' images → ' + totalClips + ' clips', 'success');
 
         // ═══ ÉTAPE 3 : SÉQUENCES VIDÉO ═══
         logConsole('══════════════════════════════', 'text');
-        logConsole('ÉTAPE 3/4 — Séquences vidéo documentaires', 'success');
+        logConsole('ÉTAPE 3/4 — Séquences vidéo (' + totalClips + ' clips)', 'success');
         logConsole('══════════════════════════════', 'text');
 
         for (let i = 0; i < totalClips; i++) createPendingVideoCard(i, totalClips);
@@ -1677,17 +1728,16 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
 
             const startImg = state.images[i];
             const endImg = state.images[i + 1];
-            const scene = state.images[i].scene || {};
+            const scene = startImg.scene || {};  // La narration vient de la scène de DÉBUT du clip
             const cameraMove = scene.camera_movement || 'slow gentle tracking shot';
 
             const videoPrompt = [
                 'DOCUMENTARY FILM SEQUENCE. ONE SINGLE UNBROKEN SHOT. NO CUTS.',
                 'Slow, smooth, contemplative camera movement.',
                 'Camera: ' + cameraMove,
-                'Style: ' + state.selectedStyle.prompt,
-                'Documentary cinematography, natural motion, realistic physics, ' +
-                'rule of thirds composition, shallow depth of field.',
-                'No text, no watermarks, no artificial movement.'
+                'Style: ' + scenario.master_style_prompt,
+                'Documentary cinematography, natural motion, realistic physics.',
+                'No text, no watermarks.'
             ].filter(Boolean).join('. ');
 
             const item = {
@@ -1756,7 +1806,7 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
         const durations = readyVideos.map(v => v.actualDuration).filter(d => d);
         if (durations.length > 0) {
             const avg = Math.round(durations.reduce((a, b) => a + b, 0) / durations.length);
-            logConsole('⚡ Durée moyenne mesurée : ' + avg + 's par clip', 'measure');
+            logConsole('⚡ Durée moyenne : ' + avg + 's par clip', 'measure');
         }
 
         if (readyVideos.length > 0) {
@@ -1766,7 +1816,7 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
         setStatus('✦ Documentaire terminé ✦');
         await sleep(3000);
         setStatus(null);
-        showToast(readyVideos.length + ' clip(s) généré(s)', 'success');
+        showToast(readyVideos.length + ' clip(s) généré(s) sur ' + totalClips + ' attendus', 'success');
 
     } catch (e) {
         logConsole('ERREUR : ' + e.message, 'error');
@@ -1796,9 +1846,13 @@ function displayScript(scenario) {
     html += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline || '') + '</p>';
     html += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Sujet : ' + esc(scenario.subject || '') + '</div>';
 
-    // Afficher la character bible
+    if (scenario.master_style_prompt) {
+        html += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.75rem;color:var(--warn);">🎨 Master Style (répété dans chaque image)</strong>';
+        html += '<div class="master-style-block">' + esc(scenario.master_style_prompt) + '</div></div>';
+    }
+
     if (scenario.characters && scenario.characters.length > 0) {
-        html += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.75rem;color:var(--success);">👥 Character Bible (cohérence visuelle)</strong>';
+        html += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.75rem;color:var(--success);">👥 Character Bible</strong>';
         scenario.characters.forEach(c => {
             html += '<div class="character-block"><strong>' + esc(c.name) + '</strong><br>' + esc(c.identity_block) + '</div>';
         });
@@ -1817,16 +1871,21 @@ function displayScript(scenario) {
         }
         html += '</div>';
     });
+
+    if (scenario.final_frame) {
+        html += '<div class="final-frame-block"><strong>🎬 Image finale (fermeture)</strong><br>' + esc(scenario.final_frame.description || '') + '</div>';
+    }
+
     display.innerHTML = html;
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function displayGeneratedImage(url, label) {
+function displayGeneratedImage(url, label, isFinal = false) {
     const section = document.getElementById('section-images');
     const grid = document.getElementById('generated-images');
     section.classList.remove('hidden');
     const card = document.createElement('div');
-    card.className = 'gen-image-card';
+    card.className = 'gen-image-card' + (isFinal ? ' final-frame' : '');
     card.innerHTML = '<img src="' + url + '" alt="" loading="lazy">' +
         '<div class="gen-label">' + esc(label) + '</div>';
     grid.appendChild(card);
@@ -1887,7 +1946,6 @@ function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actual
     setTimeout(() => card.classList.remove('newly-added'), 3000);
     document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
 
-    // Attacher les événements
     const playBtn = card.querySelector('.narration-play-btn');
     if (playBtn) {
         playBtn.addEventListener('click', () => {
@@ -1898,7 +1956,6 @@ function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actual
                 playBtn.classList.remove('playing');
                 playBtn.textContent = '▶ Écouter la narration';
             } else {
-                // Arrêter les autres
                 document.querySelectorAll('.narration-play-btn.playing').forEach(b => {
                     b.classList.remove('playing');
                     b.textContent = '▶ Écouter la narration';
@@ -2067,7 +2124,6 @@ function testVoice() {
     initSpeech();
     loadMeasuredSpeed();
 
-    // Types de documentaire
     const docGrid = document.getElementById('doc-grid');
     DOC_TYPES.forEach((d, idx) => {
         const card = document.createElement('div');
@@ -2086,7 +2142,6 @@ function testVoice() {
         docGrid.appendChild(card);
     });
 
-    // Styles documentaires
     const styleGrid = document.getElementById('style-grid');
     DOC_STYLES.forEach((s, idx) => {
         const card = document.createElement('div');
@@ -2124,7 +2179,6 @@ function testVoice() {
     });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
 
-    // Langue / Narrateur
     document.getElementById('language-select').addEventListener('change', (e) => {
         state.narrationLanguage = e.target.value;
         logConsole('Langue narration : ' + LANGUAGES[state.narrationLanguage].label, 'info');
@@ -2136,7 +2190,6 @@ function testVoice() {
     document.getElementById('test-voice-btn').addEventListener('click', testVoice);
     document.getElementById('download-narration-btn').addEventListener('click', downloadNarration);
 
-    // Sauvegarde / chargement
     document.getElementById('save-project-btn').addEventListener('click', saveProject);
     document.getElementById('load-project-btn').addEventListener('click', loadProject);
     document.getElementById('new-project-btn').addEventListener('click', newProject);
@@ -2146,8 +2199,8 @@ function testVoice() {
     updateGenerateBtn();
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('api-key-input').value = savedKey;
-    logConsole('Réalisateur Documentaire v4 prêt.', 'info');
-    logConsole('Corrections : character bible, narration par clip, téléchargement, sauvegarde projet.', 'success');
+    logConsole('Réalisateur Documentaire v5 prêt.', 'info');
+    logConsole('✅ N narrations = N clips · Character Bible + Master Style renforcés', 'success');
 })();
 </script>
 
