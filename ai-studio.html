@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Créateur IA Pro v2.2</title>
+<title>Créateur IA Pro v2.3 — Cohérence des personnages</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -247,6 +247,20 @@
     .scenario-display .scene-item .scene-num {
         font-weight: 700; color: var(--info); margin-right: 0.3rem;
     }
+    .scenario-display .char-item {
+        padding: 0.5rem 0.7rem; background: var(--panel);
+        border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.75rem;
+        border-left: 3px solid var(--accent);
+    }
+    .scenario-display .char-item .char-name {
+        font-weight: 700; color: var(--accent);
+    }
+    .scenario-display .char-item .char-identity {
+        font-size: 0.7rem; color: var(--ink-dim);
+        font-family: ui-monospace, monospace;
+        margin-top: 0.3rem;
+        line-height: 1.4;
+    }
 
     .generated-images {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -437,8 +451,8 @@
 <body>
 
 <header>
-    <h1>Créateur IA Pro v2.2</h1>
-    <p class="subtitle">Du texte à l'écran — script fidèle + voix française garantie</p>
+    <h1>Créateur IA Pro v2.3</h1>
+    <p class="subtitle">Cohérence des personnages renforcée · Script fidèle · Voix FR garantie</p>
 </header>
 
 <div class="toolbar">
@@ -1216,7 +1230,7 @@ async function runFullPipeline() {
     state.stopRequested = false;
     state.idea = idea;
     state.sceneCount = parseInt(document.getElementById('scene-count-select').value);
-    state.imagesNeeded = state.sceneCount + 1; // N+1 images pour N clips
+    state.imagesNeeded = state.sceneCount + 1;
     state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
     state.aspect = document.getElementById('aspect-select').value;
     state.images = [];
@@ -1248,7 +1262,6 @@ async function runFullPipeline() {
         const visualHint = state.selectedMode.visual;
         const aspectLabel = state.aspect === 'portrait' ? 'portrait 9:16' : state.aspect === 'landscape' ? 'paysage 16:9' : 'carré 1:1';
 
-        // ✅ CORRECTION 3 : Dialogues forcés en français
         const scenarioPrompt = `Tu es un créateur de contenu IA. Mode : ${state.selectedMode.name}.
 Instruction : ${modeInstruction}
 Style visuel : ${state.selectedStyle.prompt}
@@ -1259,13 +1272,30 @@ Durée par scène : ${state.numFrames / 24} secondes
 IMPORTANT : Génère EXACTEMENT ${state.imagesNeeded} scènes dans le tableau "scenes".
 (Chaque clip vidéo utilise 2 scènes consécutives en keyframes. Donc ${state.imagesNeeded} images → ${state.imagesNeeded - 1} clips.)
 
-RÈGLE ABSOLUE : Tous les dialogues DOIVENT être EN FRANÇAIS, même si tu utilises des mots anglais dans les descriptions visuelles. Le champ "text" du dialogue doit contenir une phrase française naturelle.
+RÈGLE ABSOLUE N°1 — LANGUE DES DIALOGUES : Tous les dialogues DOIVENT être EN FRANÇAIS. Le champ "text" du dialogue doit contenir une phrase française naturelle.
+
+RÈGLE ABSOLUE N°2 — COHÉRENCE DES PERSONNAGES : Chaque personnage doit avoir une description physique ULTRA-précise et COHÉRENTE. Utilise tous les champs : age (âge EXACT en années), hair (couleur + longueur + style), eyes (couleur exacte), face (forme + traits distinctifs), build (corpulence), clothing_top (vêtement haut PRÉCIS), clothing_bottom (vêtement bas PRÉCIS), et appearance_full.
+
+Le champ "appearance_full" doit contenir UNE SEULE PHRASE ANGLAISE COMPLÈTE qui résume TOUT : âge exact, cheveux, yeux, visage, traits distinctifs, vêtements. Cette phrase sera réutilisée TELLE QUELLE dans chaque prompt d'image pour garantir que le personnage reste IDENTIQUE dans toutes les scènes.
+
+Exemple de appearance_full : "A 45-year-old man with short brown hair swept back, dark brown eyes, elongated face with a short grey beard, right nose, thick eyebrows, wearing an open-collar blue plaid shirt and beige canvas pants."
 
 Génère un JSON avec :
 {
   "title": "Titre en français",
   "logline": "Résumé en une phrase, en français",
-  "characters": [{ "name": "Nom", "gender": "homme ou femme", "appearance": "Description physique en français" }],
+  "characters": [{ 
+    "name": "Nom", 
+    "gender": "homme ou femme", 
+    "age": "Âge EXACT en années (ex: 45 ans)",
+    "hair": "Couleur + longueur + style des cheveux",
+    "eyes": "Couleur exacte des yeux",
+    "face": "Forme du visage + traits distinctifs",
+    "build": "Corpulence (mince, athlétique, robuste)",
+    "clothing_top": "Vêtement haut PRÉCIS",
+    "clothing_bottom": "Vêtement bas PRÉCIS",
+    "appearance_full": "UNE SEULE PHRASE EN ANGLAIS qui résume TOUT pour l'IA image"
+  }],
   "scenes": [{
     "scene_number": 1,
     "description": "Description visuelle détaillée EN FRANÇAIS de ce qui doit apparaître dans l'image",
@@ -1277,7 +1307,7 @@ Génère un JSON avec :
 Réponds UNIQUEMENT en JSON valide.`;
 
         const scenarioRaw = await callTextAPI([
-            { role: 'system', content: 'Tu réponds UNIQUEMENT en JSON valide. Tous les dialogues en français.' },
+            { role: 'system', content: 'Tu réponds UNIQUEMENT en JSON valide. Tous les dialogues en français. Chaque personnage a une description physique ultra-détaillée et cohérente.' },
             { role: 'user', content: scenarioPrompt }
         ], { temperature: 0.8, maxTokens: 4096 });
 
@@ -1292,6 +1322,21 @@ Réponds UNIQUEMENT en JSON valide.`;
             logConsole('⚠ L\'IA a généré seulement ' + scenario.scenes.length + ' scènes (au lieu de ' + state.imagesNeeded + ')', 'warn');
         }
 
+        // ✅ Vérifier que appearance_full existe pour chaque personnage
+        scenario.characters.forEach(c => {
+            if (!c.appearance_full) {
+                logConsole('⚠ Personnage "' + c.name + '" sans appearance_full → reconstitution', 'warn');
+                c.appearance_full = [
+                    c.age || 'adult',
+                    c.hair || '',
+                    c.eyes || '',
+                    c.face || '',
+                    c.build || '',
+                    'wearing ' + (c.clothing_top || '') + ' and ' + (c.clothing_bottom || '')
+                ].filter(Boolean).join(', ');
+            }
+        });
+
         state.scenario = scenario;
         state.femaleCharacters = scenario.characters
             .filter(c => c.gender === 'femme')
@@ -1302,7 +1347,12 @@ Réponds UNIQUEMENT en JSON valide.`;
 
         // ═══ ÉTAPE 2 : IMAGES ═══
         setStatus('L\'IA dessine…');
-        const charDesc = scenario.characters.map(c => c.name + ' (' + c.gender + ') : ' + c.appearance).join('. ');
+
+        // ✅ Description COMPLÈTE et LITTÉRALE du personnage (répétée dans chaque prompt)
+        const fullCharDesc = scenario.characters.map(c => 
+            'CHARACTER "' + c.name + '" — ' + c.appearance_full
+        ).join('. ');
+
         const imgSize = state.aspect === 'portrait' ? '768x1024' : state.aspect === 'landscape' ? '1024x576' : '768x768';
 
         for (let i = 0; i < scenario.scenes.length; i++) {
@@ -1310,15 +1360,19 @@ Réponds UNIQUEMENT en JSON valide.`;
             const scene = scenario.scenes[i];
             setStatus('Image ' + (i + 1) + '/' + scenario.scenes.length + '…');
 
-            // ✅ CORRECTION 1 : Priorité absolue à la scène exacte
+            // ✅ PROMPT RENFORCÉ : identité du personnage répétée littéralement
             const imagePrompt = [
-                'CRITICAL — Reproduce EXACTLY this scene:',
+                'CRITICAL — Reproduce EXACTLY this scene with IDENTICAL characters:',
                 scene.description,
+                '=== CHARACTER IDENTITY (must match EXACTLY) ===',
+                fullCharDesc,
+                '=== END CHARACTER IDENTITY ===',
+                'The character(s) must look IDENTICAL to the above description. ' +
+                'Same exact age, same hair color and style, same eye color, same face shape, ' +
+                'same distinctive features, same clothing. Do NOT change the character appearance.',
                 'Specific shot: ' + (scene.image_prompt || ''),
-                'Characters present: ' + charDesc,
                 'Visual style: ' + state.selectedStyle.prompt,
                 visualHint ? 'Mood: ' + visualHint : '',
-                'Do not invent new elements. Follow the scene description literally.',
                 'No text, no watermarks.'
             ].filter(Boolean).join('. ');
 
@@ -1438,17 +1492,28 @@ Réponds UNIQUEMENT en JSON valide.`;
 }
 
 // ══════════════════════════════════════════════════════════════════
-// AFFICHAGE
+// AFFICHAGE SCÉNARIO
 // ══════════════════════════════════════════════════════════════════
 function displayScenario(scenario) {
     const section = document.getElementById('section-scenario');
     const display = document.getElementById('scenario-display');
     section.classList.remove('hidden');
     section.classList.add('open');
+
     let html = '<h3>🎬 ' + esc(scenario.title) + '</h3>';
     html += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline || '') + '</p>';
-    html += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Personnages : ' +
-        scenario.characters.map(c => esc(c.name) + ' (' + esc(c.gender) + ')').join(', ') + '</div>';
+
+    // Personnages avec description complète
+    html += '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-dim);margin-bottom:0.4rem;font-weight:700;">👥 Personnages</div>';
+    scenario.characters.forEach(c => {
+        html += '<div class="char-item">';
+        html += '<div class="char-name">' + esc(c.name) + ' <span style="color:var(--ink-dim);font-weight:400;font-size:0.7rem">(' + esc(c.gender) + ', ' + esc(c.age || '?') + ')</span></div>';
+        html += '<div class="char-identity">' + esc(c.appearance_full || c.appearance || '') + '</div>';
+        html += '</div>';
+    });
+
+    // Scènes
+    html += '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-dim);margin:0.8rem 0 0.4rem;font-weight:700;">📋 Scènes</div>';
     scenario.scenes.forEach(s => {
         html += '<div class="scene-item"><span class="scene-num">Scène ' + s.scene_number + '</span>';
         html += esc(s.description);
@@ -1458,6 +1523,7 @@ function displayScenario(scenario) {
         }
         html += '</div>';
     });
+
     display.innerHTML = html;
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -1730,7 +1796,7 @@ function stopAllVideos() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// TTS
+// TTS — Voix française strictement forcée
 // ══════════════════════════════════════════════════════════════════
 let speechSynth = null;
 function initSpeech() {
@@ -1746,7 +1812,6 @@ function isFemaleCharacter(name) {
     return state.femaleCharacters.some(f => n.includes(f) || f.includes(n));
 }
 
-// ✅ CORRECTION 2 : Voix française strictement forcée
 function speakText(text, characterName) {
     return new Promise((resolve) => {
         if (!speechSynth) { resolve(); return; }
@@ -1754,7 +1819,6 @@ function speakText(text, characterName) {
         setTimeout(() => {
             const allVoices = speechSynth.getVoices();
 
-            // Filtre STRICT : uniquement les voix françaises
             const frVoices = allVoices.filter(v => {
                 if (!v.lang) return false;
                 const lang = v.lang.toLowerCase().replace('_', '-');
@@ -1879,7 +1943,7 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
     updateGenerateBtn();
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('api-key-input').value = savedKey;
-    logConsole('Application prête (v2.2 - corrections appliquées)', 'info');
+    logConsole('Application prête (v2.3 - cohérence des personnages)', 'info');
 })();
 </script>
 
