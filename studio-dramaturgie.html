@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Studio de Dramaturgie — Vidéos explicatives</title>
+<title>Studio de Dramaturgie — v2</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -62,6 +62,7 @@
     }
     .section-title .badge.soft { background: var(--info); }
     .section-title .badge.count { background: var(--success); }
+    .section-title .badge.lock { background: var(--error); }
     .section-header .chevron {
         font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s;
     }
@@ -112,12 +113,19 @@
     }
     textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); }
     textarea { min-height: 100px; line-height: 1.5; }
+    textarea.required-field { border-color: var(--warn); }
+    textarea.required-field:focus { border-color: var(--accent); }
 
     .control-row { margin-bottom: 0.9rem; }
     .control-label {
         display: block; font-size: 0.72rem; color: var(--ink-dim);
         margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em;
         font-weight: 700;
+    }
+    .control-label .required-star { color: var(--error); margin-left: 0.2rem; }
+    .control-hint {
+        font-size: 0.68rem; color: var(--ink-faint);
+        margin-top: 0.3rem; font-style: italic;
     }
     select {
         width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px;
@@ -222,6 +230,7 @@
     .console-panel .log-text { color: var(--ink); }
     .console-panel .log-heartbeat { color: #8a8aff; }
     .console-panel .log-measure { color: #ffb84d; font-weight: 700; }
+    .console-panel .log-lock { color: var(--error); font-weight: 700; }
 
     .scenario-display {
         background: var(--panel-2); border-radius: 8px;
@@ -259,6 +268,12 @@
         margin-bottom: 0.4rem; background: var(--panel);
         border-radius: 0 6px 6px 0; font-size: 0.78rem;
         color: var(--ink-dim);
+    }
+    .constraint-block {
+        padding: 0.6rem 0.8rem; border-left: 3px solid var(--error);
+        margin-bottom: 0.4rem; background: var(--panel);
+        border-radius: 0 6px 6px 0; font-size: 0.78rem;
+        color: var(--error);
     }
 
     .generated-images {
@@ -460,6 +475,18 @@
     }
     .rule-banner strong { color: var(--accent); }
 
+    .constraint-counter {
+        display: inline-block;
+        background: var(--error);
+        color: #fff;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        margin-left: 0.5rem;
+        letter-spacing: 0;
+    }
+
     #noSleepCanvas { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
     #noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
 </style>
@@ -519,6 +546,55 @@
     <div class="limit-row">
         <span class="limit-label">⚡ Vitesse mesurée</span>
         <span class="limit-value"><span id="limit-measured-speed">en attente</span></span>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- NOUVELLE SECTION : CONTRAINTES PERSONNALISÉES -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="section open" id="section-constraints">
+    <div class="section-header" data-toggle="section-constraints">
+        <span class="section-title">🔒 Contraintes personnalisées <span class="badge lock">RÈGLES ABSOLUES</span> <span class="constraint-counter" id="constraint-counter">0</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+        <div class="section-content">
+            <div style="background:#2a1a0a;border-left:3px solid var(--error);border-radius:0 6px 6px 0;padding:0.7rem 0.9rem;margin-bottom:1rem;font-size:0.78rem;">
+                <strong style="color:var(--error);">⚠ OBLIGATION ABSOLUE :</strong> ce que vous écrivez ici sera <strong>imposé</strong> à l'IA. Elle devra s'y conformer dans chaque plan, chaque image, chaque narration.
+            </div>
+
+            <div class="control-row">
+                <label class="control-label">🎭 Objets obligatoires <span class="required-star">*</span></label>
+                <textarea id="constraint-objects" placeholder="Listez les objets qui DOIVENT apparaître dans les clips (un par ligne ou séparés par des virgules).&#10;Exemple :&#10;- Un masque tragique grec&#10;- Une balance dorée&#10;- Une couronne brisée&#10;- Un miroir ancien" style="min-height:90px;"></textarea>
+                <div class="control-hint">L'IA sera obligée d'inclure ces objets dans les visuels générés.</div>
+            </div>
+
+            <div class="control-row">
+                <label class="control-label">📚 Concepts obligatoires <span class="required-star">*</span></label>
+                <textarea id="constraint-concepts" placeholder="Listez les concepts théoriques qui DOIVENT être expliqués dans la narration.&#10;Exemple :&#10;- La purgation des passions&#10;- Le renversement du destin&#10;- La faute tragique" style="min-height:90px;"></textarea>
+                <div class="control-hint">L'IA devra expliquer chacun de ces concepts dans la narration.</div>
+            </div>
+
+            <div class="control-row">
+                <label class="control-label">📖 Références obligatoires <span class="required-star">*</span></label>
+                <textarea id="constraint-references" placeholder="Listez les œuvres, auteurs ou théoriciens qui DOIVENT être cités.&#10;Exemple :&#10;- Aristote, Poétique&#10;- Sophocle, Œdipe Roi&#10;- Racine, Phèdre" style="min-height:90px;"></textarea>
+                <div class="control-hint">L'IA devra citer chacune de ces références dans le script.</div>
+            </div>
+
+            <div class="control-row">
+                <label class="control-label">🚫 Symboles interdits</label>
+                <textarea id="constraint-forbidden" placeholder="Listez ce que l'IA NE DOIT PAS utiliser.&#10;Exemple :&#10;- Aucun animal&#10;- Aucun objet moderne (téléphone, ordinateur)&#10;- Aucune couleur vive" style="min-height:70px;"></textarea>
+                <div class="control-hint">L'IA évitera strictement ces éléments.</div>
+            </div>
+
+            <div class="control-row">
+                <label class="control-label">✏️ Contraintes libres supplémentaires</label>
+                <textarea id="constraint-free" placeholder="Toute autre règle que l'IA doit respecter.&#10;Exemple :&#10;- Chaque plan doit contenir exactement 2 objets&#10;- Le narrateur doit citer au moins un vers de Racine&#10;- Aucun plan ne doit montrer plus de 3 silhouettes" style="min-height:70px;"></textarea>
+                <div class="control-hint">Toute règle libre qui sera imposée à l'IA.</div>
+            </div>
+
+            <button type="button" id="clear-constraints-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--error);background:transparent;color:var(--error);font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🗑️ Effacer toutes les contraintes</button>
+        </div>
     </div>
 </div>
 
@@ -794,47 +870,47 @@ function getEstimatedWaitSeconds() {
 // ══════════════════════════════════════════════════════════════════
 const THEMES = [
     { id: 'structure-3-actes', name: 'Structure en 3 actes', emoji: '📐', desc: 'Exposition, nœud, dénouement',
-      focus: 'Expliquer la structure en trois actes : exposition (présentation des personnages et du conflit), nœud (montée des tensions, péripéties), dénouement (résolution). Utilise un schéma symbolique avec des flèches, des pyramides, des segments colorés.' },
+      focus: 'Expliquer la structure en trois actes : exposition, nœud, dénouement.' },
     { id: 'pyramide-freytag', name: 'Pyramide de Freytag', emoji: '🔺', desc: 'Les 5 étapes du drame',
-      focus: 'Expliquer la pyramide de Freytag : exposition, inciting incident, rising action, climax, falling action, dénouement. Utilise une pyramide symbolique qui se construit plan par plan.' },
+      focus: 'Expliquer la pyramide de Freytag : exposition, inciting incident, rising action, climax, falling action, dénouement.' },
     { id: 'catharsis', name: 'Catharsis', emoji: '💧', desc: 'Purgation des émotions',
-      focus: 'Expliquer la catharsis aristotélicienne : purgation des passions par la pitié et la terreur. Utilise des symboles de purification (eau, feu, masque tragique qui se fissure, rideau qui tombe).' },
+      focus: 'Expliquer la catharsis aristotélicienne : purgation des passions par la pitié et la terreur.' },
     { id: 'hamartia', name: 'Hamartia', emoji: '⚡', desc: 'La faute tragique',
-      focus: 'Expliquer l\'hamartia : la faute ou erreur de jugement du héros tragique qui cause sa chute. Utilise des symboles (fissure dans une statue, fil qui se rompt, couronne qui tombe).' },
+      focus: 'Expliquer l\'hamartia : la faute ou erreur de jugement du héros tragique.' },
     { id: 'ironie-dramatique', name: 'Ironie dramatique', emoji: '👁️', desc: 'Le spectateur en sait plus',
-      focus: 'Expliquer l\'ironie dramatique : le spectateur sait quelque chose que le personnage ignore. Utilise deux points de vue symboliques (un œil qui voit tout, un personnage aveugle à la vérité, une ombre révélatrice).' },
+      focus: 'Expliquer l\'ironie dramatique : le spectateur sait quelque chose que le personnage ignore.' },
     { id: 'choeur-grec', name: 'Le chœur grec', emoji: '🎭', desc: 'Voix collective',
-      focus: 'Expliquer la fonction du chœur dans la tragédie grecque : commentaire, chant, représentation du peuple. Utilise des silhouettes alignées, des masques multiples, des mouvements collectifs.' },
+      focus: 'Expliquer la fonction du chœur dans la tragédie grecque.' },
     { id: 'tragedie-comedie', name: 'Tragédie vs Comédie', emoji: '⚖️', desc: 'Les deux masques',
-      focus: 'Expliquer la différence entre tragédie et comédie : fin heureuse vs fin malheureuse, ton, personnages, structure. Utilise les deux masques grecs opposés, une balance symbolique, deux rideaux.' },
+      focus: 'Expliquer la différence entre tragédie et comédie.' },
     { id: 'peripetie', name: 'Péripétie', emoji: '🔄', desc: 'Le retournement',
-      focus: 'Expliquer la péripétie aristotélicienne : retournement soudain de situation, renversement du destin. Utilise des symboles de rotation (roue qui tourne, spirale, miroir qui se retourne).' },
+      focus: 'Expliquer la péripétie aristotélicienne : retournement soudain de situation.' },
     { id: 'anagnorisis', name: 'Anagnorisis', emoji: '💡', desc: 'La reconnaissance',
-      focus: 'Expliquer l\'anagnorisis : moment où le héros prend conscience de la vérité sur sa situation. Utilise des symboles de révélation (voile qui se lève, lumière qui surgit, miroir brisé).' },
+      focus: 'Expliquer l\'anagnorisis : moment où le héros prend conscience de la vérité.' },
     { id: 'deus-ex-machina', name: 'Deus ex machina', emoji: '⚙️', desc: 'Résolution artificielle',
-      focus: 'Expliquer le deus ex machina : résolution artificielle d\'un conflit par un élément extérieur. Utilise des symboles de machinerie (poulie, grue, main qui descend du ciel, mécanisme théâtral).' }
+      focus: 'Expliquer le deus ex machina : résolution artificielle d\'un conflit.' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
-// STYLES VISUELS DRAMATURGIQUES (SANS VISAGE HUMAIN)
+// STYLES VISUELS
 // ══════════════════════════════════════════════════════════════════
 const DRAMA_STYLES = [
     { id: 'silhouette-theatre', name: 'Silhouette Théâtre', emoji: '🌑',
-      prompt: 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, back-lit against dramatic single spotlight, empty stage, deep shadows, high contrast, Greek theatre aesthetic, no faces visible, no facial details, pure silhouettes' },
+      prompt: 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, back-lit against dramatic single spotlight, empty stage, deep shadows, high contrast' },
     { id: 'theatre-grec', name: 'Théâtre Grec', emoji: '🏛️',
-      prompt: 'Ancient Greek theatre aesthetic, classical marble columns, Greek masks (tragedy and comedy), amphitheater setting, terracotta and gold tones, symbolic props like laurel, lyre, amphora, no human faces, silhouettes only' },
+      prompt: 'Ancient Greek theatre aesthetic, classical marble columns, Greek masks, amphitheater setting, terracotta and gold tones, no human faces' },
     { id: 'puppet-shadow', name: 'Ombres Chinoises', emoji: '🎭',
-      prompt: 'Chinese shadow puppet style, black paper-cut silhouettes on illuminated white screen, intricate patterns, NO FACIAL FEATURES on silhouettes, theatrical backlighting, traditional shadow play aesthetic' },
+      prompt: 'Chinese shadow puppet style, black paper-cut silhouettes on illuminated white screen, NO FACIAL FEATURES, theatrical backlighting' },
     { id: 'minimal-symbolique', name: 'Minimal Symbolique', emoji: '⬛',
-      prompt: 'Minimalist symbolic illustration, geometric shapes, flat colors, simple icons representing dramatic concepts (masks, arrows, curtains, scales, hourglass), no human figures at all, concept art for academic explanation' },
+      prompt: 'Minimalist symbolic illustration, geometric shapes, flat colors, simple icons, no human figures at all' },
     { id: 'theatre-barock', name: 'Théâtre Baroque', emoji: '⚜️',
-      prompt: 'Baroque theatre aesthetic, ornate red velvet curtains, gilded frames, chiaroscuro lighting, theatrical props (crown, skull, dagger, rose), deep crimson and gold tones, no human faces, silhouettes and objects only' },
+      prompt: 'Baroque theatre aesthetic, ornate red velvet curtains, gilded frames, chiaroscuro lighting, deep crimson and gold tones, no human faces' },
     { id: 'theatre-noir', name: 'Théâtre Noir', emoji: '🖤',
-      prompt: 'Film noir theatrical style, stark black and white, harsh shadows, Venetian blind patterns, silhouette figures with NO FACIAL FEATURES, smoke-filled atmosphere, 1940s detective aesthetic' },
+      prompt: 'Film noir theatrical style, stark black and white, harsh shadows, silhouette figures with NO FACIAL FEATURES' },
     { id: 'blueprint', name: 'Schéma Technique', emoji: '📊',
-      prompt: 'Technical blueprint diagram style, white lines on dark blue background, geometric precision, arrows, labels, structural diagram of dramatic concepts, no human figures, pure schematic representation' },
+      prompt: 'Technical blueprint diagram style, white lines on dark blue background, geometric precision, arrows, labels' },
     { id: 'vitrail', name: 'Vitrail', emoji: '🪟',
-      prompt: 'Stained glass window aesthetic, fragmented colored glass pieces, black lead lines dividing shapes, symbolic figures without facial features, cathedral light, jewel tones of ruby, sapphire, emerald, gold' }
+      prompt: 'Stained glass window aesthetic, fragmented colored glass, black lead lines dividing shapes, symbolic figures without facial features' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
@@ -853,15 +929,15 @@ const NARRATORS = {
 const LANGUAGES = {
     'fr': {
         label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'],
-        promptInstruction: 'IMPORTANT : Écris TOUTE la narration en français académique et précis. Utilise le vocabulaire technique de la dramaturgie.'
+        promptInstruction: 'IMPORTANT : Écris TOUTE la narration en français académique et précis.'
     },
     'ar': {
         label: 'Arabe classique (Fusha)', ttsLang: 'ar-SA', ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'],
-        promptInstruction: 'IMPORTANT : Écris TOUTE la narration en arabe classique académique (الفصحى الأكاديمية). Utilise le vocabulaire technique de la dramaturgie en arabe.'
+        promptInstruction: 'IMPORTANT : Écris TOUTE la narration en arabe classique académique (الفصحى الأكاديمية).'
     },
     'ar-dz': {
         label: 'Daridja algérienne', ttsLang: 'ar-DZ', ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'],
-        promptInstruction: 'IMPORTANT : Écris TOUTE la narration en daridja algérienne cultivée (الدارجة الجزائرية المثقفة). Garde le vocabulaire technique en arabe classique quand nécessaire.'
+        promptInstruction: 'IMPORTANT : Écris TOUTE la narration en daridja algérienne cultivée.'
     }
 };
 
@@ -885,11 +961,101 @@ const state = {
     scenario: null,
     images: [],
     videos: [],
+    // ═══ CONTRAINTES PERSONNALISÉES ═══
+    constraints: {
+        objects: '',
+        concepts: '',
+        references: '',
+        forbidden: '',
+        free: ''
+    },
     currentSceneIndex: 0,
     isPlayingSequence: false,
     lastTextRequestTime: 0,
     femaleCharacters: []
 };
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRE CONTRAINTES
+// ══════════════════════════════════════════════════════════════════
+function parseConstraintLines(text) {
+    if (!text) return [];
+    // Séparer par lignes, virgules, ou points-virgules
+    return text
+        .split(/[\n,;]+/)
+        .map(s => s.trim().replace(/^[-•*]\s*/, ''))
+        .filter(s => s.length > 0);
+}
+
+function getActiveConstraints() {
+    const objects = parseConstraintLines(state.constraints.objects);
+    const concepts = parseConstraintLines(state.constraints.concepts);
+    const references = parseConstraintLines(state.constraints.references);
+    const forbidden = parseConstraintLines(state.constraints.forbidden);
+    const free = parseConstraintLines(state.constraints.free);
+    return { objects, concepts, references, forbidden, free, total: objects.length + concepts.length + references.length + forbidden.length + free.length };
+}
+
+function updateConstraintCounter() {
+    const c = getActiveConstraints();
+    const el = document.getElementById('constraint-counter');
+    if (el) el.textContent = c.total;
+}
+
+function buildConstraintBlock() {
+    const c = getActiveConstraints();
+    if (c.total === 0) return '';
+
+    let block = '\n\n═══ 🚨 CONTRAINTES ABSOLUES — OBLIGATION DE LES RESPECTER 🚨 ═══\n';
+    block += 'Ces règles sont PRIORITAIRES sur toutes les autres instructions. Tu DOIS les respecter scrupuleusement dans CHAQUE plan, CHAQUE image_prompt, CHAQUE narration. Un non-respect rend la réponse invalide.\n\n';
+
+    if (c.objects.length > 0) {
+        block += '🎭 OBJETS OBLIGATOIRES — ces objets DOIVENT apparaître dans les visuels :\n';
+        c.objects.forEach((o, i) => { block += (i+1) + '. ' + o + '\n'; });
+        block += '→ Tu dois répartir ces objets sur les différents plans. Chaque objet doit être présent dans AU MOINS UN image_prompt, décrit en anglais avec précision.\n\n';
+    }
+
+    if (c.concepts.length > 0) {
+        block += '📚 CONCEPTS OBLIGATOIRES — ces notions DOIVENT être expliquées dans la narration :\n';
+        c.concepts.forEach((o, i) => { block += (i+1) + '. ' + o + '\n'; });
+        block += '→ Chaque concept doit être nommé et expliqué dans AU MOINS UNE narration de scène.\n\n';
+    }
+
+    if (c.references.length > 0) {
+        block += '📖 RÉFÉRENCES OBLIGATOIRES — ces œuvres/auteurs DOIVENT être cités :\n';
+        c.references.forEach((o, i) => { block += (i+1) + '. ' + o + '\n'; });
+        block += '→ Chaque référence doit apparaître explicitement dans AU MOINS UNE narration.\n\n';
+    }
+
+    if (c.forbidden.length > 0) {
+        block += '🚫 SYMBOLES INTERDITS — INTERDICTION ABSOLUE d\'utiliser ces éléments :\n';
+        c.forbidden.forEach((o, i) => { block += (i+1) + '. ' + o + '\n'; });
+        block += '→ Ces éléments ne doivent apparaître NULLE PART : ni dans les image_prompt, ni dans les descriptions, ni dans les visuels.\n\n';
+    }
+
+    if (c.free.length > 0) {
+        block += '✏️ RÈGLES LIBRES SUPPLÉMENTAIRES :\n';
+        c.free.forEach((o, i) => { block += (i+1) + '. ' + o + '\n'; });
+        block += '\n';
+    }
+
+    block += '⚠️ Avant de répondre, vérifie MENTALEMENT que chacune de ces contraintes est respectée. La réponse ne sera acceptée que si TOUTES les contraintes sont satisfaites.\n';
+    block += '═══ FIN DES CONTRAINTES ABSOLUES ═══\n';
+
+    return block;
+}
+
+function buildConstraintBlockForImage() {
+    const c = getActiveConstraints();
+    let block = '';
+    if (c.objects.length > 0) {
+        block += ' MANDATORY OBJECTS (MUST APPEAR): ' + c.objects.join(', ') + '.';
+    }
+    if (c.forbidden.length > 0) {
+        block += ' FORBIDDEN ELEMENTS (MUST NOT APPEAR): ' + c.forbidden.join(', ') + '.';
+    }
+    return block;
+}
 
 // ══════════════════════════════════════════════════════════════════
 // ANTI-VEILLE
@@ -987,7 +1153,7 @@ function showToast(message, type = 'success', duration = 2500) {
 function logConsole(message, type = 'info') {
     const panel = document.getElementById('console-panel');
     const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const typeLabels = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', text: '[Texte]', heartbeat: '[En cours]', measure: '[Mesure]' };
+    const typeLabels = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', text: '[Texte]', heartbeat: '[En cours]', measure: '[Mesure]', lock: '[Contrainte]' };
     const line = document.createElement('div');
     line.className = 'log-line';
     line.innerHTML = '<span class="log-time">' + time + '</span>' +
@@ -1061,7 +1227,14 @@ function updateGenerateBtn() {
     if (state.isRunning) btn.textContent = 'Génération en cours…';
     else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
     else if (!hasIdea) btn.textContent = 'Décrivez votre sujet';
-    else btn.textContent = '🎭 Générer la leçon de dramaturgie';
+    else {
+        const c = getActiveConstraints();
+        if (c.total > 0) {
+            btn.textContent = '🎭 Générer (' + c.total + ' contrainte' + (c.total > 1 ? 's' : '') + ' active' + (c.total > 1 ? 's' : '') + ')';
+        } else {
+            btn.textContent = '🎭 Générer la leçon de dramaturgie';
+        }
+    }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1096,7 +1269,8 @@ function saveProject() {
         aspect: state.aspect,
         scenario: state.scenario,
         images: state.images,
-        videos: state.videos
+        videos: state.videos,
+        constraints: state.constraints
     };
 
     projects[name] = projectData;
@@ -1132,6 +1306,7 @@ function loadProject() {
     state.scenario = p.scenario || null;
     state.images = p.images || [];
     state.videos = p.videos || [];
+    state.constraints = p.constraints || { objects: '', concepts: '', references: '', forbidden: '', free: '' };
 
     const t = THEMES.find(x => x.id === p.selectedThemeId);
     if (t) state.selectedTheme = t;
@@ -1147,6 +1322,14 @@ function loadProject() {
     document.getElementById('clip-duration-select').value = state.numFrames;
     document.getElementById('aspect-select').value = state.aspect;
     document.getElementById('rhythm-select').value = state.rhythm;
+
+    // Restaurer les contraintes
+    document.getElementById('constraint-objects').value = state.constraints.objects || '';
+    document.getElementById('constraint-concepts').value = state.constraints.concepts || '';
+    document.getElementById('constraint-references').value = state.constraints.references || '';
+    document.getElementById('constraint-forbidden').value = state.constraints.forbidden || '';
+    document.getElementById('constraint-free').value = state.constraints.free || '';
+    updateConstraintCounter();
 
     document.querySelectorAll('.theme-card').forEach(c => {
         c.classList.toggle('selected', c.dataset.id === state.selectedTheme.id);
@@ -1187,7 +1370,14 @@ function newProject() {
     state.scenario = null;
     state.images = [];
     state.videos = [];
+    state.constraints = { objects: '', concepts: '', references: '', forbidden: '', free: '' };
     document.getElementById('idea-input').value = '';
+    document.getElementById('constraint-objects').value = '';
+    document.getElementById('constraint-concepts').value = '';
+    document.getElementById('constraint-references').value = '';
+    document.getElementById('constraint-forbidden').value = '';
+    document.getElementById('constraint-free').value = '';
+    updateConstraintCounter();
     document.getElementById('project-name').value = 'Leçon de dramaturgie';
     document.getElementById('generated-images').innerHTML = '';
     document.getElementById('generated-videos').innerHTML = '';
@@ -1200,6 +1390,19 @@ function newProject() {
     showToast('Nouveau projet', 'success');
 }
 
+function clearConstraints() {
+    if (!confirm('Effacer toutes les contraintes ?')) return;
+    state.constraints = { objects: '', concepts: '', references: '', forbidden: '', free: '' };
+    document.getElementById('constraint-objects').value = '';
+    document.getElementById('constraint-concepts').value = '';
+    document.getElementById('constraint-references').value = '';
+    document.getElementById('constraint-forbidden').value = '';
+    document.getElementById('constraint-free').value = '';
+    updateConstraintCounter();
+    updateGenerateBtn();
+    showToast('Contraintes effacées', 'success');
+}
+
 // ══════════════════════════════════════════════════════════════════
 // TÉLÉCHARGEMENT NARRATION
 // ══════════════════════════════════════════════════════════════════
@@ -1209,6 +1412,8 @@ function downloadNarration() {
         return;
     }
     const title = state.scenario.title || 'Lecon_Dramaturgie';
+    const c = getActiveConstraints();
+
     let content = '╔══════════════════════════════════════════╗\n';
     content += '║  ' + title + '\n';
     content += '╚══════════════════════════════════════════╝\n\n';
@@ -1218,6 +1423,19 @@ function downloadNarration() {
     content += 'Public : ' + state.audience + '\n';
     content += 'Langue : ' + LANGUAGES[state.narrationLanguage].label + '\n';
     content += 'Narrateur : ' + NARRATORS[state.narratorVoice].label + '\n\n';
+
+    if (c.total > 0) {
+        content += '──────────────────────────────────────────\n';
+        content += '🔒 CONTRAINTES ACTIVES\n';
+        content += '──────────────────────────────────────────\n';
+        if (c.objects.length) content += '🎭 Objets obligatoires : ' + c.objects.join(', ') + '\n';
+        if (c.concepts.length) content += '📚 Concepts obligatoires : ' + c.concepts.join(', ') + '\n';
+        if (c.references.length) content += '📖 Références obligatoires : ' + c.references.join(', ') + '\n';
+        if (c.forbidden.length) content += '🚫 Symboles interdits : ' + c.forbidden.join(', ') + '\n';
+        if (c.free.length) content += '✏️ Règles libres : ' + c.free.join(' | ') + '\n';
+        content += '\n';
+    }
+
     content += '──────────────────────────────────────────\n\n';
     state.scenario.scenes.forEach(s => {
         content += 'PLAN ' + s.scene_number + ' — ' + (s.sequence_title || '') + '\n';
@@ -1373,7 +1591,7 @@ async function createVideoTaskOnly(item) {
         width: isLandscape ? 1024 : 576
     };
 
-    logConsole('Requête vidéo → ' + MODEL_VIDEO + ' (keyframes, ' + state.numFrames + ' frames)', 'info');
+    logConsole('Requête vidéo → ' + MODEL_VIDEO, 'info');
 
     const res = await fetchWithRetry(API_BASE + '/videos', {
         method: 'POST',
@@ -1481,13 +1699,22 @@ async function pollVideoForItem(item) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PIPELINE DRAMATURGIE
+// PIPELINE DRAMATURGIE AVEC CONTRAINTES
 // ══════════════════════════════════════════════════════════════════
 async function runDramaPipeline() {
     if (state.isRunning) return;
     const idea = document.getElementById('idea-input').value.trim();
     if (idea.length < 5) { showToast('Sujet trop court', 'error'); return; }
     if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
+
+    // Lire les contraintes depuis les champs
+    state.constraints = {
+        objects: document.getElementById('constraint-objects').value,
+        concepts: document.getElementById('constraint-concepts').value,
+        references: document.getElementById('constraint-references').value,
+        forbidden: document.getElementById('constraint-forbidden').value,
+        free: document.getElementById('constraint-free').value
+    };
 
     state.isRunning = true;
     state.stopRequested = false;
@@ -1520,6 +1747,7 @@ async function runDramaPipeline() {
 
     const langInfo = LANGUAGES[state.narrationLanguage];
     const narratorInfo = NARRATORS[state.narratorVoice];
+    const activeConstraints = getActiveConstraints();
 
     logConsole('Concept : ' + state.selectedTheme.name, 'info');
     logConsole('Style : ' + state.selectedStyle.name + ' (silhouettes, aucun visage)', 'info');
@@ -1528,11 +1756,36 @@ async function runDramaPipeline() {
     logConsole('📐 Config : ' + state.clipCount + ' plans · ' + state.clipCount + ' narrations · ' + totalImagesNeeded + ' images', 'success');
     logConsole('⚜ Règle : aucun visage humain, silhouettes et symboles uniquement', 'warn');
 
+    // Afficher un résumé des contraintes actives
+    if (activeConstraints.total > 0) {
+        logConsole('══════════════════════════════', 'lock');
+        logConsole('🔒 CONTRAINTES ACTIVES (' + activeConstraints.total + ') — L\'IA DOIT LES RESPECTER', 'lock');
+        logConsole('══════════════════════════════', 'lock');
+        if (activeConstraints.objects.length > 0) {
+            logConsole('🎭 Objets obligatoires : ' + activeConstraints.objects.join(' | '), 'lock');
+        }
+        if (activeConstraints.concepts.length > 0) {
+            logConsole('📚 Concepts obligatoires : ' + activeConstraints.concepts.join(' | '), 'lock');
+        }
+        if (activeConstraints.references.length > 0) {
+            logConsole('📖 Références obligatoires : ' + activeConstraints.references.join(' | '), 'lock');
+        }
+        if (activeConstraints.forbidden.length > 0) {
+            logConsole('🚫 Symboles interdits : ' + activeConstraints.forbidden.join(' | '), 'lock');
+        }
+        if (activeConstraints.free.length > 0) {
+            logConsole('✏️ Règles libres : ' + activeConstraints.free.join(' | '), 'lock');
+        }
+        logConsole('══════════════════════════════', 'lock');
+    } else {
+        logConsole('Aucune contrainte personnalisée active', 'info');
+    }
+
     await activateWakeLock();
     setStatus('Initialisation…');
 
     try {
-        // ═══ ÉTAPE 1 : SCRIPT DRAMATURGIQUE ═══
+        // ═══ ÉTAPE 1 : SCRIPT + CONTRAINTES ═══
         logConsole('══════════════════════════════', 'text');
         logConsole('ÉTAPE 1/4 — Script explicatif', 'success');
         logConsole('══════════════════════════════', 'text');
@@ -1541,6 +1794,9 @@ async function runDramaPipeline() {
         const audienceLabel = { lycee: 'élèves de lycée', universite: 'étudiants universitaires', 'grand-public': 'grand public cultivé', initie: 'spécialistes et initiés' }[state.audience];
         const narrationStyleLabel = { universitaire: 'conférence universitaire rigoureuse', vulgarisation: 'vulgarisation accessible mais précise', poetique: 'essai poétique et littéraire', journalistique: 'exposé journalistique' }[state.narrationStyle];
         const aspectLabel = state.aspect === 'landscape' ? 'paysage 16:9' : state.aspect === 'portrait' ? 'portrait 9:16' : 'carré 1:1';
+
+        // Construire le bloc de contraintes
+        const constraintBlock = buildConstraintBlock();
 
         const scriptPrompt = `Tu es un professeur de dramaturgie et d'études théâtrales. Tu prépares une vidéo explicative pédagogique.
 
@@ -1560,67 +1816,52 @@ ${langInfo.promptInstruction}
 
 ═══ RÈGLE ABSOLUE SUR LES VISUELS ═══
 AUCUN VISAGE HUMAIN NE DOIT ÊTRE VISIBLE.
-Les visuels doivent utiliser UNIQUEMENT :
-- Des silhouettes humaines (de dos, de profil, en contre-jour, jamais de face avec détails faciaux)
-- Des symboles théâtraux (masques grecs, rideaux, projecteurs, chaises vides, couronnes, crânes, poignards, roses, balances)
-- Des formes géométriques (pyramides, flèches, cercles, spirales) pour représenter les concepts abstraits
-- Des schémas et diagrammes
-- Des objets symboliques (miroirs, sabliers, fils qui se rompent, voiles)
-- Des jeux de lumière et d'ombre
-
-Dans chaque image_prompt, tu DOIS écrire explicitement : "NO FACIAL FEATURES, NO FACES, silhouettes only, no human faces visible".
-
+Utilise UNIQUEMENT : silhouettes, symboles théâtraux (masques grecs, rideaux, projecteurs, chaises vides, couronnes, crânes, poignards, roses, balances), formes géométriques, schémas, objets symboliques, jeux de lumière.
+Dans chaque image_prompt, écris explicitement : "NO FACIAL FEATURES, NO FACES, silhouettes only".
+${constraintBlock}
 ═══ RÔLE DU SCRIPT ═══
-Chaque plan doit :
-- Illustrer UN aspect du concept (progression pédagogique)
-- Avoir une narration qui EXPLIQUE (pas qui raconte une histoire)
-- Proposer un visuel symbolique FORT qui aide à comprendre
+Chaque plan doit illustrer UN aspect du concept, avoir une narration qui EXPLIQUE, proposer un visuel symbolique fort.
 
-La narration doit :
-- Citer les théoriciens pertinents (Aristote, Freytag, etc.)
-- Utiliser le vocabulaire technique avec précision
-- Donner des exemples (œuvres, auteurs)
-- Rester synthétique : 2-3 phrases par plan maximum
+La narration doit citer les théoriciens pertinents, utiliser le vocabulaire technique avec précision, donner des exemples, rester synthétique (2-3 phrases par plan).
 
 ═══ STRUCTURE JSON ═══
 Génère EXACTEMENT ${narrativeScenes} scènes narratives (une par plan).
-Puis UNE image finale de synthèse (sans narration) qui récapitule visuellement le concept.
+Puis UNE image finale de synthèse (sans narration).
 
 {
   "title": "Titre de la leçon",
-  "logline": "Résumé du concept en une phrase",
-  "concept": "Nom du concept dramaturgique",
+  "logline": "Résumé en une phrase",
+  "concept": "Nom du concept",
   "theorician": "Théoricien(s) de référence",
-  "master_style_prompt": "English visual style anchor — MUST specify NO FACIAL FEATURES, silhouettes only",
+  "master_style_prompt": "English visual style anchor — MUST specify NO FACIAL FEATURES",
+  "constraints_respected": ["Liste des contraintes que tu as respectées"],
   "symbols": [
-    { "name": "Symbole", "description": "Description du symbole récurrent en anglais, à répéter dans les prompts" }
+    { "name": "Symbole", "description": "Description en anglais" }
   ],
   "scenes": [
     {
       "scene_number": 1,
-      "sequence_title": "Titre du plan",
-      "description": "Description visuelle symbolique (en français, pour affichage)",
-      "image_prompt": "English prompt for image generation. MUST include 'NO FACIAL FEATURES, NO FACES VISIBLE' and style anchor + verbatim symbol descriptions.",
+      "sequence_title": "Titre",
+      "description": "Description visuelle symbolique (en français)",
+      "image_prompt": "English prompt. MUST include 'NO FACIAL FEATURES' + style anchor + verbatim symbol descriptions + mandatory objects.",
       "narration": "Explication pédagogique (DANS LA LANGUE CHOISIE, 2-3 phrases)",
       "symbolism": "Quel symbole est utilisé et pourquoi",
+      "constraints_applied": "Quelles contraintes sont respectées dans ce plan",
       "camera_movement": "Slow camera movement"
     }
   ],
   "final_frame": {
     "description": "Plan de synthèse récapitulatif",
-    "image_prompt": "English prompt for the closing synthesis frame. MUST include 'NO FACIAL FEATURES' and style anchor."
+    "image_prompt": "English prompt. MUST include 'NO FACIAL FEATURES' + style anchor."
   }
 }
 
-RÈGLES JSON :
-1. Réponds UNIQUEMENT avec un objet JSON valide.
-2. PAS de balises Markdown. Commence par { et termine par }.
-3. ÉCHAPPE les guillemets internes.
+RÈGLES JSON : Réponds UNIQUEMENT avec un objet JSON valide. PAS de balises Markdown. ÉCHAPPE les guillemets internes.
 
 Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. Réponds UNIQUEMENT en JSON.`;
 
         const scriptRaw = await callTextAPI([
-            { role: 'system', content: 'Tu es un professeur de dramaturgie. Tu réponds UNIQUEMENT en JSON valide.' },
+            { role: 'system', content: 'Tu es un professeur de dramaturgie. Tu réponds UNIQUEMENT en JSON valide. Tu RESPECTES SCRUPULEUSEMENT toutes les contraintes marquées comme absolues.' },
             { role: 'user', content: scriptPrompt }
         ], { temperature: 0.65, maxTokens: 4096 });
 
@@ -1637,13 +1878,11 @@ Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. 
             throw new Error('Aucune scène générée.');
         }
         if (!scenario.symbols) scenario.symbols = [];
-        if (!scenario.master_style_prompt) {
-            scenario.master_style_prompt = state.selectedStyle.prompt;
-        }
+        if (!scenario.master_style_prompt) scenario.master_style_prompt = state.selectedStyle.prompt;
         if (!scenario.final_frame) {
             scenario.final_frame = {
                 description: 'Synthèse visuelle du concept',
-                image_prompt: scenario.scenes[scenario.scenes.length - 1].image_prompt + ' Synthesis diagram, symbolic recap.'
+                image_prompt: scenario.scenes[scenario.scenes.length - 1].image_prompt + ' Synthesis diagram.'
             };
         }
 
@@ -1652,9 +1891,18 @@ Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. 
         logConsole('Script : « ' + scenario.title + ' »', 'success');
         logConsole('Plans narratifs : ' + scenario.scenes.length, 'success');
         if (scenario.symbols.length > 0) logConsole('Symboles récurrents : ' + scenario.symbols.length, 'success');
+
+        // Vérifier que l'IA a bien déclaré les contraintes respectées
+        if (scenario.constraints_respected && scenario.constraints_respected.length > 0) {
+            logConsole('✓ Contraintes confirmées par l\'IA : ' + scenario.constraints_respected.length, 'lock');
+            scenario.constraints_respected.forEach(cr => {
+                logConsole('  → ' + cr, 'lock');
+            });
+        }
+
         displayScript(scenario);
 
-        // ═══ ÉTAPE 2 : IMAGES SYMBOLIQUES ═══
+        // ═══ ÉTAPE 2 : IMAGES ═══
         logConsole('══════════════════════════════', 'text');
         logConsole('ÉTAPE 2/4 — Images symboliques (' + totalImagesNeeded + ')', 'success');
         logConsole('══════════════════════════════', 'text');
@@ -1666,6 +1914,7 @@ Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. 
         const symbolBlock = scenario.symbols.length > 0
             ? ' RECURRING SYMBOLS: ' + scenario.symbols.map(s => s.name + ' — ' + s.description).join(' || ') + '. '
             : ' ';
+        const constraintImageBlock = buildConstraintBlockForImage();
 
         for (let i = 0; i < scenario.scenes.length; i++) {
             if (state.stopRequested) break;
@@ -1675,6 +1924,7 @@ Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. 
             const imagePrompt =
                 masterAnchor +
                 symbolBlock +
+                constraintImageBlock +
                 scene.image_prompt + '. ' +
                 'NO HUMAN FACES, NO FACIAL FEATURES, silhouettes only, symbols and objects, ' +
                 'academic illustration, high quality, no text, no watermarks.';
@@ -1695,6 +1945,7 @@ Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. 
             const finalPrompt =
                 masterAnchor +
                 symbolBlock +
+                constraintImageBlock +
                 scenario.final_frame.image_prompt + '. ' +
                 'NO HUMAN FACES, NO FACIAL FEATURES, silhouettes only, synthesis diagram, ' +
                 'academic illustration, no text, no watermarks.';
@@ -1733,15 +1984,25 @@ Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. 
             const scene = startImg.scene || {};
             const cameraMove = scene.camera_movement || 'slow contemplative zoom';
 
+            // Mentionner les objets obligatoires dans le prompt vidéo aussi
+            const objMention = activeConstraints.objects.length > 0
+                ? 'MANDATORY OBJECTS VISIBLE IN THE SHOT: ' + activeConstraints.objects.join(', ') + '. '
+                : '';
+            const forbiddenMention = activeConstraints.forbidden.length > 0
+                ? 'FORBIDDEN ELEMENTS (MUST NOT APPEAR): ' + activeConstraints.forbidden.join(', ') + '. '
+                : '';
+
             const videoPrompt = [
                 'DRAMATURGY EXPLANATION VIDEO. ONE SINGLE UNBROKEN SHOT. NO CUTS.',
                 'Slow, smooth, contemplative camera movement.',
                 'NO FACIAL FEATURES, NO HUMAN FACES VISIBLE, silhouettes and symbols only.',
+                objMention,
+                forbiddenMention,
                 'Camera: ' + cameraMove,
                 'Style: ' + scenario.master_style_prompt,
                 'Theatrical, symbolic, academic aesthetic, natural motion.',
                 'No text, no watermarks.'
-            ].filter(Boolean).join('. ');
+            ].filter(Boolean).join(' ');
 
             const item = {
                 index: i,
@@ -1812,6 +2073,10 @@ Vérifications : "scenes" doit contenir exactement ${narrativeScenes} entrées. 
             logConsole('⚡ Durée moyenne : ' + avg + 's par plan', 'measure');
         }
 
+        if (activeConstraints.total > 0) {
+            logConsole('🔒 ' + activeConstraints.total + ' contraintes ont été imposées à l\'IA', 'lock');
+        }
+
         if (readyVideos.length > 0) {
             document.getElementById('section-player').classList.remove('hidden');
         }
@@ -1850,6 +2115,15 @@ function displayScript(scenario) {
     if (scenario.concept) html += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.4rem;">Concept : ' + esc(scenario.concept) + '</div>';
     if (scenario.theorician) html += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Théoricien(s) : ' + esc(scenario.theorician) + '</div>';
 
+    // Contraintes confirmées par l'IA
+    if (scenario.constraints_respected && scenario.constraints_respected.length > 0) {
+        html += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.75rem;color:var(--error);">🔒 Contraintes respectées par l\'IA</strong>';
+        scenario.constraints_respected.forEach(c => {
+            html += '<div class="constraint-block">✓ ' + esc(c) + '</div>';
+        });
+        html += '</div>';
+    }
+
     if (scenario.master_style_prompt) {
         html += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.75rem;color:var(--warn);">🎨 Style directeur (sans visage)</strong>';
         html += '<div class="master-style-block">' + esc(scenario.master_style_prompt) + '</div></div>';
@@ -1872,6 +2146,9 @@ function displayScript(scenario) {
         }
         if (s.symbolism) {
             html += '<div style="font-size:0.7rem;color:var(--ink-faint);margin-top:0.2rem;">⚜ ' + esc(s.symbolism) + '</div>';
+        }
+        if (s.constraints_applied) {
+            html += '<div style="font-size:0.68rem;color:var(--error);margin-top:0.2rem;">🔒 ' + esc(s.constraints_applied) + '</div>';
         }
         html += '</div>';
     });
@@ -2113,8 +2390,8 @@ function testVoice() {
 
     const testText = {
         'fr': 'Aristote définit la catharsis comme la purgation des passions par la pitié et la terreur. Ce concept central de la Poétique structure toute la tragédie classique.',
-        'ar': 'يعرّف أرسطو التطهير بأنه تنقية المشاعر من خلال الشفقة والخوف. هذا المفهوم المركزي في فن الشعر يبني المأساة الكلاسيكية بأكملها.',
-        'ar-dz': 'أرسطو قال بلي الكاتارسيس هي تنقية المشاعر من خلال الشفقة والخوف. هاد المفهوم المركزي في فن الشعر يبني المأساة الكلاسيكية كامل.'
+        'ar': 'يعرّف أرسطو التطهير بأنه تنقية المشاعر من خلال الشفقة والخوف.',
+        'ar-dz': 'أرسطو قال بلي الكاتارسيس هي تنقية المشاعر من خلال الشفقة والخوف.'
     }[state.narrationLanguage] || 'Test de narration.';
 
     logConsole('Test voix : ' + narratorInfo.label + ' · Langue : ' + langInfo.label, 'info');
@@ -2198,13 +2475,32 @@ function testVoice() {
     document.getElementById('load-project-btn').addEventListener('click', loadProject);
     document.getElementById('new-project-btn').addEventListener('click', newProject);
 
+    // ═══ ÉCOUTEURS SUR LES CHAMPS DE CONTRAINTES ═══
+    const constraintFields = ['constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free'];
+    constraintFields.forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+            state.constraints = {
+                objects: document.getElementById('constraint-objects').value,
+                concepts: document.getElementById('constraint-concepts').value,
+                references: document.getElementById('constraint-references').value,
+                forbidden: document.getElementById('constraint-forbidden').value,
+                free: document.getElementById('constraint-free').value
+            };
+            updateConstraintCounter();
+            updateGenerateBtn();
+        });
+    });
+    document.getElementById('clear-constraints-btn').addEventListener('click', clearConstraints);
+
     updateApiPanel();
     updateLimitsPanel();
     updateGenerateBtn();
+    updateConstraintCounter();
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('api-key-input').value = savedKey;
-    logConsole('Studio de Dramaturgie prêt.', 'info');
+    logConsole('Studio de Dramaturgie v2 prêt.', 'info');
     logConsole('⚜ Règle absolue : aucun visage humain, silhouettes et symboles uniquement', 'warn');
+    logConsole('🔒 Section « Contraintes personnalisées » : les règles y seront OBLIGATOIRES', 'lock');
 })();
 </script>
 
