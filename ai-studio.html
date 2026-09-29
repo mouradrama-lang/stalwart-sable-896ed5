@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Créateur IA Pro — Tous les concepts en une app</title>
+<title>Créateur IA Pro v2.2</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -437,11 +437,10 @@
 <body>
 
 <header>
-    <h1>Créateur IA Pro</h1>
-    <p class="subtitle">Du texte à l'écran — film, pub, clip, docu et plus</p>
+    <h1>Créateur IA Pro v2.2</h1>
+    <p class="subtitle">Du texte à l'écran — script fidèle + voix française garantie</p>
 </header>
 
-<!-- BARRE D'OUTILS -->
 <div class="toolbar">
     <button type="button" id="save-project-btn">💾 Sauvegarder</button>
     <button type="button" id="load-project-btn">📂 Restaurer</button>
@@ -716,15 +715,15 @@ function getEstimatedWaitSeconds() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// MUSIQUES (ambiances pour montage CapCut)
+// MUSIQUES
 // ══════════════════════════════════════════════════════════════════
 const MUSIC_STYLES = [
-    { id: 'none', name: 'Aucune', emoji: '🔇', hint: 'Silence (tu ajoutes après)' },
-    { id: 'epic', name: 'Épique', emoji: '🎻', hint: 'Orchestre puissant' },
-    { id: 'emotional', name: 'Émotion', emoji: '🎹', hint: 'Piano mélancolique' },
-    { id: 'action', name: 'Action', emoji: '🥁', hint: 'Percussions rapides' },
-    { id: 'ambient', name: 'Ambient', emoji: '🌌', hint: 'Nappe sonore' },
-    { id: 'mystery', name: 'Mystère', emoji: '🌫️', hint: 'Tension douce' }
+    { id: 'none', name: 'Aucune', emoji: '🔇', hint: 'Silence' },
+    { id: 'epic', name: 'Épique', emoji: '🎻', hint: 'Orchestre' },
+    { id: 'emotional', name: 'Émotion', emoji: '🎹', hint: 'Piano' },
+    { id: 'action', name: 'Action', emoji: '🥁', hint: 'Percussions' },
+    { id: 'ambient', name: 'Ambient', emoji: '🌌', hint: 'Nappe' },
+    { id: 'mystery', name: 'Mystère', emoji: '🌫️', hint: 'Tension' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
@@ -735,31 +734,31 @@ const MODES = [
       scenario: 'Crée un scénario de film narratif avec un arc dramatique complet : introduction, conflit, climax, résolution.',
       visual: 'cinematic composition, dramatic lighting, film grain' },
     { id: 'bande-annonce', name: 'Bande-annonce', emoji: '📽️', desc: 'Teaser percutant',
-      scenario: 'Crée une bande-annonce percutante : commence par une accroche forte, alterne plans courts et moments de tension, termine par un carton final.',
+      scenario: 'Crée une bande-annonce percutante : accroche forte, plans courts, tension, carton final.',
       visual: 'trailer style, high contrast, dramatic transitions' },
     { id: 'clip', name: 'Clip musical', emoji: '🎵', desc: 'Vidéo sur une chanson',
-      scenario: 'Crée un clip musical synchronisé sur une chanson. Alterne plans larges et gros plans, intègre des mouvements de caméra fluides.',
+      scenario: 'Crée un clip musical synchronisé sur une chanson. Alterne plans larges et gros plans, mouvements fluides.',
       visual: 'music video aesthetic, rhythmic cutting, stylish lighting' },
     { id: 'pub', name: 'Publicité', emoji: '📢', desc: 'Spot publicitaire',
-      scenario: 'Crée une publicité : présente le problème, montre le produit comme solution, termine par un call-to-action clair.',
+      scenario: 'Crée une publicité : problème, produit solution, call-to-action clair.',
       visual: 'commercial product photography, clean composition, bright lighting' },
     { id: 'tutoriel', name: 'Tutoriel', emoji: '📚', desc: 'Éducatif étape par étape',
-      scenario: 'Crée un tutoriel éducatif : introduction du sujet, étapes numérotées claires, récapitulatif final.',
+      scenario: 'Crée un tutoriel éducatif : introduction, étapes numérotées, récapitulatif.',
       visual: 'clean educational illustration, infographic style, clear labels' },
     { id: 'story', name: 'Story / Reel', emoji: '📱', desc: 'Format vertical court',
-      scenario: 'Crée une story verticale captivante en 3-5 plans maximum. Chaque seconde compte.',
+      scenario: 'Crée une story verticale captivante en 3-5 plans maximum.',
       visual: 'vertical social media format, bold colors, dynamic angles' },
     { id: 'doc', name: 'Documentaire', emoji: '📖', desc: 'Narration informative',
-      scenario: 'Crée un court documentaire : narration posée, plans larges contemplatifs, informations factuelles.',
+      scenario: 'Crée un court documentaire : narration posée, plans larges contemplatifs.',
       visual: 'documentary photography, natural lighting, wide shots' },
     { id: 'comedie', name: 'Comédie', emoji: '😂', desc: 'Humour et timing',
       scenario: 'Crée une scène comique : situation absurde, dialogues percutants, chute inattendue.',
       visual: 'bright playful colors, exaggerated expressions, comic timing' },
     { id: 'horreur', name: 'Horreur', emoji: '👻', desc: 'Tension et frissons',
-      scenario: 'Crée une scène d\'horreur : ambiance oppressante, montée de tension progressive, jumpscare final.',
+      scenario: 'Crée une scène d\'horreur : ambiance oppressante, tension progressive, jumpscare final.',
       visual: 'dark atmosphere, harsh shadows, unsettling composition' },
     { id: 'custom', name: 'Personnalisé', emoji: '⚙️', desc: 'Vous décrivez tout',
-      scenario: 'Crée un scénario exactement comme décrit par l\'utilisateur, sans contrainte de format.',
+      scenario: 'Crée un scénario exactement comme décrit par l\'utilisateur.',
       visual: '' }
 ];
 
@@ -1217,10 +1216,7 @@ async function runFullPipeline() {
     state.stopRequested = false;
     state.idea = idea;
     state.sceneCount = parseInt(document.getElementById('scene-count-select').value);
-
-    // ✅ CORRECTION : N+1 images pour N clips
-    state.imagesNeeded = state.sceneCount + 1;
-
+    state.imagesNeeded = state.sceneCount + 1; // N+1 images pour N clips
     state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
     state.aspect = document.getElementById('aspect-select').value;
     state.images = [];
@@ -1252,6 +1248,7 @@ async function runFullPipeline() {
         const visualHint = state.selectedMode.visual;
         const aspectLabel = state.aspect === 'portrait' ? 'portrait 9:16' : state.aspect === 'landscape' ? 'paysage 16:9' : 'carré 1:1';
 
+        // ✅ CORRECTION 3 : Dialogues forcés en français
         const scenarioPrompt = `Tu es un créateur de contenu IA. Mode : ${state.selectedMode.name}.
 Instruction : ${modeInstruction}
 Style visuel : ${state.selectedStyle.prompt}
@@ -1262,23 +1259,25 @@ Durée par scène : ${state.numFrames / 24} secondes
 IMPORTANT : Génère EXACTEMENT ${state.imagesNeeded} scènes dans le tableau "scenes".
 (Chaque clip vidéo utilise 2 scènes consécutives en keyframes. Donc ${state.imagesNeeded} images → ${state.imagesNeeded - 1} clips.)
 
+RÈGLE ABSOLUE : Tous les dialogues DOIVENT être EN FRANÇAIS, même si tu utilises des mots anglais dans les descriptions visuelles. Le champ "text" du dialogue doit contenir une phrase française naturelle.
+
 Génère un JSON avec :
 {
-  "title": "Titre",
-  "logline": "Résumé en une phrase",
-  "characters": [{ "name": "Nom", "gender": "homme ou femme", "appearance": "Description physique" }],
+  "title": "Titre en français",
+  "logline": "Résumé en une phrase, en français",
+  "characters": [{ "name": "Nom", "gender": "homme ou femme", "appearance": "Description physique en français" }],
   "scenes": [{
     "scene_number": 1,
-    "description": "Description visuelle",
-    "image_prompt": "Prompt en anglais pour l'image, ${aspectLabel}, style ${state.selectedStyle.id}",
-    "dialogue": { "character": "Nom", "text": "Phrase courte (max 15 mots)" },
-    "camera_movement": "Mouvement de caméra"
+    "description": "Description visuelle détaillée EN FRANÇAIS de ce qui doit apparaître dans l'image",
+    "image_prompt": "Prompt technique EN ANGLAIS pour l'image, ${aspectLabel}, style ${state.selectedStyle.id}",
+    "dialogue": { "character": "Nom", "text": "Phrase courte EN FRANÇAIS (max 15 mots)" },
+    "camera_movement": "Mouvement de caméra en anglais"
   }]
 }
 Réponds UNIQUEMENT en JSON valide.`;
 
         const scenarioRaw = await callTextAPI([
-            { role: 'system', content: 'Tu réponds UNIQUEMENT en JSON valide.' },
+            { role: 'system', content: 'Tu réponds UNIQUEMENT en JSON valide. Tous les dialogues en français.' },
             { role: 'user', content: scenarioPrompt }
         ], { temperature: 0.8, maxTokens: 4096 });
 
@@ -1286,7 +1285,6 @@ Réponds UNIQUEMENT en JSON valide.`;
         try { scenario = JSON.parse(scenarioRaw.replace(/```json/g, '').replace(/```/g, '').trim()); }
         catch (e) { throw new Error('JSON invalide'); }
 
-        // ✅ Vérification : ajuster si l'IA en a généré trop ou pas assez
         if (scenario.scenes.length > state.imagesNeeded) {
             scenario.scenes = scenario.scenes.slice(0, state.imagesNeeded);
             logConsole('⚠ Tronqué à ' + state.imagesNeeded + ' scènes', 'warn');
@@ -1311,10 +1309,19 @@ Réponds UNIQUEMENT en JSON valide.`;
             if (state.stopRequested) break;
             const scene = scenario.scenes[i];
             setStatus('Image ' + (i + 1) + '/' + scenario.scenes.length + '…');
-            const imagePrompt = scene.image_prompt + '. ' + charDesc + '. ' +
-                (state.selectedStyle.prompt) + '. ' +
-                (visualHint ? visualHint + '. ' : '') +
-                'No text.';
+
+            // ✅ CORRECTION 1 : Priorité absolue à la scène exacte
+            const imagePrompt = [
+                'CRITICAL — Reproduce EXACTLY this scene:',
+                scene.description,
+                'Specific shot: ' + (scene.image_prompt || ''),
+                'Characters present: ' + charDesc,
+                'Visual style: ' + state.selectedStyle.prompt,
+                visualHint ? 'Mood: ' + visualHint : '',
+                'Do not invent new elements. Follow the scene description literally.',
+                'No text, no watermarks.'
+            ].filter(Boolean).join('. ');
+
             try {
                 const imageUrl = await callImageAPI(imagePrompt, imgSize);
                 state.images.push({ sceneIndex: i, url: imageUrl, scene: scene });
@@ -1350,7 +1357,7 @@ Réponds UNIQUEMENT en JSON valide.`;
                 'ONE SINGLE UNBROKEN SHOT. NO CUTS.',
                 'Camera: ' + cameraMove,
                 'Style: ' + state.selectedStyle.prompt,
-                dialogueText ? 'Dialogue: ' + dialogueChar + ' says "' + dialogueText + '"' : '',
+                dialogueText ? 'Dialogue (in French): ' + dialogueChar + ' says "' + dialogueText + '"' : '',
                 'No text, no watermarks.'
             ].filter(Boolean).join('. ');
 
@@ -1499,7 +1506,6 @@ function updatePendingVideoCard(index, label, progress, elapsed) {
         const remaining = Math.max(0, estWait - elapsed);
         etaEl.textContent = remaining > 0 ? '≈ ' + formatTime(remaining) + ' restantes' : 'Bientôt terminé…';
     }
-    if (fillEl && progress > 0) fillEl.style.fill.width = progress + '%';
     if (fillEl) fillEl.style.width = progress + '%';
 }
 
@@ -1608,7 +1614,6 @@ function loadProject() {
 
         if (!confirm('Restaurer le projet du ' + new Date(project.savedAt).toLocaleString('fr-FR') + ' ?\n\nTitre : ' + (project.scenario?.title || '—') + '\nClips : ' + (project.videos?.filter(v => v).length || 0) + '\n\nCela remplacera l\'état actuel.')) return;
 
-        // Restaurer les sélections
         if (project.idea) document.getElementById('idea-input').value = project.idea;
         if (project.modeId) {
             const m = MODES.find(x => x.id === project.modeId);
@@ -1635,17 +1640,12 @@ function loadProject() {
         if (project.clipDuration) document.getElementById('clip-duration-select').value = project.clipDuration;
         if (project.aspect) document.getElementById('aspect-select').value = project.aspect;
 
-        // Restaurer scénario + images + vidéos
         state.scenario = project.scenario || null;
         state.images = project.images || [];
         state.videos = (project.videos || []).map(v => v ? { url: v.url, sceneNumber: v.sceneNumber, dialogue: v.dialogue, actualDuration: v.actualDuration } : null);
 
-        // Afficher scénario
-        if (state.scenario) {
-            displayScenario(state.scenario);
-        }
+        if (state.scenario) displayScenario(state.scenario);
 
-        // Afficher images
         const grid = document.getElementById('generated-images');
         grid.innerHTML = '';
         state.images.forEach((img, i) => {
@@ -1657,7 +1657,6 @@ function loadProject() {
         document.getElementById('images-badge').textContent = state.images.length;
         if (state.images.length > 0) document.getElementById('section-images').classList.remove('hidden');
 
-        // Afficher vidéos
         const vgrid = document.getElementById('generated-videos');
         vgrid.innerHTML = '';
         state.videos.forEach((v, i) => {
@@ -1735,31 +1734,58 @@ function stopAllVideos() {
 // ══════════════════════════════════════════════════════════════════
 let speechSynth = null;
 function initSpeech() {
-    if ('speechSynthesis' in window) { speechSynth = window.speechSynthesis; speechSynth.getVoices(); }
+    if ('speechSynthesis' in window) {
+        speechSynth = window.speechSynthesis;
+        speechSynth.getVoices();
+        speechSynth.onvoiceschanged = () => speechSynth.getVoices();
+    }
 }
 function isFemaleCharacter(name) {
     if (!name) return false;
     const n = name.toLowerCase();
     return state.femaleCharacters.some(f => n.includes(f) || f.includes(n));
 }
+
+// ✅ CORRECTION 2 : Voix française strictement forcée
 function speakText(text, characterName) {
     return new Promise((resolve) => {
         if (!speechSynth) { resolve(); return; }
         speechSynth.cancel();
         setTimeout(() => {
+            const allVoices = speechSynth.getVoices();
+
+            // Filtre STRICT : uniquement les voix françaises
+            const frVoices = allVoices.filter(v => {
+                if (!v.lang) return false;
+                const lang = v.lang.toLowerCase().replace('_', '-');
+                return lang === 'fr-fr' || lang === 'fr' || lang.startsWith('fr-');
+            });
+
+            if (frVoices.length === 0) {
+                logConsole('⚠ Aucune voix française disponible. Va dans Paramètres → Synthèse vocale → installer le français.', 'warn');
+                resolve();
+                return;
+            }
+
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'fr-FR';
+            utterance.lang = frVoices[0].lang;
             utterance.rate = 0.95;
             utterance.pitch = isFemaleCharacter(characterName) ? 1.3 : 0.8;
-            const frVoices = speechSynth.getVoices().filter(v => v.lang && v.lang.startsWith('fr'));
-            if (frVoices.length > 0) {
-                const fv = frVoices.find(v => /amelie|marie|audrey|female|denise|julie/i.test(v.name));
-                const mv = frVoices.find(v => /thomas|nicolas|male|henri|paul/i.test(v.name));
-                if (isFemaleCharacter(characterName) && fv) utterance.voice = fv;
-                else if (!isFemaleCharacter(characterName) && mv) utterance.voice = mv;
-                else utterance.voice = frVoices[0];
-            }
-            utterance.onend = resolve; utterance.onerror = resolve;
+
+            const fv = frVoices.find(v => /amelie|marie|audrey|female|denise|julie|chantal|hortense|amélie|virginie/i.test(v.name));
+            const mv = frVoices.find(v => /thomas|nicolas|male|henri|paul|daniel|gilles|guillaume/i.test(v.name));
+
+            if (isFemaleCharacter(characterName) && fv) utterance.voice = fv;
+            else if (!isFemaleCharacter(characterName) && mv) utterance.voice = mv;
+            else utterance.voice = frVoices[0];
+
+            logConsole('🔊 TTS → ' + utterance.voice.name + ' (' + utterance.voice.lang + ')', 'info');
+
+            utterance.onend = resolve;
+            utterance.onerror = (e) => {
+                logConsole('Erreur TTS : ' + e.error, 'error');
+                resolve();
+            };
             speechSynth.speak(utterance);
         }, 100);
     });
@@ -1773,7 +1799,6 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
     initSpeech();
     loadMeasuredSpeed();
 
-    // Modes
     const modeGrid = document.getElementById('mode-grid');
     MODES.forEach(m => {
         const card = document.createElement('div');
@@ -1791,7 +1816,6 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
         modeGrid.appendChild(card);
     });
 
-    // Styles
     const styleGrid = document.getElementById('style-grid');
     STYLES.forEach((s, idx) => {
         const card = document.createElement('div');
@@ -1807,7 +1831,6 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
         styleGrid.appendChild(card);
     });
 
-    // Musiques
     const musicSel = document.getElementById('music-selector');
     MUSIC_STYLES.forEach((m, idx) => {
         const card = document.createElement('div');
@@ -1847,7 +1870,6 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
     });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
 
-    // Toolbar
     document.getElementById('save-project-btn').addEventListener('click', saveProject);
     document.getElementById('load-project-btn').addEventListener('click', loadProject);
     document.getElementById('export-all-btn').addEventListener('click', downloadAllClips);
@@ -1857,7 +1879,7 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
     updateGenerateBtn();
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('api-key-input').value = savedKey;
-    logConsole('Application prête (v2.1 - corrigée)', 'info');
+    logConsole('Application prête (v2.2 - corrections appliquées)', 'info');
 })();
 </script>
 
