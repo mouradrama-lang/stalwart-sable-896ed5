@@ -176,13 +176,20 @@ select { -webkit-appearance: none; appearance: none;
     <div class="chips" id="mode-chips"></div>
     <p class="note" id="mode-note"></p>
 
+    <div id="recap-wrap" class="hidden">
+      <label class="f">Durée du récap</label>
+      <div class="chips" id="recap-chips"></div>
+      <p class="note" id="recap-note"></p>
+      <button class="btn" style="margin-top:.8rem" id="btn-auto" onclick="runRecapAuto()">Créer le récap automatiquement</button>
+    </div>
+
     <div id="lesson-wrap">
       <label class="f" for="lesson-select">Leçon</label>
       <select id="lesson-select"></select>
     </div>
 
     <div id="film-wrap" class="hidden">
-      <label class="f" for="film-input">Film ou exemple unique à analyser</label>
+      <label class="f" for="film-input">Film ou exemple unique (facultatif, sinon l'IA en choisit un connu)</label>
       <input type="text" id="film-input" placeholder="Un film que ton public connaît">
     </div>
 
@@ -200,8 +207,22 @@ select { -webkit-appearance: none; appearance: none;
     </select>
     <p class="note" id="guide-note"></p>
 
+    <label class="f" for="symbol-select">Objet symbole de la leçon</label>
+    <select id="symbol-select"></select>
+    <div id="symbol-custom" class="hidden" style="margin-top:.5rem">
+      <input type="text" id="symbol-text" placeholder="Ex. : un sablier fissuré, un téléphone qui sonne">
+      <button type="button" class="btn ghost small" style="margin-top:.5rem" onclick="addObject()">Ajouter à ma liste pour les prochaines leçons</button>
+    </div>
+    <p class="note">Cet objet reste le sujet de tous les visuels de la leçon. Le choix est mémorisé pour chaque leçon.</p>
+
     <label class="f" for="decor-select">Décor dominant</label>
     <select id="decor-select"></select>
+
+    <div id="clip-wrap">
+      <label class="f">Durée des clips vidéo</label>
+      <div class="chips" id="clip-chips"></div>
+      <p class="note">5 s : l'objet se déforme moins. 10 s : plus de mouvement, mais dérive possible après 3 à 4 s.</p>
+    </div>
 
     <label class="f">Texte arabe sur les visuels</label>
     <div class="chips" id="text-chips"></div>
@@ -241,6 +262,13 @@ select { -webkit-appearance: none; appearance: none;
       <button class="btn ghost small" style="flex:1" onclick="playAll()">Lire tout</button>
       <button class="btn ghost small" style="flex:1" onclick="stopPlay()">Arrêter</button>
     </div>
+  </div>
+
+  <div class="card hidden" id="final-card">
+    <h2>Récap final</h2>
+    <video id="final-video" controls playsinline style="width:100%;border-radius:12px;background:#000;max-height:70vh"></video>
+    <a id="final-dl" class="btn" style="display:block;text-align:center;text-decoration:none;margin-top:.7rem" download>Télécharger la vidéo</a>
+    <p class="note">Vidéo sans son : ajoute ta voix ou une musique dans TikTok.</p>
   </div>
 
   <button class="btn hidden" id="btn-publish" onclick="markPublished()">Marquer comme publié aujourd'hui</button>
@@ -334,9 +362,9 @@ const MODES = {
   carousel: { label: 'Carrousel de la leçon', slides: 6,
     roles: ['Accroche', 'Idée reçue', 'Formule', 'Exemple', 'Fonction dramatique', 'Clôture'],
     note: 'Six slides publiées chaque jour : accroche, idée reçue, formule, exemple, fonction dramatique, clôture.' },
-  recap: { label: 'Vidéo récap hebdo', slides: 6,
-    roles: ['Accroche', 'Concept 1 en action', 'Concept 2 en action', 'Concept 3 en action', 'Concept 4 en action', 'Verdict'],
-    note: 'Applique tous les concepts de la semaine sur un seul film, sans les relister.' },
+  recap: { label: 'Vidéo récap hebdo', slides: 7,
+    roles: ['Accroche', 'Concept 1 en action', 'Concept 2 en action', 'Concept 3 en action', 'Concept 4 en action', 'Verdict', 'Clôture'],
+    note: 'Automatique : tu choisis la durée, l\'app écrit, illustre, anime et assemble la vidéo de la semaine.' },
   teaser: { label: 'Teaser 12 s', slides: 4,
     roles: ['Clap et masques', 'Carnet et stylo', 'Téléphone qui filme', 'Scène vide et appel'],
     note: 'Court teaser promotionnel, comme la vidéo de lancement. Décris l\'annonce dans l\'angle.' }
@@ -412,7 +440,7 @@ async function wakeOff() { try { if (wake) await wake.release(); } catch (e) {} 
 // ══════════════════════════════════════════════════════════════════
 const S = {
   mode: 'carousel', lessonN: 1, hook: 'question', guide: 'none', decor: 'auto', textMode: 'overlay', useCta: true,
-  film: '', angle: '',
+  film: '', angle: '', symbol: 'auto', symbolText: '', clipSec: '10', recapSec: '30', auto: false, autoAbort: false,
   running: false, stop: false,
   script: null, images: [], clips: [], lastText: 0
 };
@@ -564,6 +592,12 @@ function syncForm() {
   $('#mode-note').textContent = m.note;
   $('#lesson-wrap').classList.toggle('hidden', S.mode === 'teaser');
   $('#film-wrap').classList.toggle('hidden', S.mode !== 'recap');
+  $('#recap-wrap').classList.toggle('hidden', S.mode !== 'recap');
+  $('#clip-wrap').classList.toggle('hidden', S.mode === 'recap');
+  if (S.mode === 'recap') {
+    const seg = S.recapSec === '60' ? 10 : 5;
+    $('#recap-note').textContent = 'Concepts de la semaine : ' + (weekLessons().map(c => c.fr).join(', ') || 'aucun') + '. 6 segments de ' + seg + ' s' + (seg === 10 ? ' (l\'objet peut dériver après 3 à 4 s, 30 s est plus stable)' : '') + '. Film choisi par l\'IA si le champ est vide.';
+  }
   $('#angle-label').textContent = S.mode === 'teaser' ? 'Ce que le teaser annonce' : 'Angle ou consigne (facultatif)';
   const g = guideAdvice(); const gn = $('#guide-note'); gn.textContent = g.msg; gn.className = 'note ' + (g.ok ? 'ok' : 'bad');
   const cta = LS.get('mdr_cta', '');
@@ -572,15 +606,16 @@ function syncForm() {
   updateButtons();
 }
 function updateButtons() {
-  const ready = !!getKey() && !S.running &&
-    (S.mode !== 'recap' || $('#film-input').value.trim().length > 1) &&
+  const ready = !!getKey() && !S.running && !S.auto &&
     (S.mode !== 'teaser' || $('#angle-input').value.trim().length > 4);
   $('#btn-script').disabled = !ready;
+  const ba = $('#btn-auto'); if (ba) { ba.disabled = !ready; ba.textContent = !getKey() ? 'Ajoute ta clé API' : ((S.running || S.auto) ? 'En cours…' : 'Créer le récap automatiquement'); }
   $('#btn-script').textContent = !getKey() ? 'Ajoute ta clé API' : (S.running ? 'En cours…' : 'Écrire le script');
 }
 function persistForm() {
   S.film = $('#film-input').value; S.angle = $('#angle-input').value;
-  LS.set('mdr_form', { mode: S.mode, lessonN: S.lessonN, hook: S.hook, guide: S.guide, decor: S.decor, textMode: S.textMode, useCta: S.useCta, film: S.film, angle: S.angle });
+  LS.set('mdr_form', { mode: S.mode, lessonN: S.lessonN, hook: S.hook, guide: S.guide, decor: S.decor, textMode: S.textMode, useCta: S.useCta, film: S.film, angle: S.angle, symbol: S.symbol, symbolText: S.symbolText, clipSec: S.clipSec, recapSec: S.recapSec });
+  const sm = LS.get('mdr_symbols', {}); sm[S.lessonN] = { symbol: S.symbol, text: S.symbolText }; LS.set('mdr_symbols', sm);
   syncForm();
 }
 function toggleCta() { if (!LS.get('mdr_cta', '')) { toast('Choisis d\'abord l\'image de clôture', true); return; } S.useCta = !S.useCta; persistForm(); }
@@ -605,21 +640,197 @@ function handleCtaFile(file) {
 // ══════════════════════════════════════════════════════════════════
 // PROMPT DU SCRIPT
 // ══════════════════════════════════════════════════════════════════
+const RECAP_OPTS = { '30': '30 secondes', '60': '60 secondes' };
+function weekLessons() {
+  const dates = LS.get('mdr_dates', {}), t = today();
+  const wk = CURRICULUM.filter(c => c.type !== 'recap' && dates[c.n] && dates[c.n] > addDays(t, -7) && dates[c.n] <= t);
+  return wk.length >= 2 ? wk : coversOf(S.lessonN).slice(-4);
+}
+function recapExtra() {
+  const seg = S.recapSec === '60' ? 10 : 5;
+  const names = weekLessons().map(c => c.fr + (c.ar ? ' (' + c.ar + ')' : '')).join(', ');
+  return 'Concepts de la semaine à appliquer : ' + names + ' (au maximum 4 slides de concepts : regroupe-les si plus de 4). Durée finale : ' + S.recapSec + ' s, soit 6 segments de ' + seg + ' s : le texte de chaque slide doit se lire en ' + seg + ' s (maximum ' + (seg === 5 ? 8 : 14) + ' mots). Les 7 images sont les images-clés consécutives d\'un même plan qui évolue : même décor et mêmes objets, avec un petit changement à chaque étape, pour des transitions fluides. Découpe le script parlé proportionnellement à ' + S.recapSec + ' s.';
+}
+function onModeChange() {
+  if (S.mode === 'recap') {
+    const r = CURRICULUM.find(c => c.type === 'recap' && !isDone(c.n)) || CURRICULUM[CURRICULUM.length - 1];
+    S.lessonN = r.n; buildLessonSelect(); loadSymbol();
+  } else if (lessonObj().type === 'recap') {
+    const c = CURRICULUM.find(x => x.type !== 'recap' && !isDone(x.n)) || CURRICULUM[0];
+    S.lessonN = c.n; buildLessonSelect(); loadSymbol();
+  }
+  persistForm();
+}
+function drawCaption(ctx, W, text) {
+  if (!text || !text.trim()) return;
+  ctx.save(); ctx.scale(W / 1080, W / 1080);
+  const g = ctx.createLinearGradient(0, 860, 0, 1700);
+  g.addColorStop(0, 'rgba(6,10,28,0)'); g.addColorStop(.35, 'rgba(6,10,28,.74)'); g.addColorStop(1, 'rgba(6,10,28,.86)');
+  ctx.fillStyle = g; ctx.fillRect(0, 860, 1080, 900);
+  ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let size = 80, lines;
+  for (const sz of [80, 70, 60, 52]) { size = sz; ctx.font = '800 ' + sz + 'px Cairo, "Noto Sans Arabic", sans-serif'; lines = wrapLines(ctx, text, 880); if (lines.length <= 4) break; }
+  const lh = size * 1.55, total = lines.length * lh, y0 = 1240 - total / 2 + lh / 2;
+  ctx.fillStyle = '#e3b04b'; ctx.fillRect(480, y0 - lh / 2 - 34, 120, 5);
+  ctx.shadowColor = 'rgba(0,0,0,.65)'; ctx.shadowBlur = 18; ctx.fillStyle = '#f7ecd0';
+  lines.forEach((l, k) => ctx.fillText(l, 540, y0 + k * lh));
+  ctx.restore();
+}
+function coverDraw(ctx, el, w, h, W, H) { const sc = Math.max(W / w, H / h); const dw = w * sc, dh = h * sc; ctx.drawImage(el, (W - dw) / 2, (H - dh) / 2, dw, dh); }
+
+// Assemblage : clips + texte arabe + image de clôture, enregistrés depuis un canvas
+async function assembleRecap() {
+  if (typeof MediaRecorder === 'undefined') { toast('Ce navigateur ne sait pas assembler : télécharge les clips', true); return; }
+  const W = 720, H = 1280; const urls = [];
+  S.running = true; updateButtons(); await wakeOn();
+  try {
+    setStatus('Assemblage : récupération des clips…');
+    for (let k = 0; k < S.clips.length; k++) {
+      if (!S.clips[k]) { urls[k] = null; continue; }
+      const r = await fetch(S.clips[k]); if (!r.ok) throw new Error('clip inaccessible');
+      urls[k] = URL.createObjectURL(await r.blob());
+    }
+    try { await document.fonts.load('800 74px Cairo'); } catch (e) {}
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+    const mime = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+    const rec = new MediaRecorder(cv.captureStream(30), mime ? { mimeType: mime, videoBitsPerSecond: 6000000 } : {});
+    const chunks = []; rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    const stopped = new Promise(r => { rec.onstop = r; });
+    ctx.fillStyle = '#0a1024'; ctx.fillRect(0, 0, W, H);
+    rec.start(500);
+    for (let k = 0; k < urls.length; k++) {
+      if (!urls[k]) continue; if (S.autoAbort) break;
+      setStatus('Assemblage : clip ' + (k + 1) + ' sur ' + urls.length + ' (garde l\'écran allumé)');
+      const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.src = urls[k];
+      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error('lecture du clip ' + (k + 1))); });
+      await v.play();
+      const text = S.script.slides[k] ? S.script.slides[k].text : '';
+      await new Promise(res => {
+        v.onended = res;
+        const draw = () => { coverDraw(ctx, v, v.videoWidth, v.videoHeight, W, H); drawCaption(ctx, W, text); if (v.ended) { res(); return; } requestAnimationFrame(draw); };
+        draw();
+      });
+    }
+    const cta = (S.useCta && LS.get('mdr_cta', '')) ? await loadImg(LS.get('mdr_cta', '')) : null;
+    if (cta && !S.autoAbort) {
+      const t0 = performance.now();
+      await new Promise(res => { const f = () => { coverDraw(ctx, cta, cta.width, cta.height, W, H); if (performance.now() - t0 > 2500) res(); else requestAnimationFrame(f); }; f(); });
+    }
+    rec.stop(); await stopped;
+    urls.forEach(u => u && URL.revokeObjectURL(u));
+    const blob = new Blob(chunks, { type: mime || 'video/webm' }); const url = URL.createObjectURL(blob);
+    $('#final-video').src = url; const a = $('#final-dl'); a.href = url;
+    a.download = 'mouradrama-recap-L' + S.lessonN + '.' + (mime.includes('mp4') ? 'mp4' : 'webm');
+    $('#final-card').classList.remove('hidden'); $('#final-card').scrollIntoView({ block: 'start' });
+    log('Récap assemblé', 'o'); toast('Récap prêt');
+  } catch (e) {
+    log('Assemblage : ' + e.message, 'e');
+    toast('Assemblage impossible (accès aux clips bloqué). Télécharge les clips et assemble-les dans CapCut.', true);
+  }
+  S.running = false; setStatus(null); updateButtons(); await wakeOff();
+}
+
+// Pipeline automatique : script → visuels → clips → assemblage
+async function runRecapAuto() {
+  if (S.running || S.auto) return;
+  if (!getKey()) { toast('Ajoute ta clé API', true); return; }
+  S.auto = true; S.autoAbort = false; S.mode = 'recap';
+  S.clipSec = S.recapSec === '60' ? '10' : '5';
+  S.script = null; S.images = []; S.clips = []; persistForm();
+  $('#final-card').classList.add('hidden');
+  const keep = () => $('#btn-stop').classList.remove('hidden');
+  try {
+    await runScript(); if (!S.script || S.autoAbort) return; keep();
+    await runVisuals(); if (S.autoAbort) return; keep();
+    S.stop = false;
+    for (let pass = 0; pass < 2; pass++) {
+      for (let i = 0; i < S.script.slides.length; i++) {
+        if (S.autoAbort) return;
+        if (!S.images[i]) { try { setStatus('Nouvel essai du visuel ' + (i + 1)); await genSlide(i); } catch (e) { log('Slide ' + (i + 1) + ' : ' + e.message, 'e'); } }
+      }
+    }
+    if (S.script.slides.some((_, i) => !S.images[i])) { toast('Visuels incomplets : régénère les slides en échec, puis lance les clips', true); $('#btn-clips').classList.remove('hidden'); return; }
+    await runClips(); if (S.autoAbort) return; keep();
+    if (!S.clips.filter(Boolean).length) { toast('Aucun clip généré', true); return; }
+    await assembleRecap();
+    $('#btn-publish').classList.remove('hidden');
+  } finally {
+    S.auto = false; setStatus(null); $('#btn-stop').classList.add('hidden'); updateButtons();
+  }
+}
+
+const CLIP_OPTS = { '5': '5 secondes', '10': '10 secondes' };
+const SYMBOLS = {
+  masks: ['Masques de théâtre', 'two theatrical masks, comedy and tragedy, facing each other'],
+  clap: ['Clap de cinéma', 'a cinema clapperboard'],
+  notebook: ['Carnet et stylo', 'an open notebook with a fountain pen'],
+  door: ['Porte', 'a heavy closed wooden door'],
+  key: ['Clé dorée', 'a golden key'],
+  compass: ['Boussole', 'a brass compass'],
+  chair: ['Chaise vide de théâtre', 'an empty theatre chair'],
+  reel: ['Bobine de film', 'a film reel'],
+  arrow: ['Flèche dorée', 'a golden arrow'],
+  target: ['Cible', 'a circular target painted on the floor'],
+  wall: ['Mur fissuré', 'a stone wall with glowing golden cracks'],
+  rope: ['Corde épaisse', 'a thick rope'],
+  crossroads: ['Croisée de chemins', 'a stone path splitting in two directions'],
+  chains: ['Chaînes et cadenas', 'heavy chains with a padlock'],
+  hourglass: ['Sablier', 'an hourglass'],
+  mirror: ['Miroir', 'a standing mirror'],
+  candle: ['Bougie', 'a single burning candle'],
+  bridge: ['Pont de pierre', 'a narrow stone bridge'],
+  curtain: ['Rideau de scène', 'a heavy stage curtain'],
+  scale: ['Balance', 'a brass balance scale']
+};
+function symbolInfo() {
+  if (S.symbol === 'auto') return null;
+  if (S.symbol === 'custom') { const t = (S.symbolText || '').trim(); return t ? { fr: t, en: t } : null; }
+  const c = LS.get('mdr_objects', []).find(o => o.k === S.symbol); if (c) return { fr: c.fr, en: c.en };
+  const x = SYMBOLS[S.symbol]; return x ? { fr: x[0], en: x[1] } : null;
+}
+function buildSymbolSelect() {
+  const sel = $('#symbol-select'); if (!sel) return;
+  const saved = LS.get('mdr_objects', []);
+  let h = '<option value="auto">Laisser l\'IA choisir</option><optgroup label="Liste">' +
+    Object.entries(SYMBOLS).map(([k, v]) => '<option value="' + k + '">' + esc(v[0]) + '</option>').join('') + '</optgroup>';
+  if (saved.length) h += '<optgroup label="Tes objets">' + saved.map(o => '<option value="' + esc(o.k) + '">' + esc(o.fr) + '</option>').join('') + '</optgroup>';
+  h += '<option value="custom">Autre, décrire par texte…</option>';
+  sel.innerHTML = h;
+  if (![...sel.options].some(o => o.value === S.symbol)) S.symbol = 'auto';
+  sel.value = S.symbol;
+  $('#symbol-custom').classList.toggle('hidden', S.symbol !== 'custom');
+  $('#symbol-text').value = S.symbolText || '';
+}
+function loadSymbol() {
+  const m = LS.get('mdr_symbols', {})[S.lessonN];
+  S.symbol = m ? m.symbol : 'auto'; S.symbolText = m ? (m.text || '') : '';
+  buildSymbolSelect();
+}
+function addObject() {
+  const t = (S.symbolText || '').trim(); if (t.length < 2) { toast('Décris l\'objet d\'abord', true); return; }
+  const list = LS.get('mdr_objects', []); const k = 'c' + Date.now();
+  list.push({ k, fr: t, en: t }); LS.set('mdr_objects', list);
+  S.symbol = k; S.symbolText = ''; buildSymbolSelect(); persistForm(); toast('Objet ajouté à ta liste');
+}
+
 function buildScriptPrompt() {
   const m = MODES[S.mode], N = m.slides, L = lessonObj();
   const before = CURRICULUM.filter(c => c.n < L.n && c.type !== 'recap' && isDone(c.n)).map(c => 'Leçon ' + c.n + ' : ' + c.fr + (c.ar ? ' (' + c.ar + ')' : '')).join(' ; ') || 'aucune';
   let subject;
   if (S.mode === 'carousel') subject = 'Concept du jour : Leçon ' + L.n + ', ' + L.fr + (L.ar ? ' (titre darija validé : ' + L.ar + ')' : '') + '. Titre de série identique à chaque fois : « الدرس ' + L.n + ' ».';
-  else if (S.mode === 'recap') subject = 'Vidéo récap hebdomadaire (leçon ' + L.n + '). Concepts à appliquer : ' + (coversOf(L.n).map(c => c.fr).join(', ') || 'tous ceux déjà vus') + '. Exemple unique : « ' + S.film + ' ». Montre les concepts à l\'œuvre dans CET exemple, ne les relis pas comme une liste.';
+  else if (S.mode === 'recap') subject = 'Vidéo récap hebdomadaire automatique (leçon ' + L.n + '). ' + recapExtra() + ' Exemple : ' + (S.film ? '« ' + S.film + ' »' : 'choisis UN seul film très connu du public algérien et arabophone, et cite-le dans title_ar') + '. Montre les concepts à l\'œuvre dans CET exemple, ne les relis pas comme une liste.';
   else subject = 'Teaser promotionnel de 12 secondes (clap et masques, carnet et stylo, téléphone qui filme, scène vide avec flèche dorée). Message : ' + S.angle + '. Dernière slide : « الدراماتورجيا بالدارجة 🎭 » puis « تابعني @Mouradrama ».';
   const guide = { none: 'Ne mentionne pas le guide.', verbal: 'Le dernier bloc du script parlé mentionne le guide « البنية السردية لفيديوهات قصيرة » en une phrase naturelle.', visual: 'Ne cite pas le guide dans le texte, mais prévois l\'objet « livre » discret dans le visuel de la dernière slide.' }[S.guide];
   const decor = DECORS[S.decor][1] ? 'Décor dominant imposé pour les visuels : ' + DECORS[S.decor][1] + '.' : 'Choisis le décor le plus parlant pour le concept.';
+  const si = symbolInfo();
+  const symLine = si ? 'Objet symbole imposé pour toute la leçon : « ' + si.fr + ' » (' + si.en + '). Il est le sujet principal de TOUS les visuels, vu sous des angles, des lumières ou des états différents, mais toujours avec la même forme reconnaissable. Traduis-le en anglais dans chaque image_prompt_en.' : '';
   return `${subject}
 Leçons déjà publiées (pour un rappel) : ${before}. Glisse UN rappel bref vers l'une d'elles dans le bloc 20-26s du script parlé, sous la forme « اللي فاتتو الدرس ... ».
 Style d'accroche demandé pour la slide 1 : ${HOOKS[S.hook]}. Écris quand même les trois variantes dans "hooks".
 ${S.angle && S.mode !== 'teaser' ? 'Consigne de l\'auteur : ' + S.angle : ''}
 ${guide}
 ${decor}
+${symLine}
 
 Rôles des ${N} slides, dans l'ordre : ${m.roles.join(' / ')}.
 Pour chaque slide, "image_prompt_en" décrit en anglais un visuel vertical sans visage humain, sans personnes, avec des objets symboliques, laissant la moitié basse calme pour le texte. "camera_en" décrit un mouvement de caméra lent (une phrase).
@@ -661,7 +872,7 @@ async function runScript() {
     S.script = normalizeScript(parseJSON(raw));
     const fixed = fixAll();
     S.images = []; S.clips = [];
-    $('#visuals-card').classList.add('hidden'); $('#clips-card').classList.add('hidden'); $('#btn-clips').classList.add('hidden'); $('#btn-publish').classList.add('hidden');
+    $('#visuals-card').classList.add('hidden'); $('#clips-card').classList.add('hidden'); $('#final-card').classList.add('hidden'); $('#btn-clips').classList.add('hidden'); $('#btn-publish').classList.add('hidden');
     persistScript(); renderScript();
     log('Script prêt' + (fixed ? ', ' + fixed + ' mot(s) de fusha corrigé(s)' : ''), 'o');
     toast(fixed ? 'Script prêt, ' + fixed + ' correction(s) darija' : 'Script prêt');
@@ -669,7 +880,7 @@ async function runScript() {
   } catch (e) { log('Erreur : ' + e.message, 'e'); toast(e.message.slice(0, 80), true); }
   S.running = false; setStatus(null); $('#btn-stop').classList.add('hidden'); updateButtons();
 }
-function stopRun() { S.stop = true; log('Arrêt demandé', 'w'); setStatus('Arrêt en cours…'); }
+function stopRun() { S.stop = true; S.autoAbort = true; log('Arrêt demandé', 'w'); setStatus('Arrêt en cours…'); }
 
 // ══════════════════════════════════════════════════════════════════
 // AFFICHAGE + ÉDITION DU SCRIPT
@@ -713,8 +924,9 @@ function copyScript() {
 // ══════════════════════════════════════════════════════════════════
 const STYLE_SUFFIX = 'Cinematic still, deep navy and black palette with warm gold accents, one dramatic golden spotlight beam, floating dust particles in the light, reflective dark floor, shallow depth of field, fine film grain, vertical 9:16 composition with calm empty space in the lower half. Symbolic objects only, no people, no human faces.';
 function fullPrompt(sl) {
-  let p = sl.prompt + '. ' + (DECORS[S.decor][1] ? DECORS[S.decor][1] + '. ' : '') + STYLE_SUFFIX + ' ';
-  p += S.textMode === 'ai' ? 'Render this Arabic text exactly, large and centered in the lower half, with correct right-to-left letters: "' + sl.text + '".' : 'No text, no letters, no logos, no watermark.';
+  const si = symbolInfo();
+  let p = sl.prompt + '. ' + (si ? 'The recurring symbolic object of this lesson is ' + si.en + ', always the same shape and identity. ' : '') + (DECORS[S.decor][1] ? DECORS[S.decor][1] + '. ' : '') + STYLE_SUFFIX + ' ';
+  p += (S.textMode === 'ai' && !S.auto) ? 'Render this Arabic text exactly, large and centered in the lower half, with correct right-to-left letters: "' + sl.text + '".' : 'No text, no letters, no logos, no watermark.';
   return p;
 }
 const useFixedCta = i => S.mode === 'carousel' && S.useCta && !!LS.get('mdr_cta', '') && S.script && i === S.script.slides.length - 1;
@@ -811,8 +1023,7 @@ async function downloadAll() { for (let i = 0; i < S.script.slides.length; i++) 
 // ══════════════════════════════════════════════════════════════════
 // ÉTAPE 3 : CLIPS VIDÉO (keyframes entre deux slides consécutives)
 // ══════════════════════════════════════════════════════════════════
-let measured = LS.get('mdr_speed', null);
-const waitSeconds = () => measured || 105;
+const waitSeconds = () => LS.get('mdr_speed_' + S.clipSec, null) || (S.clipSec === '5' ? 60 : 105);
 function clipCard(i, total) {
   const d = document.createElement('div'); d.className = 'pending'; d.id = 'clip-' + i;
   d.innerHTML = '<b>Clip ' + (i + 1) + ' sur ' + total + '</b><span id="clip-t-' + i + '">En attente</span><div class="bar-progress"><i id="clip-p-' + i + '"></i></div>';
@@ -822,7 +1033,7 @@ function clipSet(i, txt, pct) { const t = $('#clip-t-' + i), p = $('#clip-p-' + 
 async function createVideoTask(a, b, prompt) {
   const res = await fetchRetry(API_BASE + '/videos', {
     method: 'POST', headers: { Authorization: 'Bearer ' + getKey(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: MODEL_VIDEO, prompt, extra_body: { image: [a, b], mode: 'keyframes' }, num_frames: 241, frame_rate: 24, height: 1024, width: 576 })
+    body: JSON.stringify({ model: MODEL_VIDEO, prompt, extra_body: { image: [a, b], mode: 'keyframes' }, num_frames: S.clipSec === '5' ? 121 : 241, frame_rate: 24, height: 1024, width: 576 })
   }, 3, 'Vidéo');
   if (!res.ok) throw new Error('API vidéo, HTTP ' + res.status + ' ' + (await res.text()).slice(0, 120));
   const d = await res.json(); if (!d.video_id) throw new Error('video_id absent'); return d.video_id;
@@ -840,7 +1051,7 @@ async function pollClip(i, videoId) {
         clipSet(i, 'Génération ' + (d.progress || 0) + ' %', Math.max(d.progress || 0, 50));
         if (['completed', 'succeeded', 'done'].includes(st)) {
           const url = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url); if (!url) throw new Error('Terminé sans URL');
-          measured = Math.round((Date.now() - t0) / 1000 * 1.1); LS.set('mdr_speed', measured); return url;
+          LS.set('mdr_speed_' + S.clipSec, Math.round((Date.now() - t0) / 1000 * 1.1)); return url;
         }
         if (['failed', 'error', 'cancelled'].includes(st)) throw new Error('Échec (' + st + ')');
       }
@@ -859,7 +1070,7 @@ async function runClips() {
   try {
     for (let k = 0; k < pairs.length; k++) {
       if (S.stop) break; const i = pairs[k];
-      const prompt = 'ONE SINGLE UNBROKEN SHOT. NO CUTS. Camera: ' + (S.script.slides[i].camera || 'slow push-in') + '. Golden spotlight, floating dust, cinematic navy and gold. No people, no faces, no text, no watermarks.';
+      const prompt = 'ONE SINGLE UNBROKEN SHOT. NO CUTS. Camera: ' + (S.script.slides[i].camera || 'slow push-in') + '. Golden spotlight, floating dust, cinematic navy and gold. The main object keeps exactly the same shape and identity for the whole clip: no transformation, no morphing, no new object appears. Very slow camera movement only. No people, no faces, no text, no watermarks.';
       clipSet(k, 'Création de la tâche', 0);
       try {
         const id = await createVideoTask(S.images[i].url, S.images[i + 1].url, prompt);
@@ -898,7 +1109,7 @@ function markPublished() {
   if (s.meta.mode === 'carousel') {
     const done = LS.get('mdr_done', [1, 2, 3, 4, 5]); if (!done.includes(s.meta.lessonN)) done.push(s.meta.lessonN); LS.set('mdr_done', done);
     const dates = LS.get('mdr_dates', {}); if (!dates[s.meta.lessonN]) dates[s.meta.lessonN] = t; LS.set('mdr_dates', dates);
-    S.lessonN = firstTodo(); buildLessonSelect(); persistForm();
+    S.lessonN = firstTodo(); buildLessonSelect(); loadSymbol(); persistForm();
   }
   $('#btn-publish').classList.add('hidden'); syncForm(); toast('Ajouté au journal. Reviens y saisir les chiffres.');
 }
@@ -926,7 +1137,7 @@ function setDone(n, v) { let d = LS.get('mdr_done', [1, 2, 3, 4, 5]); d = d.filt
 function setDate(n, v) { const d = LS.get('mdr_dates', {}); if (v) d[n] = v; else delete d[n]; LS.set('mdr_dates', d); renderProgramme(); }
 function goStudio(n) {
   S.lessonN = n; S.mode = CURRICULUM.find(c => c.n === n).type === 'recap' ? 'recap' : 'carousel';
-  chips($('#mode-chips'), MODES, 'mode', syncForm); buildLessonSelect(); persistForm(); showTab('studio'); window.scrollTo({ top: 0 });
+  chips($('#mode-chips'), MODES, 'mode', onModeChange); buildLessonSelect(); loadSymbol(); persistForm(); showTab('studio'); window.scrollTo({ top: 0 });
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -974,12 +1185,17 @@ function showTab(name) {
   const f = LS.get('mdr_form', null); if (f) Object.assign(S, f);
   if (!f) S.lessonN = firstTodo();
   document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
-  chips($('#mode-chips'), MODES, 'mode', syncForm);
+  chips($('#mode-chips'), MODES, 'mode', onModeChange);
+  chips($('#recap-chips'), RECAP_OPTS, 'recapSec', syncForm);
   chips($('#hook-chips'), HOOKS, 'hook');
   chips($('#text-chips'), TEXT_MODES, 'textMode', () => { if (S.script && S.images.length) redrawAll(); });
+  chips($('#clip-chips'), CLIP_OPTS, 'clipSec');
   const dsel = $('#decor-select'); dsel.innerHTML = Object.entries(DECORS).map(([k, v]) => '<option value="' + k + '">' + esc(v[0]) + '</option>').join(''); dsel.value = S.decor;
   dsel.addEventListener('change', () => { S.decor = dsel.value; persistForm(); });
-  buildLessonSelect(); $('#lesson-select').addEventListener('change', e => { S.lessonN = +e.target.value; persistForm(); });
+  buildLessonSelect(); $('#lesson-select').addEventListener('change', e => { S.lessonN = +e.target.value; loadSymbol(); persistForm(); });
+  buildSymbolSelect();
+  $('#symbol-select').addEventListener('change', e => { S.symbol = e.target.value; $('#symbol-custom').classList.toggle('hidden', S.symbol !== 'custom'); persistForm(); });
+  $('#symbol-text').addEventListener('input', e => { S.symbolText = e.target.value; persistForm(); });
   $('#guide-select').value = S.guide; $('#guide-select').addEventListener('change', e => { S.guide = e.target.value; persistForm(); });
   $('#film-input').value = S.film || ''; $('#angle-input').value = S.angle || '';
   $('#film-input').addEventListener('input', persistForm); $('#angle-input').addEventListener('input', persistForm);
