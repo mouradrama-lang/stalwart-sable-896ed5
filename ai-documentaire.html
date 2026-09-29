@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Réalisateur Documentaire IA — v3</title>
+<title>Réalisateur Documentaire IA — v4</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -243,6 +243,11 @@
         font-style: italic; color: var(--accent);
         direction: auto;
     }
+    .character-block {
+        padding: 0.6rem 0.8rem; border-left: 3px solid var(--success);
+        margin-bottom: 0.4rem; background: var(--panel);
+        border-radius: 0 6px 6px 0; font-size: 0.78rem;
+    }
 
     .generated-images {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -291,6 +296,18 @@
         border-top: 1px solid var(--border);
         direction: auto;
     }
+    .gen-video-card .gen-actions {
+        display: flex; gap: 0.4rem; padding: 0.4rem 0.6rem;
+        background: var(--panel); border-top: 1px solid var(--border);
+    }
+    .gen-video-card .gen-actions button {
+        flex: 1; padding: 0.4rem; border-radius: 6px;
+        border: 1px solid var(--border); background: var(--panel-2);
+        color: var(--ink); font-family: inherit; font-size: 0.65rem;
+        font-weight: 600; cursor: pointer;
+    }
+    .gen-video-card .gen-actions button:active { background: var(--border); }
+    .gen-video-card .gen-actions button.playing { background: var(--accent); color: #fff; border-color: var(--accent); }
     .gen-video-card .gen-timing {
         padding: 0.35rem 0.5rem; font-size: 0.65rem;
         color: var(--warn); text-align: center;
@@ -379,6 +396,21 @@
         border-radius: 2px; transition: width 0.3s;
     }
 
+    .project-bar {
+        display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+    }
+    .project-bar input {
+        flex: 1; min-width: 150px;
+    }
+    .project-bar button {
+        padding: 0.7rem 1rem; border-radius: 8px;
+        border: 1px solid var(--border); background: var(--panel-2);
+        color: var(--ink); font-family: inherit; font-size: 0.78rem;
+        font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .project-bar button:active { background: var(--border); }
+    .project-bar button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+
     .status-bar {
         position: fixed; bottom: 0; left: 0; right: 0;
         background: var(--panel); border-top: 1px solid var(--border);
@@ -412,6 +444,14 @@
     <h1>Réalisateur Documentaire IA</h1>
     <p class="subtitle">Décrivez un sujet. L'IA réalise le documentaire.</p>
 </header>
+
+<!-- BARRE DE PROJET -->
+<div class="project-bar">
+    <input type="text" id="project-name" placeholder="Nom du projet..." value="Mon documentaire">
+    <button type="button" id="save-project-btn" class="primary">💾 Sauvegarder</button>
+    <button type="button" id="load-project-btn">📂 Charger</button>
+    <button type="button" id="new-project-btn">✨ Nouveau</button>
+</div>
 
 <div class="api-panel" id="api-panel">
     <input type="password" class="api-key-input" id="api-key-input"
@@ -548,6 +588,7 @@
                 </select>
             </div>
             <button type="button" id="test-voice-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🔊 Tester la voix</button>
+            <button type="button" id="download-narration-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">💾 Télécharger la narration (.txt)</button>
         </div>
     </div>
 </div>
@@ -664,7 +705,7 @@
             </div>
             <div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div>
             <div style="font-size:0.75rem;color:var(--ink-dim);margin-top:0.5rem;text-align:center;" id="player-info">
-                Séquence 1 / 6
+                Clip 1 / 6
             </div>
         </div>
     </div>
@@ -787,61 +828,30 @@ const DOC_STYLES = [
 ];
 
 // ══════════════════════════════════════════════════════════════════
-// CONFIGURATION DES NARRATEURS
+// NARRATEURS
 // ══════════════════════════════════════════════════════════════════
 const NARRATORS = {
-    'male-deep': {
-        label: 'Voix grave',
-        pitch: 0.65,
-        rate: 0.82,
-        volume: 1.0,
-        patterns: /thomas|nicolas|henri|paul|male|denise/i
-    },
-    'male-soft': {
-        label: 'Voix douce',
-        pitch: 0.95,
-        rate: 0.92,
-        volume: 1.0,
-        patterns: /thomas|nicolas|henri|paul|male/i
-    },
-    'female': {
-        label: 'Voix féminine',
-        pitch: 1.15,
-        rate: 0.90,
-        volume: 1.0,
-        patterns: /amelie|marie|audrey|female|julie|denise/i
-    },
-    'elderly': {
-        label: 'Voix âgée',
-        pitch: 0.70,
-        rate: 0.72,
-        volume: 1.0,
-        patterns: /thomas|nicolas|henri|paul|male|denise/i
-    }
+    'male-deep': { label: 'Voix grave', pitch: 0.65, rate: 0.82, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i },
+    'male-soft': { label: 'Voix douce', pitch: 0.95, rate: 0.92, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male/i },
+    'female': { label: 'Voix féminine', pitch: 1.15, rate: 0.90, volume: 1.0, patterns: /amelie|marie|audrey|female|julie|denise/i },
+    'elderly': { label: 'Voix âgée', pitch: 0.70, rate: 0.72, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i }
 };
 
 // ══════════════════════════════════════════════════════════════════
-// CONFIGURATION DES LANGUES
+// LANGUES
 // ══════════════════════════════════════════════════════════════════
 const LANGUAGES = {
     'fr': {
-        label: 'Français',
-        ttsLang: 'fr-FR',
-        ttsFallbacks: ['fr-CA', 'fr-BE'],
-        // Instruction à mettre dans le prompt pour l'IA
-        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en français correct et naturel. Le titre, la logline et les descriptions peuvent rester en français également.'
+        label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'],
+        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en français correct et naturel.'
     },
     'ar': {
-        label: 'Arabe classique (Fusha)',
-        ttsLang: 'ar-SA',
-        ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'],
-        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en arabe classique (الفصحى / Fusha). Utilise l\'alphabet arabe. Le titre et la logline peuvent rester en français pour l\'affichage, mais la narration DOIT être en arabe classique avec les voyelles correctes.'
+        label: 'Arabe classique (Fusha)', ttsLang: 'ar-SA', ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'],
+        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en arabe classique (الفصحى / Fusha). Utilise l\'alphabet arabe.'
     },
     'ar-dz': {
-        label: 'Daridja algérienne',
-        ttsLang: 'ar-DZ',
-        ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'],
-        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en daridja algérienne (الدارجة الجزائرية), en utilisant l\'alphabet arabe. Utilise des expressions typiquement algériennes (wach, kifach, bezef, dork, etc.) et un vocabulaire populaire algérien. Le titre et la logline peuvent rester en français pour l\'affichage. La narration DOIT être en daridja.'
+        label: 'Daridja algérienne', ttsLang: 'ar-DZ', ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'],
+        promptInstruction: 'IMPORTANT : Écris TOUTE la narration (voix-off) en daridja algérienne (الدارجة الجزائرية), en utilisant l\'alphabet arabe. Utilise des expressions typiquement algériennes.'
     }
 };
 
@@ -1034,6 +1044,184 @@ function updateGenerateBtn() {
     else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
     else if (!hasIdea) btn.textContent = 'Décrivez votre sujet';
     else btn.textContent = '🎬 Réaliser le documentaire';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SAUVEGARDE / CHARGEMENT DE PROJET
+// ══════════════════════════════════════════════════════════════════
+const STORAGE_KEY = 'agnes_doc_projects';
+
+function getProjects() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+}
+
+function saveProject() {
+    const name = document.getElementById('project-name').value.trim() || 'Sans nom';
+    const projects = getProjects();
+
+    // On sauvegarde tout l'état, y compris les URLs des vidéos et images
+    const projectData = {
+        name: name,
+        savedAt: Date.now(),
+        idea: state.idea,
+        selectedDocTypeId: state.selectedDocType.id,
+        selectedStyleId: state.selectedStyle.id,
+        narrationStyle: state.narrationStyle,
+        narrationLanguage: state.narrationLanguage,
+        narratorVoice: state.narratorVoice,
+        tone: state.tone,
+        audience: state.audience,
+        clipCount: state.clipCount,
+        numFrames: state.numFrames,
+        aspect: state.aspect,
+        rhythm: state.rhythm,
+        scenario: state.scenario,
+        images: state.images,
+        videos: state.videos
+    };
+
+    projects[name] = projectData;
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+        showToast('Projet « ' + name + ' » sauvegardé ✓', 'success');
+        logConsole('Projet sauvegardé : ' + name + ' (' + state.videos.filter(v => v && v.url).length + ' clips)', 'success');
+    } catch (e) {
+        showToast('Erreur de sauvegarde : ' + e.message, 'error');
+        logConsole('Erreur sauvegarde : ' + e.message, 'error');
+    }
+}
+
+function loadProject() {
+    const name = prompt('Nom du projet à charger :');
+    if (!name) return;
+    const projects = getProjects();
+    if (!projects[name]) {
+        showToast('Projet introuvable', 'error');
+        return;
+    }
+    const p = projects[name];
+
+    state.idea = p.idea || '';
+    state.narrationStyle = p.narrationStyle || 'voix-off-classique';
+    state.narrationLanguage = p.narrationLanguage || 'fr';
+    state.narratorVoice = p.narratorVoice || 'male-deep';
+    state.tone = p.tone || 'inspirant';
+    state.audience = p.audience || 'grand-public';
+    state.clipCount = p.clipCount || 6;
+    state.numFrames = p.numFrames || 241;
+    state.aspect = p.aspect || 'landscape';
+    state.rhythm = p.rhythm || 'lent';
+    state.scenario = p.scenario || null;
+    state.images = p.images || [];
+    state.videos = p.videos || [];
+
+    // Restaurer le type et le style
+    const dt = DOC_TYPES.find(d => d.id === p.selectedDocTypeId);
+    if (dt) state.selectedDocType = dt;
+    const st = DOC_STYLES.find(s => s.id === p.selectedStyleId);
+    if (st) state.selectedStyle = st;
+
+    // Remplir l'interface
+    document.getElementById('idea-input').value = state.idea;
+    document.getElementById('language-select').value = state.narrationLanguage;
+    document.getElementById('narrator-select').value = state.narratorVoice;
+    document.getElementById('narration-select').value = state.narrationStyle;
+    document.getElementById('tone-select').value = state.tone;
+    document.getElementById('audience-select').value = state.audience;
+    document.getElementById('scene-count-select').value = state.clipCount;
+    document.getElementById('clip-duration-select').value = state.numFrames;
+    document.getElementById('aspect-select').value = state.aspect;
+    document.getElementById('rhythm-select').value = state.rhythm;
+
+    // Mettre à jour les cartes visuelles
+    document.querySelectorAll('.doc-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.id === state.selectedDocType.id);
+    });
+    document.querySelectorAll('.style-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.id === state.selectedStyle.id);
+    });
+
+    // Restaurer l'affichage
+    document.getElementById('generated-images').innerHTML = '';
+    document.getElementById('generated-videos').innerHTML = '';
+    state.images.forEach(img => displayGeneratedImage(img.url, 'Plan ' + (img.scene?.scene_number || img.sceneIndex + 1)));
+    state.videos.filter(v => v && v.url).forEach(v => {
+        replacePendingWithVideo(v.sceneIndex, v.url, v.narration, v.sceneNumber, v.actualDuration);
+    });
+
+    if (state.scenario) {
+        displayScript(state.scenario);
+        document.getElementById('section-script').classList.remove('hidden');
+    }
+    if (state.images.length > 0) document.getElementById('section-images').classList.remove('hidden');
+    if (state.videos.filter(v => v && v.url).length > 0) {
+        document.getElementById('section-videos').classList.remove('hidden');
+        document.getElementById('section-player').classList.remove('hidden');
+    }
+
+    document.getElementById('project-name').value = name;
+    updateGenerateBtn();
+    updateLimitsPanel();
+    showToast('Projet « ' + name + ' » chargé ✓', 'success');
+    logConsole('Projet chargé : ' + name, 'success');
+}
+
+function newProject() {
+    if (!confirm('Créer un nouveau projet ? Les données non sauvegardées seront perdues.')) return;
+    state.scenario = null;
+    state.images = [];
+    state.videos = [];
+    document.getElementById('idea-input').value = '';
+    document.getElementById('project-name').value = 'Mon documentaire';
+    document.getElementById('generated-images').innerHTML = '';
+    document.getElementById('generated-videos').innerHTML = '';
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('section-script').classList.add('hidden');
+    document.getElementById('section-images').classList.add('hidden');
+    document.getElementById('section-videos').classList.add('hidden');
+    document.getElementById('section-player').classList.add('hidden');
+    updateGenerateBtn();
+    showToast('Nouveau projet', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TÉLÉCHARGEMENT NARRATION
+// ══════════════════════════════════════════════════════════════════
+function downloadNarration() {
+    if (!state.scenario || !state.scenario.scenes) {
+        showToast('Aucun script à télécharger', 'warn');
+        return;
+    }
+    const title = state.scenario.title || 'Documentaire';
+    let content = '╔══════════════════════════════════════════╗\n';
+    content += '║  ' + title + '\n';
+    content += '╚══════════════════════════════════════════╝\n\n';
+    content += 'Langue : ' + LANGUAGES[state.narrationLanguage].label + '\n';
+    content += 'Narrateur : ' + NARRATORS[state.narratorVoice].label + '\n';
+    content += 'Sujet : ' + (state.scenario.subject || '') + '\n\n';
+    content += '──────────────────────────────────────────\n\n';
+    state.scenario.scenes.forEach(s => {
+        content += 'SÉQUENCE ' + s.scene_number + ' — ' + (s.sequence_title || '') + '\n';
+        content += '──────────────────────────────────────────\n';
+        content += 'Description : ' + (s.description || '') + '\n\n';
+        content += '🎙️ NARRATION :\n';
+        content += (s.narration || '(vide)') + '\n\n';
+        if (s.sound_design) content += '🔊 Ambiance : ' + s.sound_design + '\n';
+        content += '\n\n';
+    });
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = title.replace(/[^a-z0-9]/gi, '_') + '_narration.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Narration téléchargée ✓', 'success');
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1299,7 +1487,6 @@ async function runDocPipeline() {
     state.images = [];
     state.videos = [];
 
-    // CORRECTION : on génère clipCount + 1 images-clés pour obtenir clipCount clips
     const scenesToGenerate = state.clipCount + 1;
 
     document.getElementById('stop-btn').classList.add('visible');
@@ -1325,9 +1512,9 @@ async function runDocPipeline() {
     setStatus('Initialisation…');
 
     try {
-        // ═══ ÉTAPE 1 : SCRIPT DOCUMENTAIRE ═══
+        // ═══ ÉTAPE 1 : SCRIPT + CHARACTER BIBLE ═══
         logConsole('══════════════════════════════', 'text');
-        logConsole('ÉTAPE 1/4 — Script documentaire', 'success');
+        logConsole('ÉTAPE 1/4 — Script + Character Bible', 'success');
         logConsole('══════════════════════════════', 'text');
         setStatus('L\'IA écrit le script…');
 
@@ -1362,6 +1549,21 @@ RÈGLES ABSOLUES POUR LE FORMAT JSON :
 5. Le JSON doit être parfaitement lisible par un ordinateur.
 6. Le champ "narration" DOIT respecter la consigne de langue ci-dessus.
 
+═══ CRUCIAL : CRÉATION DE LA "CHARACTER BIBLE" ═══
+Avant de décrire les scènes, tu DOIS créer une fiche d'identité ultra-précise pour CHAQUE personnage qui apparaîtra dans le documentaire. Cette fiche sera répétée MOT POUR MOT dans chaque prompt d'image pour garantir la cohérence visuelle.
+
+Pour chaque personnage, décris avec une précision absolue :
+- Genre et âge
+- Coiffure (longueur, couleur, texture, style)
+- Couleur de peau et traits du visage (forme du visage, yeux, nez, bouche)
+- Morphologie (taille, corpulence, posture)
+- Tenue vestimentaire EXACTE (couleurs, matières, accessoires, chaussures)
+- Marques distinctives (cicatrices, lunettes, barbe, tatouages, etc.)
+
+Si le documentaire ne met pas en scène de personnage humain (ex: nature, environnement), tu peux ignorer cette étape ou décrire un narrateur/guide récurrent.
+
+═══ FIN DE LA CHARACTER BIBLE ═══
+
 Règles documentaires :
 - Chaque séquence doit avoir une narration (voix-off) qui accompagne les images.
 - Les mouvements de caméra doivent être LENTS et FLUIDES.
@@ -1373,12 +1575,18 @@ Génère un script complet en JSON avec cette structure exacte :
   "logline": "Résumé en une phrase",
   "subject": "Sujet principal",
   "narration_style": "Description du style de narration",
+  "characters": [
+    {
+      "name": "Nom du personnage",
+      "identity_block": "Fiche d'identité ultra-précise et complète, à répéter mot pour mot dans chaque prompt d'image"
+    }
+  ],
   "scenes": [
     {
       "scene_number": 1,
       "sequence_title": "Titre de la séquence",
       "description": "Description visuelle détaillée",
-      "image_prompt": "Prompt en anglais pour générer l'image en style documentaire ${state.selectedStyle.id}, ${aspectLabel}",
+      "image_prompt": "Prompt en anglais pour générer l'image. Tu DOIS y inclure la fiche d'identité COMPLÈTE de chaque personnage présent dans cette scène, mot pour mot.",
       "narration": "Texte de la voix-off (DANS LA LANGUE CHOISIE, 2-4 phrases)",
       "camera_movement": "Mouvement de caméra lent et fluide",
       "sound_design": "Ambiance sonore suggérée"
@@ -1403,11 +1611,16 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
         }
 
         state.scenario = scenario;
+        if (!scenario.characters) scenario.characters = [];
+
         logConsole('Script : « ' + scenario.title + ' »', 'success');
         logConsole('Scènes générées : ' + scenario.scenes.length, 'success');
+        if (scenario.characters.length > 0) {
+            logConsole('Character Bible créée : ' + scenario.characters.length + ' personnage(s)', 'success');
+        }
         displayScript(scenario);
 
-        // ═══ ÉTAPE 2 : IMAGES DOCUMENTAIRES ═══
+        // ═══ ÉTAPE 2 : IMAGES AVEC CHARACTER BIBLE ═══
         logConsole('══════════════════════════════', 'text');
         logConsole('ÉTAPE 2/4 — Plans documentaires (' + scenario.scenes.length + ' images-clés)', 'success');
         logConsole('══════════════════════════════', 'text');
@@ -1415,14 +1628,23 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
 
         const imgSize = state.aspect === 'landscape' ? '1024x576' : state.aspect === 'portrait' ? '576x1024' : '768x768';
 
+        // Construire le bloc de cohérence à répéter dans chaque prompt
+        const characterConsistencyBlock = scenario.characters && scenario.characters.length > 0
+            ? ' CRITICAL CHARACTER CONSISTENCY: ' + scenario.characters.map(c => c.name + ' — ' + c.identity_block).join(' | ') + '. '
+            : ' ';
+
         for (let i = 0; i < scenario.scenes.length; i++) {
             if (state.stopRequested) break;
             const scene = scenario.scenes[i];
             setStatus('Plan ' + (i + 1) + '/' + scenario.scenes.length + '…');
-            const imagePrompt = scene.image_prompt + '. ' +
+
+            // ⚠️ On répète le character bible COMPLET dans CHAQUE prompt
+            const imagePrompt = scene.image_prompt + '.' +
+                characterConsistencyBlock +
                 state.selectedStyle.prompt + '. ' +
                 'Documentary cinematography, rule of thirds composition, natural lighting, ' +
                 'no text, no watermarks, high quality, 4K.';
+
             try {
                 const imageUrl = await callImageAPI(imagePrompt, imgSize);
                 state.images.push({ sceneIndex: i, url: imageUrl, scene: scene });
@@ -1436,7 +1658,6 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
 
         if (state.images.length < 2) throw new Error('Pas assez de plans');
 
-        // CORRECTION : totalClips = images - 1, ce qui donne bien clipCount
         const totalClips = state.images.length - 1;
         logConsole('Images-clés : ' + state.images.length + ' → Clips à générer : ' + totalClips, 'success');
 
@@ -1458,7 +1679,6 @@ Génère exactement ${scenesToGenerate} scènes. Réponds UNIQUEMENT en JSON val
             const endImg = state.images[i + 1];
             const scene = state.images[i].scene || {};
             const cameraMove = scene.camera_movement || 'slow gentle tracking shot';
-            const narrationText = scene.narration || '';
 
             const videoPrompt = [
                 'DOCUMENTARY FILM SEQUENCE. ONE SINGLE UNBROKEN SHOT. NO CUTS.',
@@ -1575,6 +1795,16 @@ function displayScript(scenario) {
     let html = '<h3>🎬 ' + esc(scenario.title) + '</h3>';
     html += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline || '') + '</p>';
     html += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Sujet : ' + esc(scenario.subject || '') + '</div>';
+
+    // Afficher la character bible
+    if (scenario.characters && scenario.characters.length > 0) {
+        html += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.75rem;color:var(--success);">👥 Character Bible (cohérence visuelle)</strong>';
+        scenario.characters.forEach(c => {
+            html += '<div class="character-block"><strong>' + esc(c.name) + '</strong><br>' + esc(c.identity_block) + '</div>';
+        });
+        html += '</div>';
+    }
+
     scenario.scenes.forEach(s => {
         html += '<div class="scene-item">';
         html += '<span class="scene-num">Séquence ' + s.scene_number + '</span> — ' + esc(s.sequence_title || '') + '<br>';
@@ -1648,10 +1878,58 @@ function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actual
         '<video src="' + videoUrl + '" controls playsinline preload="metadata"></video>' +
         '<div class="gen-label">🎬 Clip ' + sceneNumber + '</div>' +
         (actualDuration ? '<div class="gen-timing">⚡ ' + actualDuration + 's</div>' : '') +
-        (narration ? '<div class="gen-narration">🎙️ ' + esc(narration.slice(0, 120)) + (narration.length > 120 ? '…' : '') + '</div>' : '');
+        (narration ? '<div class="gen-narration">🎙️ ' + esc(narration.slice(0, 120)) + (narration.length > 120 ? '…' : '') + '</div>' : '') +
+        '<div class="gen-actions">' +
+            (narration ? '<button class="narration-play-btn" data-index="' + index + '">▶ Écouter la narration</button>' : '') +
+            '<button class="download-narration-single-btn" data-index="' + index + '">💾 .txt</button>' +
+        '</div>';
     pending.parentNode.replaceChild(card, pending);
     setTimeout(() => card.classList.remove('newly-added'), 3000);
     document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
+
+    // Attacher les événements
+    const playBtn = card.querySelector('.narration-play-btn');
+    if (playBtn) {
+        playBtn.addEventListener('click', () => {
+            const v = state.videos[index];
+            if (!v || !v.narration) return;
+            if (playBtn.classList.contains('playing')) {
+                stopSpeech();
+                playBtn.classList.remove('playing');
+                playBtn.textContent = '▶ Écouter la narration';
+            } else {
+                // Arrêter les autres
+                document.querySelectorAll('.narration-play-btn.playing').forEach(b => {
+                    b.classList.remove('playing');
+                    b.textContent = '▶ Écouter la narration';
+                });
+                playBtn.classList.add('playing');
+                playBtn.textContent = '⏸ Arrêter';
+                speakText(v.narration).then(() => {
+                    playBtn.classList.remove('playing');
+                    playBtn.textContent = '▶ Écouter la narration';
+                });
+            }
+        });
+    }
+
+    const dlBtn = card.querySelector('.download-narration-single-btn');
+    if (dlBtn) {
+        dlBtn.addEventListener('click', () => {
+            const v = state.videos[index];
+            if (!v || !v.narration) return;
+            const content = 'SÉQUENCE ' + v.sceneNumber + '\n\n' + v.narration;
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sequence_' + v.sceneNumber + '_narration.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
 }
 
 function markPendingFailed(index, errorMessage) {
@@ -1703,16 +1981,19 @@ function stopAllVideos() {
     stopSpeech();
     document.getElementById('play-all-btn').textContent = '▶ Projeter';
     document.getElementById('play-all-btn').classList.remove('playing');
+    document.querySelectorAll('.narration-play-btn.playing').forEach(b => {
+        b.classList.remove('playing');
+        b.textContent = '▶ Écouter la narration';
+    });
 }
 
 // ══════════════════════════════════════════════════════════════════
-// TTS — NARRATION MULTILINGUE
+// TTS
 // ══════════════════════════════════════════════════════════════════
 let speechSynth = null;
 function initSpeech() {
     if ('speechSynthesis' in window) {
         speechSynth = window.speechSynthesis;
-        // Force le chargement des voix
         speechSynth.getVoices();
         if (speechSynth.onvoiceschanged !== undefined) {
             speechSynth.onvoiceschanged = () => { speechSynth.getVoices(); };
@@ -1725,15 +2006,12 @@ function findVoiceForLanguage(langConfig, narratorConfig) {
     const voices = speechSynth.getVoices();
     if (!voices.length) return null;
 
-    // 1. Essayer la langue principale exacte avec le pattern narrateur
     const langsToTry = [langConfig.ttsLang, ...langConfig.ttsFallbacks];
     for (const langCode of langsToTry) {
         const matchingLang = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(langCode.toLowerCase().split('-')[0]));
         if (matchingLang.length) {
-            // Chercher d'abord la voix correspondant au pattern du narrateur
             const preferred = matchingLang.find(v => narratorConfig.patterns.test(v.name));
             if (preferred) return preferred;
-            // Sinon prendre la première voix de cette langue
             return matchingLang[0];
         }
     }
@@ -1757,25 +2035,17 @@ function speakText(text) {
             const voice = findVoiceForLanguage(langConfig, narratorConfig);
             if (voice) {
                 utterance.voice = voice;
-                // Ajuster la langue à celle de la voix si trouvée
                 utterance.lang = voice.lang;
-                logConsole('Voix TTS sélectionnée : ' + voice.name + ' (' + voice.lang + ')', 'info');
-            } else {
-                logConsole('Aucune voix ' + langConfig.label + ' disponible, utilisation de la voix par défaut.', 'warn');
             }
 
             utterance.onend = resolve;
-            utterance.onerror = (e) => {
-                logConsole('Erreur TTS : ' + e.error, 'warn');
-                resolve();
-            };
+            utterance.onerror = resolve;
             speechSynth.speak(utterance);
         }, 150);
     });
 }
 function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
 
-// Test rapide de la voix
 function testVoice() {
     const langInfo = LANGUAGES[state.narrationLanguage];
     const narratorInfo = NARRATORS[state.narratorVoice];
@@ -1802,6 +2072,7 @@ function testVoice() {
     DOC_TYPES.forEach((d, idx) => {
         const card = document.createElement('div');
         card.className = 'doc-card' + (idx === 0 ? ' selected' : '');
+        card.dataset.id = d.id;
         card.innerHTML = '<span class="doc-emoji">' + d.emoji + '</span>' +
             '<span class="doc-name">' + d.name + '</span>' +
             '<span class="doc-desc">' + d.desc + '</span>';
@@ -1820,6 +2091,7 @@ function testVoice() {
     DOC_STYLES.forEach((s, idx) => {
         const card = document.createElement('div');
         card.className = 'style-card' + (idx === 0 ? ' selected' : '');
+        card.dataset.id = s.id;
         card.innerHTML = '<span class="style-emoji">' + s.emoji + '</span>' +
             '<span class="style-name">' + s.name + '</span>';
         card.addEventListener('click', () => {
@@ -1852,26 +2124,30 @@ function testVoice() {
     });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
 
-    // Langue
+    // Langue / Narrateur
     document.getElementById('language-select').addEventListener('change', (e) => {
         state.narrationLanguage = e.target.value;
         logConsole('Langue narration : ' + LANGUAGES[state.narrationLanguage].label, 'info');
     });
-    // Narrateur
     document.getElementById('narrator-select').addEventListener('change', (e) => {
         state.narratorVoice = e.target.value;
         logConsole('Voix narrateur : ' + NARRATORS[state.narratorVoice].label, 'info');
     });
-    // Test voix
     document.getElementById('test-voice-btn').addEventListener('click', testVoice);
+    document.getElementById('download-narration-btn').addEventListener('click', downloadNarration);
+
+    // Sauvegarde / chargement
+    document.getElementById('save-project-btn').addEventListener('click', saveProject);
+    document.getElementById('load-project-btn').addEventListener('click', loadProject);
+    document.getElementById('new-project-btn').addEventListener('click', newProject);
 
     updateApiPanel();
     updateLimitsPanel();
     updateGenerateBtn();
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('api-key-input').value = savedKey;
-    logConsole('Réalisateur Documentaire v3 prêt.', 'info');
-    logConsole('Corrections : nombre de clips exact, langues AR/FR/DZ, voix narrateur.', 'success');
+    logConsole('Réalisateur Documentaire v4 prêt.', 'info');
+    logConsole('Corrections : character bible, narration par clip, téléchargement, sauvegarde projet.', 'success');
 })();
 </script>
 
