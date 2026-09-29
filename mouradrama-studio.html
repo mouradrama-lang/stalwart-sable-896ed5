@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mouradrama Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --night: #0a1024; --panel: #111a35; --panel2: #18234a; --line: #27345f;
+  --ink: #f3ead2; --dim: #9aa3c4; --faint: #5d6890;
+  --gold: #e3b04b; --gold-dim: #a07d2f; --ok: #6cbf84; --bad: #e0674f; --warn: #e9c46a;
+  --r: 14px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Manrope', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--night); color: var(--ink); font-size: 15px; line-height: 1.5;
+  max-width: 640px; margin: 0 auto; padding: 0 1rem calc(6rem + env(safe-area-inset-bottom));
+}
+.ar { font-family: 'Cairo', 'Noto Sans Arabic', sans-serif; }
+.hidden { display: none !important; }
+
+/* Hero : le faisceau doré est le seul effet de la page */
+.hero { position: relative; text-align: center; padding: 2.4rem 0 1.4rem; overflow: hidden; }
+.hero::before {
+  content: ''; position: absolute; top: -20px; left: 50%; width: 320px; height: 260px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at top, rgba(227,176,75,.34), rgba(227,176,75,0) 70%);
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+.hero h1 { position: relative; font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; font-weight: 700; letter-spacing: .01em; }
+.hero p { position: relative; color: var(--dim); font-size: .85rem; margin-top: .2rem; }
+
+.tab { display: none; }
+.tab.active { display: block; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 1rem; margin-bottom: .9rem; }
+.card h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; margin-bottom: .6rem; }
+.card h3 { font-size: 1rem; margin-bottom: .4rem; }
+details.card > summary { cursor: pointer; font-weight: 700; list-style: none; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card[open] > summary { margin-bottom: .7rem; }
+
+label.f { display: block; font-size: .78rem; color: var(--dim); margin: .8rem 0 .3rem; font-weight: 700; }
+input[type=text], input[type=password], input[type=number], input[type=date], select, textarea {
+  width: 100%; padding: .7rem .8rem; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--night); color: var(--ink); font-family: inherit; font-size: .9rem;
+}
+textarea { resize: vertical; min-height: 70px; line-height: 1.55; }
+textarea.ar, input.ar { font-size: 1.02rem; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: transparent; }
+select { -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path fill='%239aa3c4' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat; background-position: right .8rem center; padding-right: 2rem; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip { padding: .5rem .85rem; border-radius: 999px; border: 1px solid var(--line); background: var(--panel2);
+  color: var(--ink); font-family: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; }
+.chip.on { background: var(--gold); border-color: var(--gold); color: #1a1300; }
+
+.btn { width: 100%; padding: .95rem; border-radius: var(--r); border: none; background: var(--gold); color: #1a1300;
+  font-family: inherit; font-size: .98rem; font-weight: 800; cursor: pointer; margin-bottom: .7rem; }
+.btn:active { transform: scale(.985); }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.btn.ghost { background: transparent; border: 1px solid var(--gold-dim); color: var(--gold); }
+.btn.stop { background: transparent; border: 1px solid var(--bad); color: var(--bad); }
+.btn.small { width: auto; padding: .5rem .8rem; font-size: .8rem; margin: 0; }
+
+.note { font-size: .78rem; color: var(--dim); margin-top: .4rem; }
+.note.ok { color: var(--ok); } .note.bad { color: var(--bad); }
+.sub { font-size: .8rem; color: var(--dim); font-weight: 700; margin: 1rem 0 .4rem; }
+
+/* script */
+.hooks { display: grid; gap: .4rem; }
+.hook { text-align: left; padding: .6rem .8rem; border-radius: 10px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; font-family: inherit; }
+.hook b { display: block; font-size: .72rem; color: var(--gold); margin-bottom: .1rem; }
+.hook span { display: block; direction: rtl; text-align: right; font-size: 1rem; }
+.line { display: grid; grid-template-columns: 58px 1fr; gap: .5rem; margin-bottom: .5rem; align-items: start; }
+.time { font-size: .72rem; color: var(--gold); padding-top: .6rem; }
+.slide-edit { border-top: 1px solid var(--line); padding: .8rem 0; }
+.slide-edit .role { font-size: .78rem; color: var(--gold); font-weight: 700; margin-bottom: .3rem; }
+.slide-edit details { margin-top: .4rem; font-size: .8rem; color: var(--dim); }
+.slide-edit summary { cursor: pointer; }
+.lint { font-size: .74rem; color: var(--warn); margin-top: .25rem; }
+.lint:empty { display: none; }
+
+/* visuels */
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+.slide-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.slide-card canvas { width: 100%; aspect-ratio: 9/16; display: block; background: #060a1a; }
+.slide-card .bar { display: flex; gap: .3rem; padding: .4rem; }
+.slide-card .bar button { flex: 1; padding: .45rem .2rem; border-radius: 8px; border: 1px solid var(--line);
+  background: transparent; color: var(--ink); font-family: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+.slide-card .cap { padding: .35rem .5rem 0; font-size: .7rem; color: var(--dim); }
+.pending { aspect-ratio: 9/16; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .5rem; padding: .7rem; text-align: center; font-size: .75rem; color: var(--dim); background: var(--panel2);
+  border: 1px solid var(--line); border-radius: 12px; }
+.bar-progress { width: 100%; height: 6px; background: var(--night); border-radius: 3px; overflow: hidden; }
+.bar-progress i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .4s; }
+.clip video { width: 100%; aspect-ratio: 9/16; object-fit: cover; background: #000; display: block; }
+.clip a { display: block; text-align: center; font-size: .75rem; color: var(--gold); padding: .4rem; text-decoration: none; }
+
+/* programme */
+.arc { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin: 1.2rem 0 .5rem; color: var(--gold); }
+.lesson { display: grid; grid-template-columns: 34px 1fr auto; gap: .5rem; align-items: center;
+  padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); margin-bottom: .4rem; }
+.lesson.done { border-color: var(--gold-dim); }
+.lesson .n { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--gold); text-align: center; }
+.lesson .t { font-weight: 700; font-size: .9rem; }
+.lesson .t small { display: block; color: var(--dim); font-weight: 400; font-size: .74rem; }
+.lesson .act { display: flex; gap: .35rem; align-items: center; }
+.lesson input[type=date] { width: 128px; padding: .35rem .4rem; font-size: .72rem; }
+.lesson input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--gold); }
+.rev { display: flex; justify-content: space-between; font-size: .84rem; padding: .35rem 0; border-bottom: 1px solid var(--line); }
+.rev:last-child { border-bottom: none; }
+.rev b { color: var(--gold); }
+
+/* journal */
+.entry .head { display: flex; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
+.entry .head b { font-size: .95rem; }
+.entry .head span { font-size: .75rem; color: var(--dim); }
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+.metrics label { font-size: .68rem; color: var(--dim); display: block; margin-bottom: .15rem; }
+.metrics input { padding: .45rem .5rem; font-size: .85rem; }
+.ratio { font-size: .78rem; color: var(--dim); margin-top: .5rem; }
+.ratio b { color: var(--ink); }
+
+/* console */
+#log { max-height: 220px; overflow-y: auto; font-family: ui-monospace, Menlo, monospace; font-size: .7rem; line-height: 1.6; background: #060a1a; border-radius: 10px; padding: .6rem; }
+#log .e { color: var(--bad); } #log .o { color: var(--ok); } #log .w { color: var(--warn); } #log .t { color: var(--faint); margin-right: .4rem; }
+
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; gap: .3rem;
+  background: rgba(10,16,36,.96); border-top: 1px solid var(--line); padding: .5rem .8rem calc(.5rem + env(safe-area-inset-bottom)); z-index: 50; }
+.tabs button { flex: 1; max-width: 200px; padding: .65rem; border-radius: 10px; border: none; background: transparent;
+  color: var(--dim); font-family: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
+.tabs button.on { background: var(--panel2); color: var(--gold); }
+
+#toast { position: fixed; top: calc(1rem + env(safe-area-inset-top)); left: 50%; transform: translate(-50%, -140%);
+  background: var(--panel2); border: 1px solid var(--gold-dim); color: var(--ink); padding: .7rem 1.1rem; border-radius: 10px;
+  font-size: .84rem; z-index: 200; max-width: 90vw; text-align: center; transition: transform .3s; }
+#toast.show { transform: translate(-50%, 0); }
+#toast.bad { border-color: var(--bad); }
+#status { position: fixed; left: 0; right: 0; bottom: calc(3.9rem + env(safe-area-inset-bottom)); background: var(--panel2);
+  border-top: 1px solid var(--gold-dim); padding: .6rem 1rem; font-size: .8rem; z-index: 40; transform: translateY(200%); transition: transform .3s; text-align: center; }
+#status.show { transform: none; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>Mouradrama</h1>
+  <p>L'atelier de la série dramaturgie en darija</p>
+</header>
+
+<!-- ═════════════ STUDIO ═════════════ -->
+<section class="tab active" id="tab-studio">
+
+  <details class="card" id="api-card">
+    <summary id="api-summary">Clé API agnes-ai</summary>
+    <input type="password" id="api-key" placeholder="Colle ta clé ici" autocomplete="off" spellcheck="false">
+    <p class="note">La clé reste dans ton navigateur (localStorage), la même que pour l'Atelier Vidéo.</p>
+    <button class="btn" style="margin-top:.7rem" onclick="saveKey()">Enregistrer la clé</button>
+  </details>
+
+  <div class="card">
+    <h2>Ce que tu crées aujourd'hui</h2>
+
+    <label class="f">Format</label>
+    <div class="chips" id="mode-chips"></div>
+    <p class="note" id="mode-note"></p>
+
+    <div id="lesson-wrap">
+      <label class="f" for="lesson-select">Leçon</label>
+      <select id="lesson-select"></select>
+    </div>
+
+    <div id="film-wrap" class="hidden">
+      <label class="f" for="film-input">Film ou exemple unique à analyser</label>
+      <input type="text" id="film-input" placeholder="Un film que ton public connaît">
+    </div>
+
+    <label class="f" for="angle-input" id="angle-label">Angle ou consigne (facultatif)</label>
+    <textarea id="angle-input" placeholder="Ex. : partir d'une scène de série algérienne connue"></textarea>
+
+    <label class="f">Style de l'accroche (à tester une variable à la fois)</label>
+    <div class="chips" id="hook-chips"></div>
+
+    <label class="f" for="guide-select">Mention du guide dans le script (hors CTA fixe)</label>
+    <select id="guide-select">
+      <option value="none">Aucune</option>
+      <option value="verbal">Verbale</option>
+      <option value="visual">Visuelle discrète (couverture)</option>
+    </select>
+    <p class="note" id="guide-note"></p>
+
+    <label class="f" for="decor-select">Décor dominant</label>
+    <select id="decor-select"></select>
+
+    <label class="f">Texte arabe sur les visuels</label>
+    <div class="chips" id="text-chips"></div>
+    <p class="note">Superposé par l'app : jamais de lettres déformées. « Intégré » laisse l'IA écrire le texte, avec risque de glitch.</p>
+
+    <label class="f">Image de clôture fixe</label>
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+      <label class="chip" style="cursor:pointer">Choisir l'image<input type="file" id="cta-file" accept="image/*" hidden></label>
+      <label class="chip" id="cta-toggle" onclick="toggleCta()">Utiliser en dernière slide</label>
+      <span class="note" id="cta-note"></span>
+    </div>
+  </div>
+
+  <button class="btn" id="btn-script" onclick="runScript()">Écrire le script</button>
+  <button class="btn stop hidden" id="btn-stop" onclick="stopRun()">Arrêter</button>
+
+  <div class="card hidden" id="script-out"></div>
+
+  <button class="btn hidden" id="btn-visuals" onclick="runVisuals()">Générer les visuels</button>
+
+  <div class="card hidden" id="visuals-card">
+    <h2>Visuels</h2>
+    <div class="grid" id="slides-grid"></div>
+    <div style="display:flex;gap:.5rem;margin-top:.8rem">
+      <button class="btn ghost small" style="flex:1" onclick="redrawAll()">Actualiser les textes</button>
+      <button class="btn ghost small" style="flex:1" onclick="downloadAll()">Tout télécharger</button>
+    </div>
+  </div>
+
+  <button class="btn ghost hidden" id="btn-clips" onclick="runClips()">Créer les clips vidéo (optionnel)</button>
+
+  <div class="card hidden" id="clips-card">
+    <h2>Clips vidéo</h2>
+    <div class="grid" id="clips-grid"></div>
+    <video id="player" controls playsinline class="hidden" style="width:100%;margin-top:.8rem;border-radius:12px;background:#000;max-height:60vh"></video>
+    <div style="display:flex;gap:.5rem;margin-top:.6rem">
+      <button class="btn ghost small" style="flex:1" onclick="playAll()">Lire tout</button>
+      <button class="btn ghost small" style="flex:1" onclick="stopPlay()">Arrêter</button>
+    </div>
+  </div>
+
+  <button class="btn hidden" id="btn-publish" onclick="markPublished()">Marquer comme publié aujourd'hui</button>
+
+  <details class="card">
+    <summary>Journal technique</summary>
+    <div id="log"></div>
+  </details>
+</section>
+
+<!-- ═════════════ PROGRAMME ═════════════ -->
+<section class="tab" id="tab-programme">
+  <div class="card">
+    <h2>À réviser cette semaine</h2>
+    <div id="rev-list"></div>
+    <p class="note">Jalons J+1, J+3, J+7, J+21, J+60 calculés depuis la date d'apprentissage de chaque leçon. Révise sans notes, dix minutes.</p>
+  </div>
+  <div id="curriculum"></div>
+</section>
+
+<!-- ═════════════ JOURNAL ═════════════ -->
+<section class="tab" id="tab-journal">
+  <div class="card">
+    <h2>Expérience en cours</h2>
+    <label class="f" for="exp-hyp">Hypothèse, écrite avant de publier</label>
+    <textarea id="exp-hyp" placeholder="Un hook question retient mieux qu'un hook affirmation sur mon audience"></textarea>
+    <label class="f" for="exp-var">Variable testée (une seule)</label>
+    <input type="text" id="exp-var" placeholder="Style d'accroche, 4 à 6 publications">
+  </div>
+  <div class="card" id="hook-summary"></div>
+  <div id="entries"></div>
+  <button class="btn ghost" onclick="exportCsv()">Exporter en CSV</button>
+</section>
+
+<div id="status"></div>
+<div id="toast"></div>
+
+<nav class="tabs">
+  <button class="on" data-tab="studio">Studio</button>
+  <button data-tab="programme">Programme</button>
+  <button data-tab="journal">Journal</button>
+</nav>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG API (identique à l'Atelier Vidéo)
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.5-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const HASHTAGS = '#Dramaturgie #StorytellingTips #Algerie #ContentCreator #Mouradrama';
+
+// ══════════════════════════════════════════════════════════════════
+// PROGRAMME : 28 concepts (ordre indicatif, ajustable)
+// ══════════════════════════════════════════════════════════════════
+const CURRICULUM = [
+  { n: 1, fr: "C'est quoi la dramaturgie", ar: 'الدراماتورجيا', arc: 1 },
+  { n: 2, fr: 'Le protagoniste', ar: 'البطل', arc: 1 },
+  { n: 3, fr: "L'antagoniste", ar: 'الخصم', arc: 1 },
+  { n: 4, fr: "L'élément déclencheur", ar: '', arc: 1 },
+  { n: 5, fr: 'Désir vs objectif', ar: 'الهدف والرغبة', arc: 1 },
+  { n: 6, fr: "L'obstacle", ar: '', arc: 1 },
+  { n: 7, fr: 'Le conflit', ar: '', arc: 1 },
+  { n: 8, fr: "L'enjeu", ar: '', arc: 1 },
+  { n: 9, fr: 'Récap des fondations + quiz', ar: '', arc: 1, type: 'recap' },
+  { n: 10, fr: "L'exposition", ar: '', arc: 2 },
+  { n: 11, fr: "L'action montante", ar: '', arc: 2 },
+  { n: 12, fr: 'Le point culminant', ar: '', arc: 2 },
+  { n: 13, fr: 'La résolution', ar: '', arc: 2 },
+  { n: 14, fr: 'La structure en 3 actes', ar: '', arc: 2 },
+  { n: 15, fr: 'Récap de la structure sur un film connu', ar: '', arc: 2, type: 'recap' },
+  { n: 16, fr: 'Le défaut de caractère', ar: '', arc: 3 },
+  { n: 17, fr: "L'arc de transformation", ar: '', arc: 3 },
+  { n: 18, fr: 'Le sous-texte', ar: '', arc: 3 },
+  { n: 19, fr: 'Les personnages secondaires', ar: '', arc: 3 },
+  { n: 20, fr: 'Le dialogue efficace', ar: '', arc: 3 },
+  { n: 21, fr: 'Récap du personnage', ar: '', arc: 3, type: 'recap' },
+  { n: 22, fr: 'Le rythme (pacing)', ar: '', arc: 4 },
+  { n: 23, fr: 'Le retournement de situation', ar: '', arc: 4 },
+  { n: 24, fr: 'Le thème', ar: '', arc: 4 },
+  { n: 25, fr: 'Le « show, don\'t tell »', ar: '', arc: 4 },
+  { n: 26, fr: 'Adapter au format court', ar: '', arc: 4 },
+  { n: 27, fr: 'Récap des outils avancés', ar: '', arc: 4, type: 'recap' },
+  { n: 28, fr: 'Bilan complet', ar: '', arc: 4, type: 'recap' }
+];
+const ARCS = { 1: 'Arc 1, les fondations', 2: 'Arc 2, la structure', 3: 'Arc 3, le personnage en profondeur', 4: 'Arc 4, les outils avancés' };
+
+const MODES = {
+  carousel: { label: 'Carrousel de la leçon', slides: 6,
+    roles: ['Accroche', 'Idée reçue', 'Formule', 'Exemple', 'Fonction dramatique', 'Clôture'],
+    note: 'Six slides publiées chaque jour : accroche, idée reçue, formule, exemple, fonction dramatique, clôture.' },
+  recap: { label: 'Vidéo récap hebdo', slides: 6,
+    roles: ['Accroche', 'Concept 1 en action', 'Concept 2 en action', 'Concept 3 en action', 'Concept 4 en action', 'Verdict'],
+    note: 'Applique tous les concepts de la semaine sur un seul film, sans les relister.' },
+  teaser: { label: 'Teaser 12 s', slides: 4,
+    roles: ['Clap et masques', 'Carnet et stylo', 'Téléphone qui filme', 'Scène vide et appel'],
+    note: 'Court teaser promotionnel, comme la vidéo de lancement. Décris l\'annonce dans l\'angle.' }
+};
+const HOOKS = { question: 'Question', affirmation: 'Affirmation', provocation: 'Provocation' };
+const DECORS = {
+  auto: ['Laisser l\'IA choisir', ''],
+  cinema: ['Salle de cinéma sombre', 'a dark empty cinema hall, projector beam cutting through the dust'],
+  theatre: ['Scène de théâtre vide', 'an empty theatre stage with heavy curtains and a single spotlight'],
+  desk: ['Bureau d\'écriture et de montage', 'a writer\'s editing desk with a notebook, scripts and film reels'],
+  film: ['Pellicule de film', 'strips of 35mm film and a glowing lens flare']
+};
+const TEXT_MODES = { overlay: 'Superposé (recommandé)', ai: 'Intégré par l\'IA', none: 'Aucun' };
+
+// ══════════════════════════════════════════════════════════════════
+// BIBLE DE LA SÉRIE (injectée dans chaque prompt)
+// ══════════════════════════════════════════════════════════════════
+const BIBLE = `Tu es le scénariste en chef de « Mouradrama », série TikTok qui enseigne la dramaturgie en darija algérienne. L'auteur est acteur et dramaturge algérien : le ton est celui d'un ami qui s'y connaît, jamais celui d'un prof.
+
+RÈGLES FIXES
+1. Un seul concept par publication, jamais deux notions mélangées.
+2. Darija algérienne stricte, jamais de fusha. Vocabulaire repère : بزاف، برك، بصح، ماشي، غالط، كي، واش، علاش، كيفاش، شنو، شكون، لي، ديال، باش، راه، حاب، حوس، يحسبو، اسقسي روحك، هاد، غدا. Mots interdits : التي الذي هذا هذه لأن أيضا جدا سوف لقد ليس هناك لماذا ماذا يجب.
+3. Terminologie : « الخصم » pour l'antagoniste (jamais الأنتاغونيست), « الرغبة » pour le désir profond (jamais الموتيفاسيون), « البطل », « الهدف », « العوائق ».
+4. Formules déjà établies, à ne jamais contredire : « البطل = هدف واضح + قرارات لي تبدل مجرى القصة » ; « الخصم هو أي قوة تقف ضد هدف البطل، حتى لو ماشي شخصية » ; « الرغبة هي واش يحب... والهدف هو واش لازم يحقق ».
+5. Structure d'une leçon : accroche qui pose une question implicite en 3 secondes, idée reçue (« بزاف الناس يحسبو... غالط »), formule, exemple concret, fonction dramatique, clôture. Le contexte vient après la tension, jamais avant.
+6. Une phrase, une idée, 14 mots maximum par slide. Pas de jargon universitaire.
+7. Scripts parlés de 30 secondes en 5 blocs : 0-3s, 3-9s, 9-20s, 20-26s, 26-30s. Le dernier bloc annonce la leçon de demain (« غدا: ... ») et peut renvoyer au guide si demandé.
+8. Aucun visage humain dans les visuels : objets symboliques uniquement (masques, clap, carnet, porte, clé, boussole, flèche, cible, bobine, chaise vide de théâtre, chemin qui bifurque...).
+9. Identité visuelle immuable : bleu nuit et noir avec or, ambiance cinéma et théâtre, poussière en suspension, un faisceau doré dramatique.
+
+TON VALIDÉ (script de la leçon « الخصم ») :
+0-3s : العدو مانيش الشخص لي خايب.
+3-9s : بزاف الناس يحسبو الخصم لازم يكون شرير، يضحك بطريقة غريبة، يلبس أسود. غالط.
+9-20s : الخصم هو غير أي قوة — شخص، ظرف، حتى البطل نفسو — لي توقف قدام الهدف ديالو. كي يكون قوي بزاف، القصة تولي قوية بزاف.
+20-26s : كي تكتب أو تحلل قصة، اسقسي روحك: شنو أو شكون لي يوقف بين البطل وهدفو؟`;
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════════════
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const pad = n => (n < 10 ? '0' : '') + n;
+const fmt = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const today = () => fmt(new Date());
+const parseD = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseD(s); d.setDate(d.getDate() + n); return fmt(d); };
+const daysBetween = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
+
+let toastT = null;
+function toast(msg, bad) {
+  const t = $('#toast'); t.textContent = msg; t.className = bad ? 'bad' : '';
+  requestAnimationFrame(() => t.classList.add('show'));
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3000);
+}
+function setStatus(txt) { const s = $('#status'); if (txt) { s.textContent = txt; s.classList.add('show'); } else s.classList.remove('show'); }
+function log(msg, cls) {
+  const p = $('#log'); const d = document.createElement('div');
+  const t = new Date().toLocaleTimeString('fr-FR');
+  d.innerHTML = '<span class="t">' + t + '</span><span class="' + (cls || '') + '">' + esc(msg) + '</span>';
+  p.appendChild(d); p.scrollTop = p.scrollHeight;
+}
+let wake = null;
+async function wakeOn() { try { if ('wakeLock' in navigator) wake = await navigator.wakeLock.request('screen'); } catch (e) {} }
+async function wakeOff() { try { if (wake) await wake.release(); } catch (e) {} wake = null; }
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════════
+const S = {
+  mode: 'carousel', lessonN: 1, hook: 'question', guide: 'none', decor: 'auto', textMode: 'overlay', useCta: true,
+  film: '', angle: '',
+  running: false, stop: false,
+  script: null, images: [], clips: [], lastText: 0
+};
+const isDone = n => LS.get('mdr_done', [1, 2, 3, 4, 5]).includes(n);
+const lessonObj = () => CURRICULUM.find(c => c.n === S.lessonN) || CURRICULUM[0];
+const firstTodo = () => (CURRICULUM.find(c => !isDone(c.n)) || CURRICULUM[0]).n;
+function coversOf(n) {
+  const idx = CURRICULUM.findIndex(c => c.n === n); const out = [];
+  for (let i = idx - 1; i >= 0; i--) { if (CURRICULUM[i].type === 'recap' && n !== 28) break; if (CURRICULUM[i].type !== 'recap') out.unshift(CURRICULUM[i]); }
+  return out;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CLÉ API
+// ══════════════════════════════════════════════════════════════════
+const getKey = () => { try { return (localStorage.getItem('agnes_api_key') || '').trim(); } catch (e) { return ''; } };
+function saveKey() {
+  const v = $('#api-key').value.trim();
+  try { if (v) localStorage.setItem('agnes_api_key', v); else localStorage.removeItem('agnes_api_key'); } catch (e) {}
+  refreshKey(); toast(v ? 'Clé enregistrée' : 'Clé supprimée'); updateButtons();
+}
+function refreshKey() {
+  const k = getKey();
+  $('#api-summary').textContent = k ? 'Clé API active, ' + k.slice(0, 6) + '…' + k.slice(-4) : 'Clé API agnes-ai, à renseigner';
+  $('#api-key').value = k;
+  $('#api-card').open = !k;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RÉSEAU
+// ══════════════════════════════════════════════════════════════════
+async function fetchRetry(url, opts = {}, max = 3, label = 'API') {
+  for (let a = 0; a <= max; a++) {
+    if (S.stop) throw new Error('Arrêt demandé');
+    try {
+      const c = new AbortController(); const to = setTimeout(() => c.abort(), 90000);
+      const res = await fetch(url, { ...opts, signal: c.signal }); clearTimeout(to);
+      if ([500, 502, 503, 520].includes(res.status) && a < max) {
+        const w = Math.pow(2, a) * 3000 + Math.random() * 2000;
+        log(label + ' : HTTP ' + res.status + ', nouvel essai dans ' + Math.round(w / 1000) + ' s', 'w'); await sleep(w); continue;
+      }
+      if (res.status === 429 && a < max) { log(label + ' : limite atteinte, attente de 65 s', 'w'); await sleep(65000); continue; }
+      return res;
+    } catch (e) {
+      if (e.message === 'Arrêt demandé') throw e;
+      if (a < max) { log(label + ' : ' + (e.name === 'AbortError' ? 'délai dépassé' : 'réseau') + ', nouvel essai', 'w'); await sleep(Math.pow(2, a) * 2000); }
+      else throw new Error(label + ' : échec, ' + e.message);
+    }
+  }
+  throw new Error(label + ' : échec');
+}
+async function callText(messages, o = {}) {
+  const gap = Date.now() - S.lastText; if (gap < 2000) await sleep(2000 - gap); S.lastText = Date.now();
+  log('Requête texte → ' + MODEL_TEXT);
+  const res = await fetchRetry(API_BASE + '/chat/completions', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + getKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: MODEL_TEXT, messages, temperature: o.temperature ?? 0.8, max_tokens: o.maxTokens ?? 4096 })
+  }, 3, 'Texte');
+  if (!res.ok) throw new Error('API texte, HTTP ' + res.status);
+  const d = await res.json(); const c = d.choices?.[0]?.message?.content;
+  if (!c) throw new Error('Réponse texte vide'); return c;
+}
+async function callImage(prompt) {
+  log('Requête image → ' + MODEL_IMAGE);
+  const res = await fetchRetry(API_BASE + '/images/generations', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + getKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: MODEL_IMAGE, prompt, size: '768x1024', extra_body: { response_format: 'url' } })
+  }, 3, 'Image');
+  if (!res.ok) throw new Error('API image, HTTP ' + res.status);
+  const d = await res.json(); const u = d.data?.[0]?.url || (d.data?.[0]?.b64_json ? 'data:image/png;base64,' + d.data[0].b64_json : '');
+  if (!u) throw new Error('Pas d\'image retournée'); return u;
+}
+function parseJSON(raw) {
+  let t = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a < 0 || b < 0) throw new Error('JSON introuvable');
+  return JSON.parse(t.slice(a, b + 1));
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CONTRÔLE DARIJA (aucune fusha) + VISAGES
+// ══════════════════════════════════════════════════════════════════
+const FIX = {
+  'التي': 'لي', 'الذي': 'لي', 'الذين': 'لي', 'لأن': 'خاطر', 'لان': 'خاطر', 'أيضا': 'زادة', 'أيضًا': 'زادة',
+  'جدا': 'بزاف', 'جدًا': 'بزاف', 'سوف': 'غادي', 'لقد': '', 'ليس': 'ماشي', 'هناك': 'كاين', 'لماذا': 'علاش', 'يجب': 'لازم',
+  'الأنتاغونيست': 'الخصم', 'الأنطاغونيست': 'الخصم', 'الانتاغونيست': 'الخصم', 'أنتاغونيست': 'الخصم', 'أنطاغونيست': 'الخصم',
+  'الموتيفاسيون': 'الرغبة', 'موتيفاسيون': 'الرغبة',
+  'هذا': 'هاد', 'هذه': 'هاد', 'ماذا': 'واش'
+};
+const SOFT = new Set(['هذا', 'هذه', 'ماذا']); // signalés seulement, correction manuelle
+const AR_WORD = /[\u0621-\u063A\u0641-\u064A\u064B-\u065F\u0671-\u06D3]+/g;
+const stripTashkeel = w => w.replace(/[\u064B-\u065F\u0670]/g, '');
+function lintArabic(text) {
+  const found = new Map();
+  (text.match(AR_WORD) || []).forEach(w => { const k = stripTashkeel(w); if (k in FIX && !found.has(k)) found.set(k, FIX[k]); });
+  return [...found].map(([w, f]) => ({ w, f }));
+}
+function fixArabic(text) {
+  return text.replace(AR_WORD, w => { const k = stripTashkeel(w); return (k in FIX && !SOFT.has(k)) ? FIX[k] : w; })
+    .replace(/[ \t]{2,}/g, ' ').trim();
+}
+const FACE_RE = /\b(face|faces|portrait|man|men|woman|women|girl|boy|person|people|human|smiling|selfie|eyes|actor|actress|child|crowd)\b/gi;
+function lintPrompt(p) { return [...new Set((p.match(FACE_RE) || []).map(w => w.toLowerCase()))]; }
+
+function updateLint(i) {
+  const sl = S.script.slides[i];
+  const el = $('#lint-' + i), pe = $('#plint-' + i);
+  if (el) el.textContent = lintArabic(sl.text).map(x => '«' + x.w + '» → «' + (x.f || 'supprimer') + '»').join('   ');
+  if (pe) { const f = lintPrompt(sl.prompt); pe.textContent = f.length ? 'Risque de visage : ' + f.join(', ') + '. Remplace par un objet symbolique.' : ''; }
+}
+function fixAll() {
+  const s = S.script; if (!s) return 0; let n = 0;
+  const f = t => { const r = fixArabic(t || ''); if (r !== (t || '').trim()) n++; return r; };
+  s.slides.forEach(x => x.text = f(x.text));
+  s.script30.forEach(x => x.text = f(x.text));
+  Object.keys(s.hooks).forEach(k => s.hooks[k] = f(s.hooks[k]));
+  s.caption = f(s.caption); s.tomorrow = f(s.tomorrow); s.title = f(s.title);
+  return n;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RÈGLE DU GUIDE : 3 par semaine max, jamais 2 jours de suite
+// ══════════════════════════════════════════════════════════════════
+function guideAdvice() {
+  const j = LS.get('mdr_journal', []).filter(e => e.guide && e.guide !== 'none'); const t = today();
+  const last7 = j.filter(e => e.date > addDays(t, -7) && e.date <= t).length;
+  const yest = j.some(e => e.date === addDays(t, -1));
+  if (S.guide === 'none') return { ok: true, msg: 'Mentions sur les 7 derniers jours : ' + last7 + ' sur 3.' };
+  if (yest) return { ok: false, msg: 'Le guide était déjà mentionné hier : jamais deux jours de suite.' };
+  if (last7 >= 3) return { ok: false, msg: last7 + ' mentions sur 7 jours : le maximum est de 3 par semaine.' };
+  return { ok: true, msg: 'Possible : ' + last7 + ' sur 3 cette semaine, rien hier.' };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FORMULAIRE STUDIO
+// ══════════════════════════════════════════════════════════════════
+function chips(el, obj, key, onPick) {
+  el.innerHTML = Object.entries(obj).map(([k, v]) =>
+    '<button type="button" class="chip' + (S[key] === k ? ' on' : '') + '" data-k="' + k + '">' + esc(Array.isArray(v) ? v[0] : (v.label || v)) + '</button>').join('');
+  el.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { S[key] = b.dataset.k; chips(el, obj, key, onPick); onPick && onPick(); persistForm(); }));
+}
+function buildLessonSelect() {
+  const sel = $('#lesson-select');
+  sel.innerHTML = CURRICULUM.map(c => '<option value="' + c.n + '">Leçon ' + c.n + ', ' + esc(c.fr) + (isDone(c.n) ? ' (publiée)' : '') + '</option>').join('');
+  sel.value = S.lessonN;
+}
+function syncForm() {
+  const m = MODES[S.mode];
+  $('#mode-note').textContent = m.note;
+  $('#lesson-wrap').classList.toggle('hidden', S.mode === 'teaser');
+  $('#film-wrap').classList.toggle('hidden', S.mode !== 'recap');
+  $('#angle-label').textContent = S.mode === 'teaser' ? 'Ce que le teaser annonce' : 'Angle ou consigne (facultatif)';
+  const g = guideAdvice(); const gn = $('#guide-note'); gn.textContent = g.msg; gn.className = 'note ' + (g.ok ? 'ok' : 'bad');
+  const cta = LS.get('mdr_cta', '');
+  $('#cta-note').textContent = cta ? 'Image enregistrée' : 'Aucune image enregistrée';
+  $('#cta-toggle').className = 'chip' + (S.useCta && cta ? ' on' : '');
+  updateButtons();
+}
+function updateButtons() {
+  const ready = !!getKey() && !S.running &&
+    (S.mode !== 'recap' || $('#film-input').value.trim().length > 1) &&
+    (S.mode !== 'teaser' || $('#angle-input').value.trim().length > 4);
+  $('#btn-script').disabled = !ready;
+  $('#btn-script').textContent = !getKey() ? 'Ajoute ta clé API' : (S.running ? 'En cours…' : 'Écrire le script');
+}
+function persistForm() {
+  S.film = $('#film-input').value; S.angle = $('#angle-input').value;
+  LS.set('mdr_form', { mode: S.mode, lessonN: S.lessonN, hook: S.hook, guide: S.guide, decor: S.decor, textMode: S.textMode, useCta: S.useCta, film: S.film, angle: S.angle });
+  syncForm();
+}
+function toggleCta() { if (!LS.get('mdr_cta', '')) { toast('Choisis d\'abord l\'image de clôture', true); return; } S.useCta = !S.useCta; persistForm(); }
+function handleCtaFile(file) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1920; const x = cv.getContext('2d');
+      const sc = Math.max(1080 / im.width, 1920 / im.height); const w = im.width * sc, h = im.height * sc;
+      x.drawImage(im, (1080 - w) / 2, (1920 - h) / 2, w, h);
+      try { LS.set('mdr_cta', cv.toDataURL('image/jpeg', 0.88)); S.useCta = true; toast('Image de clôture enregistrée'); }
+      catch (e) { toast('Image trop lourde pour le stockage', true); }
+      persistForm();
+    };
+    im.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPT DU SCRIPT
+// ══════════════════════════════════════════════════════════════════
+function buildScriptPrompt() {
+  const m = MODES[S.mode], N = m.slides, L = lessonObj();
+  const before = CURRICULUM.filter(c => c.n < L.n && c.type !== 'recap' && isDone(c.n)).map(c => 'Leçon ' + c.n + ' : ' + c.fr + (c.ar ? ' (' + c.ar + ')' : '')).join(' ; ') || 'aucune';
+  let subject;
+  if (S.mode === 'carousel') subject = 'Concept du jour : Leçon ' + L.n + ', ' + L.fr + (L.ar ? ' (titre darija validé : ' + L.ar + ')' : '') + '. Titre de série identique à chaque fois : « الدرس ' + L.n + ' ».';
+  else if (S.mode === 'recap') subject = 'Vidéo récap hebdomadaire (leçon ' + L.n + '). Concepts à appliquer : ' + (coversOf(L.n).map(c => c.fr).join(', ') || 'tous ceux déjà vus') + '. Exemple unique : « ' + S.film + ' ». Montre les concepts à l\'œuvre dans CET exemple, ne les relis pas comme une liste.';
+  else subject = 'Teaser promotionnel de 12 secondes (clap et masques, carnet et stylo, téléphone qui filme, scène vide avec flèche dorée). Message : ' + S.angle + '. Dernière slide : « الدراماتورجيا بالدارجة 🎭 » puis « تابعني @Mouradrama ».';
+  const guide = { none: 'Ne mentionne pas le guide.', verbal: 'Le dernier bloc du script parlé mentionne le guide « البنية السردية لفيديوهات قصيرة » en une phrase naturelle.', visual: 'Ne cite pas le guide dans le texte, mais prévois l\'objet « livre » discret dans le visuel de la dernière slide.' }[S.guide];
+  const decor = DECORS[S.decor][1] ? 'Décor dominant imposé pour les visuels : ' + DECORS[S.decor][1] + '.' : 'Choisis le décor le plus parlant pour le concept.';
+  return `${subject}
+Leçons déjà publiées (pour un rappel) : ${before}. Glisse UN rappel bref vers l'une d'elles dans le bloc 20-26s du script parlé, sous la forme « اللي فاتتو الدرس ... ».
+Style d'accroche demandé pour la slide 1 : ${HOOKS[S.hook]}. Écris quand même les trois variantes dans "hooks".
+${S.angle && S.mode !== 'teaser' ? 'Consigne de l\'auteur : ' + S.angle : ''}
+${guide}
+${decor}
+
+Rôles des ${N} slides, dans l'ordre : ${m.roles.join(' / ')}.
+Pour chaque slide, "image_prompt_en" décrit en anglais un visuel vertical sans visage humain, sans personnes, avec des objets symboliques, laissant la moitié basse calme pour le texte. "camera_en" décrit un mouvement de caméra lent (une phrase).
+
+Réponds UNIQUEMENT en JSON valide, sans commentaire :
+{
+ "title_ar": "titre court en darija",
+ "hooks": {"question": "...", "affirmation": "...", "provocation": "..."},
+ "script30": [{"time":"0-3s","text":"..."},{"time":"3-9s","text":"..."},{"time":"9-20s","text":"..."},{"time":"20-26s","text":"..."},{"time":"26-30s","text":"..."}],
+ "slides": [{"role":"...","text_ar":"...","image_prompt_en":"...","camera_en":"..."}],
+ "caption_ar": "description TikTok courte en darija",
+ "tomorrow_ar": "annonce de la leçon de demain en une ligne"
+}
+"slides" contient exactement ${N} éléments et slides[0].text_ar reprend la variante "${S.hook}".`;
+}
+function normalizeScript(j) {
+  const N = MODES[S.mode].slides;
+  if (!Array.isArray(j.slides) || j.slides.length < N) throw new Error('Script incomplet (slides)');
+  const hooks = j.hooks || {};
+  return {
+    title: j.title_ar || '', hooks: { question: hooks.question || '', affirmation: hooks.affirmation || '', provocation: hooks.provocation || '' },
+    script30: (j.script30 || []).map(x => ({ time: x.time || '', text: x.text || '' })),
+    slides: j.slides.slice(0, N).map((s, i) => ({ role: s.role || MODES[S.mode].roles[i], text: s.text_ar || '', prompt: s.image_prompt_en || '', camera: s.camera_en || 'slow push-in' })),
+    caption: j.caption_ar || '', tomorrow: j.tomorrow_ar || '',
+    meta: { mode: S.mode, lessonN: S.lessonN, hook: S.hook, guide: S.guide }
+  };
+}
+function persistScript() { LS.set('mdr_script', { script: S.script, mode: S.mode, lessonN: S.lessonN }); }
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAPE 1 : SCRIPT
+// ══════════════════════════════════════════════════════════════════
+async function runScript() {
+  if (S.running) return; persistForm();
+  S.running = true; S.stop = false; updateButtons(); $('#btn-stop').classList.remove('hidden');
+  setStatus('Écriture du script…');
+  try {
+    const raw = await callText([{ role: 'system', content: BIBLE }, { role: 'user', content: buildScriptPrompt() }], { temperature: 0.85, maxTokens: 3500 });
+    S.script = normalizeScript(parseJSON(raw));
+    const fixed = fixAll();
+    S.images = []; S.clips = [];
+    $('#visuals-card').classList.add('hidden'); $('#clips-card').classList.add('hidden'); $('#btn-clips').classList.add('hidden'); $('#btn-publish').classList.add('hidden');
+    persistScript(); renderScript();
+    log('Script prêt' + (fixed ? ', ' + fixed + ' mot(s) de fusha corrigé(s)' : ''), 'o');
+    toast(fixed ? 'Script prêt, ' + fixed + ' correction(s) darija' : 'Script prêt');
+    $('#script-out').scrollIntoView({ block: 'start' });
+  } catch (e) { log('Erreur : ' + e.message, 'e'); toast(e.message.slice(0, 80), true); }
+  S.running = false; setStatus(null); $('#btn-stop').classList.add('hidden'); updateButtons();
+}
+function stopRun() { S.stop = true; log('Arrêt demandé', 'w'); setStatus('Arrêt en cours…'); }
+
+// ══════════════════════════════════════════════════════════════════
+// AFFICHAGE + ÉDITION DU SCRIPT
+// ══════════════════════════════════════════════════════════════════
+function renderScript() {
+  const s = S.script, box = $('#script-out');
+  if (!s) { box.classList.add('hidden'); return; }
+  box.classList.remove('hidden'); $('#btn-visuals').classList.remove('hidden');
+  let h = '<h2 class="ar" dir="rtl">' + esc(s.title || 'Script') + '</h2>';
+  h += '<div class="sub">Accroches possibles, touche pour remplacer la slide 1</div><div class="hooks">' +
+    Object.keys(HOOKS).map(k => '<button class="hook" onclick="pickHook(\'' + k + '\')"><b>' + HOOKS[k] + '</b><span class="ar">' + esc(s.hooks[k]) + '</span></button>').join('') + '</div>';
+  h += '<div class="sub">Script parlé</div>' + s.script30.map((l, i) =>
+    '<div class="line"><span class="time">' + esc(l.time) + '</span><textarea class="ar" dir="rtl" rows="3" oninput="setLine(' + i + ',this.value)">' + esc(l.text) + '</textarea></div>').join('');
+  h += '<div class="sub">Slides</div>' + s.slides.map((sl, i) =>
+    '<div class="slide-edit"><div class="role">Slide ' + (i + 1) + ', ' + esc(sl.role) + '</div>' +
+    '<textarea class="ar" dir="rtl" rows="2" oninput="setSlideText(' + i + ',this.value)">' + esc(sl.text) + '</textarea>' +
+    '<div class="lint ar" id="lint-' + i + '"></div>' +
+    '<details><summary>Prompt de l\'image</summary><textarea rows="5" oninput="setSlidePrompt(' + i + ',this.value)">' + esc(sl.prompt) + '</textarea><div class="lint" id="plint-' + i + '"></div></details></div>').join('');
+  h += '<div class="sub">Description TikTok</div><textarea class="ar" dir="rtl" rows="3" oninput="S.script.caption=this.value;persistScript()">' + esc(s.caption) + '</textarea>' +
+    '<p class="note">' + HASHTAGS + '</p>' +
+    (s.tomorrow ? '<p class="note ar" dir="rtl">Demain : ' + esc(s.tomorrow) + '</p>' : '') +
+    '<div style="display:flex;gap:.5rem;margin-top:.7rem"><button class="btn ghost small" style="flex:1" onclick="copyCaption()">Copier description</button>' +
+    '<button class="btn ghost small" style="flex:1" onclick="copyScript()">Copier le script</button>' +
+    '<button class="btn ghost small" style="flex:1" onclick="manualFix()">Corriger la darija</button></div>';
+  box.innerHTML = h;
+  s.slides.forEach((_, i) => updateLint(i));
+}
+function pickHook(k) { S.script.slides[0].text = S.script.hooks[k]; S.script.meta.hook = k; persistScript(); renderScript(); toast('Slide 1 remplacée'); }
+function setLine(i, v) { S.script.script30[i].text = v; persistScript(); }
+function setSlideText(i, v) { S.script.slides[i].text = v; updateLint(i); persistScript(); }
+function setSlidePrompt(i, v) { S.script.slides[i].prompt = v; updateLint(i); persistScript(); }
+function manualFix() { const n = fixAll(); persistScript(); renderScript(); toast(n ? n + ' correction(s) appliquée(s)' : 'Rien à corriger'); }
+function copyCaption() { navigator.clipboard.writeText(S.script.caption + '\n\n' + HASHTAGS).then(() => toast('Description copiée')).catch(() => toast('Copie impossible', true)); }
+function copyScript() {
+  const t = S.script.script30.map(l => l.time + '\n' + l.text).join('\n\n');
+  navigator.clipboard.writeText(t).then(() => toast('Script copié')).catch(() => toast('Copie impossible', true));
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAPE 2 : VISUELS (génération + texte superposé sur canvas)
+// ══════════════════════════════════════════════════════════════════
+const STYLE_SUFFIX = 'Cinematic still, deep navy and black palette with warm gold accents, one dramatic golden spotlight beam, floating dust particles in the light, reflective dark floor, shallow depth of field, fine film grain, vertical 9:16 composition with calm empty space in the lower half. Symbolic objects only, no people, no human faces.';
+function fullPrompt(sl) {
+  let p = sl.prompt + '. ' + (DECORS[S.decor][1] ? DECORS[S.decor][1] + '. ' : '') + STYLE_SUFFIX + ' ';
+  p += S.textMode === 'ai' ? 'Render this Arabic text exactly, large and centered in the lower half, with correct right-to-left letters: "' + sl.text + '".' : 'No text, no letters, no logos, no watermark.';
+  return p;
+}
+const useFixedCta = i => S.mode === 'carousel' && S.useCta && !!LS.get('mdr_cta', '') && S.script && i === S.script.slides.length - 1;
+
+function buildGrid() {
+  const g = $('#slides-grid'); g.innerHTML = '';
+  S.script.slides.forEach((sl, i) => {
+    const d = document.createElement('div'); d.className = 'slide-card'; d.id = 'sc-' + i;
+    d.innerHTML = '<canvas id="cv-' + i + '" width="1080" height="1920"></canvas><div class="cap">Slide ' + (i + 1) + '</div>' +
+      '<div class="bar"><button onclick="regen(' + i + ')">Régénérer</button><button onclick="dlSlide(' + i + ')">Télécharger</button></div>';
+    g.appendChild(d);
+    const c = $('#cv-' + i).getContext('2d'); c.fillStyle = '#0d1530'; c.fillRect(0, 0, 1080, 1920);
+    c.fillStyle = '#5d6890'; c.font = '700 56px Manrope, sans-serif'; c.textAlign = 'center'; c.fillText('En attente', 540, 960);
+  });
+}
+async function genSlide(i) {
+  if (useFixedCta(i)) { S.images[i] = { url: LS.get('mdr_cta', ''), fixed: true }; }
+  else { const url = await callImage(fullPrompt(S.script.slides[i])); S.images[i] = { url, fixed: false }; }
+  await drawSlide(i);
+}
+async function runVisuals() {
+  if (S.running || !S.script) return;
+  S.running = true; S.stop = false; updateButtons(); $('#btn-stop').classList.remove('hidden'); await wakeOn();
+  $('#visuals-card').classList.remove('hidden'); if (!$('#slides-grid').children.length || $('#slides-grid').children.length !== S.script.slides.length) buildGrid();
+  try {
+    for (let i = 0; i < S.script.slides.length; i++) {
+      if (S.stop) break; if (S.images[i]) continue;
+      setStatus('Visuel ' + (i + 1) + ' sur ' + S.script.slides.length + '…');
+      try { await genSlide(i); log('Slide ' + (i + 1) + ' prête', 'o'); }
+      catch (e) { if (e.message === 'Arrêt demandé') break; log('Slide ' + (i + 1) + ' : ' + e.message, 'e'); toast('Slide ' + (i + 1) + ' en échec, régénère-la', true); }
+      await sleep(1200);
+    }
+    if (S.images.filter(Boolean).length) { $('#btn-clips').classList.remove('hidden'); $('#btn-publish').classList.remove('hidden'); toast('Visuels terminés'); }
+  } catch (e) { log('Erreur : ' + e.message, 'e'); }
+  S.running = false; setStatus(null); $('#btn-stop').classList.add('hidden'); updateButtons(); await wakeOff();
+}
+async function regen(i) {
+  if (S.running) return; S.running = true; updateButtons(); setStatus('Nouveau visuel ' + (i + 1) + '…');
+  try { S.images[i] = null; await genSlide(i); toast('Slide ' + (i + 1) + ' régénérée'); } catch (e) { log(e.message, 'e'); toast(e.message.slice(0, 70), true); }
+  S.running = false; setStatus(null); updateButtons();
+}
+function loadImg(url) {
+  return new Promise(res => {
+    const a = new Image(); a.crossOrigin = 'anonymous';
+    a.onload = () => res(a);
+    a.onerror = () => { const b = new Image(); b.onload = () => { b._tainted = true; res(b); }; b.onerror = () => res(null); b.src = url; };
+    a.src = url;
+  });
+}
+function wrapLines(ctx, text, maxW) {
+  const words = text.split(/\s+/).filter(Boolean); const lines = []; let cur = '';
+  words.forEach(w => { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+  if (cur) lines.push(cur); return lines;
+}
+async function drawSlide(i) {
+  const cv = $('#cv-' + i); if (!cv) return;
+  const ctx = cv.getContext('2d'); const W = 1080, H = 1920;
+  try { await document.fonts.load('800 74px Cairo'); await document.fonts.load('700 44px Cairo'); } catch (e) {}
+  ctx.fillStyle = '#0a1024'; ctx.fillRect(0, 0, W, H);
+  const im = S.images[i];
+  if (im && im.url) {
+    const img = await loadImg(im.url);
+    if (img) { const sc = Math.max(W / img.width, H / img.height); const w = img.width * sc, h = img.height * sc; ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h); im.tainted = !!img._tainted; }
+  }
+  if (!im || im.fixed || S.textMode !== 'overlay') return;
+  const text = S.script.slides[i].text; if (!text.trim()) return;
+  const g = ctx.createLinearGradient(0, 860, 0, 1700);
+  g.addColorStop(0, 'rgba(6,10,28,0)'); g.addColorStop(.35, 'rgba(6,10,28,.74)'); g.addColorStop(1, 'rgba(6,10,28,.86)');
+  ctx.fillStyle = g; ctx.fillRect(0, 860, W, 900);
+  ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  let size = 80, lines;
+  for (const sz of [80, 70, 60, 52]) { size = sz; ctx.font = '800 ' + sz + 'px Cairo, "Noto Sans Arabic", sans-serif'; lines = wrapLines(ctx, text, 880); if (lines.length <= 4) break; }
+  const lh = size * 1.55, total = lines.length * lh, y0 = 1240 - total / 2 + lh / 2;
+  ctx.fillStyle = '#e3b04b'; ctx.fillRect(W / 2 - 60, y0 - lh / 2 - 34, 120, 5);
+  ctx.shadowColor = 'rgba(0,0,0,.65)'; ctx.shadowBlur = 18; ctx.fillStyle = '#f7ecd0';
+  lines.forEach((l, k) => ctx.fillText(l, W / 2, y0 + k * lh));
+  ctx.shadowBlur = 0;
+  if (S.mode === 'carousel') { ctx.font = '700 44px Cairo, sans-serif'; ctx.fillStyle = '#e3b04b'; ctx.fillText('الدرس ' + S.script.meta.lessonN, W / 2, 190); }
+}
+async function redrawAll() { for (let i = 0; i < S.script.slides.length; i++) await drawSlide(i); toast('Textes actualisés'); }
+function dlSlide(i) {
+  const cv = $('#cv-' + i); const name = 'mouradrama-' + (S.script.meta.mode === 'carousel' ? 'L' + S.script.meta.lessonN : S.script.meta.mode) + '-slide' + (i + 1) + '.png';
+  try {
+    cv.toBlob(b => {
+      if (!b) { toast('Export impossible', true); return; }
+      const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    }, 'image/png');
+  } catch (e) {
+    const im = S.images[i]; toast('Export bloqué par le serveur d\'images, ouverture de l\'image brute', true); if (im && im.url) window.open(im.url, '_blank');
+  }
+}
+async function downloadAll() { for (let i = 0; i < S.script.slides.length; i++) { if (S.images[i]) { dlSlide(i); await sleep(600); } } }
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAPE 3 : CLIPS VIDÉO (keyframes entre deux slides consécutives)
+// ══════════════════════════════════════════════════════════════════
+let measured = LS.get('mdr_speed', null);
+const waitSeconds = () => measured || 105;
+function clipCard(i, total) {
+  const d = document.createElement('div'); d.className = 'pending'; d.id = 'clip-' + i;
+  d.innerHTML = '<b>Clip ' + (i + 1) + ' sur ' + total + '</b><span id="clip-t-' + i + '">En attente</span><div class="bar-progress"><i id="clip-p-' + i + '"></i></div>';
+  $('#clips-grid').appendChild(d);
+}
+function clipSet(i, txt, pct) { const t = $('#clip-t-' + i), p = $('#clip-p-' + i); if (t) t.textContent = txt; if (p && pct != null) p.style.width = pct + '%'; }
+async function createVideoTask(a, b, prompt) {
+  const res = await fetchRetry(API_BASE + '/videos', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + getKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: MODEL_VIDEO, prompt, extra_body: { image: [a, b], mode: 'keyframes' }, num_frames: 241, frame_rate: 24, height: 1024, width: 576 })
+  }, 3, 'Vidéo');
+  if (!res.ok) throw new Error('API vidéo, HTTP ' + res.status + ' ' + (await res.text()).slice(0, 120));
+  const d = await res.json(); if (!d.video_id) throw new Error('video_id absent'); return d.video_id;
+}
+async function pollClip(i, videoId) {
+  const t0 = Date.now(), wait = waitSeconds();
+  for (let r = wait; r > 0; r--) { if (S.stop) throw new Error('Arrêt demandé'); clipSet(i, 'Préparation, ' + r + ' s', Math.min(95, Math.round(((wait - r) / wait) * 100))); await sleep(1000); }
+  for (let n = 0; n < 400; n++) {
+    if (S.stop) throw new Error('Arrêt demandé');
+    try {
+      const res = await fetch(POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO), { headers: { Authorization: 'Bearer ' + getKey() } });
+      if (res.status === 429) { await sleep(20000); continue; }
+      if (res.ok) {
+        const d = await res.json(); const st = d.status || '';
+        clipSet(i, 'Génération ' + (d.progress || 0) + ' %', Math.max(d.progress || 0, 50));
+        if (['completed', 'succeeded', 'done'].includes(st)) {
+          const url = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url); if (!url) throw new Error('Terminé sans URL');
+          measured = Math.round((Date.now() - t0) / 1000 * 1.1); LS.set('mdr_speed', measured); return url;
+        }
+        if (['failed', 'error', 'cancelled'].includes(st)) throw new Error('Échec (' + st + ')');
+      }
+    } catch (e) { if (e.message === 'Arrêt demandé' || e.message.startsWith('Échec') || e.message.startsWith('Terminé')) throw e; }
+    await sleep(5000);
+  }
+  throw new Error('Délai maximal dépassé');
+}
+async function runClips() {
+  if (S.running || !S.script) return;
+  const pairs = []; for (let i = 0; i < S.images.length - 1; i++) { const a = S.images[i], b = S.images[i + 1]; if (a && b && /^https?:/.test(a.url) && /^https?:/.test(b.url)) pairs.push(i); }
+  if (!pairs.length) { toast('Il faut deux visuels générés consécutifs (la clôture fixe est exclue)', true); return; }
+  S.running = true; S.stop = false; S.clips = []; updateButtons(); $('#btn-stop').classList.remove('hidden'); await wakeOn();
+  $('#clips-card').classList.remove('hidden'); $('#clips-grid').innerHTML = ''; pairs.forEach((p, k) => clipCard(k, pairs.length));
+  const jobs = [];
+  try {
+    for (let k = 0; k < pairs.length; k++) {
+      if (S.stop) break; const i = pairs[k];
+      const prompt = 'ONE SINGLE UNBROKEN SHOT. NO CUTS. Camera: ' + (S.script.slides[i].camera || 'slow push-in') + '. Golden spotlight, floating dust, cinematic navy and gold. No people, no faces, no text, no watermarks.';
+      clipSet(k, 'Création de la tâche', 0);
+      try {
+        const id = await createVideoTask(S.images[i].url, S.images[i + 1].url, prompt);
+        log('Clip ' + (k + 1) + ' lancé', 'o');
+        jobs.push(pollClip(k, id).then(url => {
+          S.clips[k] = url; const c = $('#clip-' + k);
+          const d = document.createElement('div'); d.className = 'slide-card clip';
+          d.innerHTML = '<video src="' + esc(url) + '" controls playsinline preload="metadata"></video><a href="' + esc(url) + '" target="_blank" rel="noopener">Ouvrir / enregistrer</a>';
+          c.replaceWith(d); toast('Clip ' + (k + 1) + ' prêt');
+        }).catch(e => { log('Clip ' + (k + 1) + ' : ' + e.message, 'e'); const c = $('#clip-' + k); if (c) c.innerHTML = '<b style="color:var(--bad)">Échec</b><span>' + esc(e.message.slice(0, 70)) + '</span>'; }));
+      } catch (e) { log('Clip ' + (k + 1) + ' : ' + e.message, 'e'); clipSet(k, 'Échec : ' + e.message.slice(0, 60), 0); }
+      if (k < pairs.length - 1 && !S.stop) { for (let r = 62; r > 0; r--) { if (S.stop) break; setStatus('Prochaine tâche vidéo dans ' + r + ' s (1 par minute)'); await sleep(1000); } }
+    }
+    setStatus('Attente des clips…'); await Promise.allSettled(jobs);
+  } catch (e) { log(e.message, 'e'); }
+  S.running = false; setStatus(null); $('#btn-stop').classList.add('hidden'); updateButtons(); await wakeOff();
+}
+let playIdx = 0, playing = false;
+function playAll() {
+  const list = S.clips.filter(Boolean); if (!list.length) return;
+  playing = true; playIdx = 0; const v = $('#player'); v.classList.remove('hidden');
+  const next = () => { if (!playing || playIdx >= list.length) { playing = false; return; } v.src = list[playIdx++]; v.play().catch(() => {}); };
+  v.onended = next; next();
+}
+function stopPlay() { playing = false; const v = $('#player'); v.pause(); }
+
+// ══════════════════════════════════════════════════════════════════
+// PUBLICATION → JOURNAL + PROGRAMME
+// ══════════════════════════════════════════════════════════════════
+function markPublished() {
+  const s = S.script; if (!s) return; const t = today();
+  const j = LS.get('mdr_journal', []);
+  j.unshift({ id: Date.now(), date: t, lesson: s.meta.mode === 'carousel' ? s.meta.lessonN : 0, mode: s.meta.mode, title: s.title, hook: s.meta.hook, guide: s.meta.guide,
+    views: '', likes: '', saves: '', shares: '', comments: '', completion: '', drop: '' });
+  LS.set('mdr_journal', j);
+  if (s.meta.mode === 'carousel') {
+    const done = LS.get('mdr_done', [1, 2, 3, 4, 5]); if (!done.includes(s.meta.lessonN)) done.push(s.meta.lessonN); LS.set('mdr_done', done);
+    const dates = LS.get('mdr_dates', {}); if (!dates[s.meta.lessonN]) dates[s.meta.lessonN] = t; LS.set('mdr_dates', dates);
+    S.lessonN = firstTodo(); buildLessonSelect(); persistForm();
+  }
+  $('#btn-publish').classList.add('hidden'); syncForm(); toast('Ajouté au journal. Reviens y saisir les chiffres.');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ONGLET PROGRAMME
+// ══════════════════════════════════════════════════════════════════
+function renderProgramme() {
+  const done = LS.get('mdr_done', [1, 2, 3, 4, 5]), dates = LS.get('mdr_dates', {}), t = today();
+  const rev = [];
+  CURRICULUM.forEach(c => { const d = dates[c.n]; if (!d) return; [1, 3, 7, 21, 60].forEach(o => { const r = addDays(d, o), diff = daysBetween(t, r); if (diff >= -1 && diff <= 7) rev.push({ c, o, r, diff }); }); });
+  rev.sort((a, b) => a.diff - b.diff);
+  $('#rev-list').innerHTML = rev.length ? rev.map(x => '<div class="rev"><span>Leçon ' + x.c.n + ', ' + esc(x.c.fr) + '</span><b>J+' + x.o + ' ' + (x.diff === 0 ? 'aujourd\'hui' : x.diff < 0 ? 'hier' : 'dans ' + x.diff + ' j') + '</b></div>').join('')
+    : '<p class="note">Rien à réviser pour l\'instant. Saisis la date d\'apprentissage de tes leçons ci-dessous.</p>';
+  let h = '', arc = 0;
+  CURRICULUM.forEach(c => {
+    if (c.arc !== arc) { arc = c.arc; h += '<div class="arc">' + ARCS[arc] + '</div>'; }
+    const d = done.includes(c.n);
+    h += '<div class="lesson' + (d ? ' done' : '') + '"><div class="n">' + c.n + '</div><div class="t">' + esc(c.fr) + '<small class="ar">' + esc(c.ar) + (c.type === 'recap' ? ' récap' : '') + '</small></div>' +
+      '<div class="act"><input type="date" value="' + (dates[c.n] || '') + '" onchange="setDate(' + c.n + ',this.value)" aria-label="Date d\'apprentissage"><input type="checkbox" ' + (d ? 'checked' : '') + ' onchange="setDone(' + c.n + ',this.checked)" aria-label="Publiée"><button class="btn small ghost" onclick="goStudio(' + c.n + ')">Écrire</button></div></div>';
+  });
+  $('#curriculum').innerHTML = h;
+}
+function setDone(n, v) { let d = LS.get('mdr_done', [1, 2, 3, 4, 5]); d = d.filter(x => x !== n); if (v) d.push(n); LS.set('mdr_done', d); renderProgramme(); buildLessonSelect(); }
+function setDate(n, v) { const d = LS.get('mdr_dates', {}); if (v) d[n] = v; else delete d[n]; LS.set('mdr_dates', d); renderProgramme(); }
+function goStudio(n) {
+  S.lessonN = n; S.mode = CURRICULUM.find(c => c.n === n).type === 'recap' ? 'recap' : 'carousel';
+  chips($('#mode-chips'), MODES, 'mode', syncForm); buildLessonSelect(); persistForm(); showTab('studio'); window.scrollTo({ top: 0 });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ONGLET JOURNAL
+// ══════════════════════════════════════════════════════════════════
+const num = v => (v === '' || v == null || isNaN(+v)) ? null : +v;
+function renderJournal() {
+  const j = LS.get('mdr_journal', []);
+  const ex = LS.get('mdr_exp', { hyp: '', v: '' }); $('#exp-hyp').value = ex.hyp; $('#exp-var').value = ex.v;
+  // synthèse par style d'accroche
+  const by = {}; j.forEach(e => { if (num(e.completion) == null) return; (by[e.hook] = by[e.hook] || []).push(e); });
+  const rows = Object.keys(by).map(k => { const a = by[k]; const avg = f => { const v = a.map(x => num(x[f])).filter(x => x != null); return v.length ? Math.round(v.reduce((p, c) => p + c, 0) / v.length * 10) / 10 : '-'; };
+    return '<div class="rev"><span>' + esc(HOOKS[k] || k) + ' (' + a.length + ')</span><b>' + avg('completion') + ' % de complétion, ' + avg('saves') + ' saves</b></div>'; }).join('');
+  $('#hook-summary').innerHTML = '<h2>Ce que disent tes chiffres</h2>' + (rows || '<p class="note">Saisis la complétion de quelques publications : après 15 à 20 posts, les tendances par style d\'accroche apparaissent ici.</p>');
+  $('#entries').innerHTML = j.length ? j.map((e, idx) => {
+    const sl = num(e.saves), lk = num(e.likes), sh = num(e.shares), vw = num(e.views);
+    const r1 = (sl != null && lk) ? Math.round(sl / lk * 100) + ' %' : '-', r2 = (sh != null && vw) ? (Math.round(sh / vw * 1000) / 10) + ' %' : '-';
+    const adv = e.drop === 'brutal' ? 'Chute brutale dans les 3 premières secondes : retravaille uniquement l\'accroche.' : e.drop === 'progressive' ? 'Chute progressive : retravaille le rythme et la structure, pas l\'accroche.' : '';
+    const field = (k, lab) => '<div><label>' + lab + '</label><input type="number" inputmode="decimal" value="' + esc(e[k]) + '" onchange="setEntry(' + e.id + ',\'' + k + '\',this.value)"></div>';
+    return '<div class="card entry"><div class="head"><b>' + (e.lesson ? 'Leçon ' + e.lesson + ', ' : '') + esc(e.title || MODES[e.mode]?.label || '') + '</b><span>' + esc(e.date) + '</span></div>' +
+      '<p class="note" style="margin:0 0 .6rem">Accroche : ' + esc(HOOKS[e.hook] || e.hook) + (e.guide !== 'none' ? ', guide mentionné' : '') + '</p>' +
+      '<div class="metrics">' + field('views', 'Vues') + field('likes', 'Likes') + field('saves', 'Saves') + field('shares', 'Partages') + field('comments', 'Commentaires') + field('completion', 'Complétion %') + '</div>' +
+      '<label class="f">Courbe de rétention</label><select onchange="setEntry(' + e.id + ',\'drop\',this.value)"><option value="">Non regardée</option><option value="brutal"' + (e.drop === 'brutal' ? ' selected' : '') + '>Chute brutale avant 3 s</option><option value="progressive"' + (e.drop === 'progressive' ? ' selected' : '') + '>Chute progressive</option></select>' +
+      '<p class="ratio">Saves sur likes <b>' + r1 + '</b>, partages sur vues <b>' + r2 + '</b></p>' + (adv ? '<p class="note bad">' + adv + '</p>' : '') +
+      '<button class="btn small ghost" style="margin-top:.6rem" onclick="delEntry(' + e.id + ')">Supprimer</button></div>';
+  }).join('') : '<div class="card"><p class="note">Aucune publication suivie. Utilise « Marquer comme publié » dans le Studio.</p></div>';
+}
+function setEntry(id, k, v) { const j = LS.get('mdr_journal', []); const e = j.find(x => x.id === id); if (e) { e[k] = v; LS.set('mdr_journal', j); renderJournal(); } }
+function delEntry(id) { if (!confirm('Supprimer cette ligne ?')) return; LS.set('mdr_journal', LS.get('mdr_journal', []).filter(x => x.id !== id)); renderJournal(); syncForm(); }
+function exportCsv() {
+  const j = LS.get('mdr_journal', []); const cols = ['date', 'lesson', 'mode', 'hook', 'guide', 'views', 'likes', 'saves', 'shares', 'comments', 'completion', 'drop'];
+  const csv = [cols.join(',')].concat(j.map(e => cols.map(c => '"' + String(e[c] == null ? '' : e[c]).replace(/"/g, '""') + '"').join(','))).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = 'mouradrama-journal.csv'; a.click();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NAVIGATION + INIT
+// ══════════════════════════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  if (name === 'programme') renderProgramme(); if (name === 'journal') renderJournal(); if (name === 'studio') syncForm();
+}
+(function init() {
+  const f = LS.get('mdr_form', null); if (f) Object.assign(S, f);
+  if (!f) S.lessonN = firstTodo();
+  document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  chips($('#mode-chips'), MODES, 'mode', syncForm);
+  chips($('#hook-chips'), HOOKS, 'hook');
+  chips($('#text-chips'), TEXT_MODES, 'textMode', () => { if (S.script && S.images.length) redrawAll(); });
+  const dsel = $('#decor-select'); dsel.innerHTML = Object.entries(DECORS).map(([k, v]) => '<option value="' + k + '">' + esc(v[0]) + '</option>').join(''); dsel.value = S.decor;
+  dsel.addEventListener('change', () => { S.decor = dsel.value; persistForm(); });
+  buildLessonSelect(); $('#lesson-select').addEventListener('change', e => { S.lessonN = +e.target.value; persistForm(); });
+  $('#guide-select').value = S.guide; $('#guide-select').addEventListener('change', e => { S.guide = e.target.value; persistForm(); });
+  $('#film-input').value = S.film || ''; $('#angle-input').value = S.angle || '';
+  $('#film-input').addEventListener('input', persistForm); $('#angle-input').addEventListener('input', persistForm);
+  $('#cta-file').addEventListener('change', e => handleCtaFile(e.target.files[0]));
+  $('#exp-hyp').addEventListener('input', e => { const x = LS.get('mdr_exp', { hyp: '', v: '' }); x.hyp = e.target.value; LS.set('mdr_exp', x); });
+  $('#exp-var').addEventListener('input', e => { const x = LS.get('mdr_exp', { hyp: '', v: '' }); x.v = e.target.value; LS.set('mdr_exp', x); });
+  const saved = LS.get('mdr_script', null);
+  if (saved && saved.script) { S.script = saved.script; renderScript(); }
+  refreshKey(); syncForm(); log('Application prête');
+})();
+</script>
+</body>
+</html>
