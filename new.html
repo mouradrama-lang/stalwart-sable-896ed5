@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Court-Métrage Cinématique — 7 Scènes Navy & Or</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+        --bg: #050508; --panel: #0d0d13; --panel-2: #15151c; --border: #23232c;
+        --ink: #ece6d6; --ink-dim: #9a9280; --ink-faint: #565044;
+        --gold: #d4a017; --gold-bright: #e8b833; --navy: #0a1020;
+        --success: #2d8a4e; --error: #c0392b; --warn: #d4a017; --info: #4a6cf7;
+        --radius: 12px;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+        background: var(--bg); color: var(--ink); min-height: 100vh;
+        padding: 1.2rem 1rem 8rem; font-size: 15px; line-height: 1.55;
+        max-width: 900px; margin: 0 auto;
+    }
+    header { margin-bottom: 1.4rem; text-align: center; }
+    h1 { font-size: 1.45rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 0.25rem;
+         background: linear-gradient(135deg, #d4a017, #ece6d6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 0.78rem; color: var(--ink-dim); font-style: italic; }
+
+    .toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--panel); color: var(--ink); padding: 0.85rem 1.4rem; border-radius: 10px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 4px 30px rgba(0,0,0,0.6); border: 1px solid var(--border); z-index: 1000; opacity: 0; transition: transform 0.35s, opacity 0.35s; max-width: 90vw; text-align: center; display: flex; align-items: center; gap: 0.5rem; }
+    .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+    .toast.warn { border-color: var(--warn); }
+
+    .section { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+    .section-header { padding: 0.9rem 1.1rem; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+    .section-header:active { background: var(--panel-2); }
+    .section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-dim); font-weight: 700; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .section-title .badge { display: inline-block; padding: 0.15rem 0.5rem; background: var(--gold); color: #000; border-radius: 10px; font-size: 0.6rem; letter-spacing: 0; font-weight: 700; }
+    .section-title .badge.soft { background: var(--info); color: #fff; }
+    .section-title .badge.count { background: var(--success); color: #fff; }
+    .section-title .badge.lock { background: var(--error); color: #fff; }
+    .section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s; }
+    .section.open .section-header .chevron { transform: rotate(180deg); }
+    .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s; }
+    .section.open .section-body { max-height: 10000px; }
+    .section-content { padding: 0 1.1rem 1.1rem; }
+
+    .api-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin-bottom: 1rem; }
+    .api-key-input { width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: ui-monospace, monospace; font-size: 0.82rem; margin-bottom: 0.55rem; }
+    .api-key-input:focus { outline: none; border-color: var(--gold); }
+    .api-save-btn { width: 100%; padding: 0.75rem 1.2rem; border-radius: 8px; border: none; background: var(--gold); color: #000; font-size: 0.88rem; font-weight: 700; font-family: inherit; cursor: pointer; }
+    .api-status-line { font-size: 0.72rem; padding: 0.5rem 0.8rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem; background: var(--panel-2); color: var(--ink-dim); margin-top: 0.55rem; }
+    .api-status-line.ok { background: #1a2e1a; color: var(--success); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
+    .api-status-line.ok .status-dot { background: var(--success); }
+
+    .limits-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.85rem 1rem; margin-bottom: 1rem; }
+    .limits-panel h3 { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); margin-bottom: 0.55rem; font-weight: 700; }
+    .limit-row { display: flex; justify-content: space-between; align-items: center; padding: 0.32rem 0; font-size: 0.72rem; border-bottom: 1px solid var(--border); }
+    .limit-row:last-child { border-bottom: none; }
+    .limit-label { color: var(--ink-dim); }
+    .limit-value { font-family: ui-monospace, monospace; color: var(--ink); font-weight: 600; font-size: 0.7rem; }
+    .limit-bar { width: 70px; height: 5px; background: var(--panel-2); border-radius: 3px; overflow: hidden; margin-left: 0.5rem; display: inline-block; vertical-align: middle; }
+    .limit-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; display: block; }
+    .limit-bar-fill.ok { background: var(--success); }
+    .limit-bar-fill.warn { background: var(--warn); }
+    .limit-bar-fill.danger { background: var(--error); }
+
+    .project-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .project-bar input { flex: 1; min-width: 140px; padding: 0.68rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.82rem; }
+    .project-bar button { padding: 0.68rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .project-bar button.primary { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    .concept-display { background: linear-gradient(135deg, #0a1020, #1a1208); border: 1px solid var(--gold); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin-bottom: 1rem; font-size: 0.78rem; }
+    .concept-display .cd-title { color: var(--gold); font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.45rem; }
+    .concept-display .cd-text { color: var(--ink); line-height: 1.55; font-size: 0.76rem; }
+
+    .scenes-list { display: flex; flex-direction: column; gap: 0.55rem; }
+    .scene-item { background: var(--panel-2); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 0.75rem 0.95rem; font-size: 0.78rem; }
+    .scene-item.warn-scene { border-left-color: var(--error); }
+    .scene-item .si-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.3rem; }
+    .scene-item .si-num { font-weight: 700; color: var(--gold); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .scene-item .si-time { font-family: ui-monospace, monospace; font-size: 0.62rem; color: var(--ink-faint); }
+    .scene-item .si-title { font-weight: 600; font-size: 0.8rem; margin-bottom: 0.3rem; }
+    .scene-item .si-desc { color: var(--ink-dim); line-height: 1.5; font-size: 0.74rem; }
+    .scene-item .si-warn { color: var(--error); font-size: 0.7rem; margin-top: 0.35rem; font-weight: 600; }
+
+    .btn-primary { width: 100%; padding: 1.1rem; border-radius: var(--radius); border: none; background: linear-gradient(135deg, #d4a017, #8b6b3d); color: #000; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; letter-spacing: 0.02em; }
+    .btn-primary:active:not(:disabled) { transform: scale(0.99); }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-stop { width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid var(--error); background: transparent; color: var(--error); font-size: 0.85rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; display: none; }
+    .btn-stop.visible { display: block; }
+
+    .console-panel { background: #030306; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; max-height: 260px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 0.68rem; line-height: 1.55; }
+    .console-panel .log-line { padding: 0.1rem 0; }
+    .console-panel .log-time { color: var(--ink-faint); margin-right: 0.5rem; }
+    .console-panel .log-info { color: var(--info); }
+    .console-panel .log-success { color: var(--success); }
+    .console-panel .log-error { color: var(--error); }
+    .console-panel .log-warn { color: var(--warn); }
+    .console-panel .log-text { color: var(--ink); }
+    .console-panel .log-heartbeat { color: #8a8aff; }
+    .console-panel .log-measure { color: #ffb84d; font-weight: 700; }
+    .console-panel .log-autosave { color: #a8e0a8; font-weight: 700; }
+    .console-panel .log-cinema { color: var(--gold-bright); font-weight: 700; }
+
+    .autosave-banner { background: linear-gradient(135deg, #1a2e1a, #0a1020); border: 1px solid var(--success); border-radius: var(--radius); padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.75rem; display: none; }
+    .autosave-banner.visible { display: block; }
+    .autosave-banner .as-title { color: var(--success); font-weight: 700; margin-bottom: 0.3rem; }
+    .autosave-banner .as-info { color: var(--ink-dim); font-size: 0.7rem; }
+    .autosave-banner .as-actions { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
+    .autosave-banner .as-actions button { padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+
+    .generated-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.7rem; margin-bottom: 1rem; }
+    .gen-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.5s; }
+    .gen-video-card.newly-added { border-color: var(--success); box-shadow: 0 0 16px rgba(45,138,78,0.5); }
+    .gen-video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #000; }
+    .gen-video-card .gen-label { padding: 0.35rem 0.5rem; font-size: 0.66rem; color: var(--ink); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-weight: 600; }
+    .gen-video-card .gen-timing { padding: 0.3rem 0.5rem; font-size: 0.6rem; color: var(--warn); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-family: ui-monospace, monospace; }
+
+    .pending-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); padding: 0.9rem 0.7rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 260px; text-align: center; }
+    .pending-video-card .pending-spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 0.9rem; }
+    .pending-video-card .pending-label { font-size: 0.78rem; color: var(--ink); font-weight: 700; margin-bottom: 0.4rem; }
+    .pending-video-card .pending-progress-text { font-size: 0.66rem; color: var(--ink-dim); font-family: ui-monospace, monospace; margin-bottom: 0.55rem; }
+    .pending-video-card .pending-eta { font-size: 0.65rem; color: var(--warn); font-weight: 600; margin-bottom: 0.7rem; }
+    .pending-video-card .pending-progress-bar { width: 100%; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+    .pending-video-card .pending-progress-fill { height: 100%; background: linear-gradient(90deg, #d4a017, #8b6b3d); border-radius: 4px; transition: width 0.5s; width: 0%; }
+
+    .video-player-container { background: #000; border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+    .video-player-container video { width: 100%; display: block; max-height: 70vh; object-fit: contain; background: #000; }
+    .player-controls { display: flex; gap: 0.5rem; padding: 0.7rem; background: var(--panel); flex-wrap: wrap; }
+    .player-controls button { flex: 1; min-width: 80px; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+    .player-controls button.playing { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--border); color: var(--ink); padding: 0.75rem 1.1rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.6rem; transform: translateY(100%); transition: transform 0.3s; z-index: 100; }
+    .status-bar.visible { transform: translateY(0); }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .hidden { display: none !important; }
+    #noSleepCanvas, #noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Court-Métrage Cinématique</h1>
+    <p class="subtitle">7 scènes · 70 secondes · Navy & Or · Aucun visage · Aucun texte</p>
+</header>
+
+<div class="project-bar">
+    <input type="text" id="project-name" placeholder="Nom du projet..." value="Court-Métrage 7 Scènes">
+    <button type="button" id="save-project-btn" class="primary">💾 Sauvegarder</button>
+    <button type="button" id="load-project-btn">📂 Charger</button>
+    <button type="button" id="new-project-btn">✨ Nouveau</button>
+</div>
+
+<div class="autosave-banner" id="autosave-banner">
+    <div class="as-title">💾 Session restaurée automatiquement</div>
+    <div class="as-info" id="autosave-info"></div>
+    <div class="as-actions">
+        <button type="button" id="dismiss-autosave-btn">✓ Continuer</button>
+        <button type="button" id="clear-autosave-btn">🗑️ Effacer la session</button>
+    </div>
+</div>
+
+<div class="api-panel" id="api-panel">
+    <input type="password" class="api-key-input" id="api-key-input" placeholder="Collez votre clé API Agnès (sk-...)" autocomplete="off" spellcheck="false">
+    <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+    <div class="api-status-line" id="api-status-line"><span class="status-dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
+</div>
+
+<div class="limits-panel">
+    <h3>📊 Limites API & Vitesse mesurée</h3>
+    <div class="limit-row"><span class="limit-label">Requêtes texte</span><span class="limit-value"><span id="limit-text-count">0</span><span class="limit-bar"><span class="limit-bar-fill ok" id="limit-text-bar" style="width:0%"></span></span></span></div>
+    <div class="limit-row"><span class="limit-label">Images générées</span><span class="limit-value"><span id="limit-image-count">0</span><span class="limit-bar"><span class="limit-bar-fill ok" id="limit-image-bar" style="width:0%"></span></span></span></div>
+    <div class="limit-row"><span class="limit-label">Vidéo (secondes)</span><span class="limit-value"><span id="limit-video-count">0</span>s<span class="limit-bar"><span class="limit-bar-fill ok" id="limit-video-bar" style="width:0%"></span></span></span></div>
+    <div class="limit-row"><span class="limit-label">Vidéo RPM (gratuit : 1/min)</span><span class="limit-value"><span id="limit-video-rpm">0</span>/1</span></div>
+    <div class="limit-row"><span class="limit-label">⚡ Vitesse mesurée</span><span class="limit-value"><span id="limit-measured-speed">en attente</span></span></div>
+</div>
+
+<div class="concept-display">
+    <div class="cd-title">🎬 Contrat visuel fixe (appliqué à toutes les scènes)</div>
+    <div class="cd-text">
+        <strong>Format</strong> : 9:16 vertical · 7 scènes × 10 s = 70 s<br>
+        <strong>Lumière</strong> : Projecteur vertical doré, angle fixe, venant du haut, température ambre chaude, aucune lumière colorée froide<br>
+        <strong>Couleurs</strong> : Navy/noir profond · Objets dorés, bronze, cuivre, bois brut<br>
+        <strong>Poussière</strong> : Fines particules en suspension, mouvement lent, densité constante<br>
+        <strong>Sol</strong> : Pierre ou bois foncé verni, réflexion légère et floue<br>
+        <strong>Caméra</strong> : Un seul geste lent et constant par plan, sujet toujours entièrement visible<br>
+        <strong>Interdits absolus</strong> : Aucun texte · Aucun logo · Aucun visage identifiable · Aucune main avec détail de peau · Style illustration/2D/cartoon · Aucune seconde figure humaine
+    </div>
+</div>
+
+<div class="section open" id="section-scenes">
+    <div class="section-header" data-toggle="section-scenes">
+        <span class="section-title">🎞️ Séquence des 7 scènes <span class="badge">FIXE</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div class="scenes-list" id="scenes-list"></div>
+    </div></div>
+</div>
+
+<button type="button" class="btn-primary" id="generate-btn" disabled>🎬 Générer le court-métrage (7 scènes · 70 s)</button>
+<button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+
+<div class="console-panel" id="console-panel">
+    <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">En attente de la clé API...</span></div>
+</div>
+
+<div class="section hidden open" id="section-videos">
+    <div class="section-header" data-toggle="section-videos"><span class="section-title">🎞️ Les 7 scènes <span class="badge count" id="videos-badge">0</span></span><span class="chevron">▼</span></div>
+    <div class="section-body"><div class="section-content"><div class="generated-videos" id="generated-videos"></div></div></div>
+</div>
+
+<div class="section hidden" id="section-player">
+    <div class="section-header" data-toggle="section-player"><span class="section-title">🎬 Lecture intégrale (70 s)</span><span class="chevron">▼</span></div>
+    <div class="section-body"><div class="section-content">
+        <div class="video-player-container"><video id="player-video" controls playsinline></video></div>
+        <div class="player-controls">
+            <button type="button" id="play-all-btn">▶ Lire le court-métrage</button>
+            <button type="button" id="stop-all-btn">⏹ Arrêter</button>
+        </div>
+        <div style="font-size:0.72rem;color:var(--ink-dim);margin-top:0.5rem;text-align:center;" id="player-info">Scène 1 / 7</div>
+    </div></div>
+</div>
+
+<div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_IMAGE = 'agnes-image-2.5-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+
+const INITIAL_WAIT_SECONDS = 105;
+const POLL_INTERVAL_SECONDS = 5;
+const SAFETY_MARGIN = 1.10;
+const LIMITS = { textRpm: 30, imagesPerDay: 4000, videoSecondsPerDay: 500, videoRpm: 1 };
+
+const FRAMES_PER_CLIP = 241;   // 10 s à 24 fps
+const FPS = 24;
+
+const AUTOSAVE_KEY = 'agnes_courtmetrage7_autosave_v1';
+const PROJECTS_KEY = 'agnes_courtmetrage7_projects_v1';
+const AUTOSAVE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
+// ══════════════════════════════════════════════════════════════════
+// BLOC STYLE GLOBAL — répété dans CHAQUE prompt (image ET vidéo)
+// ══════════════════════════════════════════════════════════════════
+const GLOBAL_STYLE = `Vertical 9:16 photorealistic cinematic short film, light film grain, QUALITY CINEMA RENDERING — NO illustration, NO 2D, NO vector art, NO cartoon, NO flat design, NO stylized digital painting.
+
+LIGHTING: single vertical warm golden spotlight falling from the top of the frame, fixed angle (NO side rim light), warm amber color temperature (NO blue, NO green, NO cold light, NO secondary colored light), constant intensity across the shot (NO flickering, NO sudden flash — except Scene 7 which has a brief controlled golden flash at contact), deep shadows, high contrast between lit zone and total black.
+
+COLORS: deep navy/black background, almost no visible detail outside the beam. Foreground objects in gold, bronze, copper, raw wood tones — NO vivid colors (red, blue, green) except natural metallic reflections.
+
+DUST: fine particles permanently suspended in the air, visible only inside the light beam, slow organic drift (NO artificial swirl, NO glitter effect), constant density across all shots.
+
+FLOOR: dark surface, stone or dark varnished wood, slight blurred reflection of foreground objects — NEVER a perfect mirror, always diffuse and dark.
+
+CAMERA: ONE single slow constant camera gesture per shot (forward dolly, slight lateral dolly, or static), NO change of direction mid-shot, NO acceleration, NO jolt, subject must stay fully visible from first to last frame (NO recrop that cuts an object edge), shallow depth of field — sharp foreground, blurred background.
+
+HUMAN FIGURES (strict): maximum ONE human silhouette per shot, NEVER two people in the same frame, always from behind / far profile / full backlight, face NEVER sharp NEVER identifiable — no eye, nose, or mouth readable even blurred, NO hand with skin/pore/nail/wrinkle detail — a hand if present must remain a dark blurred mass without distinct fingers.
+
+SURFACES AND TEXT (strict): every surface that could carry text (clapperboard slate, film strip, label, notebook cover) MUST be generated BLANK and SMOOTH — NO letters, NO numbers, NO symbols, NO logo, NO inscription even unreadable or partial, anywhere at any time. If the model tends to add text by default (especially clapperboard slate), the surface must be described as "brand new, never used, no factory marking".
+
+SOUND: total silence — no voice-over, no dialogue, no music, no synthetic sound effect.
+
+STRUCTURE: one single concept per 10-second shot — NO evolution toward a second object or a second set within the shot. NO internal transition, fade, or morph. The subject at the beginning must be the same at the end.
+
+STRICTLY FORBIDDEN: any text, any watermark, any logo, any caption, any face, any identifiable human feature, illustration style. Photorealistic, sober, elegant.`;
+
+// ══════════════════════════════════════════════════════════════════
+// LES 7 SCÈNES
+// ══════════════════════════════════════════════════════════════════
+const SCENES = [
+    {
+        num: 1,
+        title: "الدراماتورجيا — Ouverture",
+        time: "0-10 s",
+        description: "Un clap de cinéma classique (bois + métal) ouvert à 45°, ardoise noire mate ENTIÈREMENT VIERGE, sans inscription, sans chiffre, sans ligne pré-imprimée. Bras du clap à rayures noir/blanc nettes, sans texte. 3-4 bobines de film métalliques empilées à côté, tailles légèrement différentes, sans étiquette. Table en bois brut, composition symétrique, vue de face.",
+        image_prompt: "A classic cinema clapperboard in wood and metal, the top arm raised at 45 degrees, the slate surface BLACK MATTE, brand new, completely BLANK — NO writing, NO numbers, NO scene/take markings, NO pre-printed lines, NO factory marking, perfectly smooth empty surface. The clapper arm has clean alternating black and white stripes with NO text. Next to the clapperboard, 3-4 stacked metallic film reels of slightly different sizes, NO labels NO inscriptions on the reels. Objects placed on a raw wood table in the center of the frame, symmetrical front-facing composition.",
+        video_prompt: "Very slow single forward dolly toward the clapperboard and stacked film reels, constant speed across the full 10 seconds, the clapperboard and all reels remain FULLY visible at the end of the movement — no crop that cuts an edge, no zoom past the frame of the objects.",
+        warn: null
+    },
+    {
+        num: 2,
+        title: "البطل — Le protagoniste",
+        time: "10-20 s",
+        description: "Une seule silhouette humaine (sexe non spécifié), costume sombre sans détail. Debout, immobile au départ, amorce un pas lent vers l'avant. Centrée dans un couloir de théâtre sombre en perspective. Toujours en contre-jour (projecteur derrière). Visage JAMAIS visible de face : dos complet ou trois-quarts dos angle large.",
+        image_prompt: "A single human silhouette of unspecified gender wearing a plain dark suit, standing in a dark theatre corridor seen in perspective with walls receding into the depth. The silhouette is ALWAYS backlit — the golden spotlight is BEHIND the figure, never frontal. Face NEVER visible from the front: orientation is full back view OR far three-quarter back at a wide angle so nose and eyes stay out of frame or in total shadow. NO second character in the background, not even blurred.",
+        video_prompt: "One slow step forward by the silhouette, distributed evenly across the full 10 seconds — no running, no abrupt stop. Camera stays FIXED or very slightly dollying forward, NO lateral movement, no second character appears, face stays invisible throughout.",
+        warn: null
+    },
+    {
+        num: 3,
+        title: "العنصر المحفز — L'élément déclencheur",
+        time: "20-30 s",
+        description: "Une bande de pellicule cinéma 35 mm authentique avec perforations latérales visibles des deux côtés. Cases VIERGES, aucune image, aucune photogramme, aucune inscription. Orientée en diagonale, suspendue dans le vide, sans support. La bande se déchire progressivement en son centre, fibres séparées, fragments qui s'envolent.",
+        image_prompt: "An authentic 35mm cinema film strip with visible regular rectangular sprocket holes on both sides, the frames on the strip are BLANK — no image, no drawing, no frame content, no text, no numbers, no edge markings. The strip is oriented diagonally in the frame, suspended in the void with NO visible support. Just at the moment of tearing: the strip begins to tear at its center, the fibers separating.",
+        video_prompt: "Progressive single action across 10 seconds: the film strip starts intact and tears in the middle, the fibers slowly separate, a few fragments fly into the golden light beam, both halves remain clearly visible in the frame at the end, no other object appears after the tear.",
+        warn: null
+    },
+    {
+        num: 4,
+        title: "الهدف والرغبة — Désir et objectif",
+        time: "30-40 s",
+        description: "Cible d'archerie ronde en bois sur support 3 pieds, anneaux concentriques (beige/blanc cassé et marron/noir alternés), centre doré qui pulse doucement. Vue légèrement de trois-quarts, droite, sans inclinaison. Flèche en bois avec plumes visibles qui entre par un côté, motion blur, s'approche du centre. À l'impact : se plante LÉGÈREMENT À CÔTÉ du centre doré, cible immobile.",
+        image_prompt: "A round wooden archery target mounted on a simple stable tripod, concentric rings painted in alternating light bands (cream/off-white) and dark bands (brown/black), the CENTER is a softly glowing golden circle, the target seen at a slight three-quarter angle (not fully front), standing straight, no tilt, no imbalance. A wooden arrow with visible feather fletching is entering the frame from one side, motion-blurred, flying horizontally toward the target.",
+        video_prompt: "The blurred arrow enters from one side and travels toward the target across the full 10 seconds, slight motion blur on the arrow. At impact, the arrow embeds into the target SLIGHTLY OFF-CENTER — close but visibly not inside the golden center. The target stays stable on impact — no fall, no tilting, no excessive vibration. No transition to any other object after impact.",
+        warn: null
+    },
+    {
+        num: 5,
+        title: "الخصم — L'antagoniste",
+        time: "40-50 s",
+        description: "Deux masques de théâtre dorés IDENTIQUES en style ornemental métallique sculpté (volutes, motifs en relief). INTERDIT : masques blancs, masques céramique peinte, joues rouges, style grec classique comédie/tragédie. Se font face de profil, espacés symétriquement. Se rapprochent lentement. Point d'arrivée : presque nez à nez mais NE SE TOUCHENT JAMAIS — un espace minime doit rester visible.",
+        image_prompt: "Two IDENTICAL theatrical masks in a specific ornamental style: GOLDEN METALLIC SCULPTED, with worked reliefs and volutes, NOT the classical white/ceramic Greek comedy-tragedy masks with red painted cheeks. Both masks face each other in profile, positioned symmetrically on either side of the center of the frame, dark blurred background.",
+        video_prompt: "Slow progressive approach of the two masks toward each other across the full 10 seconds, both remaining visible in frame. By the END of the shot, the two masks are very close — almost nose to nose — but they NEVER fully touch, a minimum gap remains visible on the last frame.",
+        warn: "Masques dorés ornementaux uniquement — pas de masques blancs style grec"
+    },
+    {
+        num: 6,
+        title: "العائق — L'obstacle",
+        time: "50-60 s",
+        description: "Une chaîne dorée à maillons ovales tendue horizontalement en travers d'un couloir de théâtre sombre, métal poli, reflets nets. La chaîne vibre légèrement sous tension. Progressivement, une seconde chaîne identique apparaît en dessous et s'entrelace. Fin : un enchevêtrement dense de chaînes forme un mur métallique fermé.",
+        image_prompt: "A single golden chain with oval links stretched horizontally across a dark theatre corridor, polished metal, sharp golden reflections on each link, slight vibration under tension, dark blurred background. NO hand, NO finger, NO skin, NO sleeve, NO human silhouette visible at ANY moment — only inanimate metallic objects.",
+        video_prompt: "Across the full 10 seconds: a second identical chain appears below the first and progressively intertwines with it, until a dense tangle of chains forms a closed metallic wall that visually blocks the passage. ABSOLUTELY NO hand, no finger, no skin, no clothing sleeve, no human silhouette at ANY moment — only inanimate metal objects from first to last frame. NO resolution: the obstacle stays closed and intact, nothing breaks, nothing opens.",
+        warn: "CRITIQUE : aucune main, aucun doigt, aucune peau, aucune manche — uniquement du métal inanimé"
+    },
+    {
+        num: 7,
+        title: "Clôture / CTA",
+        time: "60-70 s",
+        description: "Retour sur le même clap et les mêmes bobines que la scène 1 (même table, même angle de départ). Ardoise noire mate ENTIÈREMENT VIERGE. Le bras du clap descend lentement, puis se ferme complètement à plat contre le socle. Au contact exact : flash bref de lumière dorée plus intense qui redescend immédiatement à l'intensité normale. Fin : image stable sur le clap fermé, aucun autre mouvement.",
+        image_prompt: "A classic cinema clapperboard in wood and metal with the top arm still raised, alongside 3-4 stacked metallic film reels, on the same raw wood table as the opening scene, same camera angle. The slate surface is BLACK MATTE, brand new, COMPLETELY BLANK — NO writing, NO numbers, NO pre-printed lines, NO factory marking.",
+        video_prompt: "The clapper arm slowly descends across the full 10 seconds. On the very LAST frame the arm is COMPLETELY flat against the slate base — no residual angle, no visible gap, total clean closure. At the exact moment of arm/slate contact, a brief flash of brighter golden light bursts, then immediately returns to normal intensity. Final image: stable and composed on the closed clapperboard, no other movement.",
+        warn: "Flash doré bref au contact bras/socle, puis retour à l'intensité normale"
+    }
+];
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════════
+let counters = { textRequests: 0, imagesGenerated: 0, videoSeconds: 0, videoRequestsThisMinute: 0, lastVideoRequestTime: 0, lastResetTime: Date.now() };
+let measuredSpeed = { value: null, usedForEstimate: null, sampleCount: 0 };
+
+function loadMeasuredSpeed() { try { const r = localStorage.getItem('agnes_courtmetrage7_speed'); if (r) measuredSpeed = JSON.parse(r); } catch (e) {} }
+function saveMeasuredSpeed() { try { localStorage.setItem('agnes_courtmetrage7_speed', JSON.stringify(measuredSpeed)); } catch (e) {} }
+function updateMeasuredSpeedDisplay() { const el = document.getElementById('limit-measured-speed'); if (!el) return; el.textContent = measuredSpeed.value === null ? 'en attente' : Math.round(measuredSpeed.value) + 's réel / ' + Math.round(measuredSpeed.usedForEstimate) + 's estimé'; }
+function getEstimatedWaitSeconds() { return measuredSpeed.usedForEstimate !== null ? measuredSpeed.usedForEstimate : INITIAL_WAIT_SECONDS; }
+
+const state = {
+    isRunning: false,
+    stopRequested: false,
+    images: [],
+    videos: [],
+    isPlayingSequence: false,
+    lastTextRequestTime: 0,
+    projectName: 'Court-Métrage 7 Scènes'
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ANTI-VEILLE
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel = null, canvasStream = null;
+async function activateWakeLock() {
+    if ('wakeLock' in navigator) { try { wakeLockSentinel = await navigator.wakeLock.request('screen'); } catch (e) {} }
+    if (!wakeLockSentinel) { try { const c = document.getElementById('noSleepCanvas'); const v = document.getElementById('noSleepVideo'); const ctx = c.getContext('2d'); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 2, 2); canvasStream = c.captureStream(1); v.srcObject = canvasStream; v.play().catch(() => {}); } catch (e) {} }
+}
+async function deactivateWakeLock() {
+    if (wakeLockSentinel) { try { await wakeLockSentinel.release(); } catch (e) {} wakeLockSentinel = null; }
+    if (canvasStream) { try { canvasStream.getTracks().forEach(t => t.stop()); } catch (e) {} canvasStream = null; }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════════════
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function setStatus(t) { const b = document.getElementById('status-bar'); const x = document.getElementById('status-text'); if (t) { b.classList.add('visible'); x.textContent = t; } else b.classList.remove('visible'); }
+function formatTime(s) { if (s < 0) s = 0; const m = Math.floor(s / 60); const sec = Math.round(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
+
+function playNotificationSound() {
+    try {
+        const c = new (window.AudioContext || window.webkitAudioContext)();
+        const o = c.createOscillator(); const g = c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.frequency.value = 660; o.type = 'sine';
+        g.gain.setValueAtTime(0.15, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.7);
+        o.start(); o.stop(c.currentTime + 0.7);
+    } catch (e) {}
+}
+
+let toastTimeout = null;
+function showToast(m, t = 'success', d = 2500) {
+    const el = document.getElementById('toast'); const i = document.getElementById('toast-icon'); const x = document.getElementById('toast-text');
+    el.classList.remove('visible', 'success', 'error', 'warn'); void el.offsetWidth;
+    i.textContent = { success: '✓', error: '✕', warn: '⚠' }[t] || '✓';
+    x.textContent = m; el.classList.add(t);
+    requestAnimationFrame(() => el.classList.add('visible'));
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => el.classList.remove('visible'), d);
+}
+
+function logConsole(m, t = 'info') {
+    const p = document.getElementById('console-panel');
+    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const tl = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', heartbeat: '[En cours]', measure: '[Mesure]', autosave: '[Auto-save]', cinema: '[Cinéma]' };
+    const l = document.createElement('div'); l.className = 'log-line';
+    l.innerHTML = '<span class="log-time">' + time + '</span><span class="log-' + t + '">' + (tl[t] || '[Info]') + '</span> <span class="log-text">' + esc(m) + '</span>';
+    p.appendChild(l); p.scrollTop = p.scrollHeight;
+}
+
+function updateLimitsPanel() {
+    const now = Date.now();
+    if (now - counters.lastResetTime > 60000) { counters.videoRequestsThisMinute = 0; counters.lastResetTime = now; }
+    document.getElementById('limit-text-count').textContent = counters.textRequests;
+    document.getElementById('limit-text-bar').style.width = Math.min((counters.textRequests / LIMITS.textRpm) * 100, 100) + '%';
+    document.getElementById('limit-image-count').textContent = counters.imagesGenerated;
+    document.getElementById('limit-image-bar').style.width = Math.min((counters.imagesGenerated / LIMITS.imagesPerDay) * 100, 100) + '%';
+    document.getElementById('limit-video-count').textContent = Math.round(counters.videoSeconds);
+    document.getElementById('limit-video-bar').style.width = Math.min((counters.videoSeconds / LIMITS.videoSecondsPerDay) * 100, 100) + '%';
+    document.getElementById('limit-video-rpm').textContent = counters.videoRequestsThisMinute;
+    updateMeasuredSpeedDisplay();
+}
+
+function getApiKey() { try { return (localStorage.getItem('agnes_api_key') || '').trim(); } catch (e) { return ''; } }
+function saveApiKey() { const i = document.getElementById('api-key-input'); const k = i.value.trim(); if (!k) { localStorage.removeItem('agnes_api_key'); updateApiPanel(); showToast('Clé supprimée', 'warn'); return; } localStorage.setItem('agnes_api_key', k); updateApiPanel(); showToast('Clé API enregistrée ✓', 'success'); i.blur(); }
+function updateApiPanel() { const sl = document.getElementById('api-status-line'); const st = document.getElementById('api-status-text'); const i = document.getElementById('api-key-input'); const k = getApiKey(); if (k) { sl.classList.add('ok'); st.textContent = 'Clé API active · ' + k.slice(0, 8) + '…' + k.slice(-4); i.value = k; } else { sl.classList.remove('ok'); st.textContent = 'Aucune clé API enregistrée'; i.value = ''; } updateGenerateBtn(); }
+
+function updateGenerateBtn() {
+    const b = document.getElementById('generate-btn');
+    const hk = !!getApiKey();
+    b.disabled = !hk || state.isRunning;
+    if (state.isRunning) b.textContent = 'Génération en cours…';
+    else if (!hk) b.textContent = 'Ajoutez votre clé API pour générer';
+    else b.textContent = '🎬 Générer le court-métrage (7 scènes · 70 s)';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO-SAVE
+// ══════════════════════════════════════════════════════════════════
+let autoSaveTimer = null;
+
+function buildSnapshot() {
+    return {
+        version: 1,
+        savedAt: Date.now(),
+        projectName: document.getElementById('project-name').value || 'Court-Métrage 7 Scènes',
+        images: state.images,
+        videos: state.videos
+    };
+}
+
+function performAutoSave(force = false) {
+    try {
+        const snap = buildSnapshot();
+        const hasContent = snap.images.length > 0 || snap.videos.length > 0;
+        if (!hasContent && !force) return;
+        localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snap));
+    } catch (e) {
+        try { const snap = buildSnapshot(); snap.videos = []; localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snap)); }
+        catch (e2) { logConsole('Auto-save échoué : ' + e2.message, 'warn'); }
+    }
+}
+function scheduleAutoSave() { if (autoSaveTimer) clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(() => performAutoSave(false), 800); }
+
+function loadAutoSavedSession() {
+    try {
+        const raw = localStorage.getItem(AUTOSAVE_KEY);
+        if (!raw) return null;
+        const snap = JSON.parse(raw);
+        if (!snap || !snap.savedAt) return null;
+        if (Date.now() - snap.savedAt > AUTOSAVE_MAX_AGE_MS) { localStorage.removeItem(AUTOSAVE_KEY); return null; }
+        return snap;
+    } catch (e) { return null; }
+}
+function clearAutoSavedSession() { try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {} document.getElementById('autosave-banner').classList.remove('visible'); }
+
+function restoreSession(snap) {
+    document.getElementById('project-name').value = snap.projectName || 'Court-Métrage 7 Scènes';
+    state.images = snap.images || [];
+    state.videos = snap.videos || [];
+    state.projectName = snap.projectName || 'Court-Métrage 7 Scènes';
+
+    document.getElementById('generated-videos').innerHTML = '';
+    state.videos.filter(v => v && v.url).forEach(v => replacePendingWithVideo(v.index, v.url, v.actualDuration));
+
+    if (state.videos.filter(v => v && v.url).length > 0) {
+        document.getElementById('section-videos').classList.remove('hidden');
+        document.getElementById('section-player').classList.remove('hidden');
+    }
+
+    const banner = document.getElementById('autosave-banner');
+    const info = document.getElementById('autosave-info');
+    const dateStr = new Date(snap.savedAt).toLocaleString('fr-FR');
+    const ready = state.videos.filter(v => v && v.url).length;
+    info.textContent = 'Sauvegardé le ' + dateStr + ' · ' + ready + ' scène(s) prête(s) sur 7';
+    banner.classList.add('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROJETS NOMMÉS
+// ══════════════════════════════════════════════════════════════════
+function getProjects() { try { const r = localStorage.getItem(PROJECTS_KEY); return r ? JSON.parse(r) : {}; } catch (e) { return {}; } }
+function saveProject() {
+    const name = document.getElementById('project-name').value.trim() || 'Sans nom';
+    const p = getProjects();
+    const snap = buildSnapshot(); snap.name = name;
+    p[name] = snap;
+    try { localStorage.setItem(PROJECTS_KEY, JSON.stringify(p)); showToast('Projet « ' + name + ' » sauvegardé ✓', 'success'); logConsole('Projet sauvegardé : ' + name, 'success'); }
+    catch (e) { showToast('Erreur : ' + e.message, 'error'); }
+}
+function loadProject() {
+    const p = getProjects(); const names = Object.keys(p);
+    if (!names.length) { showToast('Aucun projet', 'warn'); return; }
+    const list = names.map((n, i) => (i + 1) + '. ' + n).join('\n');
+    const choice = prompt('Quel projet charger ?\n\n' + list + '\n\nNuméro :');
+    if (!choice) return;
+    const idx = parseInt(choice) - 1;
+    if (idx < 0 || idx >= names.length) { showToast('Choix invalide', 'error'); return; }
+    restoreSession(p[names[idx]]);
+    showToast('Projet chargé ✓', 'success');
+}
+function newProject() {
+    if (!confirm('Nouveau projet ? La session auto-sauvegardée sera conservée. Continuer ?')) return;
+    state.images = []; state.videos = [];
+    document.getElementById('project-name').value = 'Court-Métrage 7 Scènes';
+    document.getElementById('generated-videos').innerHTML = '';
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('section-videos').classList.add('hidden');
+    document.getElementById('section-player').classList.add('hidden');
+    performAutoSave(true);
+    showToast('Nouveau projet', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FETCH
+// ══════════════════════════════════════════════════════════════════
+async function fetchWithRetry(url, options = {}, maxRetries = 3, label = 'API') {
+    for (let a = 0; a <= maxRetries; a++) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        try {
+            const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 60000);
+            const res = await fetch(url, { ...options, signal: ctrl.signal }); clearTimeout(t);
+            if ((res.status === 500 || res.status === 502 || res.status === 503 || res.status === 520) && a < maxRetries) {
+                const w = Math.pow(2, a) * 3000 + Math.random() * 2000;
+                logConsole(label + ' : HTTP ' + res.status + ', retry ' + Math.round(w / 1000) + 's…', 'warn');
+                await sleep(w); continue;
+            }
+            if (res.status === 429 && a < maxRetries) { logConsole(label + ' : 429, attente 65s…', 'warn'); await sleep(65000); continue; }
+            return res;
+        } catch (e) {
+            if (e.message === 'Arrêt demandé') throw e;
+            if (a < maxRetries) { const w = Math.pow(2, a) * 2000 + Math.random() * 1000; logConsole(label + ' : retry…', 'warn'); await sleep(w); }
+            else throw new Error(label + ' : échec — ' + e.message);
+        }
+    }
+    throw new Error(label + ' : échec');
+}
+
+async function callImageAPI(prompt, size = '576x1024') {
+    counters.imagesGenerated++; updateLimitsPanel();
+    logConsole('Image → ' + MODEL_IMAGE + ' (' + size + ')', 'info');
+    const body = { model: MODEL_IMAGE, prompt, size, extra_body: { response_format: 'url' } };
+    const res = await fetchWithRetry(API_BASE + '/images/generations', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Image');
+    if (!res.ok) throw new Error('Image API HTTP ' + res.status);
+    const d = await res.json();
+    const u = d.data?.[0]?.url || d.data?.[0]?.b64_json;
+    if (!u) throw new Error('Pas d\'URL'); return u;
+}
+
+async function createVideoTaskOnly(item) {
+    const now = Date.now();
+    if (counters.videoRequestsThisMinute >= LIMITS.videoRpm) {
+        const w = Math.ceil((60000 - (now - counters.lastResetTime)) / 1000);
+        if (w > 0) { logConsole('Limite RPM vidéo. Attente ' + w + 's…', 'warn'); await sleep(w * 1000); counters.videoRequestsThisMinute = 0; counters.lastResetTime = Date.now(); }
+    }
+    counters.videoRequestsThisMinute++; counters.lastVideoRequestTime = Date.now();
+    counters.videoSeconds += FRAMES_PER_CLIP / FPS; updateLimitsPanel();
+
+    const body = {
+        model: MODEL_VIDEO,
+        prompt: item.video_prompt,
+        extra_body: { image: [item.startImage.url, item.endImage.url], mode: 'keyframes' },
+        num_frames: FRAMES_PER_CLIP,
+        frame_rate: FPS,
+        height: 1024,
+        width: 576
+    };
+
+    logConsole('Vidéo → ' + MODEL_VIDEO + ' (' + FRAMES_PER_CLIP + ' frames = ' + (FRAMES_PER_CLIP / FPS) + 's)', 'cinema');
+    const res = await fetchWithRetry(API_BASE + '/videos', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Vidéo');
+    if (!res.ok) { const e = await res.text(); throw new Error('Video API HTTP ' + res.status + ' — ' + e.slice(0, 250)); }
+    const d = await res.json();
+    const vId = d.video_id;
+    if (!vId) throw new Error('Pas de video_id');
+    item.videoId = vId; item.startTime = Date.now();
+    logConsole('✓ Scène ' + item.scene.num + ' — video_id ' + String(vId).slice(0, 25) + '…', 'success');
+    return vId;
+}
+
+async function pollVideoForItem(item) {
+    const startTime = Date.now();
+    const waitBeforeFirstPoll = getEstimatedWaitSeconds();
+    logConsole('Scène ' + item.scene.num + ' — attente ' + Math.round(waitBeforeFirstPoll) + 's avant polling', 'info');
+    const card = document.getElementById('pending-video-' + item.index);
+    if (card) card.classList.add('measuring');
+
+    for (let r = Math.round(waitBeforeFirstPoll); r > 0; r--) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        const elapsed = Math.round((Date.now() - startTime) / 1000);
+        const progress = Math.min(Math.round((elapsed / waitBeforeFirstPoll) * 100), 95);
+        updatePendingVideoCard(item.index, 'Préparation…', progress, elapsed);
+        setStatus('Scène ' + item.scene.num + ' — attente : ' + r + 's');
+        await sleep(1000);
+    }
+
+    let errs = 0, hb = Date.now();
+    for (let a = 0; a < 400; a++) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        const url = POLL_BASE + '?video_id=' + encodeURIComponent(item.videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+        try {
+            const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + getApiKey() } });
+            if (res.status === 429) { await sleep(20000); continue; }
+            if (res.status === 404) { await sleep(POLL_INTERVAL_SECONDS * 1000); continue; }
+            if (!res.ok) { errs++; if (errs >= 15) { await sleep(30000); errs = 0; } await sleep(POLL_INTERVAL_SECONDS * 1000); continue; }
+            errs = 0;
+            const d = await res.json();
+            const status = d.status || 'unknown';
+            const apiP = d.progress || 0;
+            const elapsed = Math.round((Date.now() - startTime) / 1000);
+            const timeP = Math.min(Math.round((elapsed / waitBeforeFirstPoll) * 100), 95);
+            updatePendingVideoCard(item.index, 'Génération…', Math.max(apiP, timeP), elapsed);
+            if (Date.now() - hb > 20000) { hb = Date.now(); logConsole('Scène ' + item.scene.num + ' — ' + apiP + '% — ' + elapsed + 's', 'heartbeat'); }
+            if (status === 'completed' || status === 'succeeded' || status === 'done') {
+                const u = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+                if (!u) throw new Error('Terminé mais pas d\'URL');
+                const actualDuration = Math.round((Date.now() - startTime) / 1000);
+                measuredSpeed.value = actualDuration;
+                measuredSpeed.usedForEstimate = Math.round(actualDuration * SAFETY_MARGIN);
+                measuredSpeed.sampleCount++;
+                saveMeasuredSpeed(); updateMeasuredSpeedDisplay();
+                logConsole('⚡ Scène ' + item.scene.num + ' générée en ' + actualDuration + 's', 'measure');
+                item.actualDuration = actualDuration;
+                return { item, videoUrl: u, actualDuration };
+            }
+            if (status === 'failed' || status === 'error' || status === 'cancelled') throw new Error('Échec (' + status + ')');
+        } catch (e) {
+            if (e.message === 'Arrêt demandé') throw e;
+            if (e.message.startsWith('Échec') || e.message === 'Terminé mais pas d\'URL') throw e;
+            errs++; if (errs >= 15) { await sleep(20000); errs = 0; }
+        }
+        await sleep(POLL_INTERVAL_SECONDS * 1000);
+    }
+    throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE
+// ══════════════════════════════════════════════════════════════════
+async function runPipeline() {
+    if (state.isRunning) return;
+    if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
+
+    state.isRunning = true;
+    state.stopRequested = false;
+    state.images = [];
+    state.videos = [];
+
+    document.getElementById('stop-btn').classList.add('visible');
+    document.getElementById('generate-btn').disabled = true;
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('generated-videos').innerHTML = '';
+    document.getElementById('videos-badge').textContent = '0';
+    document.getElementById('section-videos').classList.remove('hidden');
+    document.getElementById('section-player').classList.add('hidden');
+    document.getElementById('autosave-banner').classList.remove('visible');
+
+    logConsole('══════════════════════════════', 'cinema');
+    logConsole('🎬 COURT-MÉTRAGE — 7 SCÈNES', 'cinema');
+    logConsole('══════════════════════════════', 'cinema');
+    logConsole('Format : 9:16 · 7 × 10 s = 70 secondes', 'cinema');
+    logConsole('Style : Navy + projecteur doré vertical · Poussière · Sans visage · Sans texte', 'cinema');
+    logConsole('Clips : ' + (FRAMES_PER_CLIP / FPS) + 's par scène (' + FRAMES_PER_CLIP + ' frames @ ' + FPS + ' fps)', 'cinema');
+
+    await activateWakeLock();
+    setStatus('Initialisation…');
+    performAutoSave(true);
+
+    try {
+        // ═══ ÉTAPE 1 : IMAGES-CLÉS (2 par scène : début + fin) ═══
+        logConsole('══════════════════════════════', 'cinema');
+        logConsole('ÉTAPE 1/3 — Génération des images-clés (2 par scène)', 'success');
+        logConsole('══════════════════════════════', 'cinema');
+        setStatus('Génération des images-clés…');
+
+        const imgSize = '576x1024';
+
+        for (let i = 0; i < SCENES.length; i++) {
+            if (state.stopRequested) break;
+            const scene = SCENES[i];
+            setStatus('Images scène ' + scene.num + '/7 — ' + scene.title);
+            logConsole('Scène ' + scene.num + ' — ' + scene.title, 'cinema');
+
+            // Image de DÉBUT (début de la scène)
+            const startPrompt = GLOBAL_STYLE + '\n\nSCENE ' + scene.num + ' — BEGINNING FRAME:\n' + scene.image_prompt + '\n\nGenerate the OPENING FRAME of this 10-second shot, at t=0s.';
+            let startUrl = '';
+            try {
+                startUrl = await callImageAPI(startPrompt, imgSize);
+                logConsole('Scène ' + scene.num + ' — image DÉBUT ✓', 'success');
+            } catch (e) {
+                logConsole('Erreur image début scène ' + scene.num + ' : ' + e.message, 'error');
+                throw new Error('Échec image début scène ' + scene.num);
+            }
+
+            await sleep(1500);
+
+            // Image de FIN (fin de la scène — même objet, mouvement avancé)
+            const endPrompt = GLOBAL_STYLE + '\n\nSCENE ' + scene.num + ' — ENDING FRAME (continuation of the SAME shot, same object, same lighting, only the motion has advanced to its final state):\n' + scene.image_prompt + '\n\nGenerate the CLOSING FRAME of this 10-second shot, at t=10s.';
+            let endUrl = '';
+            try {
+                endUrl = await callImageAPI(endPrompt, imgSize);
+                logConsole('Scène ' + scene.num + ' — image FIN ✓', 'success');
+            } catch (e) {
+                logConsole('Erreur image fin scène ' + scene.num + ' : ' + e.message + ' (fallback : réutilisation image début)', 'warn');
+                endUrl = startUrl;
+            }
+
+            state.images.push({ index: i, scene, startUrl, endUrl });
+            performAutoSave(true);
+            await sleep(1200);
+        }
+
+        if (state.images.length < SCENES.length) throw new Error('Images manquantes.');
+        logConsole('✅ ' + state.images.length + ' paires d\'images-clés générées', 'success');
+
+        // ═══ ÉTAPE 2 : VIDÉOS (7 clips × 10 s) ═══
+        logConsole('══════════════════════════════', 'cinema');
+        logConsole('ÉTAPE 2/3 — Génération des 7 clips de ' + (FRAMES_PER_CLIP / FPS) + 's', 'success');
+        logConsole('══════════════════════════════', 'cinema');
+
+        for (let i = 0; i < SCENES.length; i++) createPendingVideoCard(i, SCENES[i]);
+
+        const pollingPromises = [];
+
+        for (let i = 0; i < SCENES.length; i++) {
+            if (state.stopRequested) break;
+            const scene = SCENES[i];
+            const img = state.images[i];
+
+            const item = {
+                index: i,
+                scene,
+                startImage: { url: img.startUrl },
+                endImage: { url: img.endUrl },
+                video_prompt: GLOBAL_STYLE + '\n\nSCENE ' + scene.num + ' — 10-second shot:\n' + scene.video_prompt,
+                videoId: null,
+                startTime: null,
+                actualDuration: null
+            };
+
+            logConsole('──────────────────────────────', 'cinema');
+            logConsole('Création tâche scène ' + scene.num + '/7 — ' + scene.title, 'cinema');
+            updatePendingVideoCard(i, 'Création de la tâche…', 0, 0);
+
+            try {
+                await createVideoTaskOnly(item);
+                updatePendingVideoCard(i, 'Tâche en file…', 0, 0);
+                pollingPromises.push(
+                    pollVideoForItem(item).then(result => {
+                        const { item: it, videoUrl, actualDuration } = result;
+                        state.videos[it.index] = { index: it.index, scene: it.scene, url: videoUrl, actualDuration };
+                        logConsole('✅ Scène ' + it.scene.num + ' prête en ' + actualDuration + 's !', 'success');
+                        replacePendingWithVideo(it.index, videoUrl, actualDuration);
+                        playNotificationSound();
+                        showToast('Scène ' + it.scene.num + ' prête !', 'success', 3000);
+                        performAutoSave(true);
+                        return result;
+                    }).catch(e => {
+                        logConsole('Erreur scène ' + item.scene.num + ' : ' + e.message, 'error');
+                        markPendingFailed(item.index, e.message);
+                        return null;
+                    })
+                );
+            } catch (e) {
+                logConsole('Échec création scène ' + scene.num + ' : ' + e.message, 'error');
+                markPendingFailed(i, e.message);
+            }
+
+            if (i < SCENES.length - 1 && !state.stopRequested) {
+                for (let r = 62; r > 0; r--) {
+                    if (state.stopRequested) break;
+                    setStatus('Prochaine scène dans ' + r + 's');
+                    await sleep(1000);
+                }
+            }
+        }
+
+        logConsole('Attente des ' + pollingPromises.length + ' scènes en parallèle…', 'info');
+        setStatus('Attente des ' + pollingPromises.length + ' scènes…');
+        await Promise.allSettled(pollingPromises);
+
+        // ═══ ÉTAPE 3 : FIN ═══
+        logConsole('══════════════════════════════', 'cinema');
+        logConsole('ÉTAPE 3/3 — Court-métrage terminé', 'success');
+        logConsole('══════════════════════════════', 'cinema');
+
+        const ready = state.videos.filter(v => v && v.url);
+        logConsole('Scènes prêtes : ' + ready.length + '/7', 'cinema');
+
+        if (ready.length > 0) document.getElementById('section-player').classList.remove('hidden');
+
+        performAutoSave(true);
+        logConsole('💾 Session sauvegardée automatiquement', 'autosave');
+
+        setStatus('✦ Court-métrage terminé ✦');
+        await sleep(3000);
+        setStatus(null);
+        showToast(ready.length + ' scène(s) générée(s) sur 7', 'success', 4000);
+
+    } catch (e) {
+        logConsole('ERREUR : ' + e.message, 'error');
+        setStatus('Erreur : ' + e.message.slice(0, 50));
+        await sleep(4000);
+        setStatus(null);
+        showToast('Erreur : ' + e.message.slice(0, 60), 'error');
+    }
+
+    state.isRunning = false;
+    state.stopRequested = false;
+    document.getElementById('stop-btn').classList.remove('visible');
+    updateGenerateBtn();
+    await deactivateWakeLock();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AFFICHAGE
+// ══════════════════════════════════════════════════════════════════
+function renderScenesList() {
+    const g = document.getElementById('scenes-list');
+    g.innerHTML = '';
+    SCENES.forEach(s => {
+        const c = document.createElement('div');
+        c.className = 'scene-item' + (s.warn ? ' warn-scene' : '');
+        c.innerHTML =
+            '<div class="si-head"><span class="si-num">Scène ' + s.num + '</span><span class="si-time">' + s.time + '</span></div>' +
+            '<div class="si-title">' + esc(s.title) + '</div>' +
+            '<div class="si-desc">' + esc(s.description) + '</div>' +
+            (s.warn ? '<div class="si-warn">⚠ ' + esc(s.warn) + '</div>' : '');
+        g.appendChild(c);
+    });
+}
+
+function createPendingVideoCard(index, scene) {
+    const g = document.getElementById('generated-videos');
+    const existing = document.getElementById('pending-video-' + index);
+    if (existing) existing.remove();
+    const c = document.createElement('div');
+    c.className = 'pending-video-card';
+    c.id = 'pending-video-' + index;
+    c.innerHTML =
+        '<div class="pending-spinner"></div>' +
+        '<div class="pending-label">Scène ' + scene.num + ' — ' + esc(scene.title) + '</div>' +
+        '<div class="pending-progress-text" id="pending-progress-' + index + '">En attente…</div>' +
+        '<div class="pending-eta" id="pending-eta-' + index + '"></div>' +
+        '<div class="pending-progress-bar"><div class="pending-progress-fill" id="pending-fill-' + index + '"></div></div>';
+    g.appendChild(c);
+}
+
+function updatePendingVideoCard(index, label, progress, elapsed) {
+    const p = document.getElementById('pending-progress-' + index);
+    const e = document.getElementById('pending-eta-' + index);
+    const f = document.getElementById('pending-fill-' + index);
+    if (p) { let t = label; if (progress > 0) t += ' ' + progress + '%'; if (elapsed > 0) t += ' · ' + elapsed + 's'; p.textContent = t; }
+    if (e && elapsed > 0) { const w = getEstimatedWaitSeconds(); const r = Math.max(0, w - elapsed); e.textContent = r > 0 ? '≈ ' + formatTime(r) + ' restantes' : 'Bientôt…'; }
+    if (f && progress > 0) f.style.width = progress + '%';
+}
+
+function replacePendingWithVideo(index, videoUrl, actualDuration) {
+    const p = document.getElementById('pending-video-' + index);
+    const scene = SCENES[index];
+    if (!p) return;
+    const c = document.createElement('div');
+    c.className = 'gen-video-card newly-added';
+    c.id = 'video-card-' + index;
+    c.innerHTML =
+        '<video src="' + videoUrl + '" controls playsinline preload="metadata"></video>' +
+        '<div class="gen-label">🎬 Scène ' + scene.num + ' — ' + esc(scene.title) + '</div>' +
+        '<div class="gen-timing">⚡ ' + (actualDuration ? 'généré en ' + actualDuration + 's · ' : '') + '10 s de vidéo</div>';
+    p.parentNode.replaceChild(c, p);
+    setTimeout(() => c.classList.remove('newly-added'), 3000);
+    document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
+}
+
+function markPendingFailed(index, msg) {
+    const p = document.getElementById('pending-video-' + index);
+    if (!p) return;
+    p.innerHTML =
+        '<div style="color:var(--error);font-size:2rem;">✕</div>' +
+        '<div class="pending-label" style="color:var(--error);">Échec</div>' +
+        '<div class="pending-progress-text">' + esc(msg.slice(0, 80)) + '</div>';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LECTEUR SÉQUENTIEL
+// ══════════════════════════════════════════════════════════════════
+function playAllVideos() {
+    const ready = state.videos.filter(v => v && v.url);
+    if (!ready.length) { showToast('Aucune scène prête', 'warn'); return; }
+    state.isPlayingSequence = true;
+    document.getElementById('play-all-btn').textContent = '⏸ Lecture…';
+    document.getElementById('play-all-btn').classList.add('playing');
+    document.getElementById('section-player').classList.add('open');
+    playVideoAt(0);
+}
+
+function playVideoAt(index) {
+    while (index < state.videos.length && (!state.videos[index] || !state.videos[index].url)) index++;
+    if (index >= state.videos.length || !state.isPlayingSequence) {
+        state.isPlayingSequence = false;
+        document.getElementById('play-all-btn').textContent = '▶ Lire le court-métrage';
+        document.getElementById('play-all-btn').classList.remove('playing');
+        return;
+    }
+    const video = document.getElementById('player-video');
+    const v = state.videos[index];
+    video.src = v.url;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+    const scene = SCENES[index];
+    document.getElementById('player-info').textContent = 'Scène ' + (index + 1) + ' / ' + state.videos.length + ' — ' + (scene ? scene.title : '');
+    video.onended = () => {
+        if (state.isPlayingSequence) {
+            // Fondu enchaîné doré léger entre les scènes
+            video.style.transition = 'opacity 0.35s';
+            video.style.opacity = '0.35';
+            setTimeout(() => {
+                video.style.opacity = '1';
+                playVideoAt(index + 1);
+            }, 350);
+        }
+    };
+}
+
+function stopAllVideos() {
+    state.isPlayingSequence = false;
+    const video = document.getElementById('player-video');
+    video.pause(); video.currentTime = 0;
+    video.style.opacity = '1';
+    document.getElementById('play-all-btn').textContent = '▶ Lire le court-métrage';
+    document.getElementById('play-all-btn').classList.remove('playing');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+    loadMeasuredSpeed();
+    renderScenesList();
+
+    document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
+    document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
+    document.getElementById('generate-btn').addEventListener('click', runPipeline);
+    document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; logConsole('Arrêt demandé', 'warn'); setStatus('Arrêt…'); });
+    document.querySelectorAll('[data-toggle]').forEach(h => { h.addEventListener('click', () => { document.getElementById(h.dataset.toggle).classList.toggle('open'); }); });
+    document.getElementById('play-all-btn').addEventListener('click', () => { if (state.isPlayingSequence) stopAllVideos(); else playAllVideos(); });
+    document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
+    document.getElementById('save-project-btn').addEventListener('click', saveProject);
+    document.getElementById('load-project-btn').addEventListener('click', loadProject);
+    document.getElementById('new-project-btn').addEventListener('click', newProject);
+    document.getElementById('dismiss-autosave-btn').addEventListener('click', () => { document.getElementById('autosave-banner').classList.remove('visible'); });
+    document.getElementById('clear-autosave-btn').addEventListener('click', () => { if (confirm('Effacer la session auto-sauvegardée ?')) { clearAutoSavedSession(); showToast('Session effacée', 'warn'); } });
+    document.getElementById('project-name').addEventListener('input', scheduleAutoSave);
+
+    window.addEventListener('beforeunload', () => { performAutoSave(true); });
+    setInterval(() => { if (!state.isRunning) performAutoSave(false); }, 60000);
+
+    updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
+    const sk = getApiKey(); if (sk) document.getElementById('api-key-input').value = sk;
+
+    logConsole('Court-Métrage 7 Scènes prêt.', 'info');
+    logConsole('🎬 7 scènes fixes · Navy & Or · Sans visage · Sans texte · ' + (FRAMES_PER_CLIP / FPS) + 's par scène', 'cinema');
+    logConsole('💾 Auto-save activé', 'autosave');
+
+    const snap = loadAutoSavedSession();
+    if (snap) {
+        const ageMin = Math.round((Date.now() - snap.savedAt) / 60000);
+        let ageStr = ageMin < 1 ? 'il y a quelques secondes' : ageMin < 60 ? 'il y a ' + ageMin + ' min' : ageMin < 1440 ? 'il y a ' + Math.round(ageMin / 60) + ' h' : 'il y a ' + Math.round(ageMin / 1440) + ' j';
+        logConsole('Session détectée (' + ageStr + ')', 'autosave');
+        restoreSession(snap);
+        showToast('Session restaurée automatiquement ✓', 'success', 3500);
+    }
+})();
+</script>
+
+</body>
+</html>
