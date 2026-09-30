@@ -3,68 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Studio de Dramaturgie — v4 Cinématographique</title>
+<title>Mouradrama Studio — Dramaturgie en Darija</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    :root { --bg: #0a0a0d; --panel: #16161c; --panel-2: #1e1e26; --border: #2a2a36; --ink: #e8e6e0; --ink-dim: #8a8778; --ink-faint: #55523f; --success: #2d8a4e; --error: #c0392b; --warn: #d4a017; --info: #4a6cf7; --accent: #8b6b3d; --radius: 12px; }
-    body { font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--ink); min-height: 100vh; padding: 1.5rem 1rem 8rem; font-size: 15px; line-height: 1.6; max-width: 1000px; margin: 0 auto; }
+    :root {
+        --bg: #07070c; --panel: #101018; --panel-2: #181824; --border: #26263a;
+        --ink: #f0ead8; --ink-dim: #a09880; --ink-faint: #605840;
+        --success: #2d8a4e; --error: #c0392b; --warn: #d4a017; --info: #4a6cf7;
+        --gold: #d4a017; --navy: #0f1626; --accent: #d4a017; --radius: 12px;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+        background: var(--bg); color: var(--ink); min-height: 100vh;
+        padding: 1.2rem 1rem 8rem; font-size: 15px; line-height: 1.55;
+        max-width: 1000px; margin: 0 auto;
+    }
     header { margin-bottom: 1.5rem; text-align: center; }
-    h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; background: linear-gradient(135deg, #8b6b3d, #4a2a5a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { font-size: 0.85rem; color: var(--ink-dim); font-style: italic; }
-    .toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--panel); color: var(--ink); padding: 0.85rem 1.4rem; border-radius: 10px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 4px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); z-index: 1000; opacity: 0; transition: transform 0.35s ease, opacity 0.35s ease; max-width: 90vw; text-align: center; display: flex; align-items: center; gap: 0.5rem; }
+    h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.3rem;
+         background: linear-gradient(135deg, #d4a017, #f0ead8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 0.82rem; color: var(--ink-dim); font-style: italic; }
+
+    .toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--panel); color: var(--ink); padding: 0.85rem 1.4rem; border-radius: 10px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 4px 30px rgba(0,0,0,0.6); border: 1px solid var(--border); z-index: 1000; opacity: 0; transition: transform 0.35s, opacity 0.35s; max-width: 90vw; text-align: center; display: flex; align-items: center; gap: 0.5rem; }
     .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.success { border-color: var(--success); }
     .toast.error { border-color: var(--error); }
     .toast.warn { border-color: var(--warn); }
+
     .section { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
     .section-header { padding: 1rem 1.2rem; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
     .section-header:active { background: var(--panel-2); }
-    .section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-dim); font-weight: 700; }
-    .section-title .badge { display: inline-block; margin-left: 0.5rem; padding: 0.15rem 0.5rem; background: var(--accent); color: #fff; border-radius: 10px; font-size: 0.65rem; letter-spacing: 0; }
-    .section-title .badge.soft { background: var(--info); }
-    .section-title .badge.count { background: var(--success); }
-    .section-title .badge.lock { background: var(--error); }
-    .section-title .badge.optional { background: var(--ink-faint); }
-    .section-title .badge.new { background: #d4a017; animation: pulse 1.8s infinite; }
+    .section-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-dim); font-weight: 700; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .section-title .badge { display: inline-block; padding: 0.15rem 0.5rem; background: var(--accent); color: #000; border-radius: 10px; font-size: 0.65rem; letter-spacing: 0; font-weight: 700; }
+    .section-title .badge.soft { background: var(--info); color: #fff; }
+    .section-title .badge.count { background: var(--success); color: #fff; }
+    .section-title .badge.lock { background: var(--error); color: #fff; }
+    .section-title .badge.optional { background: var(--ink-faint); color: #fff; }
+    .section-title .badge.new { background: #d4a017; color: #000; animation: pulse 1.8s infinite; }
+    .section-title .badge.darija { background: #2d8a4e; color: #fff; }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
     .section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s; }
     .section.open .section-header .chevron { transform: rotate(180deg); }
-    .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-    .section.open .section-body { max-height: 12000px; }
+    .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s; }
+    .section.open .section-body { max-height: 15000px; }
     .section-content { padding: 0 1.2rem 1.2rem; }
+
+    .project-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .project-bar input { flex: 1; min-width: 150px; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.85rem; }
+    .project-bar button { padding: 0.7rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .project-bar button:active { background: var(--border); }
+    .project-bar button.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+
     .api-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
     .api-key-input { width: 100%; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: ui-monospace, monospace; font-size: 0.85rem; margin-bottom: 0.6rem; }
     .api-key-input:focus { outline: none; border-color: var(--accent); }
-    .api-save-btn { width: 100%; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 0.6rem; }
-    .api-save-btn:active { opacity: 0.7; }
+    .api-save-btn { width: 100%; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; background: var(--accent); color: #000; font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 0.6rem; }
     .api-status-line { font-size: 0.75rem; padding: 0.55rem 0.85rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem; background: var(--panel-2); color: var(--ink-dim); }
     .api-status-line.ok { background: #1a2e1a; color: var(--success); }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
     .api-status-line.ok .status-dot { background: var(--success); }
+
     textarea, input[type="text"] { width: 100%; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.9rem; resize: vertical; }
     textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); }
-    textarea { min-height: 100px; line-height: 1.5; }
+    textarea { min-height: 80px; line-height: 1.5; }
+    textarea.darija { direction: rtl; text-align: right; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
     .control-row { margin-bottom: 0.9rem; }
     .control-label { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
     .control-hint { font-size: 0.68rem; color: var(--ink-faint); margin-top: 0.3rem; font-style: italic; }
-    select { width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.88rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238a8778' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 10px; }
+    select { width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.88rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23a09880' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 10px; }
     select:focus { outline: none; border-color: var(--accent); }
-    .theme-grid, .style-grid, .structure-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
-    .theme-card, .style-card, .structure-card { padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; transition: all 0.15s; text-align: center; }
-    .theme-card:active, .style-card:active, .structure-card:active { transform: scale(0.97); }
-    .theme-card.selected, .style-card.selected, .structure-card.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .theme-card .theme-emoji, .style-card .style-emoji, .structure-card .structure-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
-    .theme-card .theme-name, .style-card .style-name, .structure-card .structure-name { font-size: 0.75rem; font-weight: 600; }
-    .theme-card .theme-desc, .structure-card .structure-desc { font-size: 0.62rem; color: var(--ink-dim); margin-top: 0.2rem; }
-    .theme-card.selected .theme-desc, .structure-card.selected .structure-desc { color: rgba(255,255,255,0.85); }
+
+    .format-grid, .pillar-grid, .style-grid, .concept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+    .format-card, .pillar-card, .style-card, .concept-card { padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; transition: all 0.15s; text-align: center; }
+    .format-card:active, .pillar-card:active, .style-card:active, .concept-card:active { transform: scale(0.97); }
+    .format-card.selected, .pillar-card.selected, .style-card.selected, .concept-card.selected { background: var(--accent); border-color: var(--accent); color: #000; }
+    .format-card .fc-emoji, .pillar-card .pc-emoji, .style-card .sc-emoji, .concept-card .cc-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .format-card .fc-name, .pillar-card .pc-name, .style-card .sc-name, .concept-card .cc-name { font-size: 0.75rem; font-weight: 600; }
+    .format-card .fc-desc, .concept-card .cc-desc { font-size: 0.62rem; color: var(--ink-dim); margin-top: 0.2rem; }
+    .format-card.selected .fc-desc, .concept-card.selected .cc-desc { color: rgba(0,0,0,0.7); }
+
+    .pillar-card { text-align: left; padding: 0.7rem 0.9rem; }
+    .pillar-card .pc-time { font-size: 0.65rem; color: var(--ink-dim); margin-top: 0.2rem; }
+    .pillar-card.selected .pc-time { color: rgba(0,0,0,0.6); }
+
     .custom-input-panel { margin-top: 0.8rem; padding: 0.8rem; border-radius: 8px; background: var(--panel-2); border-left: 3px solid var(--accent); display: none; }
     .custom-input-panel.visible { display: block; }
-    .custom-input-panel label { font-size: 0.72rem; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; display: block; margin-bottom: 0.4rem; }
-    .btn-primary { width: 100%; padding: 1.1rem; border-radius: var(--radius); border: none; background: linear-gradient(135deg, #8b6b3d, #4a2a5a); color: #fff; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; }
+
+    .btn-primary { width: 100%; padding: 1.1rem; border-radius: var(--radius); border: none; background: linear-gradient(135deg, #d4a017, #8b6b3d); color: #000; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; }
     .btn-primary:active:not(:disabled) { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
     .btn-stop { width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid var(--error); background: transparent; color: var(--error); font-size: 0.85rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; display: none; }
     .btn-stop.visible { display: block; }
+
     .limits-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
     .limits-panel h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); margin-bottom: 0.7rem; font-weight: 700; }
     .limit-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; font-size: 0.78rem; border-bottom: 1px solid var(--border); }
@@ -76,7 +107,8 @@
     .limit-bar-fill.ok { background: var(--success); }
     .limit-bar-fill.warn { background: var(--warn); }
     .limit-bar-fill.danger { background: var(--error); }
-    .console-panel { background: #06060a; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; max-height: 300px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 0.72rem; line-height: 1.6; }
+
+    .console-panel { background: #04040a; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; max-height: 300px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 0.72rem; line-height: 1.6; }
     .console-panel .log-line { padding: 0.15rem 0; }
     .console-panel .log-time { color: var(--ink-faint); margin-right: 0.5rem; }
     .console-panel .log-info { color: var(--info); }
@@ -87,73 +119,68 @@
     .console-panel .log-heartbeat { color: #8a8aff; }
     .console-panel .log-measure { color: #ffb84d; font-weight: 700; }
     .console-panel .log-lock { color: var(--error); font-weight: 700; }
-    .console-panel .log-structure { color: #d4a017; font-weight: 700; }
-    .scenario-display { background: var(--panel-2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
-    .scenario-display h3 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
-    .scenario-display .scene-item { padding: 0.6rem 0.8rem; border-left: 3px solid var(--info); margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.8rem; }
-    .scenario-display .scene-item .scene-num { font-weight: 700; color: var(--info); margin-right: 0.3rem; }
-    .scenario-display .scene-item.hook { border-left-color: #d4a017; }
-    .scenario-display .scene-item.hook .scene-num { color: #d4a017; }
-    .scenario-display .scene-item.climax { border-left-color: var(--error); }
-    .scenario-display .scene-item.climax .scene-num { color: var(--error); }
-    .narration-block { padding: 0.6rem 0.8rem; border-left: 3px solid var(--accent); margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.8rem; font-style: italic; color: var(--accent); direction: auto; }
-    .symbol-block { padding: 0.6rem 0.8rem; border-left: 3px solid var(--success); margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.78rem; }
-    .master-style-block { padding: 0.6rem 0.8rem; border-left: 3px solid var(--warn); margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.78rem; font-family: ui-monospace, monospace; }
-    .final-frame-block { padding: 0.6rem 0.8rem; border-left: 3px solid var(--ink-faint); margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.78rem; color: var(--ink-dim); }
-    .constraint-block { padding: 0.6rem 0.8rem; border-left: 3px solid var(--error); margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.78rem; color: var(--error); }
-    .structure-block { padding: 0.6rem 0.8rem; border-left: 3px solid #d4a017; margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.78rem; color: #d4a017; }
-    .generated-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
-    .gen-image-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.4s ease; }
+    .console-panel .log-darija { color: #2d8a4e; font-weight: 700; }
+    .console-panel .log-pillar { color: #d4a017; font-weight: 700; }
+
+    .story-display { background: var(--panel-2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .story-display h3 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
+    .pillar-block { padding: 0.7rem 0.9rem; border-left: 3px solid var(--accent); margin-bottom: 0.5rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.82rem; }
+    .pillar-block .pb-title { font-weight: 700; color: var(--accent); font-size: 0.75rem; margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .pillar-block .pb-time { font-size: 0.65rem; color: var(--ink-dim); margin-bottom: 0.3rem; font-family: ui-monospace, monospace; }
+    .pillar-block .pb-content { direction: auto; }
+    .pillar-block.hook { border-left-color: #d4a017; }
+    .pillar-block.inciting { border-left-color: #ff8844; }
+    .pillar-block.goal { border-left-color: #4a6cf7; }
+    .pillar-block.obstacle { border-left-color: #c0392b; }
+    .pillar-block.resolution { border-left-color: #2d8a4e; }
+
+    .slide-block { padding: 0.7rem 0.9rem; border-left: 3px solid var(--info); margin-bottom: 0.5rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.82rem; }
+    .slide-block .sb-num { font-weight: 700; color: var(--info); font-size: 0.72rem; margin-bottom: 0.2rem; }
+    .slide-block .sb-title { font-weight: 600; font-size: 0.8rem; margin-bottom: 0.3rem; }
+    .slide-block .sb-content { font-size: 0.78rem; color: var(--ink-dim); direction: auto; }
+
+    .generated-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
+    .gen-image-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.4s; }
     .gen-image-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
     .gen-image-card .gen-label { padding: 0.3rem 0.5rem; font-size: 0.65rem; color: var(--ink-dim); text-align: center; }
-    .gen-image-card.final-frame { border-color: var(--ink-faint); }
-    .gen-image-card.final-frame .gen-label { color: var(--ink-faint); font-style: italic; }
     .gen-image-card.hook-frame { border-color: #d4a017; box-shadow: 0 0 12px rgba(212,160,23,0.4); }
     .gen-image-card.hook-frame .gen-label { color: #d4a017; font-weight: 700; }
+
     .generated-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
-    .gen-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.5s ease; }
-    .gen-video-card.newly-added { border-color: var(--success); box-shadow: 0 0 16px rgba(45,138,78,0.5); animation: successPulse 1.5s ease; }
+    .gen-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.5s; }
+    .gen-video-card.newly-added { border-color: var(--success); box-shadow: 0 0 16px rgba(45,138,78,0.5); }
     .gen-video-card.hook-video { border-color: #d4a017; }
     .gen-video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #000; }
     .gen-video-card .gen-label { padding: 0.4rem 0.5rem; font-size: 0.68rem; color: var(--ink); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-weight: 600; }
-    .gen-video-card .gen-narration { padding: 0.4rem 0.6rem; font-size: 0.68rem; color: var(--accent); font-style: italic; background: var(--panel); border-top: 1px solid var(--border); direction: auto; }
+    .gen-video-card .gen-narration { padding: 0.4rem 0.6rem; font-size: 0.68rem; color: var(--accent); font-style: italic; background: var(--panel); border-top: 1px solid var(--border); direction: rtl; text-align: right; }
     .gen-video-card .gen-actions { display: flex; gap: 0.4rem; padding: 0.4rem 0.6rem; background: var(--panel); border-top: 1px solid var(--border); }
     .gen-video-card .gen-actions button { flex: 1; padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.65rem; font-weight: 600; cursor: pointer; }
-    .gen-video-card .gen-actions button:active { background: var(--border); }
-    .gen-video-card .gen-actions button.playing { background: var(--accent); color: #fff; border-color: var(--accent); }
     .gen-video-card .gen-timing { padding: 0.35rem 0.5rem; font-size: 0.65rem; color: var(--warn); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-family: ui-monospace, monospace; }
-    .pending-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center; transition: border-color 0.3s; }
+
+    .pending-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; text-align: center; }
     .pending-video-card .pending-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
     .pending-video-card .pending-label { font-size: 0.85rem; color: var(--ink); font-weight: 700; margin-bottom: 0.5rem; }
     .pending-video-card .pending-progress-text { font-size: 0.72rem; color: var(--ink-dim); font-family: ui-monospace, monospace; margin-bottom: 0.6rem; }
     .pending-video-card .pending-eta { font-size: 0.7rem; color: var(--warn); font-weight: 600; margin-bottom: 0.8rem; }
     .pending-video-card .pending-progress-bar { width: 100%; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
-    .pending-video-card .pending-progress-fill { height: 100%; background: linear-gradient(90deg, #8b6b3d, #4a2a5a); border-radius: 4px; transition: width 0.5s ease; width: 0%; }
-    .pending-video-card.measuring { border-color: var(--info); }
-    .pending-video-card.measuring .pending-spinner { border-top-color: var(--info); }
+    .pending-video-card .pending-progress-fill { height: 100%; background: linear-gradient(90deg, #d4a017, #8b6b3d); border-radius: 4px; transition: width 0.5s; width: 0%; }
+
     .video-player-container { background: #000; border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
     .video-player-container video { width: 100%; display: block; max-height: 70vh; object-fit: contain; background: #000; }
     .player-controls { display: flex; gap: 0.5rem; padding: 0.7rem; background: var(--panel); flex-wrap: wrap; }
     .player-controls button { flex: 1; min-width: 80px; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
-    .player-controls button:active { background: var(--border); }
-    .player-controls button.playing { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .progress-bar { height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
-    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #8b6b3d, #4a2a5a); border-radius: 2px; transition: width 0.3s; }
-    .project-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .project-bar input { flex: 1; min-width: 150px; }
-    .project-bar button { padding: 0.7rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
-    .project-bar button:active { background: var(--border); }
-    .project-bar button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .player-controls button.playing { background: var(--accent); color: #000; border-color: var(--accent); }
+
     .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--border); color: var(--ink); padding: 0.8rem 1.2rem; font-size: 0.78rem; display: flex; align-items: center; gap: 0.6rem; transform: translateY(100%); transition: transform 0.3s; z-index: 100; }
     .status-bar.visible { transform: translateY(0); }
     .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes successPulse { 0% { box-shadow: 0 0 0 rgba(45,138,78,0); } 50% { box-shadow: 0 0 24px rgba(45,138,78,0.7); } 100% { box-shadow: 0 0 16px rgba(45,138,78,0.5); } }
     .hidden { display: none !important; }
-    .rule-banner { background: linear-gradient(135deg, #2a1a0a, #1a0a2a); border: 1px solid var(--accent); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--ink); text-align: center; }
+
+    .rule-banner { background: linear-gradient(135deg, #1a1208, #0f1626); border: 1px solid var(--accent); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--ink); text-align: center; }
     .rule-banner strong { color: var(--accent); }
-    .constraint-counter { display: inline-block; background: var(--error); color: #fff; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.68rem; font-weight: 700; margin-left: 0.5rem; letter-spacing: 0; }
+    .constraint-counter { display: inline-block; background: var(--error); color: #fff; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0; }
     #noSleepCanvas { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
     #noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
 </style>
@@ -161,17 +188,16 @@
 <body>
 
 <header>
-    <h1>Studio de Dramaturgie</h1>
-    <p class="subtitle">Vidéos cinématographiques — Structure narrative courte intégrée</p>
+    <h1>Mouradrama Studio</h1>
+    <p class="subtitle">البنية السردية — Production cinématographique en darija</p>
 </header>
 
 <div class="rule-banner">
-    <strong>⚜ Règle absolue :</strong> aucun visage humain. Uniquement <strong>silhouettes, symboles et objets</strong>.<br>
-    <strong>🎬 Nouveau :</strong> structure narrative courte (in medias res, hook 0-3 s, rétention 40 %).
+    <strong>⚜ Règles fixes Mouradrama :</strong> Darija stricte · Aucun visage IA · <strong>الخصم</strong> (pas الأنتاغونيست) · Un seul concept par production · Palette navy + or
 </div>
 
 <div class="project-bar">
-    <input type="text" id="project-name" placeholder="Nom du projet..." value="Vidéo concept">
+    <input type="text" id="project-name" placeholder="Nom du projet..." value="Mouradrama - Leçon">
     <button type="button" id="save-project-btn" class="primary">💾 Sauvegarder</button>
     <button type="button" id="load-project-btn">📂 Charger</button>
     <button type="button" id="new-project-btn">✨ Nouveau</button>
@@ -183,7 +209,7 @@
     <div class="api-status-line" id="api-status-line"><span class="status-dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
 </div>
 
-<div class="limits-panel" id="limits-panel">
+<div class="limits-panel">
     <h3>📊 Limites API & Vitesse mesurée</h3>
     <div class="limit-row"><span class="limit-label">Requêtes texte</span><span class="limit-value"><span id="limit-text-count">0</span><span class="limit-bar"><span class="limit-bar-fill ok" id="limit-text-bar" style="width:0%"></span></span></span></div>
     <div class="limit-row"><span class="limit-label">Images générées</span><span class="limit-value"><span id="limit-image-count">0</span><span class="limit-bar"><span class="limit-bar-fill ok" id="limit-image-bar" style="width:0%"></span></span></span></div>
@@ -192,181 +218,145 @@
     <div class="limit-row"><span class="limit-label">⚡ Vitesse mesurée</span><span class="limit-value"><span id="limit-measured-speed">en attente</span></span></div>
 </div>
 
-<!-- ═══ NOUVELLE SECTION : STRUCTURE NARRATIVE (d'après le guide) ═══ -->
-<div class="section open" id="section-structure">
-    <div class="section-header" data-toggle="section-structure">
-        <span class="section-title">🎬 Structure narrative courte <span class="badge new">NOUVEAU</span> <span class="badge">guide intégré</span></span>
+<!-- ═══ FORMAT DE PRODUCTION ═══ -->
+<div class="section open" id="section-format">
+    <div class="section-header" data-toggle="section-format">
+        <span class="section-title">🎬 Format de production <span class="badge new">GUIDE INTÉGRÉ</span></span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body">
         <div class="section-content">
-            <div style="background:#2a1a0a;border-left:3px solid #d4a017;border-radius:0 6px 6px 0;padding:0.7rem 0.9rem;margin-bottom:1rem;font-size:0.78rem;">
-                <strong style="color:#d4a017;">📐 Principes du guide :</strong> commence <em>in medias res</em> (au milieu de l'action), accroche dans les <strong>3 premières secondes</strong>, garde <strong>40 %</strong> des spectateurs dès la 1ʳᵉ image, termine par une <strong>chute mémorable</strong>.
+            <div class="format-grid" id="format-grid"></div>
+            <div style="font-size:0.72rem;color:var(--ink-dim);margin-top:0.6rem;" id="format-description">Choisissez carrousel ou vidéo courte.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ LES 5 PILIERS NARRATIFS ═══ -->
+<div class="section open" id="section-pillars">
+    <div class="section-header" data-toggle="section-pillars">
+        <span class="section-title">📐 Les 5 piliers narratifs <span class="badge">FONDAMENTAL</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+        <div class="section-content">
+            <div style="background:#1a1208;border-left:3px solid #d4a017;border-radius:0 6px 6px 0;padding:0.7rem 0.9rem;margin-bottom:1rem;font-size:0.78rem;">
+                <strong style="color:#d4a017;">📖 Du guide :</strong> العنصر الجاذب → العنصر المحفز → الهدف → العقبات/التوتر → الحل. La tension entre الهدف et العقبات est ce qui <strong>retient le spectateur</strong>.
             </div>
-            <div class="structure-grid" id="structure-grid"></div>
+            <div class="pillar-grid" id="pillar-grid"></div>
             <div class="control-row" style="margin-top:1rem;">
-                <label class="control-label">🎞️ Durée totale de la vidéo courte</label>
-                <select id="video-duration-select">
-                    <option value="15">⚡ 15 secondes (Shorts ultra-court)</option>
-                    <option value="30" selected>🎬 30 secondes (format optimal)</option>
-                    <option value="45">🎥 45 secondes (court étendu)</option>
-                    <option value="60">🎞️ 60 secondes (court cinéma)</option>
-                </select>
-                <div class="control-hint">Le nombre de plans et leur durée s'adaptent automatiquement.</div>
-            </div>
-            <div class="control-row">
-                <label class="control-label">🎯 Intensité du hook (0-3 s)</label>
+                <label class="control-label">🎯 Intensité du Hook (0-3s)</label>
                 <select id="hook-intensity-select">
                     <option value="doux">🌱 Doux — intrigue calme mais captivante</option>
-                    <option value="moyen" selected>⚡ Moyen — question intrigante ou image forte</option>
-                    <option value="fort">🔥 Fort — choc visuel, question directe, rupture</option>
+                    <option value="moyen" selected>⚡ Moyen — question intrigante</option>
+                    <option value="fort">🔥 Fort — choc visuel, rupture</option>
                 </select>
             </div>
             <div class="control-row">
-                <label class="control-label">🎭 Type de chute finale</label>
+                <label class="control-label">🎭 Type de résolution (الحل)</label>
                 <select id="ending-type-select">
-                    <option value="revelation">💡 Révélation — retournement de sens</option>
-                    <option value="citation">📖 Citation — phrase forte qui reste</option>
-                    <option value="question">❓ Question ouverte — invite au commentaire</option>
-                    <option value="synthese" selected>📊 Synthèse — récapitulatif visuel</option>
+                    <option value="revelation">💡 Révélation</option>
+                    <option value="citation">📖 Citation forte</option>
+                    <option value="question">❓ Question au public</option>
+                    <option value="cta-guide" selected>📚 CTA vers le guide (الدليل فالـ Bio)</option>
                 </select>
             </div>
         </div>
     </div>
 </div>
 
-<!-- SECTION CONTRAINTES -->
-<div class="section open" id="section-constraints">
-    <div class="section-header" data-toggle="section-constraints">
-        <span class="section-title">🔒 Contraintes personnalisées <span class="badge lock">RÈGLES ABSOLUES</span> <span class="constraint-counter" id="constraint-counter">0</span></span>
+<!-- ═══ CONCEPTS DU PLAN PÉDAGOGIQUE ═══ -->
+<div class="section open" id="section-concepts">
+    <div class="section-header" data-toggle="section-concepts">
+        <span class="section-title">📚 Concepts (28 leçons) <span class="badge optional">OPTIONNEL</span></span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body">
         <div class="section-content">
-            <div style="background:#2a1a0a;border-left:3px solid var(--error);border-radius:0 6px 6px 0;padding:0.7rem 0.9rem;margin-bottom:1rem;font-size:0.78rem;">
-                <strong style="color:var(--error);">⚠ OBLIGATION ABSOLUE :</strong> ces règles seront <strong>imposées</strong> à l'IA dans chaque plan.
-            </div>
             <div class="control-row">
-                <label class="control-label">🎭 Objets obligatoires</label>
-                <textarea id="constraint-objects" placeholder="Un par ligne. Ex:&#10;- Un masque tragique grec&#10;- Une balance dorée&#10;- Un miroir ancien" style="min-height:80px;"></textarea>
+                <label class="control-label">📅 Semaine</label>
+                <select id="week-select">
+                    <option value="1" selected>Semaine 1 — Les fondations</option>
+                    <option value="2">Semaine 2 — La structure</option>
+                    <option value="3">Semaine 3 — Le personnage en profondeur</option>
+                    <option value="4">Semaine 4 — Les outils avancés</option>
+                    <option value="0">✏️ Concept personnalisé (hors plan)</option>
+                </select>
             </div>
-            <div class="control-row">
-                <label class="control-label">📚 Concepts obligatoires</label>
-                <textarea id="constraint-concepts" placeholder="Un par ligne. Ex:&#10;- La purgation des passions&#10;- La faute tragique" style="min-height:80px;"></textarea>
-            </div>
-            <div class="control-row">
-                <label class="control-label">📖 Références obligatoires</label>
-                <textarea id="constraint-references" placeholder="Un par ligne. Ex:&#10;- Aristote, Poétique&#10;- Sophocle, Œdipe Roi" style="min-height:80px;"></textarea>
-            </div>
-            <div class="control-row">
-                <label class="control-label">🚫 Symboles interdits</label>
-                <textarea id="constraint-forbidden" placeholder="Un par ligne. Ex:&#10;- Aucun animal&#10;- Aucune couleur vive" style="min-height:70px;"></textarea>
-            </div>
-            <div class="control-row">
-                <label class="control-label">✏️ Contraintes libres</label>
-                <textarea id="constraint-free" placeholder="Ex:&#10;- Chaque plan contient 2 objets&#10;- Maximum 2 silhouettes par plan" style="min-height:70px;"></textarea>
-            </div>
-            <button type="button" id="clear-constraints-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--error);background:transparent;color:var(--error);font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🗑️ Effacer toutes les contraintes</button>
-        </div>
-    </div>
-</div>
-
-<!-- SECTION CONCEPT -->
-<div class="section open" id="section-theme">
-    <div class="section-header" data-toggle="section-theme">
-        <span class="section-title">🎭 Concept à expliquer <span class="badge optional">OPTIONNEL</span></span>
-        <span class="chevron">▼</span>
-    </div>
-    <div class="section-body">
-        <div class="section-content">
-            <div class="theme-grid" id="theme-grid"></div>
-            <div style="font-size:0.72rem;color:var(--ink-dim);margin-top:0.6rem;" id="theme-description">Choisissez un concept ou décrivez le vôtre.</div>
+            <div class="concept-grid" id="concept-grid"></div>
             <div class="custom-input-panel" id="custom-concept-panel">
-                <label>✏️ Décrivez votre concept personnalisé</label>
-                <textarea id="custom-concept-input" placeholder="Ex: Analyse comparée de la catharsis chez Aristote et Brecht, entre purgation et distanciation critique." style="min-height:90px;"></textarea>
+                <label class="control-label">✏️ Décrivez votre concept personnalisé</label>
+                <textarea id="custom-concept-input" placeholder="Ex: Le rôle du narrateur fiable et non-fiable dans la dramaturgie contemporaine" class="darija" style="min-height:80px;"></textarea>
             </div>
         </div>
     </div>
 </div>
 
-<div class="section open" id="section-sujet">
-    <div class="section-header" data-toggle="section-sujet">
-        <span class="section-title">🎯 Sujet précis <span class="badge">obligatoire</span></span>
+<!-- ═══ SUJET / IDÉE ═══ -->
+<div class="section open" id="section-idea">
+    <div class="section-header" data-toggle="section-idea">
+        <span class="section-title">🎯 Idée / Situation de départ <span class="badge">OBLIGATOIRE</span></span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body">
         <div class="section-content">
-            <textarea id="idea-input" placeholder="Ex: La catharsis dans Œdipe Roi, la structure en cinq actes selon Freytag..."></textarea>
+            <textarea id="idea-input" placeholder="Décrivez en darija ce que vous voulez enseigner ou l'histoire à raconter. Ex: كيفاش البطل ماشي هو الشخصية لي تبان الأكثر..." class="darija" style="min-height:110px;"></textarea>
+            <div class="control-hint">Soyez précis : l'IA utilisera ce texte comme fil conducteur pour les 5 piliers.</div>
         </div>
     </div>
 </div>
 
-<!-- SECTION STYLE -->
+<!-- ═══ STYLE VISUEL ═══ -->
 <div class="section open" id="section-style">
     <div class="section-header" data-toggle="section-style">
-        <span class="section-title">🎨 Style visuel <span class="badge soft">choisissez-en un</span></span>
+        <span class="section-title">🎨 Style visuel <span class="badge soft">MOURADRAMA PAR DÉFAUT</span></span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body">
         <div class="section-content">
             <div class="style-grid" id="style-grid"></div>
             <div class="custom-input-panel" id="custom-style-panel">
-                <label>✏️ Décrivez votre style visuel personnalisé</label>
-                <textarea id="custom-style-input" placeholder="Ex: Style théâtre de marionnettes siciliennes, silhouettes de bois sculpté, fonds peints à la main, ocre et bleu nuit. No human faces." style="min-height:90px;"></textarea>
+                <label class="control-label">✏️ Décrivez votre style personnalisé</label>
+                <textarea id="custom-style-input" placeholder="Ex: Style théâtre de marionnettes siciliennes, silhouettes de bois, fonds peints à la main, ocre et bleu nuit. No human faces." style="min-height:80px;"></textarea>
                 <div class="control-hint">Terminez toujours par « no human faces ».</div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ═══ VOIX & LANGUE ═══ -->
 <div class="section open" id="section-narration">
     <div class="section-header" data-toggle="section-narration">
-        <span class="section-title">🎙️ Voix & Langue</span>
+        <span class="section-title">🎙️ Voix & Langue <span class="badge darija">DARIDJA OBLIGATOIRE</span></span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body">
         <div class="section-content">
             <div class="control-row">
-                <label class="control-label">🌐 Langue</label>
+                <label class="control-label">🌐 Langue de la narration</label>
                 <select id="language-select">
-                    <option value="fr" selected>🇫🇷 Français</option>
-                    <option value="ar">🇸🇦 Arabe classique (Fusha)</option>
-                    <option value="ar-dz">🇩🇿 Daridja algérienne</option>
+                    <option value="ar-dz" selected>🇩🇿 Daridja algérienne (règle Mouradrama)</option>
+                    <option value="ar">🇸🇦 Arabe classique (hors charte)</option>
+                    <option value="fr">🇫🇷 Français (hors charte)</option>
                 </select>
+                <div class="control-hint">La charte Mouradrama impose la darija. Les autres langues sont hors charte.</div>
             </div>
             <div class="control-row">
                 <label class="control-label">🎤 Voix</label>
                 <select id="narrator-select">
-                    <option value="male-deep" selected>🎙️ Voix grave (documentaire)</option>
+                    <option value="male-deep" selected>🎙️ Voix grave (autorité)</option>
                     <option value="male-soft">🎙️ Voix douce</option>
                     <option value="female">🎙️ Voix féminine</option>
-                    <option value="elderly">🎙️ Voix professorale</option>
-                </select>
-            </div>
-            <div class="control-row">
-                <label class="control-label">Registre</label>
-                <select id="narration-select">
-                    <option value="cinematographique" selected>🎬 Cinématographique (voix-off de film)</option>
-                    <option value="universitaire">🎓 Universitaire</option>
-                    <option value="vulgarisation">📖 Vulgarisation</option>
-                    <option value="poetique">🌙 Poétique</option>
-                </select>
-            </div>
-            <div class="control-row">
-                <label class="control-label">Public</label>
-                <select id="audience-select">
-                    <option value="grand-public" selected>🌍 Grand public (réseaux sociaux)</option>
-                    <option value="lycee">🏫 Lycée</option>
-                    <option value="universite">🎓 Université</option>
-                    <option value="initie">⚜ Spécialistes</option>
+                    <option value="elderly">🎙️ Voix âgée</option>
                 </select>
             </div>
             <button type="button" id="test-voice-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🔊 Tester la voix</button>
-            <button type="button" id="download-narration-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">💾 Télécharger la narration (.txt)</button>
+            <button type="button" id="download-script-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">💾 Télécharger le script complet (.txt)</button>
         </div>
     </div>
 </div>
 
+<!-- ═══ PARAMÈTRES TECHNIQUES ═══ -->
 <div class="section" id="section-tech">
     <div class="section-header" data-toggle="section-tech">
         <span class="section-title">📷 Paramètres techniques</span>
@@ -375,15 +365,13 @@
     <div class="section-body">
         <div class="section-content">
             <div class="control-row">
-                <label class="control-label">🎬 Nombre de plans</label>
+                <label class="control-label">🎬 Nombre de plans (vidéo uniquement)</label>
                 <select id="scene-count-select">
-                    <option value="3">3 plans (court)</option>
-                    <option value="4" selected>4 plans</option>
-                    <option value="5">5 plans (leçon type)</option>
-                    <option value="6">6 plans</option>
-                    <option value="8">8 plans (analyse complète)</option>
+                    <option value="3">3 plans (15 s)</option>
+                    <option value="4" selected>4 plans (30 s)</option>
+                    <option value="5">5 plans (45 s)</option>
+                    <option value="6">6 plans (60 s)</option>
                 </select>
-                <div class="control-hint">💡 Le 1ᵉʳ plan est toujours le HOOK, le dernier porte la CHUTE.</div>
             </div>
             <div class="control-row">
                 <label class="control-label">Durée par clip</label>
@@ -392,53 +380,50 @@
                     <option value="241" selected>10 secondes (recommandé)</option>
                     <option value="361">15 secondes</option>
                 </select>
-                <div class="control-hint">La durée totale est calculée automatiquement.</div>
             </div>
             <div class="control-row">
                 <label class="control-label">Format d'image</label>
                 <select id="aspect-select">
-                    <option value="landscape" selected>📺 Paysage 16:9 (YouTube / cours)</option>
-                    <option value="portrait">📱 Portrait 9:16 (Shorts / Reels / TikTok)</option>
-                    <option value="square">⬜ Carré 1:1 (réseaux)</option>
+                    <option value="portrait" selected>📱 Portrait 9:16 (TikTok / Reels)</option>
+                    <option value="landscape">📺 Paysage 16:9 (YouTube)</option>
+                    <option value="square">⬜ Carré 1:1 (Instagram Feed)</option>
                 </select>
             </div>
         </div>
     </div>
 </div>
 
-<button type="button" class="btn-primary" id="generate-btn" disabled>🎭 Générer la vidéo cinématographique</button>
+<button type="button" class="btn-primary" id="generate-btn" disabled>🎬 Générer la production Mouradrama</button>
 <button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
 
 <div class="console-panel" id="console-panel">
     <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">En attente...</span></div>
 </div>
 
-<div class="section hidden" id="section-script">
-    <div class="section-header" data-toggle="section-script"><span class="section-title">📜 Script cinématographique</span><span class="chevron">▼</span></div>
-    <div class="section-body"><div class="section-content"><div class="scenario-display" id="script-display"></div></div></div>
+<div class="section hidden" id="section-story">
+    <div class="section-header" data-toggle="section-story"><span class="section-title">📜 Structure narrative générée</span><span class="chevron">▼</span></div>
+    <div class="section-body"><div class="section-content"><div class="story-display" id="story-display"></div></div></div>
 </div>
 
 <div class="section hidden" id="section-images">
-    <div class="section-header" data-toggle="section-images"><span class="section-title">🖼️ Plans <span class="badge count" id="images-badge">0</span></span><span class="chevron">▼</span></div>
+    <div class="section-header" data-toggle="section-images"><span class="section-title">🖼️ Visuels <span class="badge count" id="images-badge">0</span></span><span class="chevron">▼</span></div>
     <div class="section-body"><div class="section-content"><div class="generated-images" id="generated-images"></div></div></div>
 </div>
 
 <div class="section hidden open" id="section-videos">
-    <div class="section-header" data-toggle="section-videos"><span class="section-title">🎞️ Clips <span class="badge count" id="videos-badge">0</span></span><span class="chevron">▼</span></div>
+    <div class="section-header" data-toggle="section-videos"><span class="section-title">🎞️ Clips vidéo <span class="badge count" id="videos-badge">0</span></span><span class="chevron">▼</span></div>
     <div class="section-body"><div class="section-content"><div class="generated-videos" id="generated-videos"></div></div></div>
 </div>
 
 <div class="section hidden" id="section-player">
-    <div class="section-header" data-toggle="section-player"><span class="section-title">🎬 Lecture</span><span class="chevron">▼</span></div>
+    <div class="section-header" data-toggle="section-player"><span class="section-title">🎬 Lecture complète</span><span class="chevron">▼</span></div>
     <div class="section-body">
         <div class="section-content">
             <div class="video-player-container"><video id="player-video" controls playsinline></video></div>
             <div class="player-controls">
-                <button type="button" id="play-all-btn">▶ Lire la vidéo</button>
+                <button type="button" id="play-all-btn">▶ Lire</button>
                 <button type="button" id="stop-all-btn">⏹ Arrêter</button>
             </div>
-            <div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div>
-            <div style="font-size:0.75rem;color:var(--ink-dim);margin-top:0.5rem;text-align:center;" id="player-info">Plan 1 / 4</div>
         </div>
     </div>
 </div>
@@ -465,156 +450,220 @@ const LIMITS = { textRpm: 30, imagesPerDay: 4000, videoSecondsPerDay: 500, video
 let counters = { textRequests: 0, imagesGenerated: 0, videoSeconds: 0, videoRequestsThisMinute: 0, lastVideoRequestTime: 0, lastResetTime: Date.now() };
 let measuredSpeed = { value: null, usedForEstimate: null, sampleCount: 0 };
 
-function loadMeasuredSpeed() { try { const r = localStorage.getItem('agnes_drama_measured_speed'); if (r) measuredSpeed = JSON.parse(r); } catch (e) {} }
-function saveMeasuredSpeed() { try { localStorage.setItem('agnes_drama_measured_speed', JSON.stringify(measuredSpeed)); } catch (e) {} }
+function loadMeasuredSpeed() { try { const r = localStorage.getItem('agnes_mouradrama_speed'); if (r) measuredSpeed = JSON.parse(r); } catch (e) {} }
+function saveMeasuredSpeed() { try { localStorage.setItem('agnes_mouradrama_speed', JSON.stringify(measuredSpeed)); } catch (e) {} }
 function updateMeasuredSpeedDisplay() { const el = document.getElementById('limit-measured-speed'); if (!el) return; el.textContent = measuredSpeed.value === null ? 'en attente' : Math.round(measuredSpeed.value) + 's réel / ' + Math.round(measuredSpeed.usedForEstimate) + 's estimé'; }
 function getEstimatedWaitSeconds() { return measuredSpeed.usedForEstimate !== null ? measuredSpeed.usedForEstimate : INITIAL_WAIT_SECONDS; }
 
 // ══════════════════════════════════════════════════════════════════
-// STRUCTURES NARRATIVES (extraites du guide)
+// FORMATS DE PRODUCTION
 // ══════════════════════════════════════════════════════════════════
-const STRUCTURES = [
-    { id: 'in-medias-res',
-      name: 'In medias res',
-      emoji: '⚡',
-      desc: 'Démarrage au milieu de l\'action',
-      prompt: 'STRUCTURE "IN MEDIAS RES" OBLIGATOIRE : Commence DIRECTEMENT au milieu de l\'action, sans introduction. Le spectateur est plongé dans une situation déjà en cours. Aucune présentation, aucun préambule. La première image doit être dynamique, intrigante, et donner l\'impression d\'arriver en plein milieu d\'une scène.' },
-    { id: 'hook-3s',
-      name: 'Hook 3 secondes',
-      emoji: '🎯',
-      desc: 'Captiver en 0-3 s',
-      prompt: 'STRUCTURE "HOOK 3 SECONDES" : Le premier plan (0-3 secondes) doit OBLIGATOIREMENT capter l\'attention par : une question intrigante, une image visuellement forte, un contraste saisissant ou une promesse de révélation. Ce premier plan conditionne tout le reste.' },
-    { id: 'retention-40',
-      name: 'Rétention 40 %',
-      emoji: '📊',
-      desc: 'Garder le spectateur dès la 1ʳᵉ image',
-      prompt: 'STRUCTURE "RÉTENTION 40%" : La première image doit être conçue pour retenir 40% des spectateurs dès les 3 premières secondes. Utilise un symbole fort, un contraste visuel marqué, une composition qui crée immédiatement de la curiosité. Chaque plan suivant doit maintenir cette tension pour éviter l\'abandon.' },
-    { id: '3-temps',
-      name: 'Accroche → Dev → Chute',
+const FORMATS = [
+    { id: 'carousel',
+      name: 'Carrousel 6 slides',
+      emoji: '📇',
+      desc: 'Format quotidien Mouradrama',
+      outputType: 'images',
+      slides: 6,
+      structure: ['Accroche', 'Idée reçue / Problème', 'Explication + Formule', 'Application / Question', 'Illustration concrète', 'CTA vers guide'] },
+    { id: 'video-30',
+      name: 'Vidéo 30 secondes',
       emoji: '🎬',
-      desc: 'Structure en 3 temps',
-      prompt: 'STRUCTURE EN 3 TEMPS : 1) ACCROCHE (premier plan) — captiver immédiatement. 2) DÉVELOPPEMENT (plans du milieu) — dérouler le concept avec progression. 3) CHUTE (dernier plan) — conclusion marquante, retournement ou phrase qui reste.' },
-    { id: 'boucle',
-      name: 'Boucle narrative',
-      emoji: '🔄',
-      desc: 'La fin renvoie au début',
-      prompt: 'STRUCTURE "BOUCLE NARRATIVE" : Le dernier plan doit visuellement ou narrativement répondre au premier plan, créant un effet de boucle satisfaisant. Le spectateur termine avec l\'impression que l\'histoire se referme.' },
-    { id: 'aucune',
-      name: 'Libre',
-      emoji: '✏️',
-      desc: 'Pas de structure imposée',
-      prompt: '' }
+      desc: 'Format optimal réseaux',
+      outputType: 'video',
+      clipCount: 4,
+      frameCount: 241 },
+    { id: 'video-60',
+      name: 'Vidéo 60 secondes',
+      emoji: '🎥',
+      desc: 'Vidéo récap hebdo',
+      outputType: 'video',
+      clipCount: 6,
+      frameCount: 241 },
+    { id: 'video-15',
+      name: 'Vidéo 15 secondes',
+      emoji: '⚡',
+      desc: 'Short ultra-court',
+      outputType: 'video',
+      clipCount: 3,
+      frameCount: 121 }
 ];
 
-const VIDEO_DURATIONS = {
-    '15': { label: '15 secondes', idealScenes: 3, idealClipSeconds: 5 },
-    '30': { label: '30 secondes', idealScenes: 4, idealClipSeconds: 7 },
-    '45': { label: '45 secondes', idealScenes: 5, idealClipSeconds: 9 },
-    '60': { label: '60 secondes', idealScenes: 6, idealClipSeconds: 10 }
-};
+// ══════════════════════════════════════════════════════════════════
+// LES 5 PILIERS NARRATIFS (du guide arabe)
+// ══════════════════════════════════════════════════════════════════
+const PILLARS = [
+    { id: 'hook',
+      name: 'العنصر الجاذب',
+      emoji: '🎣',
+      time: '0-3 s',
+      desc: 'Ce qui capte l\'attention dans les 3 premières secondes',
+      prompt: 'Écris un HOOK court (1-2 phrases max) qui démarre IN MEDIAS RES — au milieu de l\'action. Pas d\'introduction, pas de "مرحبا بيكم". Commence par une phrase qui crée une question immédiate dans l\'esprit du spectateur. Style : "كل فيلم حبيتو... فيه نفس السر." ou "اليوم الذي قلت فيه لا لأكبر عميل عندي."' },
+    { id: 'inciting',
+      name: 'العنصر المحفز',
+      emoji: '⚡',
+      time: '3-8 s',
+      desc: 'L\'événement qui bouleverse la situation initiale',
+      prompt: 'Écris l\'ÉLÉMENT DÉCLENCHEUR en 1-2 phrases. C\'est LE fait qui change tout. Reste objectif et rapide. Pas de contexte inutile, pas d\'explications. Style : "كان هذا العميل يمثل 40% من الإيرادات ديالي." — factuel, précis, marquant.' },
+    { id: 'goal',
+      name: 'الهدف',
+      emoji: '🎯',
+      time: '8-18 s',
+      desc: 'Ce que le personnage cherche à obtenir ou préserver',
+      prompt: 'Formule LE BUT en 1-2 phrases. Le but peut être implicite mais doit être clair. Style : déduit naturellement de l\'élément déclencheur. Ne l\'explique pas lourdement — laisse-le transparaître.' },
+    { id: 'obstacle',
+      name: 'العقبات / التوتر',
+      emoji: '🔥',
+      time: '18-40 s',
+      desc: 'Ce qui empêche la réalisation du but — CŒUR DE LA STORY',
+      prompt: 'Développe LE CONFLIT en 2-3 phrases. Présente une vraie difficulté, un vrai dilemme, un vrai risque. PAS de résolution rapide. La tension doit durer. Style : "لو قلت لا، نفقد 40% من الدخل. وإذا قلت نعم، لازم نقبل بشروط..." — montre le VRAI dilemme.' },
+    { id: 'resolution',
+      name: 'الحل / CTA',
+      emoji: '🎬',
+      time: '40-60 s',
+      desc: 'Comment ça se termine — et ce qui reste en tête',
+      prompt: 'Écris LA RÉSOLUTION en 2-3 phrases. Ferme la tension ouverte. Termine par une phrase forte. Si CTA : transforme-le en prolongement narratif, PAS en "اشتركو وفعّلو الجرس". Style : "قلت لا. بعد 3 أشهر، صار عندي 3 عملاء جدد يدفعو أكثر. وأنتوما؟ واش سبق ليكم قلتو لا لحاجة كانت تخوفكم؟" ou orienter vers le guide.' }
+];
 
 const HOOK_INTENSITIES = {
-    'doux': { label: 'Doux', prompt: 'Le hook doit être doux mais intrigant : une image belle, une question posée calmement, une ambiance qui donne envie de rester.' },
-    'moyen': { label: 'Moyen', prompt: 'Le hook doit être percutant : question directe ou image forte qui crée immédiatement la curiosité.' },
-    'fort': { label: 'Fort', prompt: 'Le hook doit être CHOC : rupture visuelle, contraste brutal, question provocante ou image saisissante qui ne laisse pas indifférent.' }
+    'doux': { label: 'Doux', prompt: 'Le hook est doux mais intrigant : une image belle, une question posée calmement.' },
+    'moyen': { label: 'Moyen', prompt: 'Le hook est percutant : question directe ou image forte.' },
+    'fort': { label: 'Fort', prompt: 'Le hook est CHOC : rupture visuelle, contraste brutal, question provocante.' }
 };
 
 const ENDINGS = {
-    'revelation': { label: 'Révélation', prompt: 'La chute doit être une RÉVÉLATION : un retournement de sens qui donne une nouvelle lecture à tout ce qui précède.' },
-    'citation': { label: 'Citation', prompt: 'La chute doit être une CITATION forte (d\'un auteur ou théorique) qui reste en tête du spectateur.' },
-    'question': { label: 'Question ouverte', prompt: 'La chute doit poser une QUESTION OUVERTE qui invite le spectateur à réfléchir et à commenter.' },
-    'synthese': { label: 'Synthèse', prompt: 'La chute doit être une SYNTHÈSE visuelle et conceptuelle : récapituler le propos en une image symbolique forte.' }
+    'revelation': { label: 'Révélation', prompt: 'La chute est une RÉVÉLATION : retournement de sens.' },
+    'citation': { label: 'Citation', prompt: 'La chute est une CITATION forte (auteur, théoricien, proverbe).' },
+    'question': { label: 'Question ouverte', prompt: 'La chute pose une QUESTION OUVERTE qui invite au commentaire.' },
+    'cta-guide': { label: 'CTA vers guide', prompt: 'La chute se termine par un CTA orienté vers le guide payant "البنية السردية لفيديوهات قصيرة" — formulation suggérée : "الدليل الكامل فالـ Bio 📖" ou "هاد المبدأ فصلتو بالتفصيل فالدليل."' }
 };
 
 // ══════════════════════════════════════════════════════════════════
-// CONCEPTS (facultatifs)
+// LES 28 CONCEPTS (du document de référence Mouradrama)
 // ══════════════════════════════════════════════════════════════════
-const THEMES = [
-    { id: 'aucun', name: 'Aucun / Personnalisé', emoji: '✏️', desc: 'Décrivez vous-même', focus: '' },
-    { id: 'structure-3-actes', name: 'Structure en 3 actes', emoji: '📐', desc: 'Exposition, nœud, dénouement', focus: 'Expliquer la structure en trois actes.' },
-    { id: 'pyramide-freytag', name: 'Pyramide de Freytag', emoji: '🔺', desc: 'Les 5 étapes', focus: 'Expliquer la pyramide de Freytag.' },
-    { id: 'catharsis', name: 'Catharsis', emoji: '💧', desc: 'Purgation des émotions', focus: 'Expliquer la catharsis aristotélicienne.' },
-    { id: 'hamartia', name: 'Hamartia', emoji: '⚡', desc: 'La faute tragique', focus: 'Expliquer l\'hamartia.' },
-    { id: 'ironie-dramatique', name: 'Ironie dramatique', emoji: '👁️', desc: 'Le spectateur en sait plus', focus: 'Expliquer l\'ironie dramatique.' },
-    { id: 'choeur-grec', name: 'Le chœur grec', emoji: '🎭', desc: 'Voix collective', focus: 'Expliquer la fonction du chœur.' },
-    { id: 'tragedie-comedie', name: 'Tragédie vs Comédie', emoji: '⚖️', desc: 'Les deux masques', focus: 'Expliquer la différence.' },
-    { id: 'peripetie', name: 'Péripétie', emoji: '🔄', desc: 'Le retournement', focus: 'Expliquer la péripétie.' },
-    { id: 'anagnorisis', name: 'Anagnorisis', emoji: '💡', desc: 'La reconnaissance', focus: 'Expliquer l\'anagnorisis.' },
-    { id: 'deus-ex-machina', name: 'Deus ex machina', emoji: '⚙️', desc: 'Résolution artificielle', focus: 'Expliquer le deus ex machina.' }
-];
+const CONCEPTS = {
+    1: [
+        { id: 'c1', name: 'C\'est quoi la dramaturgie', emoji: '🎭', prompt: 'Définir la dramaturgie comme l\'art de construire une histoire qui capte. Exemple : شخصية تحب حاجة + عندها عوائق + تحارب باش توصلها.' },
+        { id: 'c2', name: 'البطل (Protagoniste)', emoji: '👤', prompt: 'Le protagoniste n\'est PAS celui qui a le plus de temps d\'écran. C\'est celui qui prend les DÉCISIONS qui changent le cours de l\'histoire.' },
+        { id: 'c3', name: 'Le désir / l\'objectif', emoji: '🎯', prompt: 'Ce que le personnage veut obtenir. Sans désir clair, pas de tension possible.' },
+        { id: 'c4', name: 'L\'obstacle', emoji: '🚧', prompt: 'Ce qui empêche le personnage d\'atteindre son objectif. Crée la tension.' },
+        { id: 'c5', name: 'Le conflit', emoji: '⚔️', prompt: 'La confrontation entre le désir et l\'obstacle. Cœur de toute dramaturgie.' },
+        { id: 'c6', name: 'L\'enjeu', emoji: '⚖️', prompt: 'Ce qui est en jeu si le personnage échoue. Plus l\'enjeu est élevé, plus la tension est forte.' },
+        { id: 'c7', name: 'Récap + Quiz', emoji: '📝', prompt: 'Récapitulatif de la semaine 1 avec questions pour tester la compréhension.' }
+    ],
+    2: [
+        { id: 'c8', name: 'L\'exposition', emoji: '📖', prompt: 'Présentation des personnages, du lieu, du contexte. Brève dans les formats courts.' },
+        { id: 'c9', name: 'L\'élément déclencheur', emoji: '⚡', prompt: 'L\'événement qui bouleverse la situation initiale et lance l\'histoire.' },
+        { id: 'c10', name: 'L\'action montante', emoji: '📈', prompt: 'La montée progressive des tensions et des obstacles.' },
+        { id: 'c11', name: 'Le point culminant', emoji: '🔥', prompt: 'Le moment de tension maximale — le pic du conflit.' },
+        { id: 'c12', name: 'La résolution', emoji: '🎬', prompt: 'Comment le conflit se résout — la fin de la tension.' },
+        { id: 'c13', name: 'La structure en 3 actes', emoji: '📐', prompt: 'Exposition → Nœud → Dénouement. La base de tout scénario.' },
+        { id: 'c14', name: 'Récap + application', emoji: '🔍', prompt: 'Appliquer tous les concepts de la semaine 2 sur un film connu.' }
+    ],
+    3: [
+        { id: 'c15', name: 'الخصم (L\'antagoniste)', emoji: '🎭', prompt: 'Utilise TOUJOURS "الخصم", jamais "الأنتاغونيست". L\'antagoniste n\'est PAS forcément le méchant — c\'est toute force qui s\'oppose au but du protagoniste.' },
+        { id: 'c16', name: 'Motivation vs Objectif', emoji: '🧭', prompt: 'La motivation est le POURQUOI profond. L\'objectif est le QUOI concret. Les deux sont nécessaires.' },
+        { id: 'c17', name: 'Le défaut de caractère', emoji: '💔', prompt: 'La faiblesse qui rend le personnage humain et qui crée ses obstacles internes.' },
+        { id: 'c18', name: 'L\'arc de transformation', emoji: '🔄', prompt: 'Comment le personnage change entre le début et la fin de l\'histoire.' },
+        { id: 'c19', name: 'Le sous-texte', emoji: '🤫', prompt: 'Ce qui est dit sans être dit. Le non-dit est souvent plus puissant que le dit.' },
+        { id: 'c20', name: 'Les personnages secondaires', emoji: '👥', prompt: 'Leur rôle : faire avancer l\'histoire, éclairer le protagoniste, créer du contraste.' },
+        { id: 'c21', name: 'Récap', emoji: '📝', prompt: 'Récapitulatif de la semaine 3.' }
+    ],
+    4: [
+        { id: 'c22', name: 'Le dialogue efficace', emoji: '💬', prompt: 'Le dialogue doit révéler le personnage et faire avancer l\'action. Pas de bavardage.' },
+        { id: 'c23', name: 'Le rythme (pacing)', emoji: '🥁', prompt: 'Alterner moments de tension et moments de respiration. Le rythme crée l\'émotion.' },
+        { id: 'c24', name: 'Le retournement', emoji: '🌀', prompt: 'Un twist qui rebat les cartes et surprend le spectateur.' },
+        { id: 'c25', name: 'Le thème', emoji: '💡', prompt: 'Le message profond, universel, qui traverse l\'histoire.' },
+        { id: 'c26', name: 'Show don\'t tell', emoji: '👁️', prompt: 'Montrer plutôt que dire. L\'image est plus forte que l\'explication.' },
+        { id: 'c27', name: 'Adapter au format court', emoji: '✂️', prompt: 'Comment compresser une dramaturgie complète en 30 secondes.' },
+        { id: 'c28', name: 'Bilan complet', emoji: '🏆', prompt: 'Bilan des 28 concepts + application complète.' }
+    ]
+};
 
-const DRAMA_STYLES = [
-    { id: 'silhouette-theatre', name: 'Silhouette Théâtre', emoji: '🌑', prompt: 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, back-lit against dramatic single spotlight, empty stage, deep shadows, high contrast' },
-    { id: 'theatre-grec', name: 'Théâtre Grec', emoji: '🏛️', prompt: 'Ancient Greek theatre aesthetic, marble columns, Greek masks, amphitheater, terracotta and gold tones, no human faces' },
-    { id: 'puppet-shadow', name: 'Ombres Chinoises', emoji: '🎭', prompt: 'Chinese shadow puppet style, black paper-cut silhouettes on illuminated screen, NO FACIAL FEATURES' },
-    { id: 'minimal-symbolique', name: 'Minimal Symbolique', emoji: '⬛', prompt: 'Minimalist symbolic illustration, geometric shapes, flat colors, icons, no human figures' },
-    { id: 'theatre-barock', name: 'Théâtre Baroque', emoji: '⚜️', prompt: 'Baroque theatre aesthetic, ornate red velvet curtains, gilded frames, chiaroscuro, crimson and gold, no human faces' },
-    { id: 'theatre-noir', name: 'Théâtre Noir', emoji: '🖤', prompt: 'Film noir theatrical style, stark black and white, harsh shadows, silhouette figures with NO FACIAL FEATURES' },
-    { id: 'blueprint', name: 'Schéma Technique', emoji: '📊', prompt: 'Technical blueprint diagram style, white lines on dark blue background, geometric precision' },
-    { id: 'vitrail', name: 'Vitrail', emoji: '🪟', prompt: 'Stained glass window aesthetic, fragmented colored glass, black lead lines, symbolic figures without facial features' },
-    { id: 'custom', name: 'Personnalisé', emoji: '✏️', prompt: '' }
+// ══════════════════════════════════════════════════════════════════
+// STYLES VISUELS (Mouradrama en premier)
+// ══════════════════════════════════════════════════════════════════
+const STYLES = [
+    { id: 'mouradrama',
+      name: 'Mouradrama (défaut)',
+      emoji: '🎬',
+      prompt: 'Cinematic theatre aesthetic, deep navy blue and black background, dramatic golden spotlight, floating dust particles, ornate vintage objects (masks, clapperboard, compass, keys, notebooks, doors), rich chiaroscuro lighting, warm golden accents (#d4a017), film grain texture, NO FACIAL FEATURES, NO HUMAN FACES, silhouettes and symbolic objects only' },
+    { id: 'theatre-noir',
+      name: 'Théâtre Noir',
+      emoji: '🖤',
+      prompt: 'Film noir theatrical style, stark black and white, harsh shadows, silhouette figures with NO FACIAL FEATURES, venetian blind lighting, 1940s detective aesthetic' },
+    { id: 'theatre-grec',
+      name: 'Théâtre Grec',
+      emoji: '🏛️',
+      prompt: 'Ancient Greek theatre aesthetic, marble columns, Greek masks, amphitheater, terracotta and gold tones, no human faces' },
+    { id: 'puppet-shadow',
+      name: 'Ombres Chinoises',
+      emoji: '🎭',
+      prompt: 'Chinese shadow puppet style, black paper-cut silhouettes on illuminated screen, NO FACIAL FEATURES, theatrical backlighting' },
+    { id: 'minimal-gold',
+      name: 'Minimal Or',
+      emoji: '⬛',
+      prompt: 'Minimalist symbolic illustration, geometric shapes, flat deep navy background, golden accents, icons representing concepts, no human figures' },
+    { id: 'vitrail',
+      name: 'Vitrail',
+      emoji: '🪟',
+      prompt: 'Stained glass window aesthetic, fragmented colored glass, black lead lines, symbolic figures without facial features' },
+    { id: 'custom',
+      name: 'Personnalisé',
+      emoji: '✏️',
+      prompt: '' }
 ];
 
 const NARRATORS = {
-    'male-deep': { label: 'Voix grave', pitch: 0.65, rate: 0.85, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i },
+    'male-deep': { label: 'Voix grave', pitch: 0.65, rate: 0.88, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i },
     'male-soft': { label: 'Voix douce', pitch: 0.95, rate: 0.92, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male/i },
     'female': { label: 'Voix féminine', pitch: 1.15, rate: 0.90, volume: 1.0, patterns: /amelie|marie|audrey|female|julie|denise/i },
-    'elderly': { label: 'Voix professorale', pitch: 0.70, rate: 0.80, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i }
+    'elderly': { label: 'Voix âgée', pitch: 0.70, rate: 0.80, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i }
 };
 
 const LANGUAGES = {
-    'fr': { label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'], promptInstruction: 'IMPORTANT : Écris TOUTE la narration en français cinématographique et précis.' },
-    'ar': { label: 'Arabe classique (Fusha)', ttsLang: 'ar-SA', ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'], promptInstruction: 'IMPORTANT : Écris TOUTE la narration en arabe classique cinématographique (الفصحى الأكاديمية).' },
-    'ar-dz': { label: 'Daridja algérienne', ttsLang: 'ar-DZ', ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'], promptInstruction: 'IMPORTANT : Écris TOUTE la narration en daridja algérienne cultivée et cinématographique.' }
+    'ar-dz': {
+        label: 'Daridja algérienne',
+        ttsLang: 'ar-DZ',
+        ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'],
+        promptInstruction: `⚠️ RÈGLE ABSOLUE MOURADRAMA ⚠️
+Tu DOIS écrire TOUTE la narration en DARIDJA ALGÉRIENNE (الدارجة الجزائرية) en alphabet arabe.
+- JAMAIS d'arabe classique (فصحى). Si tu hésites, choisis la forme populaire.
+- Utilise : واش، كيفاش، بزاف، برك، غالط، بصح، درك، هاد، هادا، ديالي، ديالك، ماشي، حتى، كي، باش، شكون، وينا، علاش، فين، كيما، على بالي، وليت، صار، يحوس، يخلي...
+- Terminologie imposée : "الخصم" (PAS الأنتاغونيست / الأنتطاغونيست / الأنتاغونست).
+- Interdit : "التي" pour les objets (utilise "لي")، sauf dans les formules figées.
+- Ton : naturel, oral, comme si tu parlais à un ami. Pas de formalité.`
+    },
+    'ar': {
+        label: 'Arabe classique (hors charte)',
+        ttsLang: 'ar-SA',
+        ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'],
+        promptInstruction: 'Note : cette langue est HORS CHARTE Mouradrama. Écris en arabe classique académique.'
+    },
+    'fr': {
+        label: 'Français (hors charte)',
+        ttsLang: 'fr-FR',
+        ttsFallbacks: ['fr-CA', 'fr-BE'],
+        promptInstruction: 'Note : cette langue est HORS CHARTE Mouradrama. Écris en français académique.'
+    }
 };
 
 const state = {
     isRunning: false, stopRequested: false, idea: '',
-    selectedStructure: STRUCTURES[0],
-    selectedTheme: THEMES[0],
-    selectedStyle: DRAMA_STYLES[0],
-    customConcept: '', customStyle: '',
-    videoDuration: '30', hookIntensity: 'moyen', endingType: 'synthese',
-    narrationStyle: 'cinematographique', audience: 'grand-public',
-    narrationLanguage: 'fr', narratorVoice: 'male-deep',
-    clipCount: 4, numFrames: 241, aspect: 'landscape',
+    selectedFormat: FORMATS[0],
+    selectedWeek: 1,
+    selectedConcept: null,
+    customConcept: '',
+    hookIntensity: 'moyen',
+    endingType: 'cta-guide',
+    selectedStyle: STYLES[0],
+    customStyle: '',
+    narrationLanguage: 'ar-dz',
+    narratorVoice: 'male-deep',
+    clipCount: 4, numFrames: 241, aspect: 'portrait',
     scenario: null, images: [], videos: [],
-    constraints: { objects: '', concepts: '', references: '', forbidden: '', free: '' },
-    currentSceneIndex: 0, isPlayingSequence: false, lastTextRequestTime: 0, femaleCharacters: []
+    currentSceneIndex: 0, isPlayingSequence: false, lastTextRequestTime: 0
 };
-
-// ══════════════════════════════════════════════════════════════════
-// UTILITAIRE CONTRAINTES
-// ══════════════════════════════════════════════════════════════════
-function parseConstraintLines(text) { if (!text) return []; return text.split(/[\n,;]+/).map(s => s.trim().replace(/^[-•*]\s*/, '')).filter(s => s.length > 0); }
-function getActiveConstraints() {
-    const o = parseConstraintLines(state.constraints.objects);
-    const c = parseConstraintLines(state.constraints.concepts);
-    const r = parseConstraintLines(state.constraints.references);
-    const f = parseConstraintLines(state.constraints.forbidden);
-    const fr = parseConstraintLines(state.constraints.free);
-    return { objects: o, concepts: c, references: r, forbidden: f, free: fr, total: o.length + c.length + r.length + f.length + fr.length };
-}
-function updateConstraintCounter() { const c = getActiveConstraints(); const el = document.getElementById('constraint-counter'); if (el) el.textContent = c.total; }
-function buildConstraintBlock() {
-    const c = getActiveConstraints();
-    if (c.total === 0) return '';
-    let b = '\n\n═══ 🚨 CONTRAINTES ABSOLUES 🚨 ═══\nCes règles sont PRIORITAIRES. Tu DOIS les respecter.\n\n';
-    if (c.objects.length) { b += '🎭 OBJETS OBLIGATOIRES :\n'; c.objects.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '→ Chaque objet dans AU MOINS UN image_prompt.\n\n'; }
-    if (c.concepts.length) { b += '📚 CONCEPTS OBLIGATOIRES :\n'; c.concepts.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '→ Chaque concept expliqué dans AU MOINS UNE narration.\n\n'; }
-    if (c.references.length) { b += '📖 RÉFÉRENCES OBLIGATOIRES :\n'; c.references.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '→ Chaque référence citée dans AU MOINS UNE narration.\n\n'; }
-    if (c.forbidden.length) { b += '🚫 INTERDITS :\n'; c.forbidden.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '→ NULLE PART.\n\n'; }
-    if (c.free.length) { b += '✏️ RÈGLES LIBRES :\n'; c.free.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); }
-    b += '\n⚠️ Vérifie MENTALEMENT le respect de chaque contrainte.\n═══ FIN ═══\n';
-    return b;
-}
-function buildConstraintBlockForImage() {
-    const c = getActiveConstraints();
-    let b = '';
-    if (c.objects.length) b += ' MANDATORY OBJECTS: ' + c.objects.join(', ') + '.';
-    if (c.forbidden.length) b += ' FORBIDDEN: ' + c.forbidden.join(', ') + '.';
-    return b;
-}
 
 // ══════════════════════════════════════════════════════════════════
 // ANTI-VEILLE
@@ -636,18 +685,28 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function setStatus(t) { const b = document.getElementById('status-bar'); const x = document.getElementById('status-text'); if (t) { b.classList.add('visible'); x.textContent = t; } else b.classList.remove('visible'); }
 function formatTime(s) { if (s < 0) s = 0; const m = Math.floor(s / 60); const sec = Math.round(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
-function playNotificationSound() { try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 440; o.type = 'sine'; g.gain.setValueAtTime(0.12, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.6); o.start(); o.stop(c.currentTime + 0.6); setTimeout(() => { const o2 = c.createOscillator(); const g2 = c.createGain(); o2.connect(g2); g2.connect(c.destination); o2.frequency.value = 660; o2.type = 'sine'; g2.gain.setValueAtTime(0.12, c.currentTime); g2.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.6); o2.start(); o2.stop(c.currentTime + 0.6); }, 200); } catch (e) {} }
+function playNotificationSound() { try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 550; o.type = 'sine'; g.gain.setValueAtTime(0.12, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.7); o.start(); o.stop(c.currentTime + 0.7); setTimeout(() => { const o2 = c.createOscillator(); const g2 = c.createGain(); o2.connect(g2); g2.connect(c.destination); o2.frequency.value = 770; o2.type = 'sine'; g2.gain.setValueAtTime(0.12, c.currentTime); g2.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.7); o2.start(); o2.stop(c.currentTime + 0.7); }, 220); } catch (e) {} }
 
 let toastTimeout = null;
-function showToast(m, t = 'success', d = 2500) { const el = document.getElementById('toast'); const i = document.getElementById('toast-icon'); const x = document.getElementById('toast-text'); el.classList.remove('visible', 'success', 'error', 'warn'); void el.offsetWidth; i.textContent = { success: '✓', error: '✕', warn: '⚠' }[t] || '✓'; x.textContent = m; el.classList.add(t); requestAnimationFrame(() => el.classList.add('visible')); if (toastTimeout) clearTimeout(toastTimeout); toastTimeout = setTimeout(() => el.classList.remove('visible'), d); }
+function showToast(m, t = 'success', d = 2500) {
+    const el = document.getElementById('toast'); const i = document.getElementById('toast-icon'); const x = document.getElementById('toast-text');
+    el.classList.remove('visible', 'success', 'error', 'warn'); void el.offsetWidth;
+    i.textContent = { success: '✓', error: '✕', warn: '⚠' }[t] || '✓';
+    x.textContent = m; el.classList.add(t);
+    requestAnimationFrame(() => el.classList.add('visible'));
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => el.classList.remove('visible'), d);
+}
+
 function logConsole(m, t = 'info') {
     const p = document.getElementById('console-panel');
     const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const tl = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', text: '[Texte]', heartbeat: '[En cours]', measure: '[Mesure]', lock: '[Contrainte]', structure: '[Structure]' };
+    const tl = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', text: '[Texte]', heartbeat: '[En cours]', measure: '[Mesure]', lock: '[Règle]', darija: '[Daridja]', pillar: '[Pilier]' };
     const l = document.createElement('div'); l.className = 'log-line';
     l.innerHTML = '<span class="log-time">' + time + '</span><span class="log-' + t + '">' + (tl[t] || '[Info]') + '</span> <span class="log-text">' + esc(m) + '</span>';
     p.appendChild(l); p.scrollTop = p.scrollHeight;
 }
+
 function updateLimitsPanel() {
     const now = Date.now();
     if (now - counters.lastResetTime > 60000) { counters.videoRequestsThisMinute = 0; counters.lastResetTime = now; }
@@ -663,126 +722,151 @@ function updateLimitsPanel() {
 
 function getApiKey() { try { return (localStorage.getItem('agnes_api_key') || '').trim(); } catch (e) { return ''; } }
 function saveApiKey() { const i = document.getElementById('api-key-input'); const k = i.value.trim(); if (!k) { localStorage.removeItem('agnes_api_key'); updateApiPanel(); showToast('Clé supprimée', 'warn'); return; } localStorage.setItem('agnes_api_key', k); updateApiPanel(); showToast('Clé API enregistrée ✓', 'success'); i.blur(); }
-function updateApiPanel() { const sl = document.getElementById('api-status-line'); const st = document.getElementById('api-status-text'); const i = document.getElementById('api-key-input'); const k = getApiKey(); if (k) { sl.classList.add('ok'); st.textContent = 'Clé API active · ' + k.slice(0, 8) + '…' + k.slice(-4); i.value = k; } else { sl.classList.remove('ok'); st.textContent = 'Aucune clé API'; i.value = ''; } updateGenerateBtn(); }
+function updateApiPanel() { const sl = document.getElementById('api-status-line'); const st = document.getElementById('api-status-text'); const i = document.getElementById('api-key-input'); const k = getApiKey(); if (k) { sl.classList.add('ok'); st.textContent = 'Clé API active · ' + k.slice(0, 8) + '…' + k.slice(-4); i.value = k; } else { sl.classList.remove('ok'); st.textContent = 'Aucune clé API enregistrée'; i.value = ''; } updateGenerateBtn(); }
+
 function updateGenerateBtn() {
     const b = document.getElementById('generate-btn');
-    const hk = !!getApiKey(); const hi = document.getElementById('idea-input').value.trim().length > 5;
+    const hk = !!getApiKey();
+    const hi = document.getElementById('idea-input').value.trim().length > 5;
     b.disabled = !hk || !hi || state.isRunning;
     if (state.isRunning) b.textContent = 'Génération en cours…';
     else if (!hk) b.textContent = 'Ajoutez votre clé API';
-    else if (!hi) b.textContent = 'Décrivez votre sujet';
-    else { const c = getActiveConstraints(); b.textContent = c.total > 0 ? '🎬 Générer (' + c.total + ' contrainte' + (c.total > 1 ? 's' : '') + ')' : '🎬 Générer la vidéo cinématographique'; }
+    else if (!hi) b.textContent = 'Décrivez votre idée';
+    else b.textContent = '🎬 Générer la production Mouradrama';
 }
 
 // ══════════════════════════════════════════════════════════════════
 // SAUVEGARDE / CHARGEMENT
 // ══════════════════════════════════════════════════════════════════
-const STORAGE_KEY = 'agnes_drama_projects';
+const STORAGE_KEY = 'agnes_mouradrama_projects';
 function getProjects() { try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : {}; } catch (e) { return {}; } }
 function saveProject() {
     const name = document.getElementById('project-name').value.trim() || 'Sans nom';
     const p = getProjects();
-    p[name] = { name, savedAt: Date.now(), idea: state.idea, selectedStructureId: state.selectedStructure.id, selectedThemeId: state.selectedTheme.id, selectedStyleId: state.selectedStyle.id, customConcept: state.customConcept, customStyle: state.customStyle, videoDuration: state.videoDuration, hookIntensity: state.hookIntensity, endingType: state.endingType, narrationStyle: state.narrationStyle, audience: state.audience, narrationLanguage: state.narrationLanguage, narratorVoice: state.narratorVoice, clipCount: state.clipCount, numFrames: state.numFrames, aspect: state.aspect, scenario: state.scenario, images: state.images, videos: state.videos, constraints: state.constraints };
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); showToast('Projet « ' + name + ' » sauvegardé ✓', 'success'); logConsole('Projet sauvegardé : ' + name, 'success'); } catch (e) { showToast('Erreur : ' + e.message, 'error'); }
+    p[name] = {
+        name, savedAt: Date.now(), idea: state.idea,
+        selectedFormatId: state.selectedFormat.id,
+        selectedWeek: state.selectedWeek,
+        selectedConceptId: state.selectedConcept?.id || null,
+        customConcept: state.customConcept,
+        hookIntensity: state.hookIntensity,
+        endingType: state.endingType,
+        selectedStyleId: state.selectedStyle.id,
+        customStyle: state.customStyle,
+        narrationLanguage: state.narrationLanguage,
+        narratorVoice: state.narratorVoice,
+        clipCount: state.clipCount, numFrames: state.numFrames, aspect: state.aspect,
+        scenario: state.scenario, images: state.images, videos: state.videos
+    };
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); showToast('Projet « ' + name + ' » sauvegardé ✓', 'success'); logConsole('Projet sauvegardé : ' + name, 'success'); }
+    catch (e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 function loadProject() {
     const name = prompt('Nom du projet à charger :'); if (!name) return;
     const p = getProjects(); if (!p[name]) { showToast('Projet introuvable', 'error'); return; }
     const d = p[name];
-    state.idea = d.idea || ''; state.customConcept = d.customConcept || ''; state.customStyle = d.customStyle || '';
-    state.videoDuration = d.videoDuration || '30'; state.hookIntensity = d.hookIntensity || 'moyen'; state.endingType = d.endingType || 'synthese';
-    state.narrationStyle = d.narrationStyle || 'cinematographique'; state.audience = d.audience || 'grand-public';
-    state.narrationLanguage = d.narrationLanguage || 'fr'; state.narratorVoice = d.narratorVoice || 'male-deep';
-    state.clipCount = d.clipCount || 4; state.numFrames = d.numFrames || 241; state.aspect = d.aspect || 'landscape';
-    state.scenario = d.scenario || null; state.images = d.images || []; state.videos = d.videos || [];
-    state.constraints = d.constraints || { objects: '', concepts: '', references: '', forbidden: '', free: '' };
-    const st = STRUCTURES.find(x => x.id === d.selectedStructureId); if (st) state.selectedStructure = st;
-    const th = THEMES.find(x => x.id === d.selectedThemeId); if (th) state.selectedTheme = th;
-    const sy = DRAMA_STYLES.find(x => x.id === d.selectedStyleId); if (sy) state.selectedStyle = sy;
+    state.idea = d.idea || '';
+    state.selectedWeek = d.selectedWeek || 1;
+    state.customConcept = d.customConcept || '';
+    state.hookIntensity = d.hookIntensity || 'moyen';
+    state.endingType = d.endingType || 'cta-guide';
+    state.customStyle = d.customStyle || '';
+    state.narrationLanguage = d.narrationLanguage || 'ar-dz';
+    state.narratorVoice = d.narratorVoice || 'male-deep';
+    state.clipCount = d.clipCount || 4;
+    state.numFrames = d.numFrames || 241;
+    state.aspect = d.aspect || 'portrait';
+    state.scenario = d.scenario || null;
+    state.images = d.images || [];
+    state.videos = d.videos || [];
+    const f = FORMATS.find(x => x.id === d.selectedFormatId); if (f) state.selectedFormat = f;
+    const s = STYLES.find(x => x.id === d.selectedStyleId); if (s) state.selectedStyle = s;
+    if (d.selectedConceptId) { const all = Object.values(CONCEPTS).flat(); state.selectedConcept = all.find(c => c.id === d.selectedConceptId) || null; }
 
     document.getElementById('idea-input').value = state.idea;
-    document.getElementById('video-duration-select').value = state.videoDuration;
+    document.getElementById('week-select').value = state.selectedWeek;
     document.getElementById('hook-intensity-select').value = state.hookIntensity;
     document.getElementById('ending-type-select').value = state.endingType;
     document.getElementById('language-select').value = state.narrationLanguage;
     document.getElementById('narrator-select').value = state.narratorVoice;
-    document.getElementById('narration-select').value = state.narrationStyle;
-    document.getElementById('audience-select').value = state.audience;
     document.getElementById('scene-count-select').value = state.clipCount;
     document.getElementById('clip-duration-select').value = state.numFrames;
     document.getElementById('aspect-select').value = state.aspect;
-    document.getElementById('constraint-objects').value = state.constraints.objects || '';
-    document.getElementById('constraint-concepts').value = state.constraints.concepts || '';
-    document.getElementById('constraint-references').value = state.constraints.references || '';
-    document.getElementById('constraint-forbidden').value = state.constraints.forbidden || '';
-    document.getElementById('constraint-free').value = state.constraints.free || '';
     document.getElementById('custom-concept-input').value = state.customConcept;
     document.getElementById('custom-style-input').value = state.customStyle;
-    updateConstraintCounter(); updateCustomPanels();
 
-    document.querySelectorAll('.structure-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedStructure.id));
-    document.querySelectorAll('.theme-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedTheme.id));
+    document.querySelectorAll('.format-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedFormat.id));
     document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedStyle.id));
+    renderConceptGrid();
+    updateCustomPanels();
 
     document.getElementById('generated-images').innerHTML = '';
     document.getElementById('generated-videos').innerHTML = '';
-    state.images.forEach((img, idx) => { const isFinal = state.scenario && state.scenario.final_frame && idx === state.images.length - 1; displayGeneratedImage(img.url, isFinal ? 'Image finale' : (idx === 0 ? '⚡ HOOK' : 'Plan ' + (img.scene?.scene_number || idx + 1)), isFinal, idx === 0); });
-    state.videos.filter(v => v && v.url).forEach(v => replacePendingWithVideo(v.sceneIndex, v.url, v.narration, v.sceneNumber, v.actualDuration));
-    if (state.scenario) { displayScript(state.scenario); document.getElementById('section-script').classList.remove('hidden'); }
+    state.images.forEach((img, idx) => displayGeneratedImage(img.url, img.label || ('Visuel ' + (idx + 1)), idx === 0));
+    state.videos.filter(v => v && v.url).forEach(v => replacePendingWithVideo(v.sceneIndex, v.url, v.narration, v.sceneNumber, v.actualDuration, v.sceneIndex === 0, v.sceneIndex === state.videos.length - 1));
+    if (state.scenario) { displayStory(state.scenario); document.getElementById('section-story').classList.remove('hidden'); }
     if (state.images.length > 0) document.getElementById('section-images').classList.remove('hidden');
     if (state.videos.filter(v => v && v.url).length > 0) { document.getElementById('section-videos').classList.remove('hidden'); document.getElementById('section-player').classList.remove('hidden'); }
     document.getElementById('project-name').value = name;
-    updateGenerateBtn(); updateLimitsPanel(); showToast('Projet « ' + name + ' » chargé ✓', 'success');
+    updateGenerateBtn(); updateLimitsPanel();
+    showToast('Projet « ' + name + ' » chargé ✓', 'success');
     logConsole('Projet chargé : ' + name, 'success');
 }
 function newProject() {
     if (!confirm('Créer un nouveau projet ? Les données non sauvegardées seront perdues.')) return;
-    state.scenario = null; state.images = []; state.videos = []; state.customConcept = ''; state.customStyle = '';
-    state.constraints = { objects: '', concepts: '', references: '', forbidden: '', free: '' };
-    ['idea-input', 'constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free', 'custom-concept-input', 'custom-style-input'].forEach(id => document.getElementById(id).value = '');
-    updateConstraintCounter(); updateCustomPanels();
-    document.getElementById('project-name').value = 'Vidéo concept';
-    document.getElementById('generated-images').innerHTML = ''; document.getElementById('generated-videos').innerHTML = '';
+    state.scenario = null; state.images = []; state.videos = []; state.customConcept = ''; state.customStyle = ''; state.selectedConcept = null;
+    ['idea-input', 'custom-concept-input', 'custom-style-input'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('project-name').value = 'Mouradrama - Leçon';
+    document.getElementById('generated-images').innerHTML = '';
+    document.getElementById('generated-videos').innerHTML = '';
     document.getElementById('console-panel').innerHTML = '';
-    document.getElementById('section-script').classList.add('hidden');
+    document.getElementById('section-story').classList.add('hidden');
     document.getElementById('section-images').classList.add('hidden');
     document.getElementById('section-videos').classList.add('hidden');
     document.getElementById('section-player').classList.add('hidden');
+    renderConceptGrid();
+    updateCustomPanels();
     updateGenerateBtn(); showToast('Nouveau projet', 'success');
 }
-function clearConstraints() {
-    if (!confirm('Effacer toutes les contraintes ?')) return;
-    state.constraints = { objects: '', concepts: '', references: '', forbidden: '', free: '' };
-    ['constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free'].forEach(id => document.getElementById(id).value = '');
-    updateConstraintCounter(); updateGenerateBtn(); showToast('Contraintes effacées', 'success');
-}
 function updateCustomPanels() {
-    document.getElementById('custom-concept-panel').classList.toggle('visible', state.selectedTheme.id === 'aucun');
+    document.getElementById('custom-concept-panel').classList.toggle('visible', state.selectedWeek === 0);
     document.getElementById('custom-style-panel').classList.toggle('visible', state.selectedStyle.id === 'custom');
 }
 
-function downloadNarration() {
-    if (!state.scenario || !state.scenario.scenes) { showToast('Aucun script à télécharger', 'warn'); return; }
-    const title = state.scenario.title || 'Script';
-    const c = getActiveConstraints();
-    let content = '═══ ' + title + ' ═══\n\n';
-    content += 'Structure : ' + state.selectedStructure.name + '\n';
-    content += 'Durée cible : ' + VIDEO_DURATIONS[state.videoDuration].label + '\n';
-    content += 'Hook : ' + HOOK_INTENSITIES[state.hookIntensity].label + ' · Chute : ' + ENDINGS[state.endingType].label + '\n';
-    content += 'Concept : ' + (state.selectedTheme.id === 'aucun' ? 'Personnalisé' : state.selectedTheme.name) + '\n';
-    content += 'Style : ' + (state.selectedStyle.id === 'custom' ? 'Personnalisé' : state.selectedStyle.name) + '\n';
-    content += 'Langue : ' + LANGUAGES[state.narrationLanguage].label + ' · Voix : ' + NARRATORS[state.narratorVoice].label + '\n\n';
-    if (c.total > 0) { content += '─── CONTRAINTES ───\n'; if (c.objects.length) content += '🎭 ' + c.objects.join(', ') + '\n'; if (c.concepts.length) content += '📚 ' + c.concepts.join(', ') + '\n'; if (c.references.length) content += '📖 ' + c.references.join(', ') + '\n'; if (c.forbidden.length) content += '🚫 ' + c.forbidden.join(', ') + '\n'; if (c.free.length) content += '✏️ ' + c.free.join(' | ') + '\n'; content += '\n'; }
-    content += '─── PLANS ───\n\n';
-    state.scenario.scenes.forEach(s => {
-        content += 'PLAN ' + s.scene_number + (s.is_hook ? ' [HOOK]' : '') + (s.is_ending ? ' [CHUTE]' : '') + ' — ' + (s.sequence_title || '') + '\n';
-        content += 'Narration : ' + (s.narration || '(vide)') + '\n';
-        if (s.symbolism) content += 'Symboles : ' + s.symbolism + '\n';
-        content += '\n';
-    });
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+function downloadScript() {
+    if (!state.scenario) { showToast('Aucun script', 'warn'); return; }
+    let c = '═══ ' + (state.scenario.title || 'Script') + ' ═══\n\n';
+    c += 'Concept : ' + (state.scenario.concept || '—') + '\n';
+    c += 'Format : ' + state.selectedFormat.name + '\n';
+    c += 'Langue : ' + LANGUAGES[state.narrationLanguage].label + '\n';
+    c += 'Hook : ' + HOOK_INTENSITIES[state.hookIntensity].label + ' · Résolution : ' + ENDINGS[state.endingType].label + '\n\n';
+    if (state.scenario.pillars) {
+        c += '── LES 5 PILIERS ──\n\n';
+        state.scenario.pillars.forEach(p => {
+            const info = PILLARS.find(x => x.id === p.id) || {};
+            c += '[' + (info.time || '') + '] ' + (info.name || p.id) + '\n';
+            c += (p.content || '') + '\n\n';
+        });
+    }
+    if (state.scenario.slides) {
+        c += '── CARROUSEL (6 slides) ──\n\n';
+        state.scenario.slides.forEach((s, i) => { c += 'Slide ' + (i + 1) + ' — ' + (s.title || '') + '\n' + (s.content || '') + '\n\n'; });
+    }
+    if (state.scenario.scenes) {
+        c += '── PLANS VIDÉO ──\n\n';
+        state.scenario.scenes.forEach(s => {
+            c += 'Plan ' + s.scene_number + (s.is_hook ? ' [HOOK]' : '') + (s.is_ending ? ' [RÉSOLUTION]' : '') + '\n';
+            c += 'Description : ' + (s.description || '') + '\n';
+            c += 'Narration : ' + (s.narration || '') + '\n\n';
+        });
+    }
+    if (state.scenario.symbols) {
+        c += '── SYMBOLES VISUELS ──\n';
+        state.scenario.symbols.forEach(s => { c += '• ' + (s.name || '') + ' : ' + (s.description || '') + '\n'; });
+    }
+    const blob = new Blob([c], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob); const a = document.createElement('a');
-    a.href = url; a.download = title.replace(/[^a-z0-9]/gi, '_') + '_script.txt';
+    a.href = url; a.download = (state.scenario.title || 'script').replace(/[^a-z0-9\u0600-\u06FF]/gi, '_') + '.txt';
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showToast('Script téléchargé ✓', 'success');
 }
@@ -816,7 +900,7 @@ async function callTextAPI(messages, options = {}) {
     const now = Date.now();
     if (now - state.lastTextRequestTime < 2000) await sleep(2000 - (now - state.lastTextRequestTime));
     state.lastTextRequestTime = Date.now(); counters.textRequests++; updateLimitsPanel();
-    const body = { model: MODEL_TEXT, messages, temperature: options.temperature ?? 0.7, max_tokens: options.maxTokens ?? 4096 };
+    const body = { model: MODEL_TEXT, messages, temperature: options.temperature ?? 0.65, max_tokens: options.maxTokens ?? 4096 };
     logConsole('Requête texte → ' + MODEL_TEXT, 'info');
     const res = await fetchWithRetry(API_BASE + '/chat/completions', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Texte');
     if (!res.ok) throw new Error('Text API HTTP ' + res.status);
@@ -824,7 +908,7 @@ async function callTextAPI(messages, options = {}) {
     if (!c) throw new Error('Pas de contenu'); return c;
 }
 
-async function callImageAPI(prompt, size = '1024x576') {
+async function callImageAPI(prompt, size = '576x1024') {
     counters.imagesGenerated++; updateLimitsPanel();
     logConsole('Requête image → ' + MODEL_IMAGE, 'info');
     const body = { model: MODEL_IMAGE, prompt, size, extra_body: { response_format: 'url' } };
@@ -836,7 +920,7 @@ async function callImageAPI(prompt, size = '1024x576') {
 
 async function createVideoTaskOnly(item) {
     const now = Date.now();
-    if (counters.videoRequestsThisMinute >= LIMITS.videoRpm) { const w = Math.ceil((60000 - (now - counters.lastResetTime)) / 1000); if (w > 0) { logConsole('Limite RPM vidéo. Attente ' + w + 's…', 'warn'); await sleep(w * 1000); counters.videoRequestsThisMinute = 0; counters.lastResetTime = Date.now(); } }
+    if (counters.videoRequestsThisMinute >= LIMITS.videoRpm) { const w = Math.ceil((60000 - (now - counters.lastResetTime)) / 1000); if (w > 0) { logConsole('Limite RPM. Attente ' + w + 's…', 'warn'); await sleep(w * 1000); counters.videoRequestsThisMinute = 0; counters.lastResetTime = Date.now(); } }
     counters.videoRequestsThisMinute++; counters.lastVideoRequestTime = Date.now(); counters.videoSeconds += state.numFrames / 24; updateLimitsPanel();
     const isLandscape = state.aspect === 'landscape';
     const body = { model: MODEL_VIDEO, prompt: item.prompt, extra_body: { image: [item.startImage.url, item.endImage.url], mode: 'keyframes' }, num_frames: state.numFrames, frame_rate: 24, height: isLandscape ? 576 : 1024, width: isLandscape ? 1024 : 576 };
@@ -853,7 +937,7 @@ async function createVideoTaskOnly(item) {
 async function pollVideoForItem(item) {
     const startTime = Date.now();
     const waitBeforeFirstPoll = getEstimatedWaitSeconds();
-    logConsole('Plan ' + (item.index + 1) + ' — attente initiale ' + Math.round(waitBeforeFirstPoll) + 's', 'info');
+    logConsole('Plan ' + (item.index + 1) + ' — attente ' + Math.round(waitBeforeFirstPoll) + 's', 'info');
     const card = document.getElementById('pending-video-' + item.index);
     if (card) card.classList.add('measuring');
     for (let r = Math.round(waitBeforeFirstPoll); r > 0; r--) {
@@ -864,11 +948,9 @@ async function pollVideoForItem(item) {
         setStatus('Plan ' + (item.index + 1) + ' — attente : ' + r + 's');
         await sleep(1000);
     }
-    logConsole('Plan ' + (item.index + 1) + ' — polling', 'info');
-    let errs = 0, hb = Date.now(), pc = 0;
+    let errs = 0, hb = Date.now();
     for (let a = 0; a < 400; a++) {
         if (state.stopRequested) throw new Error('Arrêt demandé');
-        pc++;
         const url = POLL_BASE + '?video_id=' + encodeURIComponent(item.videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
         try {
             const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + getApiKey() } });
@@ -880,8 +962,7 @@ async function pollVideoForItem(item) {
             const apiP = d.progress || 0;
             const elapsed = Math.round((Date.now() - startTime) / 1000);
             const timeP = Math.min(Math.round((elapsed / waitBeforeFirstPoll) * 100), 95);
-            const disp = Math.max(apiP, timeP);
-            updatePendingVideoCard(item.index, 'Génération…', disp, elapsed);
+            updatePendingVideoCard(item.index, 'Génération…', Math.max(apiP, timeP), elapsed);
             if (Date.now() - hb > 20000) { hb = Date.now(); logConsole('Plan ' + (item.index + 1) + ' — ' + apiP + '% — ' + elapsed + 's', 'heartbeat'); }
             if (status === 'completed' || status === 'succeeded' || status === 'done') {
                 const u = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
@@ -910,52 +991,56 @@ async function pollVideoForItem(item) {
 async function runPipeline() {
     if (state.isRunning) return;
     const idea = document.getElementById('idea-input').value.trim();
-    if (idea.length < 5) { showToast('Sujet trop court', 'error'); return; }
+    if (idea.length < 5) { showToast('Idée trop courte', 'error'); return; }
     if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
 
-    state.constraints = {
-        objects: document.getElementById('constraint-objects').value,
-        concepts: document.getElementById('constraint-concepts').value,
-        references: document.getElementById('constraint-references').value,
-        forbidden: document.getElementById('constraint-forbidden').value,
-        free: document.getElementById('constraint-free').value
-    };
     state.customConcept = document.getElementById('custom-concept-input').value.trim();
     state.customStyle = document.getElementById('custom-style-input').value.trim();
 
     state.isRunning = true; state.stopRequested = false; state.idea = idea;
-    state.videoDuration = document.getElementById('video-duration-select').value;
     state.hookIntensity = document.getElementById('hook-intensity-select').value;
     state.endingType = document.getElementById('ending-type-select').value;
-    state.narrationStyle = document.getElementById('narration-select').value;
-    state.audience = document.getElementById('audience-select').value;
     state.narrationLanguage = document.getElementById('language-select').value;
     state.narratorVoice = document.getElementById('narrator-select').value;
+    state.selectedWeek = parseInt(document.getElementById('week-select').value);
+
+    // Ajuster clipCount selon format
+    if (state.selectedFormat.outputType === 'video') {
+        state.clipCount = state.selectedFormat.clipCount;
+        state.numFrames = state.selectedFormat.frameCount;
+        document.getElementById('scene-count-select').value = state.clipCount;
+        document.getElementById('clip-duration-select').value = state.numFrames;
+    }
     state.clipCount = parseInt(document.getElementById('scene-count-select').value);
     state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
     state.aspect = document.getElementById('aspect-select').value;
     state.images = []; state.videos = [];
 
     // Concept
-    let conceptName, conceptFocus;
-    if (state.selectedTheme.id === 'aucun') {
-        if (state.customConcept.length > 3) { conceptName = 'Concept personnalisé'; conceptFocus = state.customConcept; }
-        else { conceptName = 'Analyse libre'; conceptFocus = 'Analyse le sujet selon une approche dramaturgique. Détermine les concepts pertinents.'; }
-    } else { conceptName = state.selectedTheme.name; conceptFocus = state.selectedTheme.focus; }
+    let conceptName = '', conceptPrompt = '';
+    if (state.selectedWeek === 0) {
+        if (state.customConcept.length > 3) { conceptName = state.customConcept; conceptPrompt = state.customConcept; }
+        else { conceptName = 'Libre'; conceptPrompt = 'Détermine toi-même le concept dramaturgique le plus pertinent.'; }
+    } else if (state.selectedConcept) {
+        conceptName = state.selectedConcept.name;
+        conceptPrompt = state.selectedConcept.prompt;
+    } else {
+        conceptName = 'Analyse libre';
+        conceptPrompt = 'Analyse selon une approche dramaturgique. Détermine les concepts pertinents.';
+    }
 
     // Style
     let styleName, stylePrompt;
     if (state.selectedStyle.id === 'custom') {
-        if (state.customStyle.length > 5) { styleName = 'Style personnalisé'; stylePrompt = state.customStyle + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes only'; }
-        else { styleName = 'Silhouette (défaut)'; stylePrompt = 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, back-lit against dramatic spotlight, empty stage, deep shadows'; }
+        if (state.customStyle.length > 5) { styleName = 'Personnalisé'; stylePrompt = state.customStyle + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes only'; }
+        else { styleName = 'Mouradrama (défaut)'; stylePrompt = STYLES[0].prompt; }
     } else { styleName = state.selectedStyle.name; stylePrompt = state.selectedStyle.prompt; }
 
-    const narrativeScenes = state.clipCount;
-    const totalImagesNeeded = state.clipCount + 1;
-    const structure = state.selectedStructure;
-    const durationInfo = VIDEO_DURATIONS[state.videoDuration];
+    const langInfo = LANGUAGES[state.narrationLanguage];
     const hookInfo = HOOK_INTENSITIES[state.hookIntensity];
     const endingInfo = ENDINGS[state.endingType];
+    const isCarousel = state.selectedFormat.outputType === 'images';
+    const totalImagesNeeded = isCarousel ? state.selectedFormat.slides : state.clipCount + 1;
 
     document.getElementById('stop-btn').classList.add('visible');
     document.getElementById('generate-btn').disabled = true;
@@ -964,214 +1049,255 @@ async function runPipeline() {
     document.getElementById('generated-videos').innerHTML = '';
     document.getElementById('images-badge').textContent = '0';
     document.getElementById('videos-badge').textContent = '0';
-    document.getElementById('section-script').classList.add('hidden');
+    document.getElementById('section-story').classList.add('hidden');
     document.getElementById('section-images').classList.add('hidden');
     document.getElementById('section-videos').classList.add('hidden');
     document.getElementById('section-player').classList.add('hidden');
 
-    const langInfo = LANGUAGES[state.narrationLanguage];
-    const narratorInfo = NARRATORS[state.narratorVoice];
-    const activeConstraints = getActiveConstraints();
-
-    logConsole('══════════════════════════════', 'structure');
-    logConsole('🎬 CONFIGURATION CINÉMATOGRAPHIQUE', 'structure');
-    logConsole('══════════════════════════════', 'structure');
-    logConsole('Structure : ' + structure.name, 'structure');
-    logConsole('Durée cible : ' + durationInfo.label + ' · ' + state.clipCount + ' plans', 'structure');
-    logConsole('Hook : ' + hookInfo.label + ' · Chute : ' + endingInfo.label, 'structure');
+    logConsole('══════════════════════════════', 'pillar');
+    logConsole('🎬 PRODUCTION MOURADRAMA', 'pillar');
+    logConsole('══════════════════════════════', 'pillar');
+    logConsole('Format : ' + state.selectedFormat.name, 'pillar');
     logConsole('Concept : ' + conceptName, 'info');
     logConsole('Style : ' + styleName, 'info');
-    logConsole('Langue : ' + langInfo.label + ' · Voix : ' + narratorInfo.label, 'info');
-    logConsole('⚜ Aucun visage humain · Silhouettes uniquement', 'warn');
-    if (activeConstraints.total > 0) logConsole('🔒 ' + activeConstraints.total + ' contraintes actives', 'lock');
+    logConsole('Langue : ' + langInfo.label, 'darija');
+    logConsole('Hook : ' + hookInfo.label + ' · Résolution : ' + endingInfo.label, 'pillar');
+    logConsole('⚜ Aucun visage humain · Terminologie : الخصم', 'lock');
 
     await activateWakeLock();
     setStatus('Initialisation…');
 
     try {
-        logConsole('ÉTAPE 1/4 — Script cinématographique', 'success');
+        // ═══ ÉTAPE 1 : SCRIPT (5 PILIERS) ═══
+        logConsole('══════════════════════════════', 'text');
+        logConsole('ÉTAPE 1/4 — Script + 5 piliers narratifs', 'success');
+        logConsole('══════════════════════════════', 'text');
         setStatus('L\'IA écrit le script…');
 
-        const audienceLabel = { 'grand-public': 'grand public (réseaux sociaux)', lycee: 'élèves de lycée', universite: 'étudiants universitaires', initie: 'spécialistes' }[state.audience];
-        const styleNarrLabel = { cinematographique: 'voix-off cinématographique (style bande-annonce / documentaire Netflix)', universitaire: 'conférence universitaire', vulgarisation: 'vulgarisation accessible', poetique: 'essai poétique' }[state.narrationStyle];
-        const aspectLabel = state.aspect === 'landscape' ? 'paysage 16:9' : state.aspect === 'portrait' ? 'portrait 9:16' : 'carré 1:1';
+        const conceptBlock = conceptPrompt ? 'CONCEPT À ENSEIGNER : ' + conceptName + '\nFocus : ' + conceptPrompt + '\n' : '';
+        const carouselStructure = isCarousel ? '\n📇 STRUCTURE CARROUSEL (6 SLIDES) :\n1. Accroche (hook)\n2. Idée reçue / Problème\n3. Explication + Formule\n4. Application / Question\n5. Illustration concrète\n6. CTA vers le guide (الدليل الكامل فالـ Bio 📖)\n' : '';
+        const videoStructure = !isCarousel ? '\n🎬 STRUCTURE VIDÉO :\n- Le premier plan est LE HOOK (0-3s)\n- Le dernier plan porte LA RÉSOLUTION / CTA\n- ' + state.clipCount + ' plans au total\n' : '';
 
-        const constraintBlock = buildConstraintBlock();
-        const structureBlock = structure.prompt ? '\n\n═══ 🎬 STRUCTURE NARRATIVE IMPOSÉE ═══\n' + structure.prompt + '\n═══ FIN ═══\n' : '';
+        const scriptPrompt = `Tu es le réalisateur de la chaîne Mouradrama. Tu produis du contenu pédagogique sur la dramaturgie pour un public algérien, en darija.
 
-        const scriptPrompt = `Tu es un réalisateur de vidéos courtes cinématographiques qui expliquent des concepts. Tu prépares une vidéo YouTube Shorts / Reels / TikTok de qualité cinéma.
+${conceptBlock}IDÉE / SUJET FOURNI : "${idea}"
 
-CONCEPT : "${conceptName}"
-FOCUS : ${conceptFocus}
-SUJET : "${idea}"
-
-Contraintes :
-- Style visuel : ${styleName} — ${stylePrompt}
-- Structure narrative : ${structure.name} (${structure.desc})
-- Durée totale cible : ${durationInfo.label}
-- Nombre de plans : ${state.clipCount}
-- Durée par plan : ${state.numFrames / 24} secondes
-- Format : ${aspectLabel}
-- Registre de voix-off : ${styleNarrLabel}
-- Public : ${audienceLabel}
+FORMAT : ${state.selectedFormat.name} (${state.selectedFormat.desc})
 
 ${langInfo.promptInstruction}
 
-═══ RÈGLES CINÉMATOGRAPHIQUES ═══
-1. Le PREMIER plan est LE HOOK : il doit captiver immédiatement (0-3 secondes).
-   → ${hookInfo.prompt}
+═══ STRUCTURE NARRATIVE OBLIGATOIRE (5 PILIERS DU GUIDE) ═══
+Toute production Mouradrama DOIT suivre ces 5 piliers dans cet ordre :
 
-2. Le DERNIER plan porte LA CHUTE : il doit marquer le spectateur.
-   → ${endingInfo.prompt}
+1. ${PILLARS[0].name} (${PILLARS[0].time}) — ${PILLARS[0].desc}
+   → ${PILLARS[0].prompt}
 
-3. Chaque plan doit être visuellement FORT : un seul symbole central, un cadrage cinématographique, un éclairage dramatique.
+2. ${PILLARS[1].name} (${PILLARS[1].time}) — ${PILLARS[1].desc}
+   → ${PILLARS[1].prompt}
 
-4. La narration doit être TRÈS COURTE (1-2 phrases par plan), percutante, comme une voix-off de bande-annonce.
+3. ${PILLARS[2].name} (${PILLARS[2].time}) — ${PILLARS[2].desc}
+   → ${PILLARS[2].prompt}
 
-═══ RÈGLE ABSOLUE VISUELLE ═══
-AUCUN VISAGE HUMAIN. Silhouettes, symboles, objets, formes géométriques uniquement.
-Dans chaque image_prompt, écris : "NO FACIAL FEATURES, NO FACES, silhouettes only".
-${structureBlock}${constraintBlock}
-═══ STRUCTURE JSON ═══
-Génère EXACTEMENT ${narrativeScenes} scènes narratives + 1 image finale muette.
+4. ${PILLARS[3].name} (${PILLARS[3].time}) — ${PILLARS[3].desc}
+   → ${PILLARS[3].prompt}
 
+5. ${PILLARS[4].name} (${PILLARS[4].time}) — ${PILLARS[4].desc}
+   → ${PILLARS[4].prompt}
+
+═══ RÈGLES ABSOLUES MOURADRAMA ═══
+- DARIJA STRICTE : jamais d'arabe classique (فصحى). Utilise des formes populaires algériennes.
+- Terminologie imposée : "الخصم" (PAS الأنتاغونيست / الأنتطاغونيست).
+- Aucun visage humain dans les visuels : silhouettes, symboles, objets uniquement.
+- Un seul concept par production.
+- Hook fort selon intensité : ${hookInfo.prompt}
+- Résolution : ${endingInfo.prompt}
+
+${carouselStructure}${videoStructure}
+
+═══ RÉPONSE JSON UNIQUEMENT ═══
 {
-  "title": "Titre court et percutant",
-  "logline": "Résumé en une phrase",
+  "title": "Titre court en darija",
+  "logline": "Résumé en 1 phrase",
   "concept": "${conceptName}",
-  "hook_description": "Description du hook (plan 1)",
-  "ending_description": "Description de la chute (dernier plan)",
-  "master_style_prompt": "English visual style anchor — MUST specify NO FACIAL FEATURES",
-  "constraints_respected": ["Contraintes respectées"],
-  "symbols": [{ "name": "Symbole", "description": "Description en anglais" }],
-  "scenes": [{
-    "scene_number": 1,
-    "sequence_title": "Titre",
-    "is_hook": true (plan 1 uniquement),
-    "is_ending": true (dernier plan uniquement),
-    "description": "Description en français",
-    "image_prompt": "English prompt with NO FACIAL FEATURES + style anchor + symbols + objects",
-    "narration": "Voix-off COURTE (LANGUE CHOISIE, 1-2 phrases max)",
-    "symbolism": "Symbole utilisé",
-    "constraints_applied": "Contraintes ici",
-    "camera_movement": "Cinematic movement (slow dolly, dolly zoom, etc.)"
-  }],
-  "final_frame": { "description": "Synthèse", "image_prompt": "English with NO FACIAL FEATURES" }
+  "master_style_prompt": "English visual style anchor with NO FACIAL FEATURES",
+  "pillars": [
+    { "id": "hook", "content": "texte du hook en darija" },
+    { "id": "inciting", "content": "..." },
+    { "id": "goal", "content": "..." },
+    { "id": "obstacle", "content": "..." },
+    { "id": "resolution", "content": "..." }
+  ],
+  ${isCarousel ? `"slides": [
+    { "number": 1, "title": "Titre slide 1 en darija", "content": "Texte slide 1", "image_prompt": "English prompt" },
+    { "number": 2, "title": "...", "content": "...", "image_prompt": "..." },
+    { "number": 3, "title": "...", "content": "...", "image_prompt": "..." },
+    { "number": 4, "title": "...", "content": "...", "image_prompt": "..." },
+    { "number": 5, "title": "...", "content": "...", "image_prompt": "..." },
+    { "number": 6, "title": "...", "content": "...", "image_prompt": "..." }
+  ],` : `"scenes": [
+    {
+      "scene_number": 1,
+      "sequence_title": "Titre",
+      "is_hook": true,
+      "is_ending": false,
+      "description": "Description du plan",
+      "image_prompt": "English prompt with NO FACIAL FEATURES",
+      "narration": "Texte darija (1-2 phrases max)",
+      "camera_movement": "slow cinematic dolly, dramatic zoom"
+    }
+  ],`}
+  "symbols": [
+    { "name": "Symbole", "description": "Description en anglais" }
+  ]
 }
 
-⚠️ Vérifications : "scenes" = ${narrativeScenes} exactement. JSON valide uniquement.`;
+⚠️ Vérifications :
+- Texte en DARIJA (arabe dialectal algérien)
+- Utilise "الخصم" et non "الأنتاغونيست"
+- ${isCarousel ? 'Exactement 6 slides' : 'Exactement ' + state.clipCount + ' scènes avec plan 1 = hook et dernier = résolution'}
+- Chaque image_prompt contient "NO FACIAL FEATURES, NO FACES, silhouettes only"
+- JSON valide uniquement.`;
 
         const scriptRaw = await callTextAPI([
-            { role: 'system', content: 'Tu es un réalisateur de vidéos courtes cinématographiques. Tu réponds UNIQUEMENT en JSON valide. Tu RESPECTES les structures et contraintes imposées.' },
+            { role: 'system', content: 'Tu es le réalisateur de Mouradrama. Tu écris en darija algérienne stricte (jamais en fusha). Tu réponds UNIQUEMENT en JSON valide. Tu utilises "الخصم" et non "الأنتاغونيست".' },
             { role: 'user', content: scriptPrompt }
-        ], { temperature: 0.7, maxTokens: 4096 });
+        ], { temperature: 0.65, maxTokens: 4096 });
 
         let scenario;
         try { scenario = JSON.parse(extractJsonFromString(scriptRaw)); } catch (e) { logConsole('Erreur JSON : ' + scriptRaw.slice(0, 300), 'warn'); throw new Error('JSON invalide.'); }
-        if (!scenario.scenes || scenario.scenes.length === 0) throw new Error('Aucune scène.');
-        if (!scenario.symbols) scenario.symbols = [];
-        if (!scenario.master_style_prompt) scenario.master_style_prompt = stylePrompt;
-        if (!scenario.final_frame) scenario.final_frame = { description: 'Synthèse', image_prompt: scenario.scenes[scenario.scenes.length - 1].image_prompt + ' Synthesis.' };
 
-        // Marquer hook et ending
-        scenario.scenes[0].is_hook = true;
-        scenario.scenes[scenario.scenes.length - 1].is_ending = true;
+        if (!scenario.master_style_prompt) scenario.master_style_prompt = stylePrompt;
+        if (!scenario.symbols) scenario.symbols = [];
+        if (scenario.pillars) scenario.pillars.forEach(p => { p.time = PILLARS.find(x => x.id === p.id)?.time || ''; p.name = PILLARS.find(x => x.id === p.id)?.name || p.id; });
 
         state.scenario = scenario;
-        logConsole('Script : « ' + scenario.title + ' »', 'success');
-        logConsole('Plans : ' + scenario.scenes.length + ' · Hook : plan 1 · Chute : plan ' + scenario.scenes.length, 'structure');
-        if (scenario.constraints_respected && scenario.constraints_respected.length > 0) logConsole('✓ Contraintes : ' + scenario.constraints_respected.length, 'lock');
-        displayScript(scenario);
+        logConsole('Script : « ' + scenario.title + ' »', 'darija');
+        logConsole('5 piliers narratifs : générés', 'pillar');
+        if (scenario.slides) logConsole('6 slides carrousel : générées', 'success');
+        if (scenario.scenes) logConsole('Plans vidéo : ' + scenario.scenes.length, 'success');
+        displayStory(scenario);
 
-        logConsole('ÉTAPE 2/4 — Images (' + totalImagesNeeded + ')', 'success');
-        setStatus('L\'IA dessine…');
-        const imgSize = state.aspect === 'landscape' ? '1024x576' : state.aspect === 'portrait' ? '576x1024' : '768x768';
+        // ═══ ÉTAPE 2 : IMAGES ═══
+        logConsole('══════════════════════════════', 'text');
+        logConsole('ÉTAPE 2/4 — Visuels (' + totalImagesNeeded + ')', 'success');
+        logConsole('══════════════════════════════', 'text');
+        setStatus('L\'IA génère les visuels…');
+
+        const imgSize = state.aspect === 'portrait' ? '576x1024' : state.aspect === 'landscape' ? '1024x576' : '768x768';
         const masterAnchor = 'STYLE ANCHOR: ' + scenario.master_style_prompt + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and symbols only. ';
         const symbolBlock = scenario.symbols.length > 0 ? ' RECURRING SYMBOLS: ' + scenario.symbols.map(s => s.name + ' — ' + s.description).join(' || ') + '. ' : ' ';
-        const constraintImageBlock = buildConstraintBlockForImage();
 
-        for (let i = 0; i < scenario.scenes.length; i++) {
-            if (state.stopRequested) break;
-            const scene = scenario.scenes[i];
-            const hookPrefix = (i === 0) ? 'CINEMATIC HOOK OPENING SHOT: extremely striking, high impact, attention-grabbing. ' : '';
-            setStatus('Plan ' + (i + 1) + '/' + totalImagesNeeded + (i === 0 ? ' (HOOK)' : '') + '…');
-            const imagePrompt = masterAnchor + symbolBlock + constraintImageBlock + hookPrefix + scene.image_prompt + '. NO HUMAN FACES, NO FACIAL FEATURES, silhouettes only, cinematic composition, dramatic lighting, high quality, no text, no watermarks.';
-            try {
-                const url = await callImageAPI(imagePrompt, imgSize);
-                state.images.push({ sceneIndex: i, url, scene, isFinal: false });
-                logConsole('Plan ' + (i + 1) + ' ✓', 'success');
-                displayGeneratedImage(url, i === 0 ? '⚡ HOOK' : 'Plan ' + scene.scene_number, false, i === 0);
-            } catch (e) { logConsole('Erreur plan ' + (i + 1) + ' : ' + e.message, 'error'); }
-            await sleep(1500);
-        }
-
-        if (scenario.final_frame && !state.stopRequested) {
-            setStatus('Image finale…');
-            const finalPrompt = masterAnchor + symbolBlock + constraintImageBlock + scenario.final_frame.image_prompt + '. NO HUMAN FACES, NO FACIAL FEATURES, silhouettes only, cinematic closing shot, no text.';
-            try {
-                const url = await callImageAPI(finalPrompt, imgSize);
-                state.images.push({ sceneIndex: scenario.scenes.length, url, scene: null, isFinal: true });
-                logConsole('Image finale ✓', 'success');
-                displayGeneratedImage(url, 'Image finale', true, false);
-            } catch (e) { logConsole('Erreur finale : ' + e.message, 'error'); }
-        }
-
-        if (state.images.length < 2) throw new Error('Pas assez d\'images.');
-        const totalClips = state.images.length - 1;
-        logConsole('✅ ' + state.images.length + ' images → ' + totalClips + ' plans', 'success');
-
-        logConsole('ÉTAPE 3/4 — Clips (' + totalClips + ')', 'success');
-        for (let i = 0; i < totalClips; i++) createPendingVideoCard(i, totalClips, i === 0, i === totalClips - 1);
-        document.getElementById('section-videos').classList.remove('hidden');
-        document.getElementById('section-videos').classList.add('open');
-
-        const pollingPromises = [];
-        for (let i = 0; i < totalClips; i++) {
-            if (state.stopRequested) break;
-            const startImg = state.images[i]; const endImg = state.images[i + 1];
-            const scene = startImg.scene || {};
-            const cam = scene.camera_movement || 'slow cinematic dolly';
-            const objM = activeConstraints.objects.length > 0 ? 'MANDATORY OBJECTS: ' + activeConstraints.objects.join(', ') + '. ' : '';
-            const forbM = activeConstraints.forbidden.length > 0 ? 'FORBIDDEN: ' + activeConstraints.forbidden.join(', ') + '. ' : '';
-            const hookM = i === 0 ? 'OPENING HOOK SHOT: high visual impact, attention-grabbing. ' : '';
-            const endM = i === totalClips - 1 ? 'CLOSING SHOT: strong, memorable final image. ' : '';
-            const videoPrompt = ['CINEMATIC SHORT VIDEO. ONE UNBROKEN SHOT.', hookM, endM, 'Slow cinematic camera.', 'NO FACIAL FEATURES, NO HUMAN FACES, silhouettes only.', objM, forbM, 'Camera: ' + cam, 'Style: ' + scenario.master_style_prompt, 'Theatrical, symbolic, dramatic lighting.', 'No text.'].filter(Boolean).join(' ');
-
-            const item = { index: i, startImage: startImg, endImage: endImg, scene, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
-            updatePendingVideoCard(i, 'Création…', 0, 0);
-
-            try {
-                await createVideoTaskOnly(item);
-                updatePendingVideoCard(i, 'En file…', 0, 0);
-                pollingPromises.push(
-                    pollVideoForItem(item).then(result => {
-                        const { item: it, videoUrl, actualDuration } = result;
-                        state.videos[it.index] = { sceneIndex: it.index, url: videoUrl, narration: it.scene.narration || null, sceneNumber: it.scene.scene_number || it.index + 1, actualDuration };
-                        logConsole('✅ Plan ' + (it.index + 1) + ' prêt en ' + actualDuration + 's !', 'success');
-                        replacePendingWithVideo(it.index, videoUrl, it.scene.narration, it.index + 1, actualDuration, it.index === 0, it.index === totalClips - 1);
-                        playNotificationSound();
-                        showToast('Plan ' + (it.index + 1) + ' prêt !', 'success', 3000);
-                        return result;
-                    }).catch(e => { logConsole('Erreur plan ' + (item.index + 1) + ' : ' + e.message, 'error'); markPendingFailed(item.index, e.message); return null; })
-                );
-            } catch (e) { logConsole('Échec plan ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
-
-            if (i < totalClips - 1 && !state.stopRequested) {
-                for (let r = 62; r > 0; r--) { if (state.stopRequested) break; setStatus('Prochain plan dans ' + r + 's'); await sleep(1000); }
+        if (isCarousel) {
+            for (let i = 0; i < scenario.slides.length; i++) {
+                if (state.stopRequested) break;
+                const slide = scenario.slides[i];
+                setStatus('Slide ' + (i + 1) + '/' + totalImagesNeeded + '…');
+                const isHookSlide = i === 0;
+                const hookPrefix = isHookSlide ? 'OPENING HOOK SLIDE — visually striking, attention-grabbing. ' : '';
+                const prompt = masterAnchor + symbolBlock + hookPrefix + slide.image_prompt + '. NO HUMAN FACES, NO FACIAL FEATURES, silhouettes only, cinematic composition, dramatic golden spotlight, deep navy background, high quality, no text, no watermarks.';
+                try {
+                    const url = await callImageAPI(prompt, imgSize);
+                    const label = (isHookSlide ? '⚡ ' : '') + 'Slide ' + (i + 1) + ' — ' + slide.title;
+                    state.images.push({ sceneIndex: i, url, label, isFinal: false });
+                    logConsole('Slide ' + (i + 1) + ' ✓', 'success');
+                    displayGeneratedImage(url, label, isHookSlide);
+                } catch (e) { logConsole('Erreur slide ' + (i + 1) + ' : ' + e.message, 'error'); }
+                await sleep(1500);
+            }
+        } else {
+            for (let i = 0; i < scenario.scenes.length; i++) {
+                if (state.stopRequested) break;
+                const scene = scenario.scenes[i];
+                setStatus('Plan ' + (i + 1) + '/' + totalImagesNeeded + '…');
+                const hookPrefix = (i === 0) ? 'OPENING HOOK SHOT — high visual impact. ' : '';
+                const prompt = masterAnchor + symbolBlock + hookPrefix + scene.image_prompt + '. NO HUMAN FACES, NO FACIAL FEATURES, silhouettes only, cinematic composition, dramatic golden spotlight, deep navy background, high quality, no text, no watermarks.';
+                try {
+                    const url = await callImageAPI(prompt, imgSize);
+                    const label = (i === 0 ? '⚡ HOOK' : 'Plan ' + scene.scene_number);
+                    state.images.push({ sceneIndex: i, url, label, isFinal: false });
+                    logConsole('Plan ' + (i + 1) + ' ✓', 'success');
+                    displayGeneratedImage(url, label, i === 0);
+                } catch (e) { logConsole('Erreur plan ' + (i + 1) + ' : ' + e.message, 'error'); }
+                await sleep(1500);
+            }
+            if (!state.stopRequested) {
+                setStatus('Image finale…');
+                const last = scenario.scenes[scenario.scenes.length - 1];
+                const finalPrompt = masterAnchor + symbolBlock + (last.image_prompt || '') + '. Closing frame, cinematic, no text. NO FACIAL FEATURES.';
+                try {
+                    const url = await callImageAPI(finalPrompt, imgSize);
+                    state.images.push({ sceneIndex: scenario.scenes.length, url, label: 'Image finale', isFinal: true });
+                    logConsole('Image finale ✓', 'success');
+                    displayGeneratedImage(url, 'Image finale', false);
+                } catch (e) { logConsole('Erreur image finale : ' + e.message, 'error'); }
             }
         }
 
-        setStatus('Attente des ' + pollingPromises.length + ' plans…');
-        await Promise.allSettled(pollingPromises);
+        if (state.images.length === 0) throw new Error('Aucune image générée.');
+        logConsole('✅ ' + state.images.length + ' visuels générés', 'success');
 
-        logConsole('ÉTAPE 4/4 — Terminé', 'success');
-        const ready = state.videos.filter(v => v && v.url);
-        logConsole('Plans prêts : ' + ready.length + '/' + totalClips, 'text');
-        if (ready.length > 0) document.getElementById('section-player').classList.remove('hidden');
+        // ═══ ÉTAPE 3 : VIDÉOS (si format vidéo) ═══
+        if (!isCarousel) {
+            const totalClips = state.images.length - 1;
+            logConsole('══════════════════════════════', 'text');
+            logConsole('ÉTAPE 3/4 — Clips vidéo (' + totalClips + ')', 'success');
+            logConsole('══════════════════════════════', 'text');
+            for (let i = 0; i < totalClips; i++) createPendingVideoCard(i, totalClips, i === 0, i === totalClips - 1);
+            document.getElementById('section-videos').classList.remove('hidden');
+            document.getElementById('section-videos').classList.add('open');
 
-        setStatus('✦ Vidéo terminée ✦');
+            const pollingPromises = [];
+            for (let i = 0; i < totalClips; i++) {
+                if (state.stopRequested) break;
+                const startImg = state.images[i]; const endImg = state.images[i + 1];
+                const scene = scenario.scenes[i] || {};
+                const cam = scene.camera_movement || 'slow cinematic dolly';
+                const hookM = i === 0 ? 'OPENING HOOK SHOT. ' : '';
+                const endM = i === totalClips - 1 ? 'CLOSING SHOT with strong memorable image. ' : '';
+                const videoPrompt = ['MOURADRAMA CINEMATIC SHORT. ONE UNBROKEN SHOT.', hookM, endM, 'Slow cinematic camera.', 'NO FACIAL FEATURES, NO HUMAN FACES, silhouettes and symbols only.', 'Camera: ' + cam, 'Style: ' + scenario.master_style_prompt, 'Theatrical atmosphere, deep navy and golden accents, floating dust particles.', 'No text, no watermarks.'].filter(Boolean).join(' ');
+
+                const item = { index: i, startImage: startImg, endImage: endImg, scene, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
+                updatePendingVideoCard(i, 'Création…', 0, 0);
+
+                try {
+                    await createVideoTaskOnly(item);
+                    updatePendingVideoCard(i, 'En file…', 0, 0);
+                    pollingPromises.push(
+                        pollVideoForItem(item).then(result => {
+                            const { item: it, videoUrl, actualDuration } = result;
+                            state.videos[it.index] = { sceneIndex: it.index, url: videoUrl, narration: it.scene.narration || null, sceneNumber: it.scene.scene_number || it.index + 1, actualDuration };
+                            logConsole('✅ Plan ' + (it.index + 1) + ' prêt en ' + actualDuration + 's !', 'success');
+                            replacePendingWithVideo(it.index, videoUrl, it.scene.narration, it.index + 1, actualDuration, it.index === 0, it.index === totalClips - 1);
+                            playNotificationSound();
+                            showToast('Plan ' + (it.index + 1) + ' prêt !', 'success', 3000);
+                            return result;
+                        }).catch(e => { logConsole('Erreur plan ' + (item.index + 1) + ' : ' + e.message, 'error'); markPendingFailed(item.index, e.message); return null; })
+                    );
+                } catch (e) { logConsole('Échec plan ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
+
+                if (i < totalClips - 1 && !state.stopRequested) {
+                    for (let r = 62; r > 0; r--) { if (state.stopRequested) break; setStatus('Prochain plan dans ' + r + 's'); await sleep(1000); }
+                }
+            }
+            setStatus('Attente des ' + pollingPromises.length + ' plans…');
+            await Promise.allSettled(pollingPromises);
+        } else {
+            logConsole('══════════════════════════════', 'text');
+            logConsole('ÉTAPE 3/4 — Carrousel : pas de vidéo', 'success');
+            logConsole('══════════════════════════════', 'text');
+        }
+
+        // ═══ ÉTAPE 4 : FIN ═══
+        logConsole('══════════════════════════════', 'text');
+        logConsole('ÉTAPE 4/4 — Production terminée', 'success');
+        logConsole('══════════════════════════════', 'text');
+
+        const readyVideos = state.videos.filter(v => v && v.url);
+        if (!isCarousel && readyVideos.length > 0) document.getElementById('section-player').classList.remove('hidden');
+
+        setStatus('✦ Production terminée ✦');
         await sleep(3000); setStatus(null);
-        showToast(ready.length + ' plan(s) généré(s) sur ' + totalClips, 'success');
+        showToast(isCarousel ? state.images.length + ' slides générées' : readyVideos.length + ' plan(s) généré(s)', 'success');
 
     } catch (e) {
         logConsole('ERREUR : ' + e.message, 'error');
@@ -1189,49 +1315,70 @@ Génère EXACTEMENT ${narrativeScenes} scènes narratives + 1 image finale muett
 // ══════════════════════════════════════════════════════════════════
 // AFFICHAGE
 // ══════════════════════════════════════════════════════════════════
-function displayScript(scenario) {
-    const s = document.getElementById('section-script'); const d = document.getElementById('script-display');
+function displayStory(scenario) {
+    const s = document.getElementById('section-story'); const d = document.getElementById('story-display');
     s.classList.remove('hidden'); s.classList.add('open');
-    let h = '<h3>🎬 ' + esc(scenario.title) + '</h3>';
-    h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline || '') + '</p>';
-    if (scenario.concept) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.4rem;">Concept : ' + esc(scenario.concept) + '</div>';
-    h += '<div class="structure-block"><strong>🎬 Structure</strong> : ' + esc(state.selectedStructure.name) + ' · ' + esc(VIDEO_DURATIONS[state.videoDuration].label) + '<br>⚡ Hook : ' + esc(HOOK_INTENSITIES[state.hookIntensity].label) + ' · 🎯 Chute : ' + esc(ENDINGS[state.endingType].label) + '</div>';
-    if (scenario.hook_description) h += '<div class="structure-block"><strong>⚡ HOOK (plan 1)</strong> — ' + esc(scenario.hook_description) + '</div>';
-    if (scenario.ending_description) h += '<div class="structure-block"><strong>🎯 CHUTE (dernier plan)</strong> — ' + esc(scenario.ending_description) + '</div>';
-    if (scenario.constraints_respected && scenario.constraints_respected.length > 0) {
-        h += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.75rem;color:var(--error);">🔒 Contraintes respectées</strong>';
-        scenario.constraints_respected.forEach(c => { h += '<div class="constraint-block">✓ ' + esc(c) + '</div>'; });
+    let h = '<h3>🎬 ' + esc(scenario.title || 'Production') + '</h3>';
+    if (scenario.logline) h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;direction:rtl;text-align:right;">' + esc(scenario.logline) + '</p>';
+    if (scenario.concept) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Concept : ' + esc(scenario.concept) + '</div>';
+
+    if (scenario.pillars && scenario.pillars.length > 0) {
+        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--accent);text-transform:uppercase;">📐 Les 5 piliers narratifs</strong>';
+        scenario.pillars.forEach(p => {
+            const info = PILLARS.find(x => x.id === p.id) || {};
+            h += '<div class="pillar-block ' + p.id + '">';
+            h += '<div class="pb-title">' + esc(info.emoji || '') + ' ' + esc(info.name || p.id) + '</div>';
+            h += '<div class="pb-time">' + esc(info.time || '') + '</div>';
+            h += '<div class="pb-content" style="direction:rtl;text-align:right;">' + esc(p.content || '') + '</div>';
+            h += '</div>';
+        });
         h += '</div>';
     }
-    if (scenario.master_style_prompt) {
-        h += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.75rem;color:var(--warn);">🎨 Style directeur</strong>';
-        h += '<div class="master-style-block">' + esc(scenario.master_style_prompt) + '</div></div>';
+
+    if (scenario.slides && scenario.slides.length > 0) {
+        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--info);text-transform:uppercase;">📇 Carrousel — 6 slides</strong>';
+        scenario.slides.forEach((sl, i) => {
+            h += '<div class="slide-block">';
+            h += '<div class="sb-num">SLIDE ' + (i + 1) + '</div>';
+            h += '<div class="sb-title" style="direction:rtl;text-align:right;">' + esc(sl.title || '') + '</div>';
+            h += '<div class="sb-content">' + esc(sl.content || '') + '</div>';
+            h += '</div>';
+        });
+        h += '</div>';
     }
+
+    if (scenario.scenes && scenario.scenes.length > 0) {
+        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--info);text-transform:uppercase;">🎬 Plans vidéo</strong>';
+        scenario.scenes.forEach(sc => {
+            const tag = sc.is_hook ? ' ⚡ HOOK' : (sc.is_ending ? ' 🎯 RÉSOLUTION' : '');
+            h += '<div class="slide-block"><div class="sb-num">PLAN ' + sc.scene_number + tag + '</div>';
+            if (sc.description) h += '<div class="sb-content">' + esc(sc.description) + '</div>';
+            if (sc.narration) h += '<div style="font-size:0.75rem;color:var(--accent);font-style:italic;direction:rtl;text-align:right;margin-top:0.3rem;">🎙️ « ' + esc(sc.narration) + ' »</div>';
+            h += '</div>';
+        });
+        h += '</div>';
+    }
+
     if (scenario.symbols && scenario.symbols.length > 0) {
-        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.75rem;color:var(--success);">⚜ Symboles</strong>';
-        scenario.symbols.forEach(x => { h += '<div class="symbol-block"><strong>' + esc(x.name) + '</strong><br>' + esc(x.description) + '</div>'; });
+        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--success);text-transform:uppercase;">⚜ Symboles visuels</strong>';
+        scenario.symbols.forEach(x => { h += '<div class="slide-block" style="border-left-color:var(--success);"><strong>' + esc(x.name) + '</strong> — ' + esc(x.description) + '</div>'; });
         h += '</div>';
     }
-    scenario.scenes.forEach(sc => {
-        const cls = sc.is_hook ? ' hook' : (sc.is_ending ? ' climax' : '');
-        const tag = sc.is_hook ? ' ⚡ HOOK' : (sc.is_ending ? ' 🎯 CHUTE' : '');
-        h += '<div class="scene-item' + cls + '"><span class="scene-num">Plan ' + sc.scene_number + tag + '</span> — ' + esc(sc.sequence_title || '') + '<br>';
-        h += '<span style="font-size:0.75rem;">' + esc(sc.description) + '</span>';
-        if (sc.narration) h += '<div class="narration-block">🎙️ « ' + esc(sc.narration) + ' »</div>';
-        if (sc.symbolism) h += '<div style="font-size:0.7rem;color:var(--ink-faint);margin-top:0.2rem;">⚜ ' + esc(sc.symbolism) + '</div>';
-        if (sc.constraints_applied) h += '<div style="font-size:0.68rem;color:var(--error);margin-top:0.2rem;">🔒 ' + esc(sc.constraints_applied) + '</div>';
-        h += '</div>';
-    });
-    if (scenario.final_frame) h += '<div class="final-frame-block"><strong>🎬 Image finale</strong><br>' + esc(scenario.final_frame.description || '') + '</div>';
+
+    if (scenario.master_style_prompt) {
+        h += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.72rem;color:var(--warn);text-transform:uppercase;">🎨 Style directeur</strong>';
+        h += '<div style="padding:0.6rem 0.8rem;background:var(--panel);border-left:3px solid var(--warn);border-radius:0 6px 6px 0;font-size:0.72rem;font-family:ui-monospace,monospace;margin-top:0.3rem;">' + esc(scenario.master_style_prompt) + '</div></div>';
+    }
+
     d.innerHTML = h;
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function displayGeneratedImage(url, label, isFinal = false, isHook = false) {
+function displayGeneratedImage(url, label, isHook = false) {
     const s = document.getElementById('section-images'); const g = document.getElementById('generated-images');
     s.classList.remove('hidden');
     const c = document.createElement('div');
-    c.className = 'gen-image-card' + (isFinal ? ' final-frame' : '') + (isHook ? ' hook-frame' : '');
+    c.className = 'gen-image-card' + (isHook ? ' hook-frame' : '');
     c.innerHTML = '<img src="' + url + '" alt="" loading="lazy"><div class="gen-label">' + esc(label) + '</div>';
     g.appendChild(c);
     document.getElementById('images-badge').textContent = g.children.length;
@@ -1241,7 +1388,7 @@ function createPendingVideoCard(index, total, isHook, isEnding) {
     const g = document.getElementById('generated-videos');
     const c = document.createElement('div');
     c.className = 'pending-video-card'; c.id = 'pending-video-' + index;
-    const tag = isHook ? ' ⚡ HOOK' : (isEnding ? ' 🎯 CHUTE' : '');
+    const tag = isHook ? ' ⚡ HOOK' : (isEnding ? ' 🎯 RÉSOLUTION' : '');
     c.innerHTML = '<div class="pending-spinner"></div><div class="pending-label">Plan ' + (index + 1) + ' / ' + total + tag + '</div><div class="pending-progress-text" id="pending-progress-' + index + '">En attente…</div><div class="pending-eta" id="pending-eta-' + index + '"></div><div class="pending-progress-bar"><div class="pending-progress-fill" id="pending-fill-' + index + '"></div></div>';
     g.appendChild(c);
 }
@@ -1260,7 +1407,7 @@ function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actual
     const c = document.createElement('div');
     c.className = 'gen-video-card newly-added' + (isHook ? ' hook-video' : '');
     c.id = 'video-card-' + index;
-    const tag = isHook ? '⚡ HOOK' : (isEnding ? '🎯 CHUTE' : 'Plan ' + sceneNumber);
+    const tag = isHook ? '⚡ HOOK' : (isEnding ? '🎯 RÉSOLUTION' : 'Plan ' + sceneNumber);
     c.innerHTML = '<video src="' + videoUrl + '" controls playsinline preload="metadata"></video>' +
         '<div class="gen-label">🎬 ' + tag + '</div>' +
         (actualDuration ? '<div class="gen-timing">⚡ ' + actualDuration + 's</div>' : '') +
@@ -1297,20 +1444,17 @@ function playAllVideos() {
     state.isPlayingSequence = true; state.currentSceneIndex = 0;
     document.getElementById('play-all-btn').textContent = '⏸ Lecture…';
     document.getElementById('play-all-btn').classList.add('playing');
-    document.getElementById('section-player').classList.add('open');
     playVideoAt(0);
 }
 function playVideoAt(index) {
     while (index < state.videos.length && (!state.videos[index] || !state.videos[index].url)) index++;
     if (index >= state.videos.length || !state.isPlayingSequence) {
         state.isPlayingSequence = false;
-        document.getElementById('play-all-btn').textContent = '▶ Lire la vidéo';
+        document.getElementById('play-all-btn').textContent = '▶ Lire';
         document.getElementById('play-all-btn').classList.remove('playing'); return;
     }
     const v = document.getElementById('player-video'); const d = state.videos[index];
     v.src = d.url; v.currentTime = 0; v.play().catch(() => {});
-    document.getElementById('player-info').textContent = 'Plan ' + (index + 1) + ' / ' + state.videos.length;
-    document.getElementById('player-progress').style.width = ((index + 1) / state.videos.length * 100) + '%';
     if (d.narration) setTimeout(() => speakText(d.narration), 800);
     v.onended = () => { if (state.isPlayingSequence) setTimeout(() => playVideoAt(index + 1), 600); };
 }
@@ -1318,7 +1462,7 @@ function stopAllVideos() {
     state.isPlayingSequence = false;
     const v = document.getElementById('player-video'); v.pause(); v.currentTime = 0;
     stopSpeech();
-    document.getElementById('play-all-btn').textContent = '▶ Lire la vidéo';
+    document.getElementById('play-all-btn').textContent = '▶ Lire';
     document.getElementById('play-all-btn').classList.remove('playing');
     document.querySelectorAll('.narration-play-btn.playing').forEach(b => { b.classList.remove('playing'); b.textContent = '▶ Écouter'; });
 }
@@ -1352,9 +1496,36 @@ function speakText(text) {
 function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
 function testVoice() {
     const lt = LANGUAGES[state.narrationLanguage]; const nt = NARRATORS[state.narratorVoice];
-    const t = { 'fr': 'Au commencement était la catharsis. Aristote la définit comme la purgation des passions.', 'ar': 'يعرّف أرسطو التطهير بأنه تنقية المشاعر.', 'ar-dz': 'أرسطو قال بلي الكاتارسيس هي تنقية المشاعر.' }[state.narrationLanguage] || 'Test.';
+    const t = state.narrationLanguage === 'ar-dz'
+        ? 'كيفاش الدراماتورجيا كتبنى قصة تجذب؟ كل فيلم ناجح، بنا على نفس القواعد: شخصية تحب حاجة، عندها عوائق، وتحارب باش توصلها.'
+        : (state.narrationLanguage === 'ar' ? 'كيف تُبنى الدراماتورجيا؟' : 'Comment se construit la dramaturgie ?');
     logConsole('Test voix : ' + nt.label + ' · ' + lt.label, 'info');
     speakText(t);
+}
+
+function renderConceptGrid() {
+    const g = document.getElementById('concept-grid');
+    g.innerHTML = '';
+    const week = state.selectedWeek;
+    if (week === 0) {
+        g.innerHTML = '<div style="font-size:0.72rem;color:var(--ink-dim);padding:0.5rem;">Concept personnalisé — remplissez le champ ci-dessous.</div>';
+        updateCustomPanels();
+        return;
+    }
+    const list = CONCEPTS[week] || [];
+    list.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'concept-card' + (state.selectedConcept && state.selectedConcept.id === c.id ? ' selected' : '');
+        card.innerHTML = '<span class="cc-emoji">' + c.emoji + '</span><span class="cc-name">' + c.name + '</span>';
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.concept-card').forEach(x => x.classList.remove('selected'));
+            card.classList.add('selected');
+            state.selectedConcept = c;
+            logConsole('Concept sélectionné : ' + c.name, 'info');
+        });
+        g.appendChild(card);
+    });
+    updateCustomPanels();
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1364,44 +1535,40 @@ function testVoice() {
     initSpeech();
     loadMeasuredSpeed();
 
-    const sg = document.getElementById('structure-grid');
-    STRUCTURES.forEach((st, i) => {
+    // Formats
+    const fg = document.getElementById('format-grid');
+    FORMATS.forEach((f, i) => {
         const c = document.createElement('div');
-        c.className = 'structure-card' + (i === 0 ? ' selected' : '');
-        c.dataset.id = st.id;
-        c.innerHTML = '<span class="structure-emoji">' + st.emoji + '</span><span class="structure-name">' + st.name + '</span><span class="structure-desc">' + st.desc + '</span>';
+        c.className = 'format-card' + (i === 0 ? ' selected' : '');
+        c.dataset.id = f.id;
+        c.innerHTML = '<span class="fc-emoji">' + f.emoji + '</span><span class="fc-name">' + f.name + '</span><span class="fc-desc">' + f.desc + '</span>';
         c.addEventListener('click', () => {
-            document.querySelectorAll('.structure-card').forEach(x => x.classList.remove('selected'));
+            document.querySelectorAll('.format-card').forEach(x => x.classList.remove('selected'));
             c.classList.add('selected');
-            state.selectedStructure = st;
-            logConsole('Structure : ' + st.name, 'structure');
+            state.selectedFormat = f;
+            document.getElementById('format-description').textContent = f.desc + (f.outputType === 'images' ? ' — Structure en 6 slides' : ' — ' + f.clipCount + ' plans');
+            logConsole('Format : ' + f.name, 'info');
         });
-        sg.appendChild(c);
+        fg.appendChild(c);
     });
 
-    const tg = document.getElementById('theme-grid');
-    THEMES.forEach((t, i) => {
+    // Piliers (visuels, pas de sélection — c'est imposé)
+    const pg = document.getElementById('pillar-grid');
+    PILLARS.forEach(p => {
         const c = document.createElement('div');
-        c.className = 'theme-card' + (i === 0 ? ' selected' : '');
-        c.dataset.id = t.id;
-        c.innerHTML = '<span class="theme-emoji">' + t.emoji + '</span><span class="theme-name">' + t.name + '</span>' + (t.desc ? '<span class="theme-desc">' + t.desc + '</span>' : '');
-        c.addEventListener('click', () => {
-            document.querySelectorAll('.theme-card').forEach(x => x.classList.remove('selected'));
-            c.classList.add('selected');
-            state.selectedTheme = t;
-            document.getElementById('theme-description').textContent = t.id === 'aucun' ? 'Décrivez vous-même votre concept ci-dessous.' : t.desc + ' — ' + t.focus.slice(0, 100) + '…';
-            updateCustomPanels();
-            logConsole('Concept : ' + t.name, 'info');
-        });
-        tg.appendChild(c);
+        c.className = 'pillar-card';
+        c.innerHTML = '<div style="font-weight:700;font-size:0.85rem;direction:rtl;text-align:right;">' + p.emoji + ' ' + p.name + '</div><div class="pc-time">' + p.time + '</div>';
+        c.style.cursor = 'default';
+        pg.appendChild(c);
     });
 
-    const syg = document.getElementById('style-grid');
-    DRAMA_STYLES.forEach((s, i) => {
+    // Styles
+    const sg = document.getElementById('style-grid');
+    STYLES.forEach((s, i) => {
         const c = document.createElement('div');
         c.className = 'style-card' + (i === 0 ? ' selected' : '');
         c.dataset.id = s.id;
-        c.innerHTML = '<span class="style-emoji">' + s.emoji + '</span><span class="style-name">' + s.name + '</span>';
+        c.innerHTML = '<span class="sc-emoji">' + s.emoji + '</span><span class="sc-name">' + s.name + '</span>';
         c.addEventListener('click', () => {
             document.querySelectorAll('.style-card').forEach(x => x.classList.remove('selected'));
             c.classList.add('selected');
@@ -1409,8 +1576,16 @@ function testVoice() {
             updateCustomPanels();
             logConsole('Style : ' + s.name, 'info');
         });
-        syg.appendChild(c);
+        sg.appendChild(c);
     });
+
+    // Semaine
+    document.getElementById('week-select').addEventListener('change', (e) => {
+        state.selectedWeek = parseInt(e.target.value);
+        state.selectedConcept = null;
+        renderConceptGrid();
+    });
+    renderConceptGrid();
 
     document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
     document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
@@ -1420,36 +1595,21 @@ function testVoice() {
     document.querySelectorAll('[data-toggle]').forEach(h => { h.addEventListener('click', () => { document.getElementById(h.dataset.toggle).classList.toggle('open'); }); });
     document.getElementById('play-all-btn').addEventListener('click', () => { if (state.isPlayingSequence) stopAllVideos(); else playAllVideos(); });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
-
-    document.getElementById('language-select').addEventListener('change', (e) => { state.narrationLanguage = e.target.value; logConsole('Langue : ' + LANGUAGES[state.narrationLanguage].label, 'info'); });
-    document.getElementById('narrator-select').addEventListener('change', (e) => { state.narratorVoice = e.target.value; logConsole('Voix : ' + NARRATORS[state.narratorVoice].label, 'info'); });
     document.getElementById('test-voice-btn').addEventListener('click', testVoice);
-    document.getElementById('download-narration-btn').addEventListener('click', downloadNarration);
+    document.getElementById('download-script-btn').addEventListener('click', downloadScript);
     document.getElementById('save-project-btn').addEventListener('click', saveProject);
     document.getElementById('load-project-btn').addEventListener('click', loadProject);
     document.getElementById('new-project-btn').addEventListener('click', newProject);
-
-    ['constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
-            state.constraints = {
-                objects: document.getElementById('constraint-objects').value,
-                concepts: document.getElementById('constraint-concepts').value,
-                references: document.getElementById('constraint-references').value,
-                forbidden: document.getElementById('constraint-forbidden').value,
-                free: document.getElementById('constraint-free').value
-            };
-            updateConstraintCounter(); updateGenerateBtn();
-        });
-    });
-    document.getElementById('clear-constraints-btn').addEventListener('click', clearConstraints);
     document.getElementById('custom-concept-input').addEventListener('input', (e) => { state.customConcept = e.target.value.trim(); });
     document.getElementById('custom-style-input').addEventListener('input', (e) => { state.customStyle = e.target.value.trim(); });
+    document.getElementById('language-select').addEventListener('change', (e) => { state.narrationLanguage = e.target.value; logConsole('Langue : ' + LANGUAGES[state.narrationLanguage].label, 'darija'); });
+    document.getElementById('narrator-select').addEventListener('change', (e) => { state.narratorVoice = e.target.value; logConsole('Voix : ' + NARRATORS[state.narratorVoice].label, 'info'); });
 
-    updateApiPanel(); updateLimitsPanel(); updateGenerateBtn(); updateConstraintCounter(); updateCustomPanels();
+    updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
     const sk = getApiKey(); if (sk) document.getElementById('api-key-input').value = sk;
-    logConsole('Studio de Dramaturgie v4 — Structure narrative intégrée', 'info');
-    logConsole('🎬 In medias res · Hook 3s · Rétention 40% · Chute mémorable', 'structure');
-    logConsole('⚜ Aucun visage humain · Silhouettes uniquement', 'warn');
+    logConsole('Mouradrama Studio prêt.', 'info');
+    logConsole('⚜ Règles : Daridja · Pas de visage · الخصم · Un concept/production', 'darija');
+    logConsole('📐 Structure : 5 piliers du guide intégrés', 'pillar');
 })();
 </script>
 
