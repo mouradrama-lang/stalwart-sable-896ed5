@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MarxTok Generator — Concepts du marxisme en vidéos TikTok</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+        --bg: #0a0a0e; --panel: #14141c; --panel-2: #1c1c28; --border: #2a2a3a;
+        --ink: #e8e8f0; --ink-dim: #8888a0; --ink-faint: #55556a;
+        --success: #2d8a4e; --error: #c0392b; --warn: #d4a017; --info: #4a6cf7;
+        --accent: #e94560; --radius: 12px;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background: var(--bg); color: var(--ink); min-height: 100vh;
+        padding: 1rem 0.8rem 6rem; font-size: 15px; line-height: 1.5;
+        max-width: 800px; margin: 0 auto;
+    }
+    header { margin-bottom: 1.2rem; text-align: center; }
+    h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.2rem;
+         background: linear-gradient(135deg, #e94560, #d4a017, #4a6cf7);
+         -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 0.8rem; color: var(--ink-dim); }
+
+    .toast {
+        position: fixed; top: 1rem; left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        background: var(--panel); color: var(--ink);
+        padding: 0.75rem 1.2rem; border-radius: 10px;
+        font-size: 0.82rem; font-weight: 500;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+        border: 1px solid var(--border);
+        z-index: 1000; opacity: 0;
+        transition: transform 0.35s ease, opacity 0.35s ease;
+        max-width: 90vw; text-align: center;
+        display: flex; align-items: center; gap: 0.5rem;
+    }
+    .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+    .toast.warn { border-color: var(--warn); }
+
+    .panel {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 1rem;
+        margin-bottom: 0.8rem;
+    }
+    .panel h2 {
+        font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+        color: var(--ink-dim); font-weight: 700; margin-bottom: 0.8rem;
+        display: flex; align-items: center; gap: 0.4rem;
+    }
+    .panel h2 .badge {
+        background: var(--accent); color: #fff; border-radius: 10px;
+        padding: 0.1rem 0.5rem; font-size: 0.6rem; letter-spacing: 0;
+    }
+
+    .api-row {
+        display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 0.5rem;
+    }
+    .api-row input {
+        flex: 1; padding: 0.7rem 0.9rem; border-radius: 8px;
+        border: 1px solid var(--border); background: var(--bg);
+        color: var(--ink); font-family: ui-monospace, monospace;
+        font-size: 0.8rem;
+    }
+    .api-row input:focus { outline: none; border-color: var(--accent); }
+    .api-row button {
+        padding: 0.7rem 1rem; border-radius: 8px; border: none;
+        background: var(--accent); color: #fff; font-weight: 700;
+        font-family: inherit; font-size: 0.8rem; cursor: pointer;
+        white-space: nowrap;
+    }
+    .api-status {
+        font-size: 0.72rem; color: var(--ink-dim);
+        display: flex; align-items: center; gap: 0.4rem;
+    }
+    .api-status .dot {
+        width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint);
+    }
+    .api-status.ok .dot { background: var(--success); }
+    .api-status.ok { color: var(--success); }
+
+    .field { margin-bottom: 0.8rem; }
+    .field label {
+        display: block; font-size: 0.68rem; color: var(--ink-dim);
+        text-transform: uppercase; letter-spacing: 0.06em;
+        font-weight: 700; margin-bottom: 0.35rem;
+    }
+    .field select, .field textarea, .field input[type="text"] {
+        width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px;
+        border: 1px solid var(--border); background: var(--bg);
+        color: var(--ink); font-family: inherit; font-size: 0.88rem;
+        -webkit-appearance: none; appearance: none;
+    }
+    .field select {
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238888a0' d='M0 0l5 6 5-6z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 0.9rem center;
+        background-size: 10px;
+    }
+    .field select:focus, .field textarea:focus, .field input:focus {
+        outline: none; border-color: var(--accent);
+    }
+    .field textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
+
+    .grid-2 {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;
+    }
+    .grid-3 {
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem;
+    }
+    @media (max-width: 400px) {
+        .grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .toggle-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-row .tl { font-size: 0.82rem; }
+    .toggle-row .th { font-size: 0.65rem; color: var(--ink-faint); }
+    .switch {
+        position: relative; display: inline-block; width: 42px; height: 23px; flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch .slider {
+        position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+        background: var(--panel-2); transition: 0.3s;
+        border-radius: 23px; border: 1px solid var(--border);
+    }
+    .switch .slider:before {
+        position: absolute; content: ""; height: 15px; width: 15px;
+        left: 3px; bottom: 3px; background: var(--ink-dim);
+        transition: 0.3s; border-radius: 50%;
+    }
+    .switch input:checked + .slider { background: var(--success); border-color: var(--success); }
+    .switch input:checked + .slider:before { transform: translateX(19px); background: #fff; }
+
+    .btn-generate {
+        width: 100%; padding: 1.1rem; border-radius: var(--radius);
+        border: none; background: linear-gradient(135deg, #e94560, #d4a017, #4a6cf7);
+        color: #fff; font-size: 1.05rem; font-weight: 800; font-family: inherit;
+        cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+        margin-bottom: 0.8rem;
+    }
+    .btn-generate:active:not(:disabled) { transform: scale(0.98); }
+    .btn-generate:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .btn-secondary {
+        width: 100%; padding: 0.8rem; border-radius: var(--radius);
+        border: 1px solid var(--info); background: transparent;
+        color: var(--info); font-size: 0.85rem; font-weight: 700;
+        font-family: inherit; cursor: pointer; margin-bottom: 0.6rem;
+    }
+    .btn-secondary:active { background: var(--info); color: #fff; }
+    .btn-secondary:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .btn-stop {
+        width: 100%; padding: 0.8rem; border-radius: var(--radius);
+        border: 1px solid var(--error); background: transparent;
+        color: var(--error); font-size: 0.85rem; font-weight: 700;
+        font-family: inherit; cursor: pointer; margin-bottom: 0.6rem;
+        display: none;
+    }
+    .btn-stop.visible { display: block; }
+
+    .console {
+        background: #060608; border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 0.7rem 0.9rem;
+        margin-bottom: 0.8rem; max-height: 220px; overflow-y: auto;
+        font-family: ui-monospace, monospace; font-size: 0.68rem; line-height: 1.6;
+    }
+    .console .log-line { padding: 0.1rem 0; }
+    .console .log-time { color: var(--ink-faint); margin-right: 0.4rem; }
+    .console .log-info { color: var(--info); }
+    .console .log-success { color: var(--success); }
+    .console .log-error { color: var(--error); }
+    .console .log-warn { color: var(--warn); }
+    .console .log-text { color: var(--ink); }
+
+    .result-section {
+        background: var(--panel); border: 1px solid var(--border);
+        border-radius: var(--radius); margin-bottom: 0.8rem; overflow: hidden;
+    }
+    .result-header {
+        padding: 0.8rem 1rem; cursor: pointer; user-select: none;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .result-header:active { background: var(--panel-2); }
+    .result-title {
+        font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+        color: var(--ink-dim); font-weight: 700;
+    }
+    .result-header .chevron {
+        font-size: 0.65rem; color: var(--ink-faint); transition: transform 0.2s;
+    }
+    .result-section.open .result-header .chevron { transform: rotate(180deg); }
+    .result-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .result-section.open .result-body { max-height: 20000px; }
+    .result-content { padding: 0 1rem 1rem; }
+
+    .scene-card {
+        background: var(--panel-2); border-radius: 8px; padding: 0.8rem;
+        margin-bottom: 0.6rem; border-left: 3px solid var(--accent);
+    }
+    .scene-card .scene-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    .scene-card .scene-num {
+        font-weight: 800; color: var(--accent); font-size: 0.85rem;
+    }
+    .scene-card .scene-duration {
+        font-size: 0.68rem; color: var(--warn); font-family: ui-monospace, monospace;
+        background: var(--panel); padding: 0.1rem 0.5rem; border-radius: 4px;
+    }
+    .scene-card .scene-field {
+        margin-bottom: 0.4rem;
+    }
+    .scene-card .scene-field .sf-label {
+        font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em;
+        color: var(--ink-faint); font-weight: 700; display: block;
+    }
+    .scene-card .scene-field .sf-value {
+        font-size: 0.78rem; color: var(--ink); line-height: 1.5;
+    }
+    .scene-card .scene-field .sf-value.prompt {
+        background: #060608; border: 1px solid var(--border);
+        border-radius: 6px; padding: 0.5rem; font-family: ui-monospace, monospace;
+        font-size: 0.65rem; color: #a0d0a0; word-break: break-word;
+        white-space: pre-wrap; max-height: 200px; overflow-y: auto;
+    }
+    .scene-card .scene-field .sf-value.narration {
+        color: var(--ink); font-style: italic;
+    }
+    .scene-card .scene-field .sf-value.plan {
+        display: inline-block; background: var(--info); color: #fff;
+        padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem;
+        font-weight: 700;
+    }
+    .scene-card .scene-field .sf-value.camera {
+        display: inline-block; background: var(--warn); color: #000;
+        padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+    .style-lock-box {
+        background: #060608; border: 1px solid var(--info);
+        border-radius: 8px; padding: 0.8rem; margin-bottom: 0.8rem;
+    }
+    .style-lock-box .sl-label {
+        font-size: 0.65rem; text-transform: uppercase; color: var(--info);
+        font-weight: 700; letter-spacing: 0.08em; margin-bottom: 0.3rem;
+    }
+    .style-lock-box .sl-text {
+        font-family: ui-monospace, monospace; font-size: 0.68rem;
+        color: #88aaff; line-height: 1.5; white-space: pre-wrap;
+    }
+
+    .export-bar {
+        display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem;
+    }
+    .export-bar button {
+        flex: 1; min-width: 100px; padding: 0.6rem 0.5rem;
+        border-radius: 8px; border: 1px solid var(--border);
+        background: var(--panel-2); color: var(--ink);
+        font-family: inherit; font-size: 0.7rem; font-weight: 700;
+        cursor: pointer;
+    }
+    .export-bar button:active { background: var(--border); }
+
+    .status-bar {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: var(--panel); border-top: 1px solid var(--border);
+        color: var(--ink); padding: 0.7rem 1rem;
+        font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
+        transform: translateY(100%); transition: transform 0.3s;
+        z-index: 100;
+    }
+    .status-bar.visible { transform: translateY(0); }
+    .spinner {
+        width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.15);
+        border-top-color: var(--accent); border-radius: 50%;
+        animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>MarxTok Generator</h1>
+    <p class="subtitle">Générateur de vidéos éducatives sur les concepts du marxisme</p>
+</header>
+
+<!-- ═══ API KEY ═══ -->
+<div class="panel">
+    <h2>🔑 Clé API Agnès</h2>
+    <div class="api-row">
+        <input type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false">
+        <button type="button" id="api-save-btn">OK</button>
+    </div>
+    <div class="api-status" id="api-status">
+        <span class="dot"></span>
+        <span id="api-status-text">Aucune clé enregistrée</span>
+    </div>
+</div>
+
+<!-- ═══ CONCEPT ═══ -->
+<div class="panel">
+    <h2>📖 Concept marxiste <span class="badge">1 par vidéo</span></h2>
+    <div class="field">
+        <select id="concept-select">
+            <option value="">— Choisir un concept —</option>
+            <optgroup label="Fondements">
+                <option value="Matérialisme historique">Matérialisme historique</option>
+                <option value="Matérialisme dialectique">Matérialisme dialectique</option>
+                <option value="Forces productives">Forces productives</option>
+                <option value="Rapports de production">Rapports de production</option>
+                <option value="Mode de production">Mode de production</option>
+            </optgroup>
+            <optgroup label="Classes et rapports sociaux">
+                <option value="Lutte des classes">Lutte des classes</option>
+                <option value="Bourgeoisie">Bourgeoisie</option>
+                <option value="Prolétariat">Prolétariat</option>
+                <option value="Classe en soi / classe pour soi">Classe en soi / classe pour soi</option>
+                <option value="Conscience de classe">Conscience de classe</option>
+            </optgroup>
+            <optgroup label="Économie politique">
+                <option value="Force de travail">Force de travail</option>
+                <option value="Travail">Travail</option>
+                <option value="Valeur">Valeur</option>
+                <option value="Marchandise">Marchandise</option>
+                <option value="Théorie de la valeur-travail">Théorie de la valeur-travail</option>
+                <option value="Plus-value">Plus-value</option>
+                <option value="Exploitation">Exploitation</option>
+                <option value="Capital">Capital</option>
+                <option value="Accumulation du capital">Accumulation du capital</option>
+                <option value="Concentration et centralisation du capital">Concentration et centralisation du capital</option>
+                <option value="Armée industrielle de réserve">Armée industrielle de réserve</option>
+                <option value="Crises du capitalisme">Crises du capitalisme</option>
+            </optgroup>
+            <optgroup label="Aliénation et idéologie">
+                <option value="Aliénation">Aliénation</option>
+                <option value="Fétichisme de la marchandise">Fétichisme de la marchandise</option>
+                <option value="Réification">Réification</option>
+                <option value="Infrastructure et superstructure">Infrastructure et superstructure</option>
+                <option value="Idéologie">Idéologie</option>
+                <option value="Hégémonie">Hégémonie (Gramsci)</option>
+                <option value="Appareils idéologiques d'État">Appareils idéologiques d'État (Althusser)</option>
+                <option value="Reproduction sociale">Reproduction sociale</option>
+            </optgroup>
+            <optgroup label="Perspectives et développements">
+                <option value="Impérialisme">Impérialisme</option>
+                <option value="Travail productif et improductif">Travail productif et improductif</option>
+                <option value="Développement inégal">Développement inégal</option>
+                <option value="Socialisme">Socialisme</option>
+                <option value="Communisme">Communisme</option>
+                <option value="Dictature du prolétariat">Dictature du prolétariat</option>
+                <option value="Dépérissement de l'État">Dépérissement de l'État</option>
+            </optgroup>
+            <option value="__custom__">✏️ Concept personnalisé…</option>
+        </select>
+    </div>
+    <div class="field hidden" id="custom-concept-field">
+        <label>Votre concept personnalisé</label>
+        <input type="text" id="custom-concept-input" placeholder="Ex: Matérialisme culturel, Écologie marxiste…">
+    </div>
+</div>
+
+<!-- ═══ PARAMÈTRES ═══ -->
+<div class="panel">
+    <h2>⚙️ Paramètres de la vidéo</h2>
+    <div class="grid-2">
+        <div class="field">
+            <label>Langue de narration</label>
+            <select id="lang-select">
+                <option value="darija">🇩🇿 Darija algérienne</option>
+                <option value="arabe-standard">🇸🇦 Arabe standard</option>
+                <option value="francais">🇫🇷 Français</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Durée totale</label>
+            <select id="duration-select">
+                <option value="30">30 secondes</option>
+                <option value="45" selected>45 secondes</option>
+                <option value="60">60 secondes</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Nombre de scènes</label>
+            <select id="scenes-select">
+                <option value="5">5 scènes</option>
+                <option value="6" selected>6 scènes</option>
+                <option value="8">8 scènes</option>
+                <option value="10">10 scènes</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Durée par scène</label>
+            <select id="scene-duration-select">
+                <option value="5">5 secondes</option>
+                <option value="10" selected>10 secondes</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Style visuel</label>
+            <select id="style-select">
+                <option value="documentaire-historique" selected>Documentaire historique</option>
+                <option value="cinematographique">Cinématographique</option>
+                <option value="realiste">Réaliste</option>
+                <option value="educatif">Éducatif</option>
+                <option value="minimaliste">Minimaliste</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Type de caméra</label>
+            <select id="camera-select">
+                <option value="automatique" selected>Automatique</option>
+                <option value="cinematographique">Plans cinématographiques</option>
+                <option value="pedagogique">Plans pédagogiques</option>
+            </select>
+        </div>
+    </div>
+    <div class="toggle-row">
+        <div>
+            <div class="tl">Sans personnages humains</div>
+            <div class="th">Uniquement objets, machines, paysages</div>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="no-humans-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="toggle-row">
+        <div>
+            <div class="tl">Symboles visuels principaux</div>
+            <div class="th">Privilégier les métaphores visuelles</div>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="symbols-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+</div>
+
+<!-- ═══ BOUTONS ═══ -->
+<button type="button" class="btn-generate" id="generate-btn" disabled>
+    🎬 GÉNÉRER LA VIDÉO
+</button>
+<button type="button" class="btn-secondary" id="series-btn" disabled>
+    📚 CRÉER UNE SÉRIE (12 épisodes)
+</button>
+<button type="button" class="btn-stop" id="stop-btn">
+    ⏹ Arrêter la génération
+</button>
+
+<!-- ═══ CONSOLE ═══ -->
+<div class="console" id="console-panel">
+    <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">En attente…</span></div>
+</div>
+
+<!-- ═══ RÉSULTATS ═══ -->
+<div id="results-container"></div>
+
+<div class="status-bar" id="status-bar">
+    <div class="spinner"></div>
+    <span id="status-text">Préparation…</span>
+</div>
+
+<div class="toast" id="toast">
+    <span id="toast-icon">✓</span>
+    <span id="toast-text">Message</span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.5-flash';
+const MODEL_VIDEO = 'agnes-video-2.5';
+
+// ══════════════════════════════════════════════════════════════════
+// CONCEPTS MARXISTES — Base de connaissances
+// ══════════════════════════════════════════════════════════════════
+const CONCEPTS_DB = {
+    'Matérialisme historique': {
+        attribution: 'Marx et Engels',
+        annee: '1845-1859',
+        definition: 'Théorie selon laquelle les conditions matérielles d\'existence déterminent la conscience et le cours de l\'histoire.',
+        precision: 'La formule « détermination en dernière instance par l\'économie » est une précision d\'Engels (1890), pas de Marx.',
+        symboles: 'usine, machine à vapeur, architecture de classes sociales, infrastructure/superstructure'
+    },
+    'Matérialisme dialectique': {
+        attribution: 'Marx (inspiré de Hegel), terme popularisé par Engels',
+        annee: 'XIXe siècle',
+        definition: 'Méthode philosophique qui analyse les phénomènes comme des processus en contradiction et en transformation.',
+        precision: 'L\'expression « matérialisme dialectique » n\'est pas de Marx lui-même. Elle a été popularisée par Engels puis Plekhanov.',
+        symboles: 'spirale, mouvement, contradiction, thèse-antithèse-synthèse'
+    },
+    'Forces productives': {
+        attribution: 'Marx',
+        annee: '1845-1867',
+        definition: 'Ensemble des moyens de production (outils, machines, technologie) et de la force de travail humaine.',
+        precision: 'Chez Marx, les forces productives incluent la coopération et la division du travail, pas seulement les outils.',
+        symboles: 'machines, outils, technologie, travail humain, coopération'
+    },
+    'Rapports de production': {
+        attribution: 'Marx',
+        annee: '1845-1867',
+        definition: 'Relations sociales dans lesquelles les humains produisent : qui possède les moyens de production, qui travaille pour qui.',
+        precision: 'Marx distingue les rapports techniques (coopération) des rapports sociaux (propriété).',
+        symboles: 'propriétaire / travailleur, usine, contrat, salaire'
+    },
+    'Mode de production': {
+        attribution: 'Marx',
+        annee: '1845-1867',
+        definition: 'Combinaison historique spécifique des forces productives et des rapports de production.',
+        precision: 'La succession mode asiatique → antique → féodal → capitaliste est une systématisation ultérieure, pas une loi chez Marx.',
+        symboles: 'forces productives + rapports de production, époque, structure sociale'
+    },
+    'Lutte des classes': {
+        attribution: 'Marx et Engels',
+        annee: '1848',
+        definition: 'Conflit fondamental entre classes sociales aux intérêts économiques opposés.',
+        precision: 'Marx n\'a pas dit que toute histoire est réductible à la lutte des classes. Il l\'a présentée comme le moteur principal des sociétés divisées en classes.',
+        symboles: 'deux groupes sociaux opposés, intérêts économiques différents, conflit'
+    },
+    'Bourgeoisie': {
+        attribution: 'Marx et Engels',
+        annee: '1848',
+        definition: 'Classe sociale qui possède les moyens de production et emploie des travailleurs salariés.',
+        precision: 'Chez Marx, la bourgeoisie n\'est pas définie par le mode de vie mais par la position dans les rapports de production.',
+        symboles: 'propriétaire d\'usine, capital, patron'
+    },
+    'Prolétariat': {
+        attribution: 'Marx et Engels',
+        annee: '1848',
+        definition: 'Classe sociale qui ne possède que sa force de travail et doit la vendre pour survivre.',
+        precision: 'Le terme « prolétariat » vient du latin proletarius (ceux qui n\'ont que leurs enfants à offrir).',
+        symboles: 'ouvrier, salaire, force de travail, usine'
+    },
+    'Force de travail': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Capacité de travail d\'un être humain, marchandise spécifique vendue contre un salaire.',
+        precision: 'Marx distingue la force de travail (capacité) du travail (activité). Cette distinction est centrale dans Le Capital.',
+        symboles: 'travailleur, capacité, salaire, contrat'
+    },
+    'Travail': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Activité humaine transformant la nature pour produire des biens utiles.',
+        precision: 'Marx distingue travail concret (utile, qualitatif) et travail abstrait (dépense de force de travail, quantitatif).',
+        symboles: 'activité, transformation, effort, production'
+    },
+    'Valeur': {
+        attribution: 'Marx (d\'après Smith et Ricardo)',
+        annee: '1867',
+        definition: 'Dans l\'analyse marxiste, la valeur d\'une marchandise est déterminée par le temps de travail socialement nécessaire à sa production.',
+        precision: 'Marx ne dit pas que le travail est la seule source de richesse matérielle. La nature y contribue aussi.',
+        symboles: 'temps de travail, mesure, équivalence, échange'
+    },
+    'Marchandise': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Objet produit pour être échangé sur un marché, possédant une valeur d\'usage et une valeur d\'échange.',
+        precision: 'Marx commence Le Capital par l\'analyse de la marchandise car c\'est la forme élémentaire de la richesse capitaliste.',
+        symboles: 'objet, échange, marché, valeur d\'usage'
+    },
+    'Théorie de la valeur-travail': {
+        attribution: 'Marx (développe Smith et Ricardo)',
+        annee: '1867',
+        definition: 'Théorie selon laquelle la valeur d\'échange des marchandises est déterminée par le temps de travail socialement nécessaire.',
+        precision: 'Cette théorie était déjà présente chez Adam Smith et David Ricardo. Marx l\'a reformulée et intégrée à sa critique du capitalisme.',
+        symboles: 'horloge, temps de travail, production, mesure'
+    },
+    'Plus-value': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Différence entre la valeur produite par le travailleur et le salaire qu\'il reçoit. C\'est le mécanisme central de l\'exploitation capitaliste selon Marx.',
+        precision: 'Marx distingue plus-value absolue (allongement du temps de travail) et plus-value relative (augmentation de la productivité).',
+        symboles: 'production, salaire, valeur créée, surplus'
+    },
+    'Exploitation': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Dans l\'analyse marxiste, extraction de plus-value par le capitaliste, appropriation d\'une partie du travail non payé.',
+        precision: 'Pour Marx, l\'exploitation n\'est pas un jugement moral mais une catégorie analytique décrivant un rapport économique structurel.',
+        symboles: 'travail, salaire, valeur créée, appropriation'
+    },
+    'Capital': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Richesse utilisée pour produire de la plus-value. Le capital n\'est pas une chose mais un rapport social.',
+        precision: 'Marx insiste : le capital est un rapport social de production, pas simplement de l\'argent ou des machines.',
+        symboles: 'argent, investissement, usine, expansion, rapport social'
+    },
+    'Accumulation du capital': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Processus par lequel la plus-value est réinvestie pour agrandir la production et générer davantage de plus-value.',
+        precision: 'Marx voit dans l\'accumulation une tendance structurelle du capitalisme, avec des crises périodiques.',
+        symboles: 'réinvestissement, expansion, croissance, cycle'
+    },
+    'Concentration et centralisation du capital': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Concentration : croissance de la taille des capitaux individuels. Centralisation : fusion ou absorption de capitaux.',
+        precision: 'Marx distingue ces deux tendances dans Le Capital, livre I, chapitre 25.',
+        symboles: 'usines géantes, monopoles, fusions, accumulation'
+    },
+    'Aliénation': {
+        attribution: 'Marx (inspiré de Hegel et Feuerbach)',
+        annee: '1844',
+        definition: 'Processus par lequel le travailleur est séparé du produit de son travail, de son activité et de son essence humaine.',
+        precision: 'Le concept d\'aliénation est surtout développé dans les Manuscrits de 1844. Marx l\'a ensuite moins utilisé au profit de concepts économiques.',
+        symboles: 'travailleur séparé du produit, dépossession, usine, machine'
+    },
+    'Fétichisme de la marchandise': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Processus par lequel les marchandises semblent avoir une valeur autonome, masquant les rapports sociaux de production.',
+        precision: 'Marx compare ce phénomène au fétichisme religieux : les objets semblent avoir des pouvoirs propres.',
+        symboles: 'marchandises autonomes, voile, rapports sociaux cachés'
+    },
+    'Réification': {
+        attribution: 'Lukács (développe Marx)',
+        annee: '1923',
+        definition: 'Processus par lequel les rapports sociaux sont perçus comme des choses, des objets naturels et non comme des constructions historiques.',
+        precision: 'La réification (Verdinglichung) est développée par Georg Lukács dans Histoire et conscience de classe, en s\'appuyant sur Marx.',
+        symboles: 'choses, rapports sociaux, marchandisation, objectivation'
+    },
+    'Infrastructure et superstructure': {
+        attribution: 'Marx (métaphore), systématisé par les marxistes ultérieurs',
+        annee: '1859',
+        definition: 'Infrastructure (base économique : forces productives + rapports de production) déterminant la superstructure (institutions, droit, politique, culture).',
+        precision: 'Marx utilise la métaphore du « bâtiment » (Grundlage/Überbau) mais ne la systématise pas. La distinction rigide est le fait de marxistes ultérieurs.',
+        symboles: 'bâtiment à étages, base économique, institutions, culture'
+    },
+    'Idéologie': {
+        attribution: 'Marx et Engels, développé par Gramsci et Althusser',
+        annee: '1846-1930',
+        definition: 'Ensemble d\'idées, de représentations et de valeurs qui justifient et reproduisent les rapports sociaux existants.',
+        precision: 'Chez Marx, l\'idéologie est liée à la classe dominante. Gramsci et Althusser ont développé des conceptions plus complexes.',
+        symboles: 'représentations, société, rapports sociaux, culture'
+    },
+    'Hégémonie': {
+        attribution: 'Gramsci',
+        annee: '1929-1935',
+        definition: 'Direction intellectuelle et morale exercée par une classe sur l\'ensemble de la société, au-delà de la simple coercition.',
+        precision: 'Concept développé par Antonio Gramsci dans les Cahiers de prison. Il ne figure pas chez Marx sous cette forme.',
+        symboles: 'consensus, direction morale, société civile, culture'
+    },
+    'Appareils idéologiques d\'État': {
+        attribution: 'Althusser',
+        annee: '1970',
+        definition: 'Institutions (écoles, églises, médias, famille) qui diffusent l\'idéologie dominante et reproduisent les rapports de production.',
+        precision: 'Concept élaboré par Louis Althusser. Il distingue appareils répressifs (État) et appareils idéologiques (société civile).',
+        symboles: 'école, église, médias, famille, institutions'
+    },
+    'Reproduction sociale': {
+        attribution: 'Marx, développé par les féministes marxistes et la théorie de la reproduction',
+        annee: 'XIXe-XXe siècle',
+        definition: 'Ensemble des processus par lesquels les rapports sociaux et les classes sont reproduits d\'une génération à l\'autre.',
+        precision: 'Marx l\'aborde dans Le Capital (reproduction de la force de travail). Les développements sur la reproduction sociale non rémunérée sont plus récents.',
+        symboles: 'famille, éducation, transmission, quotidien'
+    },
+    'Impérialisme': {
+        attribution: 'Lénine (développe Marx et Hobson)',
+        annee: '1917',
+        definition: 'Stade suprême du capitalisme caractérisé par l\'exportation des capitaux, les monopoles et le partage du monde.',
+        precision: 'L\'analyse de Lénine (L\'Impérialisme, stade suprême du capitalisme) développe des thèses de Marx et de l\'économiste britannique J.A. Hobson.',
+        symboles: 'cartes du monde, capitaux, colonies, monopoles'
+    },
+    'Travail productif et improductif': {
+        attribution: 'Marx',
+        annee: '1867',
+        definition: 'Travail productif : crée de la plus-value pour le capital. Travail improductif : ne la crée pas directement.',
+        precision: 'La distinction est relative au mode de production. Un même travail peut être productif ou improductif selon le contexte.',
+        symboles: 'usine, service, production, valeur'
+    },
+    'Développement inégal': {
+        attribution: 'Trotsky (développe Marx)',
+        annee: '1906-1930',
+        definition: 'Théorie selon laquelle le développement historique est inégal et combiné, les sociétés sautant des étapes.',
+        precision: 'La loi du développement inégal et combiné est formulée par Léon Trotsky, en s\'appuyant sur des intuitions de Marx.',
+        symboles: 'sociétés différentes, sauts, combinaison, temporalités'
+    },
+    'Socialisme': {
+        attribution: 'Marx, Engels et courants ultérieurs',
+        annee: '1848-1890',
+        definition: 'Phase de transition après la révolution, où les moyens de production sont socialisés et l\'État se transforme.',
+        precision: 'Marx distingue rarement « socialisme » et « communisme ». Cette distinction est surtout due à Lénine (L\'État et la Révolution, 1917).',
+        symboles: 'transition, socialisation, usines, collectif'
+    },
+    'Communisme': {
+        attribution: 'Marx et Engels',
+        annee: '1848',
+        definition: 'Société sans classes, sans État, où les moyens de production sont communs et chacun contribue selon ses capacités.',
+        precision: 'Dans le Manifeste, Marx et Engels ne décrivent pas précisément la société communiste. La formule « de chacun selon ses capacités, à chacun selon ses besoins » est de Marx (Critique du programme de Gotha, 1875).',
+        symboles: 'société sans classes, partage, collectif, abondance'
+    },
+    'Dictature du prolétariat': {
+        attribution: 'Marx et Engels',
+        annee: '1875',
+        definition: 'Forme d\'État transitoire après la révolution, où la classe ouvrière exerce le pouvoir politique.',
+        precision: 'L\'expression apparaît chez Marx (Critique du programme de Gotha) et Engels. Elle a été reprise et transformée par Lénine.',
+        symboles: 'pouvoir ouvrier, transition, État, classe'
+    },
+    'Dépérissement de l\'État': {
+        attribution: 'Engels, Lénine',
+        annee: '1884-1917',
+        definition: 'Processus par lequel l\'État, une fois les classes abolies, perd sa raison d\'être et disparaît progressivement.',
+        precision: 'Développé par Engels (L\'Origine de la famille) et Lénine (L\'État et la Révolution). Marx en parle plus allusivement.',
+        symboles: 'État qui s\'efface, institutions qui disparaissent, société sans classes'
+    }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// PLANS ET MOUVEMENTS
+// ══════════════════════════════════════════════════════════════════
+const PLAN_TYPES = {
+    'Introduction société': { plan: 'Large', camera: 'Travelling' },
+    'Explication objet': { plan: 'Rapproché', camera: 'Zoom' },
+    'Travail collectif': { plan: 'Moyen', camera: 'Travelling' },
+    'Opposition groupes': { plan: 'Large', camera: 'Panoramique' },
+    'Action déplacement': { plan: 'Moyen', camera: 'Steadicam' },
+    'Conclusion système': { plan: 'Aérien', camera: 'Grue' },
+    'Portrait personnage': { plan: 'Rapproché', camera: 'Statique' },
+    'Paysage / contexte': { plan: 'Général', camera: 'Panoramique' },
+    'Détail technique': { plan: 'Gros plan', camera: 'Zoom' },
+    'Vue subjective': { plan: 'POV', camera: 'Épaule' },
+    'Symbolique': { plan: 'Moyen', camera: 'Tilt' },
+    'Transition': { plan: 'Large', camera: 'Travelling' }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// VISUAL STYLE LOCK
+// ══════════════════════════════════════════════════════════════════
+const VISUAL_STYLE_LOCK = `STYLE CONSTANT :
+Vertical 9:16, cinematic documentary realism, realistic lighting, consistent color palette, realistic textures, subtle film grain, natural human movement, coherent architecture and costumes, no modern objects unless historically appropriate.`;
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════════
+const state = {
+    isRunning: false,
+    stopRequested: false,
+    concept: '',
+    customConcept: '',
+    lang: 'darija',
+    duration: 45,
+    scenes: 6,
+    sceneDuration: 10,
+    style: 'documentaire-historique',
+    camera: 'automatique',
+    noHumans: false,
+    symbols: false,
+    results: null
+};
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════════════
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+function setStatus(text) {
+    const bar = document.getElementById('status-bar');
+    const txt = document.getElementById('status-text');
+    if (text) { bar.classList.add('visible'); txt.textContent = text; }
+    else bar.classList.remove('visible');
+}
+function logConsole(message, type = 'info') {
+    const panel = document.getElementById('console-panel');
+    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const typeLabels = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]' };
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.innerHTML = '<span class="log-time">' + time + '</span>' +
+        '<span class="log-' + type + '">' + (typeLabels[type] || '[Info]') + '</span> ' +
+        '<span class="log-text">' + esc(message) + '</span>';
+    panel.appendChild(line);
+    panel.scrollTop = panel.scrollHeight;
+}
+function showToast(message, type = 'success', duration = 2500) {
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toast-icon');
+    const text = document.getElementById('toast-text');
+    toast.classList.remove('visible', 'success', 'error', 'warn');
+    void toast.offsetWidth;
+    const icons = { success: '✓', error: '✕', warn: '⚠' };
+    icon.textContent = icons[type] || '✓';
+    text.textContent = message;
+    toast.classList.add(type);
+    requestAnimationFrame(() => toast.classList.add('visible'));
+    setTimeout(() => toast.classList.remove('visible'), duration);
+}
+function copyToClipboard(text) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => showToast('Copié !', 'success')).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+}
+function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); showToast('Copié !', 'success'); } catch (e) { showToast('Échec copie', 'error'); }
+    document.body.removeChild(ta);
+}
+function downloadTxt(filename, content) {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════════════════════════════
+function getApiKey() {
+    try { return (localStorage.getItem('agnestok_api_key') || '').trim(); } catch (e) { return ''; }
+}
+function saveApiKey() {
+    const input = document.getElementById('api-key-input');
+    const key = input.value.trim();
+    if (!key) { localStorage.removeItem('agnestok_api_key'); updateApiStatus(); showToast('Clé supprimée', 'warn'); return; }
+    localStorage.setItem('agnestok_api_key', key);
+    updateApiStatus();
+    showToast('Clé enregistrée ✓', 'success');
+    input.blur();
+}
+function updateApiStatus() {
+    const status = document.getElementById('api-status');
+    const text = document.getElementById('api-status-text');
+    const key = getApiKey();
+    if (key) {
+        status.classList.add('ok');
+        text.textContent = 'Clé active · ' + key.slice(0, 8) + '…' + key.slice(-4);
+        document.getElementById('api-key-input').value = key;
+    } else {
+        status.classList.remove('ok');
+        text.textContent = 'Aucune clé enregistrée';
+        document.getElementById('api-key-input').value = '';
+    }
+    updateButtons();
+}
+function updateButtons() {
+    const hasKey = !!getApiKey();
+    const hasConcept = document.getElementById('concept-select').value && document.getElementById('concept-select').value !== '__custom__';
+    const hasCustom = document.getElementById('concept-select').value === '__custom__' && document.getElementById('custom-concept-input').value.trim().length > 2;
+    const ready = hasKey && (hasConcept || hasCustom) && !state.isRunning;
+    document.getElementById('generate-btn').disabled = !ready;
+    document.getElementById('series-btn').disabled = !ready;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FETCH RETRY
+// ══════════════════════════════════════════════════════════════════
+async function fetchWithRetry(url, options = {}, maxRetries = 3, label = 'API') {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 90000);
+            const res = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(timeout);
+            if ([500, 502, 503, 520].includes(res.status) && attempt < maxRetries) {
+                await sleep(Math.pow(2, attempt) * 3000 + Math.random() * 2000);
+                continue;
+            }
+            if (res.status === 429 && attempt < maxRetries) {
+                logConsole(label + ' : 429, attente 65s…', 'warn');
+                await sleep(65000);
+                continue;
+            }
+            return res;
+        } catch (e) {
+            if (e.message === 'Arrêt demandé') throw e;
+            if (attempt < maxRetries) {
+                await sleep(Math.pow(2, attempt) * 2000 + Math.random() * 1000);
+            } else {
+                throw new Error(label + ' : échec — ' + e.message);
+            }
+        }
+    }
+    throw new Error(label + ' : échec');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CALL TEXT API
+// ══════════════════════════════════════════════════════════════════
+async function callTextAPI(messages, options = {}) {
+    const body = {
+        model: MODEL_TEXT,
+        messages: messages,
+        temperature: options.temperature ?? 0.75,
+        max_tokens: options.maxTokens ?? 8000
+    };
+    logConsole('Requête texte → ' + MODEL_TEXT, 'info');
+    const res = await fetchWithRetry(API_BASE + '/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    }, 3, 'Texte');
+    if (!res.ok) throw new Error('Text API HTTP ' + res.status);
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) throw new Error('Pas de contenu texte');
+    return content;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPT DE GÉNÉRATION
+// ══════════════════════════════════════════════════════════════════
+function buildGenerationPrompt(concept, conceptInfo) {
+    const langLabel = {
+        'darija': 'l\'arabe algérien (darija) — utilise une darija naturelle, compréhensible en Algérie, pas de traduction littérale du français',
+        'arabe-standard': 'l\'arabe standard moderne (فصحى) — clair et accessible',
+        'francais': 'le français — simple, direct et naturel'
+    }[state.lang] || 'le français';
+
+    const styleLabel = {
+        'documentaire-historique': 'documentaire historique',
+        'cinematographique': 'cinématographique',
+        'realiste': 'réaliste',
+        'educatif': 'éducatif',
+        'minimaliste': 'minimaliste'
+    }[state.style] || 'documentaire';
+
+    const noHumansRule = state.noHumans ? 'CONTRAINTE ABSOLUE : AUCUN personnage humain visible dans les scènes. Utilise uniquement des objets, machines, paysages, architectures, symboles visuels.' : '';
+
+    const symbolsRule = state.symbols ? 'Privilégie les SYMBOLES VISUELS (machines, architectures, métaphores visuelles) plutôt que les scènes réalistes.' : '';
+
+    const attribution = conceptInfo ? conceptInfo.attribution : 'Marx';
+    const precision = conceptInfo ? conceptInfo.precision : '';
+    const symboles = conceptInfo ? conceptInfo.symboles : '';
+
+    return `Tu es un assistant de production TikTok spécialisé dans la vulgarisation pédagogique du marxisme.
+
+MISSION : Créer un script vidéo TikTok éducatif sur le concept suivant :
+"${concept}"
+
+CONTEXTE CONCEPTUEL :
+- Attribution principale : ${attribution}
+- Définition de référence : ${conceptInfo ? conceptInfo.definition : 'à préciser'}
+- Précaution d'exactitude : ${precision || 'Distinguer ce qui relève de Marx et des développements ultérieurs.'}
+- Symboles visuels suggérés : ${symboles || 'à déterminer'}
+
+PARAMÈTRES DE PRODUCTION :
+- Langue de narration : ${langLabel}
+- Durée totale : ${state.duration} secondes
+- Nombre de scènes : ${state.scenes}
+- Durée par scène : ${state.sceneDuration} secondes
+- Style visuel : ${styleLabel}
+- Format : TikTok vertical 9:16
+- ${noHumansRule}
+- ${symbolsRule}
+
+RÈGLES DE PRODUCTION :
+1. Chaque vidéo = UNE idée principale.
+2. Structure : HOOK (3s) → DÉFINITION (10s) → EXPLICATION → EXEMPLE CONCRET → CONCLUSION.
+3. Ton pédagogique, sérieux, accessible, analytique, cinématographique, non propagandiste.
+4. Utilise des formulations comme : "Selon Marx…", "Dans l'analyse marxiste…", "Marx soutient que…", "Cette théorie cherche à expliquer…"
+5. Ne JAMAIS écrire : "Marx avait absolument raison", "Le capitalisme est forcément…", "Voici la vérité".
+6. Distingue clairement : ce que Marx affirme directement, les développements ultérieurs, les interprétations d'autres auteurs.
+7. Ne pas inventer de citations. Si une formulation est une interprétation, le signaler.
+8. Pour les exemples historiques, ne pas inventer de faits.
+9. Éviter le jargon universitaire inutile.
+10. Adapter le rythme à TikTok : dynamique mais compréhensible.
+
+Génère un JSON valide avec cette structure EXACTE :
+
+{
+  "titre": "Titre court et accrocheur pour TikTok (max 60 caractères)",
+  "hook": "Accroche de 1 à 3 secondes — question ou curiosité (max 20 mots)",
+  "cta": "Question courte pour les commentaires (différente à chaque vidéo)",
+  "concept_info": {
+    "attribution": "À qui/quoi ce concept est attribué",
+    "precision": "Précision d'exactitude historique",
+    "distinction": "Ce qui relève de Marx vs des développements ultérieurs"
+  },
+  "scenes": [
+    {
+      "numero": 1,
+      "duree": 5,
+      "narration": "Texte de narration en ${state.lang}",
+      "concept_explique": "Ce que cette scène explique du concept",
+      "type_scene": "Introduction société | Explication objet | Travail collectif | Opposition groupes | Action déplacement | Conclusion système | Portrait personnage | Paysage contexte | Détail technique | Vue subjective | Symbolique | Transition",
+      "plan": "Large | Rapproché | Moyen | Général | Gros plan | Épaule | POV | Aérien",
+      "mouvement_camera": "Statique | Panoramique | Tilt | Travelling | Zoom | Grue | Épaule | Steadicam",
+      "description_visuelle": "Description détaillée de ce qu'on voit",
+      "prompt_video": "PROMPT EN ANGLAIS pour générateur vidéo — décrire sujet, environnement, action, plan, mouvement, lumière, style, continuité",
+      "transition_suivante": "Type de transition vers la scène suivante"
+    }
+  ]
+}
+
+RAPPELS POUR LES PROMPTS VIDÉO :
+- Écrire en ANGLAIS (les générateurs comprennent mieux les instructions cinématographiques en anglais).
+- Chaque prompt doit préciser : durée, format 9:16, sujet, environnement, personnages, action, plan, mouvement caméra, lumière, style, continuité.
+- Terminer TOUJOURS par :
+"NO subtitles. NO captions. NO written text. NO logos. NO watermark. NO branding. NO modern objects unless historically appropriate."
+- Le Visual Style Lock sera ajouté automatiquement après le prompt.
+
+RÈGLE ABSOLUE : Réponds UNIQUEMENT en JSON valide. Pas de markdown, pas de commentaire.`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE PRINCIPAL
+// ══════════════════════════════════════════════════════════════════
+async function generateVideo() {
+    if (state.isRunning) return;
+    const conceptSelect = document.getElementById('concept-select');
+    let concept = conceptSelect.value;
+    if (concept === '__custom__') {
+        concept = document.getElementById('custom-concept-input').value.trim();
+        if (concept.length < 3) { showToast('Concept personnalisé trop court', 'error'); return; }
+    }
+    if (!concept) { showToast('Choisissez un concept', 'error'); return; }
+    if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
+
+    state.isRunning = true;
+    state.stopRequested = false;
+    state.concept = concept;
+    state.customConcept = conceptSelect.value === '__custom__' ? concept : '';
+
+    // Récupérer paramètres
+    state.lang = document.getElementById('lang-select').value;
+    state.duration = parseInt(document.getElementById('duration-select').value);
+    state.scenes = parseInt(document.getElementById('scenes-select').value);
+    state.sceneDuration = parseInt(document.getElementById('scene-duration-select').value);
+    state.style = document.getElementById('style-select').value;
+    state.camera = document.getElementById('camera-select').value;
+    state.noHumans = document.getElementById('no-humans-toggle').checked;
+    state.symbols = document.getElementById('symbols-toggle').checked;
+
+    document.getElementById('stop-btn').classList.add('visible');
+    document.getElementById('generate-btn').disabled = true;
+    document.getElementById('series-btn').disabled = true;
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('results-container').innerHTML = '';
+
+    logConsole('Génération : « ' + concept + ' »', 'info');
+    logConsole('Langue : ' + state.lang + ' · Durée : ' + state.duration + 's · Scènes : ' + state.scenes, 'info');
+
+    setStatus('L\'IA rédige le script…');
+
+    try {
+        const conceptInfo = CONCEPTS_DB[concept] || null;
+        if (conceptInfo) {
+            logConsole('Concept documenté — attribution : ' + conceptInfo.attribution, 'success');
+        } else {
+            logConsole('Concept personnalisé — vérification nécessaire', 'warn');
+        }
+
+        const prompt = buildGenerationPrompt(concept, conceptInfo);
+        const raw = await callTextAPI([
+            { role: 'system', content: 'Tu es un assistant de production pédagogique. Tu réponds UNIQUEMENT en JSON valide, sans markdown.' },
+            { role: 'user', content: prompt }
+        ], { temperature: 0.7, maxTokens: 8000 });
+
+        let data;
+        try {
+            data = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim());
+        } catch (e) {
+            logConsole('JSON invalide — tentative de réparation…', 'warn');
+            const match = raw.match(/\{[\s\S]*\}/);
+            if (match) data = JSON.parse(match[0]);
+            else throw new Error('Impossible de parser le JSON');
+        }
+
+        // Normaliser les scènes
+        if (!data.scenes || !Array.isArray(data.scenes)) {
+            data.scenes = [];
+        }
+        data.scenes.forEach((s, i) => {
+            s.numero = s.numero || (i + 1);
+            s.duree = s.duree || state.sceneDuration;
+            if (!s.plan || !s.mouvement_camera) {
+                const type = s.type_scene || 'Symbolique';
+                const preset = PLAN_TYPES[type] || { plan: 'Moyen', camera: 'Travelling' };
+                s.plan = s.plan || preset.plan;
+                s.mouvement_camera = s.mouvement_camera || preset.camera;
+            }
+            if (!s.prompt_video) {
+                s.prompt_video = 'Cinematic documentary shot of ' + (s.description_visuelle || concept) + '. ' + VISUAL_STYLE_LOCK;
+            }
+            // Ajouter le style lock au prompt vidéo
+            if (!s.prompt_video.includes('STYLE CONSTANT')) {
+                s.prompt_video += '\n\n' + VISUAL_STYLE_LOCK;
+            }
+            // Ajouter les garde-fous
+            if (!s.prompt_video.includes('NO subtitles')) {
+                s.prompt_video += '\nNO subtitles. NO captions. NO written text. NO logos. NO watermark. NO branding. NO modern objects unless historically appropriate.';
+            }
+        });
+
+        state.results = data;
+        renderResults(data);
+        logConsole('Script généré : « ' + (data.titre || concept) + ' »', 'success');
+        setStatus('✦ Script prêt ✦');
+        await sleep(2000);
+        setStatus(null);
+        showToast('Script généré !', 'success');
+
+    } catch (e) {
+        logConsole('ERREUR : ' + e.message, 'error');
+        setStatus('Erreur : ' + e.message.slice(0, 50));
+        await sleep(3000);
+        setStatus(null);
+        showToast('Erreur : ' + e.message.slice(0, 60), 'error');
+    }
+
+    state.isRunning = false;
+    state.stopRequested = false;
+    document.getElementById('stop-btn').classList.remove('visible');
+    updateButtons();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AFFICHAGE DES RÉSULTATS
+// ══════════════════════════════════════════════════════════════════
+function renderResults(data) {
+    const container = document.getElementById('results-container');
+    let html = '';
+
+    // ─── Titre ───
+    html += '<div class="result-section open">';
+    html += '<div class="result-header" data-toggle="result-titre"><span class="result-title">🎯 Titre TikTok</span><span class="chevron">▼</span></div>';
+    html += '<div class="result-body"><div class="result-content">';
+    html += '<div style="font-size:1.1rem;font-weight:800;color:var(--accent);margin-bottom:0.3rem;">' + esc(data.titre || state.concept) + '</div>';
+    html += '</div></div></div>';
+
+    // ─── Hook ───
+    html += '<div class="result-section open">';
+    html += '<div class="result-header" data-toggle="result-hook"><span class="result-title">🪝 Hook (0-3s)</span><span class="chevron">▼</span></div>';
+    html += '<div class="result-body"><div class="result-content">';
+    html += '<div style="font-size:0.9rem;color:var(--warn);font-style:italic;">« ' + esc(data.hook || '') + ' »</div>';
+    html += '</div></div></div>';
+
+    // ─── CTA ───
+    if (data.cta) {
+        html += '<div class="result-section open">';
+        html += '<div class="result-header" data-toggle="result-cta"><span class="result-title">💬 CTA (commentaires)</span><span class="chevron">▼</span></div>';
+        html += '<div class="result-body"><div class="result-content">';
+        html += '<div style="font-size:0.85rem;color:var(--info);">« ' + esc(data.cta) + ' »</div>';
+        html += '</div></div></div>';
+    }
+
+    // ─── Concept info ───
+    if (data.concept_info) {
+        const ci = data.concept_info;
+        html += '<div class="result-section open">';
+        html += '<div class="result-header" data-toggle="result-concept"><span class="result-title">📖 Attribution & exactitude</span><span class="chevron">▼</span></div>';
+        html += '<div class="result-body"><div class="result-content">';
+        if (ci.attribution) html += '<div style="font-size:0.8rem;margin-bottom:0.3rem;"><strong>Attribution :</strong> ' + esc(ci.attribution) + '</div>';
+        if (ci.precision) html += '<div style="font-size:0.8rem;margin-bottom:0.3rem;"><strong>Précision :</strong> ' + esc(ci.precision) + '</div>';
+        if (ci.distinction) html += '<div style="font-size:0.8rem;"><strong>Distinction :</strong> ' + esc(ci.distinction) + '</div>';
+        html += '</div></div></div>';
+    }
+
+    // ─── Visual Style Lock ───
+    html += '<div class="style-lock-box"><div class="sl-label">🔒 VISUAL STYLE LOCK — ajouté automatiquement à chaque prompt</div><div class="sl-text">' + esc(VISUAL_STYLE_LOCK) + '</div></div>';
+
+    // ─── Scènes ───
+    if (data.scenes && data.scenes.length > 0) {
+        html += '<div class="result-section open">';
+        html += '<div class="result-header" data-toggle="result-scenes"><span class="result-title">🎬 Scènes (' + data.scenes.length + ')</span><span class="chevron">▼</span></div>';
+        html += '<div class="result-body"><div class="result-content">';
+
+        data.scenes.forEach(s => {
+            html += '<div class="scene-card">';
+            html += '<div class="scene-header"><span class="scene-num">SCÈNE ' + s.numero + '</span><span class="scene-duration">' + s.duree + 's</span></div>';
+
+            html += '<div class="scene-field"><span class="sf-label">Narration</span><span class="sf-value narration">« ' + esc(s.narration || '') + ' »</span></div>';
+
+            if (s.concept_explique) {
+                html += '<div class="scene-field"><span class="sf-label">Concept expliqué</span><span class="sf-value">' + esc(s.concept_explique) + '</span></div>';
+            }
+
+            html += '<div class="scene-field"><span class="sf-label">Plan</span><span class="sf-value plan">' + esc(s.plan) + '</span></div>';
+            html += '<div class="scene-field"><span class="sf-label">Mouvement caméra</span><span class="sf-value camera">' + esc(s.mouvement_camera) + '</span></div>';
+
+            if (s.description_visuelle) {
+                html += '<div class="scene-field"><span class="sf-label">Description visuelle</span><span class="sf-value">' + esc(s.description_visuelle) + '</span></div>';
+            }
+
+            html += '<div class="scene-field"><span class="sf-label">Prompt vidéo (EN)</span>';
+            html += '<div class="sf-value prompt">' + esc(s.prompt_video) + '</div>';
+            html += '<button type="button" class="export-bar" style="margin-top:0.3rem;" onclick="copyToClipboard(\'' + encodeURIComponent(s.prompt_video).replace(/'/g, "\\'") + '\')">📋 Copier ce prompt</button>';
+            html += '</div>';
+
+            if (s.transition_suivante) {
+                html += '<div class="scene-field"><span class="sf-label">Transition suivante</span><span class="sf-value">' + esc(s.transition_suivante) + '</span></div>';
+            }
+
+            html += '</div>';
+        });
+
+        html += '</div></div></div>';
+    }
+
+    // ─── Barre d'export ───
+    html += '<div class="export-bar">';
+    html += '<button type="button" id="export-txt">📄 Exporter TXT</button>';
+    html += '<button type="button" id="export-json">📋 Copier JSON</button>';
+    html += '<button type="button" id="export-all-prompts">📋 Tous les prompts</button>';
+    html += '</div>';
+
+    container.innerHTML = html;
+
+    // Écouter les toggles
+    container.querySelectorAll('[data-toggle]').forEach(header => {
+        header.addEventListener('click', () => {
+            const section = header.closest('.result-section');
+            if (section) section.classList.toggle('open');
+        });
+    });
+
+    // Écouter les exports
+    document.getElementById('export-txt')?.addEventListener('click', () => {
+        const txt = generateExportTxt(data);
+        downloadTxt('marxtok-' + (data.titre || state.concept).replace(/\s+/g, '-').slice(0, 40) + '.txt', txt);
+        showToast('Fichier TXT téléchargé', 'success');
+    });
+    document.getElementById('export-json')?.addEventListener('click', () => {
+        copyToClipboard(JSON.stringify(data, null, 2));
+    });
+    document.getElementById('export-all-prompts')?.addEventListener('click', () => {
+        const all = data.scenes.map(s => 'SCÈNE ' + s.numero + ' :\n' + s.prompt_video).join('\n\n---\n\n');
+        copyToClipboard(all);
+    });
+
+    // Scroll vers les résultats
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generateExportTxt(data) {
+    let txt = '═══════════════════════════════════════════\n';
+    txt += 'MARXTOK GENERATOR — ' + (data.titre || state.concept) + '\n';
+    txt += '═══════════════════════════════════════════\n\n';
+    txt += 'CONCEPT : ' + state.concept + '\n';
+    txt += 'LANGUE : ' + state.lang + ' | DURÉE : ' + state.duration + 's | SCÈNES : ' + state.scenes + '\n\n';
+    txt += 'HOOK :\n' + (data.hook || '') + '\n\n';
+    txt += 'CTA :\n' + (data.cta || '') + '\n\n';
+    if (data.concept_info) {
+        txt += 'ATTRIBUTION : ' + (data.concept_info.attribution || '') + '\n';
+        txt += 'PRÉCISION : ' + (data.concept_info.precision || '') + '\n\n';
+    }
+    txt += 'VISUAL STYLE LOCK :\n' + VISUAL_STYLE_LOCK + '\n\n';
+    txt += '═══════════════════════════════════════════\n';
+    txt += 'SCÈNES\n';
+    txt += '═══════════════════════════════════════════\n\n';
+    if (data.scenes) {
+        data.scenes.forEach(s => {
+            txt += '── SCÈNE ' + s.numero + ' (' + s.duree + 's) ──\n';
+            txt += 'Narration : ' + (s.narration || '') + '\n';
+            txt += 'Concept : ' + (s.concept_explique || '') + '\n';
+            txt += 'Plan : ' + s.plan + ' | Caméra : ' + s.mouvement_camera + '\n';
+            txt += 'Visuel : ' + (s.description_visuelle || '') + '\n';
+            txt += 'Prompt vidéo :\n' + (s.prompt_video || '') + '\n\n';
+            txt += 'Transition : ' + (s.transition_suivante || '') + '\n\n';
+        });
+    }
+    return txt;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SÉRIE — 12 épisodes
+// ══════════════════════════════════════════════════════════════════
+async function generateSeries() {
+    if (state.isRunning) return;
+    if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
+
+    const SERIES_CONCEPTS = [
+        'Matérialisme historique', 'Matérialisme dialectique', 'Forces productives',
+        'Rapports de production', 'Mode de production', 'Lutte des classes',
+        'Marchandise', 'Plus-value', 'Exploitation', 'Capital',
+        'Accumulation du capital', 'Aliénation'
+    ];
+
+    state.isRunning = true;
+    state.stopRequested = false;
+    document.getElementById('stop-btn').classList.add('visible');
+    document.getElementById('generate-btn').disabled = true;
+    document.getElementById('series-btn').disabled = true;
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('results-container').innerHTML = '';
+
+    logConsole('══════════════════════════════', 'info');
+    logConsole('SÉRIE — 12 épisodes', 'success');
+    logConsole('══════════════════════════════', 'info');
+
+    const allEpisodes = [];
+
+    for (let i = 0; i < SERIES_CONCEPTS.length; i++) {
+        if (state.stopRequested) break;
+        const concept = SERIES_CONCEPTS[i];
+        logConsole('Épisode ' + (i + 1) + '/12 : ' + concept, 'info');
+        setStatus('Épisode ' + (i + 1) + '/12 : ' + concept + '…');
+
+        try {
+            const info = CONCEPTS_DB[concept];
+            const prompt = buildGenerationPrompt(concept, info);
+            const raw = await callTextAPI([
+                { role: 'system', content: 'Tu es un assistant de production pédagogique. Tu réponds UNIQUEMENT en JSON valide.' },
+                { role: 'user', content: prompt }
+            ], { temperature: 0.7, maxTokens: 6000 });
+
+            let data = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim());
+            data._concept = concept;
+            data._episode = i + 1;
+
+            // Normaliser
+            if (data.scenes) {
+                data.scenes.forEach((s, j) => {
+                    s.numero = s.numero || (j + 1);
+                    s.duree = s.duree || state.sceneDuration;
+                    if (!s.plan || !s.mouvement_camera) {
+                        const type = s.type_scene || 'Symbolique';
+                        const preset = PLAN_TYPES[type] || { plan: 'Moyen', camera: 'Travelling' };
+                        s.plan = s.plan || preset.plan;
+                        s.mouvement_camera = s.mouvement_camera || preset.camera;
+                    }
+                    if (!s.prompt_video) {
+                        s.prompt_video = 'Cinematic documentary shot. ' + VISUAL_STYLE_LOCK;
+                    } else if (!s.prompt_video.includes('STYLE CONSTANT')) {
+                        s.prompt_video += '\n\n' + VISUAL_STYLE_LOCK;
+                    }
+                    if (!s.prompt_video.includes('NO subtitles')) {
+                        s.prompt_video += '\nNO subtitles. NO captions. NO written text. NO logos. NO watermark. NO branding. NO modern objects unless historically appropriate.';
+                    }
+                });
+            }
+
+            allEpisodes.push(data);
+            logConsole('Épisode ' + (i + 1) + ' ✓ — ' + (data.titre || concept), 'success');
+
+        } catch (e) {
+            logConsole('Erreur épisode ' + (i + 1) + ' : ' + e.message, 'error');
+            allEpisodes.push({ _concept: concept, _episode: i + 1, _error: e.message, titre: concept, hook: '', cta: '', scenes: [] });
+        }
+
+        await sleep(3000); // Espacement entre les appels
+    }
+
+    // Afficher la série complète
+    renderSeries(allEpisodes);
+    logConsole('Série terminée — ' + allEpisodes.filter(e => !e._error).length + '/12 épisodes réussis', 'success');
+    setStatus('✦ Série terminée ✦');
+    await sleep(3000);
+    setStatus(null);
+    showToast('Série terminée !', 'success');
+
+    state.isRunning = false;
+    document.getElementById('stop-btn').classList.remove('visible');
+    updateButtons();
+}
+
+function renderSeries(episodes) {
+    const container = document.getElementById('results-container');
+    let html = '<div class="result-section open">';
+    html += '<div class="result-header"><span class="result-title">📚 SÉRIE — ' + episodes.length + ' épisodes</span></div>';
+    html += '<div class="result-body"><div class="result-content">';
+
+    episodes.forEach(ep => {
+        html += '<div style="background:var(--panel-2);border-radius:8px;padding:0.7rem;margin-bottom:0.5rem;border-left:3px solid ' + (ep._error ? 'var(--error)' : 'var(--success)') + ';">';
+        html += '<div style="font-weight:800;color:var(--accent);font-size:0.85rem;">Épisode ' + ep._episode + ' — ' + esc(ep._concept) + '</div>';
+        if (ep._error) {
+            html += '<div style="font-size:0.75rem;color:var(--error);">Erreur : ' + esc(ep._error) + '</div>';
+        } else {
+            html += '<div style="font-size:0.8rem;margin-top:0.3rem;"><strong>' + esc(ep.titre || '') + '</strong></div>';
+            html += '<div style="font-size:0.75rem;color:var(--ink-dim);font-style:italic;margin-top:0.2rem;">Hook : « ' + esc(ep.hook || '') + ' »</div>';
+            html += '<div style="font-size:0.7rem;color:var(--warn);margin-top:0.2rem;">' + (ep.scenes ? ep.scenes.length : 0) + ' scènes</div>';
+        }
+        html += '</div>';
+    });
+
+    html += '</div></div></div>';
+
+    // Bouton export série
+    html += '<div class="export-bar"><button type="button" id="export-series-txt">📄 Exporter la série en TXT</button></div>';
+
+    container.innerHTML = html;
+
+    document.getElementById('export-series-txt')?.addEventListener('click', () => {
+        let txt = '═══════════════════════════════════════════\n';
+        txt += 'MARXTOK GENERATOR — SÉRIE COMPLÈTE (12 ÉPISODES)\n';
+        txt += '═══════════════════════════════════════════\n\n';
+        episodes.forEach(ep => {
+            txt += '═══════════════════════════════════════════\n';
+            txt += 'ÉPISODE ' + ep._episode + ' — ' + ep._concept + '\n';
+            txt += '═══════════════════════════════════════════\n';
+            if (ep._error) { txt += 'ERREUR : ' + ep._error + '\n\n'; return; }
+            txt += 'Titre : ' + (ep.titre || '') + '\n';
+            txt += 'Hook : ' + (ep.hook || '') + '\n';
+            txt += 'CTA : ' + (ep.cta || '') + '\n\n';
+            if (ep.scenes) {
+                ep.scenes.forEach(s => {
+                    txt += '── SCÈNE ' + s.numero + ' (' + s.duree + 's) ──\n';
+                    txt += 'Narration : ' + (s.narration || '') + '\n';
+                    txt += 'Plan : ' + s.plan + ' | Caméra : ' + s.mouvement_camera + '\n';
+                    txt += 'Prompt : ' + (s.prompt_video || '') + '\n\n';
+                });
+            }
+            txt += '\n';
+        });
+        downloadTxt('marxtok-serie-complete.txt', txt);
+        showToast('Série exportée !', 'success');
+    });
+
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+    // API
+    document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
+    document.getElementById('api-key-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); }
+    });
+
+    // Concept
+    const conceptSelect = document.getElementById('concept-select');
+    conceptSelect.addEventListener('change', () => {
+        const customField = document.getElementById('custom-concept-field');
+        if (conceptSelect.value === '__custom__') {
+            customField.classList.remove('hidden');
+            document.getElementById('custom-concept-input').focus();
+        } else {
+            customField.classList.add('hidden');
+        }
+        updateButtons();
+    });
+    document.getElementById('custom-concept-input').addEventListener('input', updateButtons);
+
+    // Boutons
+    document.getElementById('generate-btn').addEventListener('click', generateVideo);
+    document.getElementById('series-btn').addEventListener('click', generateSeries);
+    document.getElementById('stop-btn').addEventListener('click', () => {
+        state.stopRequested = true;
+        logConsole('Arrêt demandé', 'warn');
+        setStatus('Arrêt en cours…');
+    });
+
+    // Init
+    updateApiStatus();
+    logConsole('MarxTok Generator prêt.', 'info');
+    logConsole('Sélectionnez un concept et cliquez sur Générer.', 'info');
+})();
+</script>
+
+</body>
+</html>
