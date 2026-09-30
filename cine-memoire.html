@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CinéMémoire — Studio de films longs IA</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a0e;--panel:#14141c;--panel-2:#1c1c28;--border:#2a2a3a;--ink:#e8e8f0;--ink-dim:#8888a0;--ink-faint:#55556a;--success:#2d8a4e;--error:#c0392b;--warn:#d4a017;--info:#4a6cf7;--accent:#e94560;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem .8rem 7rem;font-size:15px;line-height:1.5;max-width:900px;margin:0 auto}
+header{margin-bottom:1rem;text-align:center}
+h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;background:linear-gradient(135deg,#e94560,#d4a017,#4a6cf7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:.8rem;color:var(--ink-dim)}
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel);color:var(--ink);padding:.75rem 1.2rem;border-radius:10px;font-size:.82rem;font-weight:500;box-shadow:0 4px 30px rgba(0,0,0,.6);border:1px solid var(--border);z-index:1000;opacity:0;transition:transform .35s ease,opacity .35s ease;max-width:90vw;text-align:center;display:flex;align-items:center;gap:.5rem}
+.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{border-color:var(--success)}.toast.error{border-color:var(--error)}.toast.warn{border-color:var(--warn)}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:.8rem}
+.panel h2{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-dim);font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem}
+.panel h2 .badge{background:var(--accent);color:#fff;border-radius:10px;padding:.1rem .5rem;font-size:.6rem;letter-spacing:0}
+.api-row{display:flex;gap:.5rem;margin-bottom:.5rem}
+.api-row input{flex:1;padding:.7rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:ui-monospace,monospace;font-size:.8rem}
+.api-row input:focus{outline:none;border-color:var(--accent)}
+.api-row button{padding:.7rem 1rem;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:700;font-family:inherit;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.api-status{font-size:.72rem;color:var(--ink-dim);display:flex;align-items:center;gap:.4rem}
+.api-status .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint)}
+.api-status.ok .dot{background:var(--success)}.api-status.ok{color:var(--success)}
+.field{margin-bottom:.7rem}
+.field label{display:block;font-size:.68rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:.35rem}
+.field select,.field textarea,.field input[type=text]{width:100%;padding:.7rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.88rem;-webkit-appearance:none;appearance:none}
+.field select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238888a0' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right .9rem center;background-size:10px}
+.field select:focus,.field textarea:focus,.field input:focus{outline:none;border-color:var(--accent)}
+.field textarea{min-height:60px;resize:vertical;line-height:1.5}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row .tl{font-size:.82rem}.toggle-row .th{font-size:.65rem;color:var(--ink-faint)}
+.switch{position:relative;display:inline-block;width:42px;height:23px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--panel-2);transition:.3s;border-radius:23px;border:1px solid var(--border)}
+.switch .slider:before{position:absolute;content:"";height:15px;width:15px;left:3px;bottom:3px;background:var(--ink-dim);transition:.3s;border-radius:50%}
+.switch input:checked+.slider{background:var(--success);border-color:var(--success)}
+.switch input:checked+.slider:before{transform:translateX(19px);background:#fff}
+.btn{width:100%;padding:1rem;border-radius:var(--radius);border:none;font-size:1rem;font-weight:800;font-family:inherit;cursor:pointer;transition:opacity .2s,transform .1s;margin-bottom:.7rem}
+.btn:active:not(:disabled){transform:scale(.98)}.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,#e94560,#d4a017,#4a6cf7);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-info{background:var(--info);color:#fff}
+.btn-warn{background:var(--warn);color:#000}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--ink)}
+.btn-outline:active{background:var(--panel-2)}
+.btn-sm{padding:.6rem .8rem;font-size:.75rem;font-weight:700}
+.btn-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem}
+.btn-row .btn{flex:1;min-width:100px;margin-bottom:0}
+.console{background:#060608;border:1px solid var(--border);border-radius:var(--radius);padding:.7rem .9rem;margin-bottom:.8rem;max-height:200px;overflow-y:auto;font-family:ui-monospace,monospace;font-size:.68rem;line-height:1.6}
+.console .log-line{padding:.1rem 0}
+.console .log-time{color:var(--ink-faint);margin-right:.4rem}
+.console .log-info{color:var(--info)}.console .log-success{color:var(--success)}.console .log-error{color:var(--error)}.console .log-warn{color:var(--warn)}.console .log-measure{color:#ffb84d;font-weight:700}
+.result-section{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:.8rem;overflow:hidden}
+.result-header{padding:.8rem 1rem;cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center}
+.result-header:active{background:var(--panel-2)}
+.result-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-dim);font-weight:700}
+.result-header .chevron{font-size:.65rem;color:var(--ink-faint);transition:transform .2s}
+.result-section.open .result-header .chevron{transform:rotate(180deg)}
+.result-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.result-section.open .result-body{max-height:50000px}
+.result-content{padding:0 1rem 1rem}
+.scene-card{background:var(--panel-2);border-radius:8px;padding:.8rem;margin-bottom:.6rem;border-left:3px solid var(--accent)}
+.scene-card.done{border-left-color:var(--success)}
+.scene-card .scene-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.scene-card .scene-num{font-weight:800;color:var(--accent);font-size:.85rem}
+.scene-card.done .scene-num{color:var(--success)}
+.scene-card .scene-status{font-size:.65rem;padding:.1rem .5rem;border-radius:4px;font-weight:700}
+.scene-card .scene-status.pending{background:var(--panel);color:var(--ink-dim)}
+.scene-card .scene-status.processing{background:var(--info);color:#fff}
+.scene-card .scene-status.done{background:var(--success);color:#fff}
+.scene-card .scene-field{margin-bottom:.4rem}
+.scene-card .scene-field .sf-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;display:block}
+.scene-card .scene-field .sf-value{font-size:.78rem;color:var(--ink);line-height:1.5}
+.scene-card .scene-field .sf-value.prompt{background:#060608;border:1px solid var(--border);border-radius:6px;padding:.5rem;font-family:ui-monospace,monospace;font-size:.65rem;color:#a0d0a0;word-break:break-word;white-space:pre-wrap;max-height:150px;overflow-y:auto}
+.scene-card .scene-field .sf-value.plan,.scene-card .scene-field .sf-value.camera{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700}
+.scene-card .scene-field .sf-value.plan{background:var(--info);color:#fff}
+.scene-card .scene-field .sf-value.camera{background:var(--warn);color:#000}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.5rem;margin-bottom:.6rem}
+.video-card{border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--panel-2);animation:fadeIn .5s ease}
+.video-card.new{border-color:var(--success);box-shadow:0 0 16px rgba(45,138,78,.5)}
+.video-card video{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;background:#000}
+.video-card .v-label{padding:.35rem .5rem;font-size:.65rem;color:var(--ink);text-align:center;background:var(--panel);border-top:1px solid var(--border);font-weight:600}
+.video-card .v-timing{padding:.25rem .5rem;font-size:.6rem;color:var(--warn);text-align:center;background:var(--panel);border-top:1px solid var(--border);font-family:ui-monospace,monospace}
+.pending-card{border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--panel-2);padding:1rem .6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;text-align:center}
+.pending-card.measuring{border-color:var(--info)}
+.pending-card .p-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:.6rem}
+.pending-card.measuring .p-spinner{border-top-color:var(--info)}
+.pending-card .p-label{font-size:.75rem;color:var(--ink);font-weight:700;margin-bottom:.3rem}
+.pending-card .p-text{font-size:.65rem;color:var(--ink-dim);font-family:ui-monospace,monospace;margin-bottom:.4rem}
+.pending-card .p-eta{font-size:.6rem;color:var(--warn);font-weight:600;margin-bottom:.5rem}
+.pending-card .p-bar{width:100%;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+.pending-card .p-fill{height:100%;background:linear-gradient(90deg,#e94560,#4a6cf7);border-radius:3px;transition:width .5s ease;width:0%}
+.player-container{background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:.6rem}
+.player-container video{width:100%;display:block;max-height:70vh;object-fit:contain;background:#000}
+.player-controls{display:flex;gap:.4rem;padding:.5rem;background:var(--panel);flex-wrap:wrap}
+.player-controls button{flex:1;min-width:70px;padding:.5rem .6rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:.72rem;font-weight:700;cursor:pointer}
+.player-controls button.playing{background:var(--accent);color:#fff;border-color:var(--accent)}
+.progress-bar{height:4px;background:var(--panel-2);border-radius:2px;overflow:hidden;margin-top:.4rem}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#e94560,#4a6cf7);border-radius:2px;transition:width .3s}
+.character-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:.4rem;margin-bottom:.6rem}
+.char-card{border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--panel-2);text-align:center;padding:.3rem}
+.char-card img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:6px;margin-bottom:.2rem}
+.char-card .char-name{font-size:.65rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.char-card .char-gender{font-size:.55rem;color:var(--ink-dim)}
+.memory-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:.2rem .5rem;font-size:.65rem;color:var(--ink-dim);margin-right:.3rem;margin-bottom:.3rem}
+.memory-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);color:var(--ink);padding:.7rem 1rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:transform .3s;z-index:100}
+.status-bar.visible{transform:translateY(0)}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.hidden{display:none!important}
+#noSleepCanvas,#noSleepVideo{position:fixed;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1}
+.project-item{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem;margin-bottom:.4rem;cursor:pointer;transition:border-color .2s}
+.project-item:active{border-color:var(--accent)}
+.project-item.active{border-color:var(--accent);background:rgba(233,69,96,.08)}
+.project-item .pi-title{font-size:.82rem;font-weight:700;color:var(--ink)}
+.project-item .pi-meta{font-size:.65rem;color:var(--ink-dim);margin-top:.15rem}
+.progress-ring{display:inline-block;width:36px;height:36px;border-radius:50%;background:conic-gradient(var(--success) calc(var(--pct)*1%), var(--panel-2) 0);position:relative}
+.progress-ring::after{content:attr(data-pct)'%';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.55rem;font-weight:800;color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>CinéMémoire</h1>
+    <p class="subtitle">Studio de films longs — Sauvegarde auto · Mémoire persistante · Reprise à tout moment</p>
+</header>
+
+<!-- ═══ API KEY ═══ -->
+<div class="panel">
+    <h2>🔑 Clé API Agnès</h2>
+    <div class="api-row">
+        <input type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false">
+        <button type="button" id="api-save-btn">OK</button>
+    </div>
+    <div class="api-status" id="api-status"><span class="dot"></span><span id="api-status-text">Aucune clé</span></div>
+</div>
+
+<!-- ═══ PROJETS ═══ -->
+<div class="panel">
+    <h2>📁 Projets <span class="badge" id="projects-count">0</span></h2>
+    <div id="projects-list"><div style="font-size:.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucun projet. Créez-en un ci-dessous.</div></div>
+    <button type="button" class="btn btn-primary btn-sm" id="new-project-btn" style="margin-top:.6rem;">➕ Nouveau projet</button>
+    <div class="field hidden" id="new-project-field" style="margin-top:.6rem;">
+        <label>Titre du projet</label>
+        <input type="text" id="project-title-input" placeholder="Ex: La Chute de l'Empire">
+        <label style="margin-top:.6rem;">Idée / Pitch</label>
+        <textarea id="project-idea-input" placeholder="Décrivez l'histoire en quelques phrases..."></textarea>
+        <label style="margin-top:.6rem;">Genre / Style</label>
+        <select id="project-genre-select">
+            <option value="cinematographique">Cinématographique</option>
+            <option value="documentaire">Documentaire</option>
+            <option value="science-fiction">Science-Fiction</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="polar">Polar / Thriller</option>
+            <option value="historique">Historique</option>
+            <option value="comedie">Comédie</option>
+            <option value="horreur">Horreur</option>
+        </select>
+        <button type="button" class="btn btn-success btn-sm" id="create-project-btn" style="margin-top:.6rem;">✅ Créer le projet</button>
+    </div>
+</div>
+
+<!-- ═══ PARAMÈTRES DE SCÈNE ═══ -->
+<div class="panel" id="params-panel" style="display:none;">
+    <h2>⚙️ Paramètres de production</h2>
+    <div class="grid-2">
+        <div class="field"><label>Format</label><select id="format-select"><option value="9:16" selected>9:16 Vertical</option><option value="16:9">16:9 Horizontal</option><option value="1:1">1:1 Carré</option></select></div>
+        <div class="field"><label>Durée/clip</label><select id="duration-select"><option value="121">5s</option><option value="241" selected>10s</option><option value="361">15s</option></select></div>
+        <div class="field"><label>Scènes par session</label><select id="batch-select"><option value="1">1 scène</option><option value="2" selected>2 scènes</option><option value="3">3 scènes</option><option value="5">5 scènes</option></select></div>
+        <div class="field"><label>Qualité image</label><select id="quality-select"><option value="768x1024" selected>Standard</option><option value="1024x1024">Haute</option></select></div>
+    </div>
+    <div class="toggle-row"><div><div class="tl">Sans personnages</div><div class="th">Objets, paysages, symboles</div></div><label class="switch"><input type="checkbox" id="no-humans-toggle"><span class="slider"></span></label></div>
+    <div class="toggle-row"><div><div class="tl">Générer les vidéos</div><div class="th">Images + clips animés</div></div><label class="switch"><input type="checkbox" id="videos-toggle" checked><span class="slider"></span></label></div>
+    <div class="toggle-row"><div><div class="tl">Voix off (TTS)</div><div class="th">Lecture des dialogues/narration</div></div><label class="switch"><input type="checkbox" id="tts-toggle" checked><span class="slider"></span></label></div>
+</div>
+
+<!-- ═══ MÉMOIRE DU PROJET ═══ -->
+<div class="panel" id="memory-panel" style="display:none;">
+    <h2>🧠 Mémoire du projet</h2>
+    <div id="memory-content"></div>
+</div>
+
+<!-- ═══ ACTIONS ═══ -->
+<div class="btn-row" id="actions-row" style="display:none;">
+    <button type="button" class="btn btn-primary" id="generate-btn">🎬 Générer les prochaines scènes</button>
+    <button type="button" class="btn btn-stop btn-outline" id="stop-btn" style="display:none;">⏹ Arrêter</button>
+</div>
+<div class="btn-row" id="export-row" style="display:none;">
+    <button type="button" class="btn btn-info btn-sm" id="export-txt-btn">📄 Exporter TXT</button>
+    <button type="button" class="btn btn-outline btn-sm" id="export-json-btn">📋 Exporter JSON</button>
+    <button type="button" class="btn btn-outline btn-sm" id="delete-project-btn" style="border-color:var(--error);color:var(--error);">🗑 Supprimer</button>
+</div>
+
+<!-- ═══ CONSOLE ═══ -->
+<div class="console" id="console-panel"><div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">Prêt. Créez ou ouvrez un projet.</span></div></div>
+
+<!-- ═══ RÉSULTATS ═══ -->
+<div id="results-container"></div>
+
+<div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ══════════════════════════════════════════════════════════════════
+const API_BASE='https://apihub.agnes-ai.com/v1';
+const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT='agnes-2.5-flash';
+const MODEL_IMAGE='agnes-image-2.5-flash';
+const MODEL_VIDEO='agnes-video-v2.0';
+const INITIAL_WAIT=105;
+const POLL_INTERVAL=5;
+const SAFETY=1.10;
+const LIMITS={textRpm:30,imagesPerDay:4000,videoSecondsPerDay:500,videoRpm:1};
+const DB_NAME='cinememoire_db';
+const DB_VERSION=1;
+
+// ══════════════════════════════════════════════════════════════════
+// INDEXEDDB — Persistance
+// ══════════════════════════════════════════════════════════════════
+let db=null;
+
+function openDB(){
+    return new Promise((resolve,reject)=>{
+        const req=indexedDB.open(DB_NAME,DB_VERSION);
+        req.onupgradeneeded=e=>{
+            const d=e.target.result;
+            if(!d.objectStoreNames.contains('projects')){
+                d.createObjectStore('projects',{keyPath:'id'});
+            }
+            if(!d.objectStoreNames.contains('scenes')){
+                const s=d.createObjectStore('scenes',{keyPath:'id'});
+                s.createIndex('projectId','projectId',{unique:false});
+                s.createIndex('status','status',{unique:false});
+            }
+            if(!d.objectStoreNames.contains('characters')){
+                const c=d.createObjectStore('characters',{keyPath:'id'});
+                c.createIndex('projectId','projectId',{unique:false});
+            }
+            if(!d.objectStoreNames.contains('locations')){
+                const l=d.createObjectStore('locations',{keyPath:'id'});
+                l.createIndex('projectId','projectId',{unique:false});
+            }
+            if(!d.objectStoreNames.contains('assets')){
+                const a=d.createObjectStore('assets',{keyPath:'id'});
+                a.createIndex('projectId','projectId',{unique:false});
+                a.createIndex('type','type',{unique:false});
+            }
+        };
+        req.onsuccess=e=>{db=e.target.result;resolve(db);};
+        req.onerror=e=>reject(e);
+    });
+}
+
+function dbPut(store,data){
+    return new Promise((resolve,reject)=>{
+        const tx=db.transaction(store,'readwrite');
+        tx.objectStore(store).put(data);
+        tx.oncomplete=()=>resolve(data);
+        tx.onerror=e=>reject(e);
+    });
+}
+
+function dbGet(store,id){
+    return new Promise((resolve,reject)=>{
+        const tx=db.transaction(store,'readonly');
+        const req=tx.objectStore(store).get(id);
+        req.onsuccess=()=>resolve(req.result);
+        req.onerror=e=>reject(e);
+    });
+}
+
+function dbGetAll(store,indexName,indexValue){
+    return new Promise((resolve,reject)=>{
+        const tx=db.transaction(store,'readonly');
+        const st=tx.objectStore(store);
+        const req=indexName?st.index(indexName).getAll(indexValue):st.getAll();
+        req.onsuccess=()=>resolve(req.result||[]);
+        req.onerror=e=>reject(e);
+    });
+}
+
+function dbDelete(store,id){
+    return new Promise((resolve,reject)=>{
+        const tx=db.transaction(store,'readwrite');
+        tx.objectStore(store).delete(id);
+        tx.oncomplete=()=>resolve();
+        tx.onerror=e=>reject(e);
+    });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════════
+const state={
+    isRunning:false,
+    stopRequested:false,
+    currentProject:null,
+    projects:[],
+    scenes:[],
+    characters:[],
+    locations:[],
+    assets:[],
+    storyBible:null,
+    narrativeSummary:'',
+    sessionCount:0,
+    counters:{text:0,images:0,videoSeconds:0,videoRpm:0,lastReset:Date.now()},
+    measuredSpeed:{value:null,usedForEstimate:null},
+    isPlayingSequence:false,
+    playerIndex:0
+};
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function setStatus(t){const b=document.getElementById('status-bar');if(t){b.classList.add('visible');document.getElementById('status-text').textContent=t;}else b.classList.remove('visible');}
+function log(m,t='info'){const p=document.getElementById('console-panel');const tm=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});const labels={info:'[Info]',success:'[OK]',error:'[Erreur]',warn:'[!]',measure:'[Mesure]'};const l=document.createElement('div');l.className='log-line';l.innerHTML='<span class="log-time">'+tm+'</span><span class="log-'+t+'">'+(labels[t]||'[Info]')+'</span> <span class="log-text">'+esc(m)+'</span>';p.appendChild(l);p.scrollTop=p.scrollHeight;}
+function toast(m,t='success',d=2500){const to=document.getElementById('toast');const ic=document.getElementById('toast-icon');const tx=document.getElementById('toast-text');to.classList.remove('visible','success','error','warn');void to.offsetWidth;const icons={success:'✓',error:'✕',warn:'⚠'};ic.textContent=icons[t]||'✓';tx.textContent=m;to.classList.add(t);requestAnimationFrame(()=>to.classList.add('visible'));setTimeout(()=>to.classList.remove('visible'),d);}
+function formatTime(s){if(s<0)s=0;const m=Math.floor(s/60);const sec=Math.round(s%60);return m+':'+(sec<10?'0':'')+sec;}
+function getApiKey(){try{return(localStorage.getItem('cinememoire_key')||'').trim();}catch(e){return'';}}
+function updateSpeedDisplay(){const el=document.getElementById('speed-display');if(!el)return;el.textContent=state.measuredSpeed.value===null?'en attente':Math.round(state.measuredSpeed.value)+'s';}
+function getEstimatedWait(){return state.measuredSpeed.usedForEstimate!==null?state.measuredSpeed.usedForEstimate:INITIAL_WAIT;}
+
+// ══════════════════════════════════════════════════════════════════
+// API
+// ══════════════════════════════════════════════════════════════════
+async function callTextAPI(messages,options={}){
+    const now=Date.now();if(now-state.lastTextRequest<2000)await sleep(2000-(now-state.lastTextRequest));state.lastTextRequest=Date.now();
+    state.counters.text++;updateCounters();
+    const body={model:MODEL_TEXT,messages,temperature:options.temperature??0.75,max_tokens:options.maxTokens??8000};
+    log('Requête texte → '+MODEL_TEXT,'info');
+    const res=await fetchWithRetry(API_BASE+'/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},body:JSON.stringify(body)},3,'Texte');
+    if(!res.ok)throw new Error('Text HTTP '+res.status);
+    const d=await res.json();const c=d.choices?.[0]?.message?.content;if(!c)throw new Error('Pas de contenu');return c;
+}
+
+async function callImageAPI(prompt,size='768x1024'){
+    state.counters.images++;updateCounters();
+    log('Image → '+MODEL_IMAGE,'info');
+    const body={model:MODEL_IMAGE,prompt:prompt,size:size,extra_body:{response_format:'url'}};
+    const res=await fetchWithRetry(API_BASE+'/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},body:JSON.stringify(body)},3,'Image');
+    if(!res.ok)throw new Error('Image HTTP '+res.status);
+    const d=await res.json();const url=d.data?.[0]?.url||d.data?.[0]?.b64_json;if(!url)throw new Error('Pas d\'URL');return url;
+}
+
+async function createVideoTask(startUrl,endUrl,prompt,numFrames){
+    const now=Date.now();
+    if(state.counters.videoRpm>=LIMITS.videoRpm){
+        const wait=Math.ceil((60000-(now-state.counters.lastReset))/1000);
+        if(wait>0){log('RPM vidéo — attente '+wait+'s','warn');await sleep(wait*1000);state.counters.videoRpm=0;state.counters.lastReset=Date.now();}
+    }
+    state.counters.videoRpm++;state.counters.videoSeconds+=numFrames/24;updateCounters();
+    const body={model:MODEL_VIDEO,prompt:prompt,extra_body:{image:[startUrl,endUrl],mode:'keyframes'},num_frames:numFrames,frame_rate:24,height:1024,width:576};
+    log('Création tâche vidéo','info');
+    const res=await fetchWithRetry(API_BASE+'/videos',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},body:JSON.stringify(body)},3,'Vidéo');
+    if(!res.ok){const e=await res.text();throw new Error('Vidéo HTTP '+res.status+' — '+e.slice(0,200));}
+    const d=await res.json();const vid=d.video_id;if(!vid)throw new Error('Pas de video_id');return vid;
+}
+
+async function pollVideo(videoId,sceneIndex){
+    const start=Date.now();const waitFirst=getEstimatedWait();
+    const card=document.getElementById('pending-'+sceneIndex);if(card)card.classList.add('measuring');
+    for(let r=Math.round(waitFirst);r>0;r--){
+        if(state.stopRequested)throw new Error('Arrêt');
+        const el=Math.round((Date.now()-start)/1000);const pr=Math.min(Math.round((el/waitFirst)*100),95);
+        updatePending(sceneIndex,'Préparation…',pr,el);
+        setStatus('Scène '+(sceneIndex+1)+' — attente '+r+'s');await sleep(1000);
+    }
+    log('Scène '+(sceneIndex+1)+' — polling','info');
+    let err=0;
+    for(let a=0;a<400;a++){
+        if(state.stopRequested)throw new Error('Arrêt');
+        const url=POLL_BASE+'?video_id='+encodeURIComponent(videoId)+'&model_name='+encodeURIComponent(MODEL_VIDEO);
+        try{
+            const res=await fetch(url,{headers:{'Authorization':'Bearer '+getApiKey()}});
+            if(res.status===429){await sleep(20000);continue;}
+            if(res.status===404){await sleep(POLL_INTERVAL*1000);continue;}
+            if(!res.ok){err++;if(err>=15){await sleep(30000);err=0;}await sleep(POLL_INTERVAL*1000);continue;}
+            err=0;const d=await res.json();const st=d.status||'unknown';const apiPr=d.progress||0;
+            const el=Math.round((Date.now()-start)/1000);const timePr=Math.min(Math.round((el/waitFirst)*100),95);const dp=Math.max(apiPr,timePr);
+            updatePending(sceneIndex,'Génération…',dp,el);
+            if(st==='completed'||st==='succeeded'||st==='done'){
+                const vUrl=(d.metadata&&d.metadata.url)||d.url||(d.output&&d.output.url);
+                if(!vUrl)throw new Error('URL manquante');
+                const dur=Math.round((Date.now()-start)/1000);
+                state.measuredSpeed.value=dur;state.measuredSpeed.usedForEstimate=Math.round(dur*SAFETY);
+                log('⚡ Scène '+(sceneIndex+1)+' générée en '+dur+'s','measure');
+                return {url:vUrl,duration:dur};
+            }
+            if(st==='failed'||st==='error'||st==='cancelled')throw new Error('Échec ('+st+')');
+        }catch(e){if(e.message==='Arrêt')throw e;if(e.message.startsWith('Échec')||e.message==='URL manquante')throw e;err++;if(err>=15){await sleep(20000);err=0;}}
+        await sleep(POLL_INTERVAL*1000);
+    }
+    throw new Error('Délai max');
+}
+
+async function fetchWithRetry(url,options={},maxRetries=3,label='API'){
+    for(let a=0;a<=maxRetries;a++){
+        if(state.stopRequested)throw new Error('Arrêt');
+        try{
+            const ctrl=new AbortController();const timeout=setTimeout(()=>ctrl.abort(),90000);
+            const res=await fetch(url,{...options,signal:ctrl.signal});clearTimeout(timeout);
+            if([500,502,503,520].includes(res.status)&&a<maxRetries){await sleep(Math.pow(2,a)*3000);continue;}
+            if(res.status===429&&a<maxRetries){log(label+' 429, attente 65s','warn');await sleep(65000);continue;}
+            return res;
+        }catch(e){if(e.message==='Arrêt')throw e;if(a<maxRetries){await sleep(Math.pow(2,a)*2000);}else throw new Error(label+' échec — '+e.message);}
+    }
+    throw new Error(label+' échec');
+}
+
+function updateCounters(){
+    document.getElementById('ct-text').textContent=state.counters.text;
+    document.getElementById('ct-img').textContent=state.counters.images;
+    document.getElementById('ct-vid').textContent=Math.round(state.counters.videoSeconds);
+    document.getElementById('ct-rpm').textContent=state.counters.videoRpm;
+    updateSpeedDisplay();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GESTION DES PROJETS
+// ══════════════════════════════════════════════════════════════════
+async function loadProjects(){
+    state.projects=await dbGetAll('projects');
+    renderProjectsList();
+}
+
+function renderProjectsList(){
+    const el=document.getElementById('projects-list');
+    if(state.projects.length===0){el.innerHTML='<div style="font-size:.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucun projet.</div>';document.getElementById('projects-count').textContent='0';return;}
+    document.getElementById('projects-count').textContent=state.projects.length;
+    el.innerHTML='';
+    state.projects.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).forEach(p=>{
+        const done=p.scenesDone||0;const total=p.scenesTotal||0;
+        const pct=total>0?Math.round((done/total)*100):0;
+        const div=document.createElement('div');div.className='project-item'+(state.currentProject&&state.currentProject.id===p.id?' active':'');
+        div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;">'+
+            '<div><div class="pi-title">'+esc(p.title)+'</div>'+
+            '<div class="pi-meta">'+esc(p.genre||'')+' · '+done+'/'+total+' scènes · '+new Date(p.updatedAt||p.createdAt).toLocaleDateString('fr-FR')+'</div></div>'+
+            '<div class="progress-ring" style="--pct:'+pct+'" data-pct="'+pct+'"></div></div>';
+        div.addEventListener('click',()=>openProject(p.id));
+        el.appendChild(div);
+    });
+}
+
+async function createProject(){
+    const title=document.getElementById('project-title-input').value.trim();
+    const idea=document.getElementById('project-idea-input').value.trim();
+    if(!title||title.length<2){toast('Titre trop court','error');return;}
+    if(!idea||idea.length<20){toast('Idée trop courte (20 car. min)','error');return;}
+    const genre=document.getElementById('project-genre-select').value;
+    const p={
+        id:uid(),title,idea,genre,
+        createdAt:Date.now(),updatedAt:Date.now(),
+        scenesTotal:0,scenesDone:0,
+        storyBible:null,narrativeSummary:'',
+        sessionCount:0,
+        format:'9:16',duration:241,
+        characters:[],locations:[]
+    };
+    await dbPut('projects',p);
+    state.projects.push(p);
+    await openProject(p.id);
+    toast('Projet créé !','success');
+    document.getElementById('new-project-field').classList.add('hidden');
+    document.getElementById('project-title-input').value='';
+    document.getElementById('project-idea-input').value='';
+}
+
+async function openProject(id){
+    const p=await dbGet('projects',id);
+    if(!p){toast('Projet introuvable','error');return;}
+    state.currentProject=p;
+    state.scenes=await dbGetAll('scenes','projectId',id);
+    state.characters=await dbGetAll('characters','projectId',id);
+    state.locations=await dbGetAll('locations','projectId',id);
+    state.assets=await dbGetAll('assets','projectId',id);
+    state.storyBible=p.storyBible||null;
+    state.narrativeSummary=p.narrativeSummary||'';
+    state.sessionCount=p.sessionCount||0;
+    state.format=p.format||'9:16';
+    state.duration=p.duration||241;
+
+    // Mettre à jour les sélecteurs
+    document.getElementById('format-select').value=state.format;
+    document.getElementById('duration-select').value=state.duration;
+
+    renderProjectsList();
+    document.getElementById('params-panel').style.display='block';
+    document.getElementById('memory-panel').style.display='block';
+    document.getElementById('actions-row').style.display='flex';
+    document.getElementById('export-row').style.display='flex';
+    renderMemory();
+    renderScenes();
+    renderResults();
+    log('Projet ouvert : « '+p.title+' »','success');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MÉMOIRE DU PROJET
+// ══════════════════════════════════════════════════════════════════
+function renderMemory(){
+    const el=document.getElementById('memory-content');
+    let html='';
+    if(state.storyBible){
+        html+='<div style="font-size:.75rem;margin-bottom:.4rem;"><strong>📖 Bible :</strong> '+esc(state.storyBible.title||'')+'</div>';
+        html+='<div style="font-size:.7rem;color:var(--ink-dim);margin-bottom:.5rem;">'+esc((state.storyBible.logline||'').slice(0,150))+'</div>';
+    }
+    if(state.characters.length>0){
+        html+='<div style="font-size:.7rem;font-weight:700;margin-bottom:.3rem;">👤 Personnages ('+state.characters.length+')</div>';
+        html+='<div class="character-grid">';
+        state.characters.forEach(c=>{
+            html+='<div class="char-card">'+(c.url?'<img src="'+c.url+'" loading="lazy">':'<div style="aspect-ratio:1;background:var(--panel);border-radius:6px;margin-bottom:.2rem;"></div>')+
+                '<div class="char-name">'+esc(c.name)+'</div><div class="char-gender">'+esc(c.gender||'')+'</div></div>';
+        });
+        html+='</div>';
+    }
+    if(state.locations.length>0){
+        html+='<div style="font-size:.7rem;font-weight:700;margin-bottom:.3rem;">📍 Lieux ('+state.locations.length+')</div>';
+        state.locations.forEach(l=>{html+='<span class="memory-badge"><span class="dot"></span>'+esc(l.name)+'</span>';});
+        html+='<div style="margin-top:.3rem;"></div>';
+    }
+    html+='<div style="font-size:.7rem;color:var(--ink-dim);margin-top:.4rem;">📝 Résumé narratif : '+(state.narrativeSummary?state.narrativeSummary.slice(0,200)+'…':'aucun')+'</div>';
+    html+='<div style="font-size:.65rem;color:var(--ink-faint);margin-top:.2rem;">Sessions : '+(state.sessionCount||0)+' · Scènes : '+state.scenes.filter(s=>s.status==='done').length+'/'+(state.currentProject.scenesTotal||state.scenes.length||0)+'</div>';
+    el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SCÈNES
+// ══════════════════════════════════════════════════════════════════
+function renderScenes(){
+    const c=document.getElementById('results-container');
+    let html='';
+    html+='<div class="result-section open"><div class="result-header" data-toggle><span class="result-title">🎬 Scènes ('+state.scenes.length+')</span><span class="chevron">▼</span></div><div class="result-body"><div class="result-content"><div id="scenes-list"></div></div></div></div>';
+    html+='<div class="result-section" id="player-section"><div class="result-header" data-toggle><span class="result-title">▶ Lecture séquentielle</span><span class="chevron">▼</span></div><div class="result-body"><div class="result-content"><div class="player-container"><video id="player-video" controls playsinline></video></div><div class="player-controls"><button type="button" id="play-all-btn">▶ Lire tout</button><button type="button" id="stop-all-btn">⏹ Arrêter</button></div><div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div><div style="font-size:.72rem;color:var(--ink-dim);margin-top:.4rem;text-align:center;" id="player-info">—</div></div></div></div>';
+    c.innerHTML=html;
+
+    const list=document.getElementById('scenes-list');
+    state.scenes.sort((a,b)=>(a.numero||0)-(b.numero||0)).forEach(s=>{
+        const card=document.createElement('div');card.className='scene-card'+(s.status==='done'?' done':'');
+        card.innerHTML='<div class="scene-header"><span class="scene-num">SCÈNE '+(s.numero||'?')+'</span><span class="scene-status '+(s.status||'pending')+'">'+(s.status==='done'?'✅ Terminée':s.status==='processing'?'⏳ En cours':'⏸ En attente')+'</span></div>'+
+            (s.narration?'<div class="scene-field"><span class="sf-label">Narration</span><span class="sf-value">« '+esc(s.narration)+' »</span></div>':'')+
+            (s.plan?'<div class="scene-field"><span class="sf-label">Plan</span><span class="sf-value plan">'+esc(s.plan)+'</span></div>':'')+
+            (s.mouvement_camera?'<div class="scene-field"><span class="sf-label">Caméra</span><span class="sf-value camera">'+esc(s.mouvement_camera)+'</span></div>':'')+
+            (s.description_visuelle?'<div class="scene-field"><span class="sf-label">Visuel</span><span class="sf-value">'+esc(s.description_visuelle)+'</span></div>':'')+
+            (s.videoUrl?'<div class="scene-field"><span class="sf-label">Vidéo</span><video src="'+s.videoUrl+'" controls style="width:100%;border-radius:6px;margin-top:.3rem;" preload="metadata"></video></div>':'');
+        list.appendChild(card);
+    });
+
+    c.querySelectorAll('[data-toggle]').forEach(h=>h.addEventListener('click',()=>h.closest('.result-section').classList.toggle('open')));
+    document.getElementById('play-all-btn').addEventListener('click',playAll);
+    document.getElementById('stop-all-btn').addEventListener('click',stopAll);
+}
+
+function renderResults(){
+    renderScenes();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION PRINCIPALE
+// ══════════════════════════════════════════════════════════════════
+async function generateNextScenes(){
+    if(state.isRunning)return;
+    if(!state.currentProject){toast('Ouvrez un projet','error');return;}
+    if(!getApiKey()){toast('Ajoutez votre clé API','error');return;}
+
+    state.isRunning=true;state.stopRequested=false;
+    state.format=document.getElementById('format-select').value;
+    state.duration=parseInt(document.getElementById('duration-select').value);
+    const batch=parseInt(document.getElementById('batch-select').value);
+    const noHumans=document.getElementById('no-humans-toggle').checked;
+    const genVideos=document.getElementById('videos-toggle').checked;
+    const tts=document.getElementById('tts-toggle').checked;
+
+    // Sauvegarder les paramètres dans le projet
+    state.currentProject.format=state.format;
+    state.currentProject.duration=state.duration;
+    await dbPut('projects',state.currentProject);
+
+    document.getElementById('stop-btn').style.display='block';
+    document.getElementById('generate-btn').disabled=true;
+    log('═══════ SESSION '+(state.sessionCount+1)+' ═══════','info');
+    log('Génération de '+batch+' nouvelle(s) scène(s)','info');
+
+    await activateWakeLock();
+    setStatus('Préparation de la session…');
+
+    try{
+        // ═══ ÉTAPE 1 : BIBLE (si première session) ═══
+        if(!state.storyBible){
+            log('Création de la bible du film…','info');
+            setStatus('L\'IA crée la bible du film…');
+            const bible=await createStoryBible(state.currentProject.idea,state.currentProject.genre);
+            state.storyBible=bible;
+            state.currentProject.storyBible=bible;
+            state.currentProject.scenesTotal=bible.totalScenes||20;
+            await dbPut('projects',state.currentProject);
+            log('Bible créée : « '+(bible.title||'')+' » — '+(bible.totalScenes||20)+' scènes prévues','success');
+
+            // Créer les personnages de référence
+            if(bible.characters&&bible.characters.length>0){
+                log('Génération des portraits de référence ('+bible.characters.length+')…','info');
+                for(let i=0;i<bible.characters.length;i++){
+                    if(state.stopRequested)break;
+                    const ch=bible.characters[i];
+                    const existing=state.characters.find(c=>c.name===ch.name);
+                    if(existing&&existing.url){log('Portrait '+ch.name+' déjà existant','info');continue;}
+                    setStatus('Portrait '+ch.name+'…');
+                    try{
+                        const prompt='Character reference portrait, '+ch.gender+', '+ch.appearance+', '+state.format+' vertical, plain background, front-facing, cinematic realistic style, no text.';
+                        const url=await callImageAPI(prompt,'1:1');
+                        const char={id:uid(),projectId:state.currentProject.id,name:ch.name,gender:ch.gender,appearance:ch.appearance,url,createdAt:Date.now()};
+                        await dbPut('characters',char);
+                        state.characters.push(char);
+                        log('Portrait '+ch.name+' ✓','success');
+                    }catch(e){log('Erreur portrait '+ch.name+' : '+e.message,'error');}
+                    await sleep(1500);
+                }
+            }
+            // Créer les lieux
+            if(bible.locations&&bible.locations.length>0){
+                for(const loc of bible.locations){
+                    const existing=state.locations.find(l=>l.name===loc.name);
+                    if(existing)continue;
+                    const l={id:uid(),projectId:state.currentProject.id,name:loc.name,description:loc.description||'',createdAt:Date.now()};
+                    await dbPut('locations',l);
+                    state.locations.push(l);
+                }
+                log(state.locations.length+' lieux enregistrés','success');
+            }
+            renderMemory();
+        }
+
+        // ═══ ÉTAPE 2 : PROCHAINES SCÈNES ═══
+        const doneScenes=state.scenes.filter(s=>s.status==='done');
+        const nextNum=doneScenes.length+1;
+        log('Prochaine scène : '+(nextNum)+'/'+(state.currentProject.scenesTotal||20),'info');
+
+        setStatus('Écriture des scènes…');
+        const newScenes=await generateSceneScripts(nextNum,batch);
+        if(!newScenes||newScenes.length===0)throw new Error('Aucune scène générée');
+
+        // Sauvegarder les scènes
+        for(const s of newScenes){
+            s.id=uid();s.projectId=state.currentProject.id;s.status='pending';s.createdAt=Date.now();
+            await dbPut('scenes',s);
+            state.scenes.push(s);
+        }
+        state.currentProject.scenesTotal=Math.max(state.currentProject.scenesTotal||0,state.scenes.length+(batch*2));
+        await dbPut('projects',state.currentProject);
+        renderScenes();
+
+        // ═══ ÉTAPE 3 : IMAGES ═══
+        log('Génération des images…','info');
+        for(let i=0;i<newScenes.length;i++){
+            if(state.stopRequested)break;
+            const s=newScenes[i];
+            setStatus('Image scène '+s.numero+'…');
+            try{
+                const startPrompt=buildImagePrompt(s,'start',noHumans);
+                s.imageStartUrl=await callImageAPI(startPrompt,state.format==='16:9'?'1024x576':'768x1024');
+                if(genVideos){
+                    const endPrompt=buildImagePrompt(s,'end',noHumans);
+                    s.imageEndUrl=await callImageAPI(endPrompt,state.format==='16:9'?'1024x576':'768x1024');
+                }
+                s.status='images_ready';
+                await dbPut('scenes',s);
+                log('Images scène '+s.numero+' ✓','success');
+            }catch(e){log('Erreur images scène '+s.numero+' : '+e.message,'error');}
+            await sleep(1500);
+        }
+
+        // ═══ ÉTAPE 4 : VIDÉOS ═══
+        if(genVideos&&!state.stopRequested){
+            log('Génération des clips vidéo…','info');
+            const readyScenes=newScenes.filter(s=>s.imageStartUrl&&s.imageEndUrl&&s.status==='images_ready');
+            const promises=[];
+            for(let i=0;i<readyScenes.length;i++){
+                if(state.stopRequested)break;
+                const s=readyScenes[i];
+                s.status='processing';
+                await dbPut('scenes',s);
+                renderScenes();
+                try{
+                    log('Création tâche vidéo scène '+s.numero,'info');
+                    const prompt=buildVideoPrompt(s,noHumans);
+                    const vid=await createVideoTask(s.imageStartUrl,s.imageEndUrl,prompt,state.duration);
+                    const p=pollVideo(vid,s.numero).then(r=>{
+                        s.videoUrl=r.url;s.videoDuration=r.duration;s.status='done';
+                        return dbPut('scenes',s).then(()=>{
+                            log('✅ Scène '+s.numero+' terminée en '+r.duration+'s','success');
+                            renderScenes();renderMemory();
+                            playNotificationSound();toast('Scène '+s.numero+' prête !','success');
+                        });
+                    }).catch(e=>{log('Erreur scène '+s.numero+' : '+e.message,'error');s.status='pending';return dbPut('scenes',s);});
+                    promises.push(p);
+                }catch(e){log('Échec tâche scène '+s.numero+' : '+e.message,'error');s.status='pending';await dbPut('scenes',s);}
+                if(i<readyScenes.length-1&&!state.stopRequested){
+                    for(let r=62;r>0;r--){if(state.stopRequested)break;setStatus('Prochain clip dans '+r+'s');await sleep(1000);}
+                }
+            }
+            setStatus('Attente des clips…');
+            await Promise.allSettled(promises);
+        }
+
+        // ═══ ÉTAPE 5 : MISE À JOUR DU PROJET ═══
+        state.currentProject.narrativeSummary=await updateNarrativeSummary();
+        state.currentProject.sessionCount=(state.currentProject.sessionCount||0)+1;
+        state.currentProject.scenesDone=state.scenes.filter(s=>s.status==='done').length;
+        state.currentProject.updatedAt=Date.now();
+        await dbPut('projects',state.currentProject);
+        state.sessionCount=state.currentProject.sessionCount;
+
+        const doneCount=state.scenes.filter(s=>s.status==='done').length;
+        log('═══════ SESSION TERMINÉE ═══════','success');
+        log(doneCount+' scènes terminées sur '+(state.currentProject.scenesTotal||20)+' prévues','text');
+        setStatus('✦ Session terminée ✦');
+        await sleep(2000);setStatus(null);
+        toast('Session terminée — '+doneCount+' scènes !','success');
+
+    }catch(e){
+        log('ERREUR : '+e.message,'error');
+        setStatus('Erreur : '+e.message.slice(0,50));
+        await sleep(3000);setStatus(null);toast('Erreur : '+e.message.slice(0,60),'error');
+    }
+
+    state.isRunning=false;state.stopRequested=false;
+    document.getElementById('stop-btn').style.display='none';
+    document.getElementById('generate-btn').disabled=false;
+    await deactivateWakeLock();
+    renderMemory();renderProjectsList();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CRÉATION DE LA BIBLE
+// ══════════════════════════════════════════════════════════════════
+async function createStoryBible(idea,genre){
+    const prompt=`Tu es un scénariste professionnel. Crée la bible d'un film long à partir de cette idée :
+
+"${idea}"
+
+Genre : ${genre}
+Format : vertical 9:16 (style TikTok cinématographique)
+
+Génère un JSON valide :
+{
+  "title": "Titre du film",
+  "logline": "Résumé en une phrase",
+  "totalScenes": 20,
+  "characters": [
+    {"name":"Nom","gender":"homme ou femme","appearance":"Description physique TRÈS précise (âge, cheveux, yeux, vêtements, traits distinctifs)"}
+  ],
+  "locations": [
+    {"name":"Nom du lieu","description":"Description visuelle du lieu"}
+  ],
+  "arc": "Structure narrative en 3 actes (début, milieu, fin)",
+  "visualStyle": "Description du style visuel constant (palette, lumière, ambiance)"
+}
+
+RÈGLE ABSOLUE : Réponds UNIQUEMENT en JSON valide.`;
+    const raw=await callTextAPI([{role:'system',content:'Tu réponds UNIQUEMENT en JSON valide.'},{role:'user',content:prompt}],{temperature:0.7,maxTokens:3000});
+    let data;try{data=JSON.parse(raw.replace(/\`\`\`json/g,'').replace(/\`\`\`/g,'').trim());}catch(e){const m=raw.match(/\{[\s\S]*\}/);if(m)data=JSON.parse(m[0]);else throw new Error('JSON invalide');}
+    return data;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION DE SCÈNES
+// ══════════════════════════════════════════════════════════════════
+async function generateSceneScripts(startNum,count){
+    const bible=state.storyBible;
+    const charList=state.characters.map(c=>c.name+' ('+c.gender+'): '+c.appearance).join('\n');
+    const locList=state.locations.map(l=>l.name+': '+l.description).join('\n');
+    const doneScenes=state.scenes.filter(s=>s.status==='done');
+    const lastNarr=doneScenes.length>0?doneScenes[doneScenes.length-1].narration||'':'';
+
+    const prompt=`Tu es un scénariste. Continue l'écriture des scènes de ce film.
+
+TITRE : ${bible.title||state.currentProject.title}
+LOGLINE : ${bible.logline||state.currentProject.idea}
+GENRE : ${state.currentProject.genre}
+ARC NARRATIF : ${bible.arc||'linéaire'}
+
+PERSONNAGES (DOIVENT rester identiques dans toutes les scènes) :
+${charList||'Aucun personnage défini'}
+
+LIEUX :
+${locList||'Aucun lieu défini'}
+
+RÉSUMÉ NARRATIF JUSQU'ICI :
+${state.narrativeSummary||'Début du film.'}
+
+DERNIÈRE SCÈNE :
+${lastNarr||'Aucune scène précédente.'}
+
+Génère EXACTEMENT ${count} nouvelle(s) scène(s) à partir du numéro ${startNum}.
+Chaque scène doit être UNE AVANCÉE narrative.
+
+JSON :
+{
+  "scenes": [
+    {
+      "numero": ${startNum},
+      "narration": "Texte de narration en français (max 30 mots)",
+      "description_visuelle": "Description visuelle détaillée de ce qu'on voit",
+      "plan": "Large|Rapproché|Moyen|Général|Gros plan|Aérien",
+      "mouvement_camera": "Statique|Panoramique|Tilt|Travelling|Zoom|Grue|Steadicam",
+      "image_prompt": "PROMPT EN ANGLAIS pour l'image de départ (scène, personnages, lieu, style)",
+      "image_prompt_end": "PROMPT EN ANGLAIS pour l'image de fin (même scène, léger mouvement)",
+      "video_prompt": "PROMPT EN ANGLAIS pour la vidéo (mouvement caméra, action)",
+      "narrative_link": "Lien avec la scène précédente",
+      "characters_in_scene": ["Nom1","Nom2"],
+      "location": "Nom du lieu"
+    }
+  ]
+}
+
+IMPORTANT : Utilise EXACTEMENT les descriptions physiques des personnages telles que définies dans la bible.
+RÈGLE ABSOLUE : Réponds UNIQUEMENT en JSON valide.`;
+
+    const raw=await callTextAPI([{role:'system',content:'Tu réponds UNIQUEMENT en JSON valide.'},{role:'user',content:prompt}],{temperature:0.75,maxTokens:4000});
+    let data;try{data=JSON.parse(raw.replace(/\`\`\`json/g,'').replace(/\`\`\`/g,'').trim());}catch(e){const m=raw.match(/\{[\s\S]*\}/);if(m)data=JSON.parse(m[0]);else throw new Error('JSON invalide');}
+    return data.scenes||[];
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CONSTRUCTION DES PROMPTS
+// ══════════════════════════════════════════════════════════════════
+function buildImagePrompt(scene,moment,noHumans){
+    const bible=state.storyBible||{};
+    const charDesc=state.characters.map(c=>c.name+' ('+c.gender+'): '+c.appearance).join('. ');
+    const style=bible.visualStyle||'cinematic realistic style';
+    const noHumansRule=noHumans?'NO human characters. Objects, landscapes, machines only.':'';
+    const base=scene.image_prompt||scene.description_visuelle||'';
+    const endRule=moment==='end'?'Same scene continued, subtle movement, camera slightly advanced.':'';
+    return [base,'STYLE: '+style,'CHARACTERS (MUST match exactly): '+charDesc,'Location: '+(scene.location||''),noHumansRule,endRule,'Format: '+state.format+', cinematic documentary realism, natural lighting, subtle film grain, no text, no watermark.'].filter(Boolean).join('. ');
+}
+
+function buildVideoPrompt(scene,noHumans){
+    const bible=state.storyBible||{};
+    const style=bible.visualStyle||'cinematic realistic style';
+    const noHumansRule=noHumans?'NO human characters.':'';
+    return [scene.video_prompt||scene.description_visuelle||'','Camera: '+(scene.mouvement_camera||'slow tracking shot'),'Style: '+style,noHumansRule,'ONE CONTINUOUS SHOT. NO CUTS.','Maintain character appearance exactly as in reference.','No text, no watermark, no style drift.'].filter(Boolean).join('. ');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RÉSUMÉ NARRATIF
+// ══════════════════════════════════════════════════════════════════
+async function updateNarrativeSummary(){
+    const doneScenes=state.scenes.filter(s=>s.status==='done').sort((a,b)=>(a.numero||0)-(b.numero||0));
+    if(doneScenes.length===0)return'';
+    const scenesText=doneScenes.map(s=>'Scène '+s.numero+': '+(s.narration||s.description_visuelle||'')).join('\n');
+    const prompt=`Résume en 3 phrases maximum l'histoire de ce film à partir de ces scènes :
+
+${scenesText}
+
+Le résumé doit mentionner : les personnages principaux, les lieux, et les événements clés.
+Réponds UNIQUEMENT par le résumé, sans introduction.`;
+    try{
+        const raw=await callTextAPI([{role:'user',content:prompt}],{temperature:0.5,maxTokens:300});
+        return raw.trim().slice(0,500);
+    }catch(e){return scenesText.slice(0,300);}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LECTEUR SÉQUENTIEL
+// ══════════════════════════════════════════════════════════════════
+function playAll(){
+    const ready=state.scenes.filter(s=>s.status==='done'&&s.videoUrl).sort((a,b)=>(a.numero||0)-(b.numero||0));
+    if(!ready.length){toast('Aucune vidéo prête','warn');return;}
+    state.isPlayingSequence=true;state.playerIndex=0;
+    document.getElementById('player-section').classList.add('open');
+    document.getElementById('play-all-btn').textContent='⏸ Lecture…';
+    document.getElementById('play-all-btn').classList.add('playing');
+    playAt(0);
+}
+function playAt(idx){
+    const ready=state.scenes.filter(s=>s.status==='done'&&s.videoUrl).sort((a,b)=>(a.numero||0)-(b.numero||0));
+    if(idx>=ready.length||!state.isPlayingSequence){state.isPlayingSequence=false;document.getElementById('play-all-btn').textContent='▶ Lire tout';document.getElementById('play-all-btn').classList.remove('playing');return;}
+    const v=document.getElementById('player-video');const sc=ready[idx];
+    v.src=sc.videoUrl;v.currentTime=0;v.play().catch(()=>{});
+    document.getElementById('player-info').textContent='Scène '+(sc.numero||idx+1)+' / '+ready.length;
+    document.getElementById('player-progress').style.width=((idx+1)/ready.length*100)+'%';
+    if(sc.narration&&document.getElementById('tts-toggle').checked)setTimeout(()=>speakText(sc.narration),500);
+    v.onended=()=>{if(state.isPlayingSequence)setTimeout(()=>playAt(idx+1),300);};
+}
+function stopAll(){
+    state.isPlayingSequence=false;
+    const v=document.getElementById('player-video');v.pause();v.currentTime=0;
+    stopSpeech();document.getElementById('play-all-btn').textContent='▶ Lire tout';document.getElementById('play-all-btn').classList.remove('playing');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TTS
+// ══════════════════════════════════════════════════════════════════
+let speechSynth=null;
+function initSpeech(){if('speechSynthesis' in window){speechSynth=window.speechSynthesis;speechSynth.getVoices();}}
+function speakText(text){if(!speechSynth)return;speechSynth.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';u.rate=0.9;u.pitch=0.9;const voices=speechSynth.getVoices();const fr=voices.filter(x=>x.lang&&x.lang.startsWith('fr'));if(fr.length)u.voice=fr[0];speechSynth.speak(u);},100);}
+function stopSpeech(){if(speechSynth)speechSynth.cancel();}
+
+// ══════════════════════════════════════════════════════════════════
+// SONS
+// ══════════════════════════════════════════════════════════════════
+function playNotificationSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;o.type='sine';g.gain.setValueAtTime(0.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);o.start();o.stop(ctx.currentTime+0.5);}catch(e){}}
+
+// ══════════════════════════════════════════════════════════════════
+// WAKE LOCK
+// ══════════════════════════════════════════════════════════════════
+let wakeLock=null;let canvasStream=null;
+async function activateWakeLock(){if('wakeLock' in navigator){try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}}if(!wakeLock){try{const cv=document.getElementById('noSleepCanvas');const vid=document.getElementById('noSleepVideo');const ctx=cv.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,2,2);canvasStream=cv.captureStream(1);vid.srcObject=canvasStream;vid.play().catch(()=>{});}catch(e){}}}
+async function deactivateWakeLock(){if(wakeLock){try{await wakeLock.release();}catch(e){}wakeLock=null;}if(canvasStream){try{canvasStream.getTracks().forEach(t=>t.stop());}catch(e){}canvasStream=null;}}
+
+// ══════════════════════════════════════════════════════════════════
+// EXPORT
+// ══════════════════════════════════════════════════════════════════
+function exportTxt(){
+    const p=state.currentProject;const scenes=state.scenes.sort((a,b)=>(a.numero||0)-(b.numero||0));
+    let t='═══════════════════════════════════════\n';
+    t+='CINÉMÉMOIRE — '+p.title+'\n═══════════════════════════════════════\n\n';
+    t+='IDÉE : '+p.idea+'\nGENRE : '+p.genre+'\n\n';
+    if(state.storyBible)t+='BIBLE :\n'+JSON.stringify(state.storyBible,null,2)+'\n\n';
+    if(state.characters.length)t+='PERSONNAGES :\n'+state.characters.map(c=>c.name+' ('+c.gender+') : '+c.appearance).join('\n')+'\n\n';
+    if(state.locations.length)t+='LIEUX :\n'+state.locations.map(l=>l.name+' : '+l.description).join('\n')+'\n\n';
+    t+='RÉSUMÉ NARRATIF :\n'+state.narrativeSummary+'\n\n';
+    t+='SCÈNES :\n';
+    scenes.forEach(s=>{t+='── SCÈNE '+s.numero+' ('+s.status+') ──\n';t+='Narration : '+(s.narration||'')+'\n';t+='Plan : '+(s.plan||'')+' | Caméra : '+(s.mouvement_camera||'')+'\n';if(s.videoUrl)t+='Vidéo : '+s.videoUrl+'\n';t+='\n';});
+    downloadTxt('cinememoire-'+p.title.replace(/\s+/g,'-').slice(0,40)+'.txt',t);
+    toast('TXT exporté !','success');
+}
+function downloadTxt(name,content){const blob=new Blob([content],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
+function exportJson(){copyToClipboard(JSON.stringify({project:state.currentProject,scenes:state.scenes,characters:state.characters,locations:state.locations,storyBible:state.storyBible},null,2));}
+function copyToClipboard(txt){if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>toast('Copié !','success')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copié !','success');});}}
+
+// ══════════════════════════════════════════════════════════════════
+// SUPPRESSION PROJET
+// ══════════════════════════════════════════════════════════════════
+async function deleteCurrentProject(){
+    if(!state.currentProject)return;
+    if(!confirm('Supprimer définitivement ce projet et toutes ses scènes ?'))return;
+    const pid=state.currentProject.id;
+    const scenes=await dbGetAll('scenes','projectId',pid);
+    const chars=await dbGetAll('characters','projectId',pid);
+    const locs=await dbGetAll('locations','projectId',pid);
+    for(const s of scenes)await dbDelete('scenes',s.id);
+    for(const c of chars)await dbDelete('characters',c.id);
+    for(const l of locs)await dbDelete('locations',l.id);
+    await dbDelete('projects',pid);
+    state.currentProject=null;state.scenes=[];state.characters=[];state.locations=[];
+    state.storyBible=null;state.narrativeSummary='';
+    document.getElementById('params-panel').style.display='none';
+    document.getElementById('memory-panel').style.display='none';
+    document.getElementById('actions-row').style.display='none';
+    document.getElementById('export-row').style.display='none';
+    document.getElementById('results-container').innerHTML='';
+    await loadProjects();
+    log('Projet supprimé','warn');toast('Projet supprimé','warn');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(async function init(){
+    try{
+        await openDB();
+        log('Base de données IndexedDB ouverte','success');
+    }catch(e){log('Erreur IndexedDB : '+e.message,'error');toast('Erreur de stockage','error');}
+
+    initSpeech();
+    try{const s=localStorage.getItem('cinememoire_speed');if(s)state.measuredSpeed=JSON.parse(s);}catch(e){}
+
+    // API
+    document.getElementById('api-save-btn').addEventListener('click',()=>{
+        const i=document.getElementById('api-key-input');const k=i.value.trim();
+        if(!k){localStorage.removeItem('cinememoire_key');updateApiStatus();toast('Clé supprimée','warn');return;}
+        localStorage.setItem('cinememoire_key',k);updateApiStatus();toast('Clé enregistrée ✓','success');i.blur();
+    });
+    document.getElementById('api-key-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('api-save-btn').click();}});
+
+    // Projets
+    document.getElementById('new-project-btn').addEventListener('click',()=>{document.getElementById('new-project-field').classList.toggle('hidden');});
+    document.getElementById('create-project-btn').addEventListener('click',createProject);
+
+    // Génération
+    document.getElementById('generate-btn').addEventListener('click',generateNextScenes);
+    document.getElementById('stop-btn').addEventListener('click',()=>{state.stopRequested=true;log('Arrêt demandé','warn');setStatus('Arrêt…');});
+
+    // Export
+    document.getElementById('export-txt-btn').addEventListener('click',exportTxt);
+    document.getElementById('export-json-btn').addEventListener('click',exportJson);
+    document.getElementById('delete-project-btn').addEventListener('click',deleteCurrentProject);
+
+    updateApiStatus();
+    await loadProjects();
+    updateCounters();
+    log('CinéMémoire prêt — créez un projet pour commencer.','info');
+})();
+
+function updateApiStatus(){
+    const s=document.getElementById('api-status');const t=document.getElementById('api-status-text');const k=getApiKey();
+    if(k){s.classList.add('ok');t.textContent='Clé active · '+k.slice(0,8)+'…';document.getElementById('api-key-input').value=k;}
+    else{s.classList.remove('ok');t.textContent='Aucune clé';document.getElementById('api-key-input').value='';}
+}
+</script>
+
+</body>
+</html>
