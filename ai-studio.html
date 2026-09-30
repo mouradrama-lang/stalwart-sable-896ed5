@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Créateur IA — Cinéma & Animation</title>
+<title>Créateur IA — Cinéma & Animation · v2</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -19,127 +19,68 @@
         max-width: 1000px; margin: 0 auto;
     }
     header { margin-bottom: 1.5rem; text-align: center; }
-    h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.3rem;
+    h1 { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.3rem;
          background: linear-gradient(135deg, #e94560, #4a6cf7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { font-size: 0.85rem; color: var(--ink-dim); }
+    .subtitle { font-size: 0.82rem; color: var(--ink-dim); }
 
-    .toast {
-        position: fixed; top: 1.5rem; left: 50%;
-        transform: translateX(-50%) translateY(-100px);
-        background: var(--panel); color: var(--ink);
-        padding: 0.85rem 1.4rem; border-radius: 10px;
-        font-size: 0.85rem; font-weight: 500;
-        box-shadow: 0 4px 30px rgba(0,0,0,0.5);
-        border: 1px solid var(--border);
-        z-index: 1000; opacity: 0;
-        transition: transform 0.35s ease, opacity 0.35s ease;
-        max-width: 90vw; text-align: center;
-        display: flex; align-items: center; gap: 0.5rem;
-    }
+    .toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--panel); color: var(--ink); padding: 0.85rem 1.4rem; border-radius: 10px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 4px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); z-index: 1000; opacity: 0; transition: transform 0.35s ease, opacity 0.35s ease; max-width: 90vw; text-align: center; display: flex; align-items: center; gap: 0.5rem; }
     .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
     .toast.success { border-color: var(--success); }
     .toast.error { border-color: var(--error); }
     .toast.warn { border-color: var(--warn); }
 
-    .section {
-        background: var(--panel); border: 1px solid var(--border);
-        border-radius: var(--radius); margin-bottom: 1rem;
-        overflow: hidden;
-    }
-    .section-header {
-        padding: 1rem 1.2rem; cursor: pointer; user-select: none;
-        display: flex; justify-content: space-between; align-items: center;
-    }
+    .section { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+    .section-header { padding: 1rem 1.2rem; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
     .section-header:active { background: var(--panel-2); }
-    .section-title {
-        font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
-        color: var(--ink-dim); font-weight: 700;
-    }
-    .section-title .badge {
-        display: inline-block; margin-left: 0.5rem; padding: 0.15rem 0.5rem;
-        background: var(--accent); color: #fff; border-radius: 10px;
-        font-size: 0.65rem; letter-spacing: 0;
-    }
+    .section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-dim); font-weight: 700; }
+    .section-title .badge { display: inline-block; margin-left: 0.5rem; padding: 0.15rem 0.5rem; background: var(--accent); color: #fff; border-radius: 10px; font-size: 0.65rem; letter-spacing: 0; }
     .section-title .badge.soft { background: var(--info); }
     .section-title .badge.count { background: var(--success); }
-    .section-header .chevron {
-        font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s;
-    }
+    .section-title .badge.saved { background: var(--success); animation: pulse 1.8s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s; }
     .section.open .section-header .chevron { transform: rotate(180deg); }
     .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
     .section.open .section-body { max-height: 10000px; }
     .section-content { padding: 0 1.2rem 1.2rem; }
 
-    .api-panel {
-        background: var(--panel); border: 1px solid var(--border);
-        border-radius: var(--radius); padding: 1rem 1.2rem;
-        margin-bottom: 1rem;
-    }
-    .api-key-input {
-        width: 100%; padding: 0.85rem 1rem;
-        border-radius: 8px; border: 1px solid var(--border);
-        background: var(--bg); color: var(--ink);
-        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-        font-size: 0.85rem; margin-bottom: 0.6rem;
-    }
+    .project-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .project-bar input { flex: 1; min-width: 140px; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.85rem; }
+    .project-bar input:focus { outline: none; border-color: var(--accent); }
+    .project-bar button { padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .project-bar button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .project-bar button.session-active { background: linear-gradient(135deg, #2d8a4e, #1a5a30); color: #fff; border-color: #2d8a4e; }
+
+    .autosave-banner { background: linear-gradient(135deg, #1a2e1a, #122a4a); border: 1px solid var(--success); border-radius: var(--radius); padding: 0.85rem 1rem; margin-bottom: 1rem; display: none; }
+    .autosave-banner.visible { display: block; animation: fadeIn 0.4s ease; }
+    .autosave-banner .as-title { color: var(--success); font-weight: 700; margin-bottom: 0.3rem; font-size: 0.82rem; }
+    .autosave-banner .as-info { color: var(--ink-dim); font-size: 0.72rem; line-height: 1.5; }
+    .autosave-banner .as-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap; }
+    .autosave-banner .as-actions button { padding: 0.45rem 0.85rem; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+    .autosave-banner .as-actions button.primary { background: var(--success); color: #fff; border-color: var(--success); }
+    .autosave-banner .as-actions button.danger { border-color: var(--error); color: var(--error); }
+
+    .api-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
+    .api-key-input { width: 100%; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: ui-monospace, monospace; font-size: 0.85rem; margin-bottom: 0.6rem; }
     .api-key-input:focus { outline: none; border-color: var(--accent); }
-    .api-save-btn {
-        width: 100%; padding: 0.8rem 1.2rem;
-        border-radius: 8px; border: none;
-        background: var(--accent); color: #fff;
-        font-size: 0.9rem; font-weight: 700; font-family: inherit;
-        cursor: pointer; transition: opacity 0.2s;
-        margin-bottom: 0.6rem;
-    }
-    .api-save-btn:active { opacity: 0.7; }
-    .api-status-line {
-        font-size: 0.75rem; padding: 0.55rem 0.85rem;
-        border-radius: 6px; display: flex; align-items: center; gap: 0.5rem;
-        background: var(--panel-2); color: var(--ink-dim);
-    }
+    .api-save-btn { width: 100%; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 0.6rem; }
+    .api-status-line { font-size: 0.75rem; padding: 0.55rem 0.85rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem; background: var(--panel-2); color: var(--ink-dim); }
     .api-status-line.ok { background: #1a2e1a; color: var(--success); }
-    .status-dot {
-        width: 8px; height: 8px; border-radius: 50%;
-        background: var(--ink-faint); flex-shrink: 0;
-    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
     .api-status-line.ok .status-dot { background: var(--success); }
 
-    textarea, input[type="text"] {
-        width: 100%; padding: 0.85rem 1rem; border-radius: 8px;
-        border: 1px solid var(--border); background: var(--bg);
-        color: var(--ink); font-family: inherit; font-size: 0.9rem;
-        resize: vertical;
-    }
+    textarea, input[type="text"] { width: 100%; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.9rem; resize: vertical; }
     textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); }
     textarea { min-height: 100px; line-height: 1.5; }
 
     .control-row { margin-bottom: 0.9rem; }
-    .control-label {
-        display: block; font-size: 0.72rem; color: var(--ink-dim);
-        margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em;
-        font-weight: 700;
-    }
-    select {
-        width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px;
-        border: 1px solid var(--border); background: var(--bg);
-        color: var(--ink); font-family: inherit; font-size: 0.88rem;
-        -webkit-appearance: none; appearance: none;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238888a0' d='M0 0l5 6 5-6z'/></svg>");
-        background-repeat: no-repeat;
-        background-position: right 0.9rem center;
-        background-size: 10px;
-    }
+    .control-label { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .control-hint { font-size: 0.68rem; color: var(--ink-faint); margin-top: 0.3rem; font-style: italic; }
+    select { width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.88rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238888a0' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 10px; }
     select:focus { outline: none; border-color: var(--accent); }
 
-    .mode-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 0.5rem; margin-top: 0.5rem;
-    }
-    .mode-card {
-        padding: 0.8rem; border-radius: 8px;
-        border: 1px solid var(--border); background: var(--panel-2);
-        cursor: pointer; transition: all 0.15s; text-align: center;
-    }
+    .mode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+    .mode-card { padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; transition: all 0.15s; text-align: center; }
     .mode-card:active { transform: scale(0.97); }
     .mode-card.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
     .mode-card .mode-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
@@ -147,15 +88,8 @@
     .mode-card .mode-desc { font-size: 0.62rem; color: var(--ink-dim); margin-top: 0.2rem; }
     .mode-card.selected .mode-desc { color: rgba(255,255,255,0.8); }
 
-    .style-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 0.5rem; margin-top: 0.5rem;
-    }
-    .style-card {
-        padding: 0.7rem 0.8rem; border-radius: 8px;
-        border: 1px solid var(--border); background: var(--panel-2);
-        cursor: pointer; transition: all 0.15s; text-align: center;
-    }
+    .style-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+    .style-card { padding: 0.7rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; transition: all 0.15s; text-align: center; }
     .style-card:active { transform: scale(0.97); }
     .style-card.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
     .style-card .style-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
@@ -163,58 +97,26 @@
     .style-card .style-cat { font-size: 0.58rem; color: var(--ink-faint); margin-top: 0.15rem; text-transform: uppercase; letter-spacing: 0.05em; }
     .style-card.selected .style-cat { color: rgba(255,255,255,0.7); }
 
-    .btn-primary {
-        width: 100%; padding: 1.1rem; border-radius: var(--radius);
-        border: none; background: linear-gradient(135deg, #e94560, #4a6cf7);
-        color: #fff; font-size: 1rem; font-weight: 700; font-family: inherit;
-        cursor: pointer; transition: opacity 0.2s, transform 0.1s;
-        margin-bottom: 1rem;
-    }
+    .btn-primary { width: 100%; padding: 1.1rem; border-radius: var(--radius); border: none; background: linear-gradient(135deg, #e94560, #4a6cf7); color: #fff; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; }
     .btn-primary:active:not(:disabled) { transform: scale(0.98); }
     .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
 
-    .btn-stop {
-        width: 100%; padding: 0.8rem; border-radius: var(--radius);
-        border: 1px solid var(--error); background: transparent;
-        color: var(--error); font-size: 0.85rem; font-weight: 700;
-        font-family: inherit; cursor: pointer; margin-bottom: 1rem;
-        display: none;
-    }
+    .btn-stop { width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid var(--error); background: transparent; color: var(--error); font-size: 0.85rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; display: none; }
     .btn-stop.visible { display: block; }
 
-    .limits-panel {
-        background: var(--panel); border: 1px solid var(--border);
-        border-radius: var(--radius); padding: 1rem 1.2rem;
-        margin-bottom: 1rem;
-    }
-    .limits-panel h3 {
-        font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
-        color: var(--ink-dim); margin-bottom: 0.7rem; font-weight: 700;
-    }
-    .limit-row {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 0.4rem 0; font-size: 0.78rem;
-        border-bottom: 1px solid var(--border);
-    }
+    .limits-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
+    .limits-panel h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); margin-bottom: 0.7rem; font-weight: 700; }
+    .limit-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; font-size: 0.78rem; border-bottom: 1px solid var(--border); }
     .limit-row:last-child { border-bottom: none; }
     .limit-label { color: var(--ink-dim); }
     .limit-value { font-family: ui-monospace, monospace; color: var(--ink); font-weight: 600; }
-    .limit-bar {
-        width: 80px; height: 6px; background: var(--panel-2);
-        border-radius: 3px; overflow: hidden; margin-left: 0.5rem; display: inline-block; vertical-align: middle;
-    }
+    .limit-bar { width: 80px; height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden; margin-left: 0.5rem; display: inline-block; vertical-align: middle; }
     .limit-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; display: block; }
     .limit-bar-fill.ok { background: var(--success); }
     .limit-bar-fill.warn { background: var(--warn); }
     .limit-bar-fill.danger { background: var(--error); }
 
-    .console-panel {
-        background: #0a0a0e; border: 1px solid var(--border);
-        border-radius: var(--radius); padding: 0.8rem 1rem;
-        margin-bottom: 1rem; max-height: 300px; overflow-y: auto;
-        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-        font-size: 0.72rem; line-height: 1.6;
-    }
+    .console-panel { background: #0a0a0e; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; max-height: 300px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 0.72rem; line-height: 1.6; }
     .console-panel .log-line { padding: 0.15rem 0; }
     .console-panel .log-time { color: var(--ink-faint); margin-right: 0.5rem; }
     .console-panel .log-info { color: var(--info); }
@@ -224,176 +126,53 @@
     .console-panel .log-text { color: var(--ink); }
     .console-panel .log-heartbeat { color: #8a8aff; }
     .console-panel .log-measure { color: #ffb84d; font-weight: 700; }
+    .console-panel .log-autosave { color: #a8e0a8; font-weight: 700; }
 
-    .scenario-display {
-        background: var(--panel-2); border-radius: 8px;
-        padding: 1rem; margin-bottom: 1rem;
-    }
+    .scenario-display { background: var(--panel-2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
     .scenario-display h3 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
-    .scenario-display .scene-item {
-        padding: 0.6rem 0.8rem; border-left: 3px solid var(--info);
-        margin-bottom: 0.4rem; background: var(--panel);
-        border-radius: 0 6px 6px 0; font-size: 0.8rem;
-    }
-    .scenario-display .scene-item .scene-num {
-        font-weight: 700; color: var(--info); margin-right: 0.3rem;
-    }
+    .scenario-display .scene-item { padding: 0.6rem 0.8rem; border-left: 3px solid var(--info); margin-bottom: 0.4rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.8rem; }
+    .scenario-display .scene-item .scene-num { font-weight: 700; color: var(--info); margin-right: 0.3rem; }
 
-    .generated-images {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 0.5rem; margin-bottom: 1rem;
-    }
-    .gen-image-card {
-        border-radius: 8px; overflow: hidden;
-        border: 1px solid var(--border); background: var(--panel-2);
-        animation: fadeIn 0.4s ease;
-    }
+    .generated-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
+    .gen-image-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.4s ease; }
     .gen-image-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
-    .gen-image-card .gen-label {
-        padding: 0.3rem 0.5rem; font-size: 0.65rem;
-        color: var(--ink-dim); text-align: center;
-    }
+    .gen-image-card .gen-label { padding: 0.3rem 0.5rem; font-size: 0.65rem; color: var(--ink-dim); text-align: center; }
+    .gen-image-card.start-frame { border-color: var(--info); }
+    .gen-image-card.end-frame { border-color: var(--warn); }
 
-    .generated-videos {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 0.8rem; margin-bottom: 1rem;
-    }
-    .gen-video-card {
-        border-radius: 8px; overflow: hidden;
-        border: 1px solid var(--border); background: var(--panel-2);
-        animation: fadeIn 0.5s ease;
-    }
-    .gen-video-card.newly-added {
-        border-color: var(--success);
-        box-shadow: 0 0 16px rgba(45,138,78,0.5);
-        animation: successPulse 1.5s ease;
-    }
-    .gen-video-card video {
-        width: 100%; aspect-ratio: 9/16; object-fit: cover;
-        display: block; background: #000;
-    }
-    .gen-video-card .gen-label {
-        padding: 0.4rem 0.5rem; font-size: 0.68rem;
-        color: var(--ink); text-align: center;
-        background: var(--panel);
-        border-top: 1px solid var(--border);
-        font-weight: 600;
-    }
-    .gen-video-card .gen-dialogue {
-        padding: 0.4rem 0.6rem; font-size: 0.68rem;
-        color: var(--accent); font-style: italic;
-        background: var(--panel);
-        border-top: 1px solid var(--border);
-    }
-    .gen-video-card .gen-timing {
-        padding: 0.35rem 0.5rem; font-size: 0.65rem;
-        color: var(--warn); text-align: center;
-        background: var(--panel);
-        border-top: 1px solid var(--border);
-        font-family: ui-monospace, monospace;
-    }
+    .generated-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
+    .gen-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.5s ease; }
+    .gen-video-card.newly-added { border-color: var(--success); box-shadow: 0 0 16px rgba(45,138,78,0.5); animation: successPulse 1.5s ease; }
+    .gen-video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #000; }
+    .gen-video-card .gen-label { padding: 0.4rem 0.5rem; font-size: 0.68rem; color: var(--ink); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-weight: 600; }
+    .gen-video-card .gen-dialogue { padding: 0.4rem 0.6rem; font-size: 0.68rem; color: var(--accent); font-style: italic; background: var(--panel); border-top: 1px solid var(--border); }
+    .gen-video-card .gen-timing { padding: 0.35rem 0.5rem; font-size: 0.65rem; color: var(--warn); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-family: ui-monospace, monospace; }
 
-    .pending-video-card {
-        border-radius: 8px; overflow: hidden;
-        border: 1px solid var(--border); background: var(--panel-2);
-        padding: 1rem 0.8rem;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        min-height: 300px; text-align: center;
-        transition: border-color 0.3s;
-    }
-    .pending-video-card .pending-spinner {
-        width: 40px; height: 40px;
-        border: 3px solid var(--border);
-        border-top-color: var(--accent);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
-    }
-    .pending-video-card .pending-label {
-        font-size: 0.85rem; color: var(--ink); font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    .pending-video-card .pending-progress-text {
-        font-size: 0.72rem; color: var(--ink-dim);
-        font-family: ui-monospace, monospace;
-        margin-bottom: 0.6rem;
-    }
-    .pending-video-card .pending-eta {
-        font-size: 0.7rem; color: var(--warn);
-        font-weight: 600; margin-bottom: 0.8rem;
-    }
-    .pending-video-card .pending-progress-bar {
-        width: 100%; height: 8px;
-        background: var(--bg); border-radius: 4px;
-        overflow: hidden;
-    }
-    .pending-video-card .pending-progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #e94560, #4a6cf7);
-        border-radius: 4px;
-        transition: width 0.5s ease;
-        width: 0%;
-    }
-    .pending-video-card.measuring {
-        border-color: var(--info);
-    }
-    .pending-video-card.measuring .pending-spinner {
-        border-top-color: var(--info);
-    }
+    .pending-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center; }
+    .pending-video-card .pending-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+    .pending-video-card .pending-label { font-size: 0.85rem; color: var(--ink); font-weight: 700; margin-bottom: 0.5rem; }
+    .pending-video-card .pending-progress-text { font-size: 0.72rem; color: var(--ink-dim); font-family: ui-monospace, monospace; margin-bottom: 0.6rem; }
+    .pending-video-card .pending-eta { font-size: 0.7rem; color: var(--warn); font-weight: 600; margin-bottom: 0.8rem; }
+    .pending-video-card .pending-progress-bar { width: 100%; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+    .pending-video-card .pending-progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #4a6cf7); border-radius: 4px; transition: width 0.5s ease; width: 0%; }
+    .pending-video-card.measuring { border-color: var(--info); }
+    .pending-video-card.measuring .pending-spinner { border-top-color: var(--info); }
 
-    .video-player-container {
-        background: #000; border-radius: var(--radius);
-        overflow: hidden; margin-bottom: 1rem;
-    }
-    .video-player-container video {
-        width: 100%; display: block; max-height: 70vh;
-        object-fit: contain; background: #000;
-    }
-    .player-controls {
-        display: flex; gap: 0.5rem; padding: 0.7rem;
-        background: var(--panel); flex-wrap: wrap;
-    }
-    .player-controls button {
-        flex: 1; min-width: 80px; padding: 0.6rem 0.8rem;
-        border-radius: 8px; border: 1px solid var(--border);
-        background: var(--panel-2); color: var(--ink);
-        font-family: inherit; font-size: 0.75rem; font-weight: 700;
-        cursor: pointer;
-    }
-    .player-controls button:active { background: var(--border); }
+    .video-player-container { background: #000; border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+    .video-player-container video { width: 100%; display: block; max-height: 70vh; object-fit: contain; background: #000; }
+    .player-controls { display: flex; gap: 0.5rem; padding: 0.7rem; background: var(--panel); flex-wrap: wrap; }
+    .player-controls button { flex: 1; min-width: 80px; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
     .player-controls button.playing { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    .progress-bar {
-        height: 4px; background: var(--panel-2); border-radius: 2px;
-        overflow: hidden; margin-top: 0.5rem;
-    }
-    .progress-bar-fill {
-        height: 100%; background: linear-gradient(90deg, #e94560, #4a6cf7);
-        border-radius: 2px; transition: width 0.3s;
-    }
+    .progress-bar { height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #e94560, #4a6cf7); border-radius: 2px; transition: width 0.3s; }
 
-    .status-bar {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        background: var(--panel); border-top: 1px solid var(--border);
-        color: var(--ink); padding: 0.8rem 1.2rem;
-        font-size: 0.78rem; display: flex; align-items: center; gap: 0.6rem;
-        transform: translateY(100%); transition: transform 0.3s;
-        z-index: 100;
-    }
+    .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--border); color: var(--ink); padding: 0.8rem 1.2rem; font-size: 0.78rem; display: flex; align-items: center; gap: 0.6rem; transform: translateY(100%); transition: transform 0.3s; z-index: 100; }
     .status-bar.visible { transform: translateY(0); }
-    .spinner {
-        width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2);
-        border-top-color: var(--accent); border-radius: 50%;
-        animation: spin 0.8s linear infinite; flex-shrink: 0;
-    }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes successPulse {
-        0% { box-shadow: 0 0 0 rgba(45,138,78,0); }
-        50% { box-shadow: 0 0 24px rgba(45,138,78,0.7); }
-        100% { box-shadow: 0 0 16px rgba(45,138,78,0.5); }
-    }
+    @keyframes successPulse { 0% { box-shadow: 0 0 0 rgba(45,138,78,0); } 50% { box-shadow: 0 0 24px rgba(45,138,78,0.7); } 100% { box-shadow: 0 0 16px rgba(45,138,78,0.5); } }
     .hidden { display: none !important; }
 
     #noSleepCanvas { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
@@ -404,17 +183,31 @@
 
 <header>
     <h1>Créateur IA — Cinéma & Animation</h1>
-    <p class="subtitle">30 genres · 36 styles visuels · Du texte à l'écran</p>
+    <p class="subtitle">30 genres · 39 styles · Sauvegarde automatique activée</p>
 </header>
 
-<div class="api-panel" id="api-panel">
-    <input type="password" class="api-key-input" id="api-key-input"
-           placeholder="Collez votre clé API ici (sk-...)" autocomplete="off" spellcheck="false">
-    <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
-    <div class="api-status-line" id="api-status-line">
-        <span class="status-dot"></span>
-        <span id="api-status-text">Aucune clé API enregistrée</span>
+<div class="project-bar">
+    <input type="text" id="project-name" placeholder="Nom du projet..." value="Mon projet">
+    <button type="button" id="save-project-btn" class="primary">💾 Sauvegarder</button>
+    <button type="button" id="load-project-btn">📂 Charger</button>
+    <button type="button" id="session-btn">🔓 Session</button>
+    <button type="button" id="new-project-btn">✨ Nouveau</button>
+</div>
+
+<div class="autosave-banner" id="autosave-banner">
+    <div class="as-title">💾 Session restaurée automatiquement</div>
+    <div class="as-info" id="autosave-info"></div>
+    <div class="as-actions">
+        <button type="button" id="dismiss-autosave-btn" class="primary">✓ Continuer</button>
+        <button type="button" id="save-as-project-btn">💾 Sauvegarder comme projet</button>
+        <button type="button" id="clear-autosave-btn" class="danger">🗑️ Effacer la session</button>
     </div>
+</div>
+
+<div class="api-panel" id="api-panel">
+    <input type="password" class="api-key-input" id="api-key-input" placeholder="Collez votre clé API ici (sk-...)" autocomplete="off" spellcheck="false">
+    <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+    <div class="api-status-line" id="api-status-line"><span class="status-dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
 </div>
 
 <div class="limits-panel" id="limits-panel">
@@ -424,13 +217,11 @@
     <div class="limit-row"><span class="limit-label">Vidéo (secondes)</span><span class="limit-value"><span id="limit-video-count">0</span>s<span class="limit-bar"><span class="limit-bar-fill ok" id="limit-video-bar" style="width:0%"></span></span></span></div>
     <div class="limit-row"><span class="limit-label">Vidéo RPM (gratuit : 1/min)</span><span class="limit-value"><span id="limit-video-rpm">0</span>/1</span></div>
     <div class="limit-row"><span class="limit-label">⚡ Vitesse mesurée</span><span class="limit-value"><span id="limit-measured-speed">en attente</span></span></div>
+    <div class="limit-row"><span class="limit-label">💾 Sauvegarde auto</span><span class="limit-value" id="autosave-status">inactive</span></div>
 </div>
 
 <div class="section open" id="section-mode">
-    <div class="section-header" data-toggle="section-mode">
-        <span class="section-title">🎯 Genre / Mode de création <span class="badge">essentiel</span></span>
-        <span class="chevron">▼</span>
-    </div>
+    <div class="section-header" data-toggle="section-mode"><span class="section-title">🎯 Genre / Mode de création <span class="badge">essentiel</span></span><span class="chevron">▼</span></div>
     <div class="section-body"><div class="section-content">
         <div class="mode-grid" id="mode-grid"></div>
         <div style="font-size:0.72rem;color:var(--ink-dim);margin-top:0.6rem;" id="mode-description">Choisissez un genre pour adapter le scénario et les visuels.</div>
@@ -438,44 +229,35 @@
 </div>
 
 <div class="section open" id="section-idea">
-    <div class="section-header" data-toggle="section-idea">
-        <span class="section-title">💡 Votre idée <span class="badge">obligatoire</span></span>
-        <span class="chevron">▼</span>
-    </div>
+    <div class="section-header" data-toggle="section-idea"><span class="section-title">💡 Votre idée <span class="badge">obligatoire</span></span><span class="chevron">▼</span></div>
     <div class="section-body"><div class="section-content">
         <textarea id="idea-input" placeholder="Décrivez ce que vous voulez créer..."></textarea>
     </div></div>
 </div>
 
 <div class="section open" id="section-style">
-    <div class="section-header" data-toggle="section-style">
-        <span class="section-title">🎨 Style visuel <span class="badge soft">choisissez-en un</span> <span class="badge count" id="style-count-badge">36</span></span>
-        <span class="chevron">▼</span>
-    </div>
+    <div class="section-header" data-toggle="section-style"><span class="section-title">🎨 Style visuel <span class="badge soft">choisissez-en un</span> <span class="badge count" id="style-count-badge">39</span></span><span class="chevron">▼</span></div>
     <div class="section-body"><div class="section-content">
-        <div style="font-size:0.72rem;color:var(--ink-dim);margin-bottom:0.6rem;">
-            🎞️ <strong>Cinéma :</strong> ARRI, Hyperréaliste, Teal&Orange, Kodak, Technicolor, Bleach, Blade Runner, Tarantino...<br>
-            🎬 <strong>Cinéastes :</strong> Nolan, Villeneuve, Fincher, Kubrick, Coen, Refn, Malick, A24<br>
-            🎨 <strong>Animation :</strong> Ghibli, Pixar, Anime, Aquarelle, Claymation...
-        </div>
+        <div style="font-size:0.72rem;color:var(--ink-dim);margin-bottom:0.6rem;">🎞️ Cinéma · 🎬 Cinéastes · 🎨 Animation</div>
         <div class="style-grid" id="style-grid"></div>
     </div></div>
 </div>
 
 <div class="section" id="section-tech">
-    <div class="section-header" data-toggle="section-tech">
-        <span class="section-title">📷 Paramètres techniques</span>
-        <span class="chevron">▼</span>
-    </div>
+    <div class="section-header" data-toggle="section-tech"><span class="section-title">📷 Paramètres techniques</span><span class="chevron">▼</span></div>
     <div class="section-body"><div class="section-content">
         <div class="control-row">
-            <label class="control-label">Nombre de scènes</label>
-            <select id="scene-count-select">
-                <option value="3">3 scènes (court)</option>
-                <option value="5" selected>5 scènes (recommandé)</option>
-                <option value="8">8 scènes (long)</option>
-                <option value="12">12 scènes (moyen-métrage)</option>
+            <label class="control-label">🎬 Nombre de clips à générer</label>
+            <select id="clip-count-select">
+                <option value="3">3 clips</option>
+                <option value="4">4 clips</option>
+                <option value="5" selected>5 clips (recommandé)</option>
+                <option value="6">6 clips</option>
+                <option value="8">8 clips (long)</option>
+                <option value="10">10 clips</option>
+                <option value="12">12 clips</option>
             </select>
+            <div class="control-hint">💡 2 images-clés générées par scène pour produire exactement le nombre de clips demandé.</div>
         </div>
         <div class="control-row">
             <label class="control-label">Durée par clip</label>
@@ -488,8 +270,8 @@
         <div class="control-row">
             <label class="control-label">Format d'image</label>
             <select id="aspect-select">
-                <option value="portrait">Portrait 9:16 (mobile / Shorts / Reels)</option>
-                <option value="landscape" selected>Paysage 16:9 (cinéma / TV)</option>
+                <option value="portrait">Portrait 9:16 (mobile)</option>
+                <option value="landscape" selected>Paysage 16:9 (cinéma)</option>
                 <option value="square">Carré 1:1 (réseaux)</option>
             </select>
         </div>
@@ -500,7 +282,7 @@
 <button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
 
 <div class="console-panel" id="console-panel">
-    <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">En attente...</span></div>
+    <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">Initialisation...</span></div>
 </div>
 
 <div class="section hidden" id="section-scenario">
@@ -509,7 +291,7 @@
 </div>
 
 <div class="section hidden" id="section-images">
-    <div class="section-header" data-toggle="section-images"><span class="section-title">🖼️ Images générées <span class="badge count" id="images-badge">0</span></span><span class="chevron">▼</span></div>
+    <div class="section-header" data-toggle="section-images"><span class="section-title">🖼️ Images-clés (2 par clip) <span class="badge count" id="images-badge">0</span></span><span class="chevron">▼</span></div>
     <div class="section-body"><div class="section-content"><div class="generated-images" id="generated-images"></div></div></div>
 </div>
 
@@ -527,7 +309,7 @@
             <button type="button" id="stop-all-btn">⏹ Arrêter</button>
         </div>
         <div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div>
-        <div style="font-size:0.75rem;color:var(--ink-dim);margin-top:0.5rem;text-align:center;" id="player-info">Scène 1 / 5</div>
+        <div style="font-size:0.75rem;color:var(--ink-dim);margin-top:0.5rem;text-align:center;" id="player-info">Clip 1 / 5</div>
     </div></div>
 </div>
 
@@ -546,207 +328,103 @@ const MODEL_TEXT = 'agnes-2.5-flash';
 const MODEL_IMAGE = 'agnes-image-2.5-flash';
 const MODEL_VIDEO = 'agnes-video-v2.0';
 
-const CREATE_INTERVAL_MS = 62000;
 const INITIAL_WAIT_SECONDS = 105;
 const POLL_INTERVAL_SECONDS = 5;
 const SAFETY_MARGIN = 1.10;
-
 const LIMITS = { textRpm: 30, imagesPerDay: 4000, videoSecondsPerDay: 500, videoRpm: 1 };
+
+// ═══ CLÉS DE STOCKAGE ═══
+const AUTOSAVE_KEY = 'agnes_crea_autosave_v1';
+const PROJECTS_KEY = 'agnes_crea_projects_v1';
+const AUTOSAVE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 jours
 
 let counters = { textRequests: 0, imagesGenerated: 0, videoSeconds: 0, videoRequestsThisMinute: 0, lastVideoRequestTime: 0, lastResetTime: Date.now() };
 let measuredSpeed = { value: null, usedForEstimate: null, sampleCount: 0 };
 
-function loadMeasuredSpeed() { try { const raw = localStorage.getItem('agnes_measured_speed'); if (raw) measuredSpeed = JSON.parse(raw); } catch (e) {} }
+function loadMeasuredSpeed() { try { const r = localStorage.getItem('agnes_measured_speed'); if (r) measuredSpeed = JSON.parse(r); } catch (e) {} }
 function saveMeasuredSpeed() { try { localStorage.setItem('agnes_measured_speed', JSON.stringify(measuredSpeed)); } catch (e) {} }
 function updateMeasuredSpeedDisplay() { const el = document.getElementById('limit-measured-speed'); if (!el) return; el.textContent = measuredSpeed.value === null ? 'en attente' : Math.round(measuredSpeed.value) + 's réel / ' + Math.round(measuredSpeed.usedForEstimate) + 's estimé'; }
 function getEstimatedWaitSeconds() { return measuredSpeed.usedForEstimate !== null ? measuredSpeed.usedForEstimate : INITIAL_WAIT_SECONDS; }
 
 // ══════════════════════════════════════════════════════════════════
-// GENRES / MODES DE CRÉATION — 30 entrées (cinéma + animation + formats)
+// MODES (30) — inchangés
 // ══════════════════════════════════════════════════════════════════
 const MODES = [
-    // ─── Formats narratifs génériques ───
-    { id: 'film', name: 'Film narratif', emoji: '🎬', desc: 'Long métrage narratif',
-      scenario: 'Crée un scénario de film narratif avec un arc dramatique complet : introduction, conflit, climax, résolution.',
-      visual: 'cinematic composition, dramatic lighting, film grain' },
-    { id: 'court-metrage', name: 'Court-métrage', emoji: '🎥', desc: 'Format court cinéma',
-      scenario: 'Crée un court-métrage percutant en 3-5 scènes maximum. Un seul concept, une seule émotion, une chute forte.',
-      visual: 'arthouse cinematography, striking compositions, naturalistic acting' },
-    { id: 'bande-annonce', name: 'Bande-annonce', emoji: '📽️', desc: 'Teaser percutant',
-      scenario: 'Crée une bande-annonce : accroche forte, plans courts alternés, montée en tension, carton final.',
-      visual: 'trailer style, high contrast, dramatic transitions' },
-    { id: 'clip', name: 'Clip musical', emoji: '🎵', desc: 'Vidéo sur une chanson',
-      scenario: 'Crée un clip musical synchronisé sur une chanson. Alterne plans larges et gros plans, mouvements fluides.',
-      visual: 'music video aesthetic, rhythmic cutting, stylish lighting' },
-    { id: 'pub', name: 'Publicité', emoji: '📢', desc: 'Spot publicitaire',
-      scenario: 'Crée une publicité : problème, produit solution, call-to-action clair.',
-      visual: 'commercial product photography, clean composition, bright lighting' },
-    { id: 'tutoriel', name: 'Tutoriel', emoji: '📚', desc: 'Éducatif étape par étape',
-      scenario: 'Crée un tutoriel éducatif : intro, étapes numérotées, récap.',
-      visual: 'clean educational illustration, infographic style' },
-    { id: 'story', name: 'Story / Reel', emoji: '📱', desc: 'Format vertical court',
-      scenario: 'Crée une story verticale captivante en 3-5 plans. Chaque seconde compte.',
-      visual: 'vertical social media format, bold colors, dynamic angles' },
-    { id: 'doc', name: 'Documentaire', emoji: '📖', desc: 'Narration informative',
-      scenario: 'Crée un court documentaire : narration posée, plans larges contemplatifs, informations factuelles.',
-      visual: 'documentary photography, natural lighting, wide shots' },
-
-    // ─── Genres cinématographiques ───
-    { id: 'western', name: 'Western', emoji: '🤠', desc: 'Western classique ou spaghetti',
-      scenario: 'Crée un western : paysage désertique, duel, silence tendu, regards qui parlent, solitude du héros. Utilise le rythme lent et les cadrages larges.',
-      visual: 'western cinematography, Monument Valley, wide vistas, harsh sunlight, dusty atmosphere' },
-    { id: 'polar', name: 'Polar / Néo-noir', emoji: '🕵️', desc: 'Enquête sombre et pluvieuse',
-      scenario: 'Crée un polar : crime, enquête, ville nocturne sous la pluie, détective fatigué, corruption, morale ambiguë.',
-      visual: 'neo-noir cinematography, rain-soaked streets, neon reflections, high contrast, moody atmosphere' },
-    { id: 'thriller', name: 'Thriller psychologique', emoji: '🧠', desc: 'Tension et manipulation',
-      scenario: 'Crée un thriller psychologique : un protagoniste dont la perception est fragilisée, un doute constant, une révélation finale qui reconfigure tout.',
-      visual: 'psychological thriller aesthetic, unstable framing, cold color grade, unsettling compositions' },
-    { id: 'scifi', name: 'Science-fiction', emoji: '🚀', desc: 'Futur, espace, IA',
-      scenario: 'Crée une séquence de science-fiction : un concept scientifique, un questionnement philosophique, un univers visuel cohérent et novateur.',
-      visual: 'science-fiction cinematography, sleek futuristic design, volumetric light, cool tones' },
-    { id: 'fantasy', name: 'Fantasy / Heroic fantasy', emoji: '🐉', desc: 'Mondes magiques et quêtes',
-      scenario: 'Crée une séquence de fantasy : quête, prophétie, créature mythique, monde enchanté, choix héroïque.',
-      visual: 'epic fantasy cinematography, sweeping landscapes, magical light, rich textures' },
-    { id: 'guerre', name: 'Film de guerre', emoji: '💥', desc: 'Combat et fraternité',
-      scenario: 'Crée une séquence de film de guerre : camaraderie, peur, sacrifice, bruit des combats, boue et sueur.',
-      visual: 'war film cinematography, desaturated palette, handheld camera, dust and smoke' },
-    { id: 'espionnage', name: 'Espionnage', emoji: '🕶️', desc: 'Agents secrets et complots',
-      scenario: 'Crée une séquence d\'espionnage : mission secrète, identité double, gadgets, trahison, tension géopolitique.',
-      visual: 'spy thriller cinematography, sleek modern settings, cool tones, sharp cuts' },
-    { id: 'historique', name: 'Historique / Péplum', emoji: '🏛️', desc: 'Époques révolues',
-      scenario: 'Crée une séquence historique : reconstitution minutieuse d\'une époque (Antiquité, Moyen Âge, XIXe, etc.), personnages réels ou fictifs, enjeux de l\'époque.',
-      visual: 'historical film cinematography, period-accurate production design, warm torchlight, rich costumes' },
-    { id: 'biopic', name: 'Biopic', emoji: '👤', desc: 'Vie d\'une figure réelle',
-      scenario: 'Crée une séquence de biopic : moments-clés de la vie d\'une figure réelle, fragilité humaine, sacrifice, accomplissement.',
-      visual: 'biographical film aesthetic, intimate framing, natural lighting, period details' },
-    { id: 'romance', name: 'Romance', emoji: '💕', desc: 'Histoire d\'amour',
-      scenario: 'Crée une séquence romantique : rencontre, tension amoureuse, gestes retenus, aveu ou rupture, émotion à fleur de peau.',
-      visual: 'romantic cinematography, warm golden hour, soft focus, intimate framing' },
-    { id: 'drame', name: 'Drame social', emoji: '🎭', desc: 'Réalisme social',
-      scenario: 'Crée une séquence de drame social : milieu modeste, conflit de classe, dignité, injustice, espoir fragile.',
-      visual: 'social drama cinematography, naturalistic lighting, handheld camera, muted palette' },
-    { id: 'comedie-noire', name: 'Comédie noire', emoji: '😈', desc: 'Humour grinçant',
-      scenario: 'Crée une séquence de comédie noire : situation absurde, personnages cyniques, morale renversée, humour décalé.',
-      visual: 'dark comedy aesthetic, ironic framing, saturated colors, deadpan composition' },
-    { id: 'road-movie', name: 'Road movie', emoji: '🚗', desc: 'Voyage initiatique',
-      scenario: 'Crée une séquence de road movie : route infinie, rencontres fortuites, paysages qui défilent, transformation intérieure.',
-      visual: 'road movie cinematography, wide landscapes, natural light, long traveling shots' },
-    { id: 'catastrophe', name: 'Film catastrophe', emoji: '🌪️', desc: 'Désastres et survie',
-      scenario: 'Crée une séquence catastrophe : cataclysme en cours, panique collective, survie, choix déchirants.',
-      visual: 'disaster film cinematography, epic scale, dramatic destruction, dust and debris' },
-    { id: 'super-heros', name: 'Super-héros', emoji: '🦸', desc: 'Pouvoirs et responsabilités',
-      scenario: 'Crée une séquence de super-héros : origine du pouvoir, dilemme moral, combat spectaculaire, sacrifice personnel.',
-      visual: 'superhero cinematography, epic scale, dynamic action, cinematic color grading' },
-    { id: 'arts-martiaux', name: 'Arts martiaux', emoji: '🥋', desc: 'Kung-fu et chorégraphies',
-      scenario: 'Crée une séquence d\'arts martiaux : entraînement, affrontement chorégraphié, sagesse du maître, dépassement de soi.',
-      visual: 'martial arts cinematography, dynamic fights, wire work, precise choreography' },
-    { id: 'musical', name: 'Film musical', emoji: '🎼', desc: 'Chant et danse',
-      scenario: 'Crée une séquence de comédie musicale : numéro chanté, chorégraphie, émotion portée par la musique.',
-      visual: 'musical cinematography, theatrical staging, saturated colors, elaborate choreography' },
-    { id: 'found-footage', name: 'Found footage', emoji: '📼', desc: 'Faux film amateur',
-      scenario: 'Crée une séquence en found footage : caméra amateur, point de vue subjectif, événements inexpliqués, montage brut.',
-      visual: 'found footage aesthetic, handheld shaky camera, VHS grain, amateur look' },
-    { id: 'mockumentary', name: 'Mockumentaire', emoji: '🎤', desc: 'Faux documentaire humoristique',
-      scenario: 'Crée une séquence de mockumentaire : fausse interview, personnages décalés, ton sérieux pour contenu absurde.',
-      visual: 'mockumentary style, talking heads, handheld camera, awkward framing' },
-    { id: 'experimental', name: 'Expérimental / Surréaliste', emoji: '🌀', desc: 'Formes libres',
-      scenario: 'Crée une séquence expérimentale : narration non-linéaire, images oniriques, symboles, rupture des codes.',
-      visual: 'experimental film aesthetic, surreal imagery, unconventional framing, dream logic' },
-    { id: 'noir-ba', name: 'Noir et blanc (cinéma)', emoji: '⚫', desc: 'Cinéma classique N&B',
-      scenario: 'Crée une séquence en noir et blanc cinématographique : éclairage contrasté, cadrages classiques, émotion intemporelle.',
-      visual: 'black and white cinematography, high contrast, classic Hollywood lighting, film grain' },
-    { id: 'animation-generique', name: 'Animation (générique)', emoji: '🎨', desc: 'Dessin animé classique',
-      scenario: 'Crée un scénario d\'animation : personnages stylisés, univers visuel cohérent, ton adapté à l\'animation.',
-      visual: 'animated film aesthetic, stylized characters, consistent visual universe' }
+    { id: 'film', name: 'Film narratif', emoji: '🎬', desc: 'Long métrage narratif', scenario: 'Crée un scénario de film narratif avec un arc dramatique complet : introduction, conflit, climax, résolution.', visual: 'cinematic composition, dramatic lighting, film grain' },
+    { id: 'court-metrage', name: 'Court-métrage', emoji: '🎥', desc: 'Format court cinéma', scenario: 'Crée un court-métrage percutant. Un seul concept, une seule émotion, une chute forte.', visual: 'arthouse cinematography, striking compositions, naturalistic acting' },
+    { id: 'bande-annonce', name: 'Bande-annonce', emoji: '📽️', desc: 'Teaser percutant', scenario: 'Crée une bande-annonce : accroche forte, plans courts alternés, montée en tension, carton final.', visual: 'trailer style, high contrast, dramatic transitions' },
+    { id: 'clip', name: 'Clip musical', emoji: '🎵', desc: 'Vidéo sur une chanson', scenario: 'Crée un clip musical synchronisé sur une chanson. Alterne plans larges et gros plans.', visual: 'music video aesthetic, rhythmic cutting, stylish lighting' },
+    { id: 'pub', name: 'Publicité', emoji: '📢', desc: 'Spot publicitaire', scenario: 'Crée une publicité : problème, produit solution, call-to-action clair.', visual: 'commercial product photography, clean composition, bright lighting' },
+    { id: 'tutoriel', name: 'Tutoriel', emoji: '📚', desc: 'Éducatif étape par étape', scenario: 'Crée un tutoriel éducatif : intro, étapes numérotées, récap.', visual: 'clean educational illustration, infographic style' },
+    { id: 'story', name: 'Story / Reel', emoji: '📱', desc: 'Format vertical court', scenario: 'Crée une story verticale captivante.', visual: 'vertical social media format, bold colors, dynamic angles' },
+    { id: 'doc', name: 'Documentaire', emoji: '📖', desc: 'Narration informative', scenario: 'Crée un court documentaire : narration posée, plans larges contemplatifs, informations factuelles.', visual: 'documentary photography, natural lighting, wide shots' },
+    { id: 'western', name: 'Western', emoji: '🤠', desc: 'Western classique', scenario: 'Crée un western : désert, duel, silence tendu, solitude du héros.', visual: 'western cinematography, Monument Valley, wide vistas, harsh sunlight' },
+    { id: 'polar', name: 'Polar / Néo-noir', emoji: '🕵️', desc: 'Enquête sombre', scenario: 'Crée un polar : crime, enquête, ville nocturne sous la pluie, morale ambiguë.', visual: 'neo-noir cinematography, rain-soaked streets, neon reflections' },
+    { id: 'thriller', name: 'Thriller psychologique', emoji: '🧠', desc: 'Tension et manipulation', scenario: 'Crée un thriller psychologique : perception fragilisée, doute, révélation finale.', visual: 'psychological thriller aesthetic, unstable framing, cold color grade' },
+    { id: 'scifi', name: 'Science-fiction', emoji: '🚀', desc: 'Futur, espace, IA', scenario: 'Crée une séquence de SF : concept scientifique, questionnement philosophique.', visual: 'science-fiction cinematography, sleek futuristic design, volumetric light' },
+    { id: 'fantasy', name: 'Fantasy', emoji: '🐉', desc: 'Mondes magiques', scenario: 'Crée une séquence de fantasy : quête, prophétie, créature mythique.', visual: 'epic fantasy cinematography, sweeping landscapes, magical light' },
+    { id: 'guerre', name: 'Film de guerre', emoji: '💥', desc: 'Combat et fraternité', scenario: 'Crée une séquence de guerre : camaraderie, peur, sacrifice, boue et sueur.', visual: 'war film cinematography, desaturated palette, handheld camera' },
+    { id: 'espionnage', name: 'Espionnage', emoji: '🕶️', desc: 'Agents secrets', scenario: 'Crée une séquence d\'espionnage : mission secrète, identité double, trahison.', visual: 'spy thriller cinematography, sleek modern settings, cool tones' },
+    { id: 'historique', name: 'Historique / Péplum', emoji: '🏛️', desc: 'Époques révolues', scenario: 'Crée une séquence historique : reconstitution minutieuse d\'une époque.', visual: 'historical film cinematography, period-accurate design, warm torchlight' },
+    { id: 'biopic', name: 'Biopic', emoji: '👤', desc: 'Vie d\'une figure réelle', scenario: 'Crée une séquence de biopic : moments-clés d\'une vie, fragilité humaine.', visual: 'biographical film aesthetic, intimate framing, natural lighting' },
+    { id: 'romance', name: 'Romance', emoji: '💕', desc: 'Histoire d\'amour', scenario: 'Crée une séquence romantique : rencontre, tension amoureuse, gestes retenus.', visual: 'romantic cinematography, warm golden hour, soft focus' },
+    { id: 'drame', name: 'Drame social', emoji: '🎭', desc: 'Réalisme social', scenario: 'Crée une séquence de drame social : milieu modeste, conflit de classe, dignité.', visual: 'social drama cinematography, naturalistic lighting, handheld camera' },
+    { id: 'comedie-noire', name: 'Comédie noire', emoji: '😈', desc: 'Humour grinçant', scenario: 'Crée une séquence de comédie noire : situation absurde, morale renversée.', visual: 'dark comedy aesthetic, ironic framing, saturated colors' },
+    { id: 'road-movie', name: 'Road movie', emoji: '🚗', desc: 'Voyage initiatique', scenario: 'Crée une séquence de road movie : route infinie, rencontres fortuites.', visual: 'road movie cinematography, wide landscapes, natural light' },
+    { id: 'catastrophe', name: 'Film catastrophe', emoji: '🌪️', desc: 'Désastres et survie', scenario: 'Crée une séquence catastrophe : cataclysme, panique collective, survie.', visual: 'disaster film cinematography, epic scale, dramatic destruction' },
+    { id: 'super-heros', name: 'Super-héros', emoji: '🦸', desc: 'Pouvoirs et responsabilités', scenario: 'Crée une séquence de super-héros : origine du pouvoir, dilemme moral.', visual: 'superhero cinematography, epic scale, dynamic action' },
+    { id: 'arts-martiaux', name: 'Arts martiaux', emoji: '🥋', desc: 'Kung-fu et chorégraphies', scenario: 'Crée une séquence d\'arts martiaux : entraînement, affrontement, sagesse.', visual: 'martial arts cinematography, dynamic fights, wire work' },
+    { id: 'musical', name: 'Film musical', emoji: '🎼', desc: 'Chant et danse', scenario: 'Crée une séquence de comédie musicale : numéro chanté, chorégraphie.', visual: 'musical cinematography, theatrical staging, saturated colors' },
+    { id: 'found-footage', name: 'Found footage', emoji: '📼', desc: 'Faux film amateur', scenario: 'Crée une séquence en found footage : caméra amateur, événements inexpliqués.', visual: 'found footage aesthetic, handheld shaky camera, VHS grain' },
+    { id: 'mockumentary', name: 'Mockumentaire', emoji: '🎤', desc: 'Faux documentaire', scenario: 'Crée une séquence de mockumentaire : fausse interview, personnages décalés.', visual: 'mockumentary style, talking heads, handheld camera' },
+    { id: 'experimental', name: 'Expérimental', emoji: '🌀', desc: 'Formes libres', scenario: 'Crée une séquence expérimentale : narration non-linéaire, images oniriques.', visual: 'experimental film aesthetic, surreal imagery, dream logic' },
+    { id: 'noir-ba', name: 'Noir et blanc', emoji: '⚫', desc: 'Cinéma classique N&B', scenario: 'Crée une séquence en noir et blanc : éclairage contrasté, cadrages classiques.', visual: 'black and white cinematography, high contrast, classic Hollywood lighting' },
+    { id: 'animation-generique', name: 'Animation', emoji: '🎨', desc: 'Dessin animé classique', scenario: 'Crée un scénario d\'animation : personnages stylisés, univers visuel cohérent.', visual: 'animated film aesthetic, stylized characters, consistent visual universe' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
-// STYLES VISUELS — 36 entrées (cinéma + cinéastes + animation)
+// STYLES (39) — inchangés
 // ══════════════════════════════════════════════════════════════════
 const STYLES = [
-    // ─── Cinéma — Rendu général ───
-    { id: 'arri', name: 'ARRI Alexa Cinéma', emoji: '🎞️', cat: 'Cinéma',
-      prompt: 'Shot on ARRI Alexa, cinematic cinematography, filmic dynamic range, subtle film grain, natural color science, high-end cinema look' },
-    { id: 'hyperrealiste', name: 'Hyperréaliste', emoji: '📷', cat: 'Cinéma',
-      prompt: 'Hyperrealistic photography, ultra-detailed, 8K resolution, natural lighting, physical accuracy, no stylization' },
-    { id: 'teal-orange', name: 'Teal & Orange', emoji: '🎬', cat: 'Cinéma',
-      prompt: 'Blockbuster color grading, teal shadows and orange skin tones, cinematic contrast, high production value' },
-    { id: 'kodak-portra', name: 'Kodak Portra', emoji: '📸', cat: 'Cinéma',
-      prompt: 'Shot on Kodak Portra film stock, warm natural skin tones, soft pastel palette, analog film look' },
-    { id: 'technicolor', name: 'Technicolor 50s', emoji: '🎨', cat: 'Cinéma',
-      prompt: 'Classic 1950s Technicolor, oversaturated reds and greens, studio lighting, glossy Hollywood aesthetic' },
-    { id: 'noir-bw', name: 'Noir & Blanc 40s', emoji: '🖤', cat: 'Cinéma',
-      prompt: 'Classic 1940s black and white cinematography, hard shadows, venetian blind lighting, deep contrast, film noir' },
-    { id: 'bleach-bypass', name: 'Bleach Bypass', emoji: '⚔️', cat: 'Cinéma',
-      prompt: 'Bleach bypass film look, desaturated colors, harsh contrast, war film aesthetic, gritty texture' },
-    { id: 'blade-runner', name: 'Blade Runner Néon', emoji: '🌃', cat: 'Cinéma',
-      prompt: 'Blade Runner 2049 aesthetic, neon orange and cyan lighting, fog, futuristic cityscape, cinematic haze' },
-    { id: 'western-spaghetti', name: 'Western Spaghetti', emoji: '🌵', cat: 'Cinéma',
-      prompt: 'Spaghetti western aesthetic, wide desert vistas, harsh noon sun, dusty atmosphere, extreme close-ups on eyes' },
-    { id: 'nouvelle-vague', name: 'Nouvelle Vague', emoji: '🗼', cat: 'Cinéma',
-      prompt: 'French New Wave cinematography, handheld camera, natural light, jump cuts, casual compositions, 1960s Parisian mood' },
-    { id: 'dogme95', name: 'Dogme 95', emoji: '📽️', cat: 'Cinéma',
-      prompt: 'Dogme 95 style, natural light only, handheld camera, raw unpolished look, documentary realism' },
-    { id: 'found-footage-style', name: 'Found Footage', emoji: '📹', cat: 'Cinéma',
-      prompt: 'Found footage aesthetic, amateur camcorder look, shaky handheld, VHS scan lines, timestamp corner, raw on-location feel' },
-    { id: 'expressionnisme', name: 'Expressionnisme', emoji: '🌑', cat: 'Cinéma',
-      prompt: 'German Expressionism, distorted angles, painted shadows on walls, stark black and white, unsettling compositions' },
-    { id: 'surrealiste', name: 'Surréaliste', emoji: '🌀', cat: 'Cinéma',
-      prompt: 'Surrealist film aesthetic, dreamlike imagery, impossible objects, symbolic mise-en-scène, Buñuel-Dalí influence' },
-    { id: 'a24', name: 'A24 Indie', emoji: '🅰️', cat: 'Cinéma',
-      prompt: 'A24 indie film aesthetic, muted color palette, naturalistic lighting, atmospheric dread, contemplative framing' },
-
-    // ─── Cinéastes ───
-    { id: 'nolan', name: 'Christopher Nolan', emoji: '⏱️', cat: 'Cinéaste',
-      prompt: 'Christopher Nolan style, IMAX-scale cinematography, cool color palette, practical effects, intricate composition, Hans Zimmer mood' },
-    { id: 'villeneuve', name: 'Denis Villeneuve', emoji: '🏜️', cat: 'Cinéaste',
-      prompt: 'Denis Villeneuve style, minimalist epic framing, oppressive scale, muted palette, slow-burn atmosphere, Roger Deakins lighting' },
-    { id: 'fincher', name: 'David Fincher', emoji: '🎯', cat: 'Cinéaste',
-      prompt: 'David Fincher style, precise symmetrical compositions, cool green-yellow palette, low-key lighting, meticulous framing' },
-    { id: 'tarantino', name: 'Quentin Tarantino', emoji: '🩸', cat: 'Cinéaste',
-      prompt: 'Quentin Tarantino style, bold saturated colors, long takes, retro references, stylized violence, 1970s exploitation aesthetic' },
-    { id: 'kubrick', name: 'Stanley Kubrick', emoji: '🔷', cat: 'Cinéaste',
-      prompt: 'Stanley Kubrick style, perfect one-point perspective symmetry, wide angle lenses, cold clinical lighting, unsettling stillness' },
-    { id: 'coen', name: 'Coen Brothers', emoji: '🌾', cat: 'Cinéaste',
-      prompt: 'Coen Brothers style, deadpan framing, wide-angle compositions, warm dusty palette, precise production design, ironic tone' },
-    { id: 'refn', name: 'Nicolas Winding Refn', emoji: '🌆', cat: 'Cinéaste',
-      prompt: 'Nicolas Winding Refn style, neon saturated palette (pink/blue), hypnotic slow pacing, minimal dialogue, symbolic imagery' },
-    { id: 'malick', name: 'Terrence Malick', emoji: '🌾', cat: 'Cinéaste',
-      prompt: 'Terrence Malick style, magic hour golden light, handheld drifting camera, whispered voice-over, poetic nature imagery' },
-
-    // ─── Animation — Rendu ───
-    { id: 'ghibli', name: 'Studio Ghibli', emoji: '🌿', cat: 'Animation',
-      prompt: 'Studio Ghibli anime style, Hayao Miyazaki aesthetic, hand-painted watercolor backgrounds, warm soft lighting' },
-    { id: 'pixar', name: 'Pixar 3D', emoji: '✨', cat: 'Animation',
-      prompt: 'High-quality 3D computer animation, Pixar-style rendering, cinematic lighting, subsurface scattering' },
-    { id: 'disney-renaissance', name: 'Disney Renaissance', emoji: '🏰', cat: 'Animation',
-      prompt: 'Disney Renaissance 2D animation style, expressive characters, musical staging, rich painted backgrounds, warm palette' },
-    { id: 'anime', name: 'Anime', emoji: '⚡', cat: 'Animation',
-      prompt: 'Japanese anime style, cel shading, vibrant colors, expressive eyes, dynamic action lines' },
-    { id: 'manga-nb', name: 'Manga N&B', emoji: '🖤', cat: 'Animation',
-      prompt: 'Black and white Japanese manga style, stark ink outlines, dramatic screentones, dynamic composition' },
-    { id: 'simpson', name: 'Les Simpson', emoji: '🍩', cat: 'Animation',
-      prompt: 'The Simpsons cartoon style, yellow-skinned characters, thick black outlines, flat saturated colors' },
-    { id: 'south-park', name: 'South Park', emoji: '🏔️', cat: 'Animation',
-      prompt: 'South Park animation style, simple geometric character shapes, flat colors, thick outlines' },
-    { id: 'watercolor', name: 'Aquarelle', emoji: '🎨', cat: 'Animation',
-      prompt: 'Dreamy watercolor painting aesthetic, soft bleeding edges, visible paper texture, delicate washes' },
-    { id: 'oil', name: 'Huile classique', emoji: '🖼️', cat: 'Animation',
-      prompt: 'Classical oil painting style, visible impasto brushstrokes, old master technique, rich chiaroscuro' },
-    { id: 'claymation', name: 'Claymation', emoji: '🧱', cat: 'Animation',
-      prompt: 'Claymation stop-motion animation, plasticine texture, fingerprint details, tactile quality' },
-    { id: 'cyberpunk-anim', name: 'Cyberpunk Anime', emoji: '🌃', cat: 'Animation',
-      prompt: 'Cyberpunk anime aesthetic, neon pink and cyan lighting, rain-soaked Tokyo streets, 90s OVA style' },
-    { id: 'wes', name: 'Wes Anderson', emoji: '🏨', cat: 'Animation',
-      prompt: 'Wes Anderson style, symmetrical framing, pastel color palette, centered composition, flat lay aesthetic' },
-    { id: 'retro-80s', name: 'Rétro 80s', emoji: '📼', cat: 'Animation',
-      prompt: '1980s retro aesthetic, VHS grain, neon colors, synthwave atmosphere, chromatic aberration' },
-    { id: 'gouache', name: 'Gouache', emoji: '🖌️', cat: 'Animation',
-      prompt: 'Gouache illustration style, opaque matte colors, textured brushwork, children book illustration feel' },
-    { id: 'low-poly', name: 'Low Poly 3D', emoji: '💎', cat: 'Animation',
-      prompt: 'Low poly 3D aesthetic, faceted geometry, minimal textures, stylized shading, indie game look' },
-    { id: 'pixel-art', name: 'Pixel Art', emoji: '👾', cat: 'Animation',
-      prompt: 'Pixel art aesthetic, 16-bit retro game style, limited palette, sharp pixel edges, dithering' }
+    { id: 'arri', name: 'ARRI Alexa Cinéma', emoji: '🎞️', cat: 'Cinéma', prompt: 'Shot on ARRI Alexa, cinematic cinematography, filmic dynamic range, subtle film grain, natural color science' },
+    { id: 'hyperrealiste', name: 'Hyperréaliste', emoji: '📷', cat: 'Cinéma', prompt: 'Hyperrealistic photography, ultra-detailed, 8K resolution, natural lighting, physical accuracy' },
+    { id: 'teal-orange', name: 'Teal & Orange', emoji: '🎬', cat: 'Cinéma', prompt: 'Blockbuster color grading, teal shadows and orange skin tones, cinematic contrast' },
+    { id: 'kodak-portra', name: 'Kodak Portra', emoji: '📸', cat: 'Cinéma', prompt: 'Shot on Kodak Portra film stock, warm natural skin tones, soft pastel palette, analog film look' },
+    { id: 'technicolor', name: 'Technicolor 50s', emoji: '🎨', cat: 'Cinéma', prompt: 'Classic 1950s Technicolor, oversaturated reds and greens, studio lighting, glossy Hollywood' },
+    { id: 'noir-bw', name: 'Noir & Blanc 40s', emoji: '🖤', cat: 'Cinéma', prompt: 'Classic 1940s black and white cinematography, hard shadows, venetian blind lighting, film noir' },
+    { id: 'bleach-bypass', name: 'Bleach Bypass', emoji: '⚔️', cat: 'Cinéma', prompt: 'Bleach bypass film look, desaturated colors, harsh contrast, war film aesthetic' },
+    { id: 'blade-runner', name: 'Blade Runner Néon', emoji: '🌃', cat: 'Cinéma', prompt: 'Blade Runner 2049 aesthetic, neon orange and cyan lighting, fog, futuristic cityscape' },
+    { id: 'western-spaghetti', name: 'Western Spaghetti', emoji: '🌵', cat: 'Cinéma', prompt: 'Spaghetti western aesthetic, wide desert vistas, harsh noon sun, dusty atmosphere' },
+    { id: 'nouvelle-vague', name: 'Nouvelle Vague', emoji: '🗼', cat: 'Cinéma', prompt: 'French New Wave cinematography, handheld camera, natural light, jump cuts, 1960s Parisian mood' },
+    { id: 'dogme95', name: 'Dogme 95', emoji: '📽️', cat: 'Cinéma', prompt: 'Dogme 95 style, natural light only, handheld camera, raw unpolished look' },
+    { id: 'found-footage-style', name: 'Found Footage', emoji: '📹', cat: 'Cinéma', prompt: 'Found footage aesthetic, amateur camcorder look, shaky handheld, VHS scan lines' },
+    { id: 'expressionnisme', name: 'Expressionnisme', emoji: '🌑', cat: 'Cinéma', prompt: 'German Expressionism, distorted angles, painted shadows on walls, stark black and white' },
+    { id: 'surrealiste', name: 'Surréaliste', emoji: '🌀', cat: 'Cinéma', prompt: 'Surrealist film aesthetic, dreamlike imagery, impossible objects, Buñuel-Dalí influence' },
+    { id: 'a24', name: 'A24 Indie', emoji: '🅰️', cat: 'Cinéma', prompt: 'A24 indie film aesthetic, muted color palette, naturalistic lighting, atmospheric dread' },
+    { id: 'nolan', name: 'Christopher Nolan', emoji: '⏱️', cat: 'Cinéaste', prompt: 'Christopher Nolan style, IMAX-scale cinematography, cool color palette, practical effects' },
+    { id: 'villeneuve', name: 'Denis Villeneuve', emoji: '🏜️', cat: 'Cinéaste', prompt: 'Denis Villeneuve style, minimalist epic framing, oppressive scale, Roger Deakins lighting' },
+    { id: 'fincher', name: 'David Fincher', emoji: '🎯', cat: 'Cinéaste', prompt: 'David Fincher style, precise symmetrical compositions, cool green-yellow palette, low-key lighting' },
+    { id: 'tarantino', name: 'Quentin Tarantino', emoji: '🩸', cat: 'Cinéaste', prompt: 'Quentin Tarantino style, bold saturated colors, long takes, retro references, 1970s exploitation aesthetic' },
+    { id: 'kubrick', name: 'Stanley Kubrick', emoji: '🔷', cat: 'Cinéaste', prompt: 'Stanley Kubrick style, perfect one-point perspective symmetry, wide angle lenses, cold clinical lighting' },
+    { id: 'coen', name: 'Coen Brothers', emoji: '🌾', cat: 'Cinéaste', prompt: 'Coen Brothers style, deadpan framing, wide-angle compositions, warm dusty palette' },
+    { id: 'refn', name: 'Nicolas Winding Refn', emoji: '🌆', cat: 'Cinéaste', prompt: 'Nicolas Winding Refn style, neon saturated palette (pink/blue), hypnotic slow pacing' },
+    { id: 'malick', name: 'Terrence Malick', emoji: '🌾', cat: 'Cinéaste', prompt: 'Terrence Malick style, magic hour golden light, handheld drifting camera, whispered voice-over' },
+    { id: 'ghibli', name: 'Studio Ghibli', emoji: '🌿', cat: 'Animation', prompt: 'Studio Ghibli anime style, Hayao Miyazaki aesthetic, hand-painted watercolor backgrounds' },
+    { id: 'pixar', name: 'Pixar 3D', emoji: '✨', cat: 'Animation', prompt: 'High-quality 3D computer animation, Pixar-style rendering, cinematic lighting' },
+    { id: 'disney-renaissance', name: 'Disney Renaissance', emoji: '🏰', cat: 'Animation', prompt: 'Disney Renaissance 2D animation style, expressive characters, rich painted backgrounds' },
+    { id: 'anime', name: 'Anime', emoji: '⚡', cat: 'Animation', prompt: 'Japanese anime style, cel shading, vibrant colors, expressive eyes, dynamic action lines' },
+    { id: 'manga-nb', name: 'Manga N&B', emoji: '🖤', cat: 'Animation', prompt: 'Black and white Japanese manga style, stark ink outlines, dramatic screentones' },
+    { id: 'simpson', name: 'Les Simpson', emoji: '🍩', cat: 'Animation', prompt: 'The Simpsons cartoon style, yellow-skinned characters, thick black outlines' },
+    { id: 'south-park', name: 'South Park', emoji: '🏔️', cat: 'Animation', prompt: 'South Park animation style, simple geometric character shapes, flat colors' },
+    { id: 'watercolor', name: 'Aquarelle', emoji: '🎨', cat: 'Animation', prompt: 'Dreamy watercolor painting aesthetic, soft bleeding edges, visible paper texture' },
+    { id: 'oil', name: 'Huile classique', emoji: '🖼️', cat: 'Animation', prompt: 'Classical oil painting style, visible impasto brushstrokes, old master technique' },
+    { id: 'claymation', name: 'Claymation', emoji: '🧱', cat: 'Animation', prompt: 'Claymation stop-motion animation, plasticine texture, fingerprint details' },
+    { id: 'cyberpunk-anim', name: 'Cyberpunk Anime', emoji: '🌃', cat: 'Animation', prompt: 'Cyberpunk anime aesthetic, neon pink and cyan lighting, rain-soaked Tokyo streets' },
+    { id: 'wes', name: 'Wes Anderson', emoji: '🏨', cat: 'Animation', prompt: 'Wes Anderson style, symmetrical framing, pastel color palette, centered composition' },
+    { id: 'retro-80s', name: 'Rétro 80s', emoji: '📼', cat: 'Animation', prompt: '1980s retro aesthetic, VHS grain, neon colors, synthwave atmosphere' },
+    { id: 'gouache', name: 'Gouache', emoji: '🖌️', cat: 'Animation', prompt: 'Gouache illustration style, opaque matte colors, textured brushwork' },
+    { id: 'low-poly', name: 'Low Poly 3D', emoji: '💎', cat: 'Animation', prompt: 'Low poly 3D aesthetic, faceted geometry, minimal textures, stylized shading' },
+    { id: 'pixel-art', name: 'Pixel Art', emoji: '👾', cat: 'Animation', prompt: 'Pixel art aesthetic, 16-bit retro game style, limited palette, dithering' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
@@ -758,16 +436,18 @@ const state = {
     idea: '',
     selectedStyle: STYLES[0],
     selectedMode: MODES[0],
-    sceneCount: 5,
+    clipCount: 5,
     numFrames: 241,
     aspect: 'landscape',
     scenario: null,
-    images: [],
+    sceneFrames: [],
     videos: [],
     currentSceneIndex: 0,
     isPlayingSequence: false,
     lastTextRequestTime: 0,
-    femaleCharacters: []
+    femaleCharacters: [],
+    projectName: 'Mon projet',
+    lastSavedAt: null
 };
 
 // ══════════════════════════════════════════════════════════════════
@@ -776,7 +456,7 @@ const state = {
 let wakeLockSentinel = null, canvasStream = null;
 async function activateWakeLock() {
     if ('wakeLock' in navigator) { try { wakeLockSentinel = await navigator.wakeLock.request('screen'); } catch (e) {} }
-    if (!wakeLockSentinel) { try { const canvas = document.getElementById('noSleepCanvas'); const video = document.getElementById('noSleepVideo'); const ctx = canvas.getContext('2d'); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 2, 2); canvasStream = canvas.captureStream(1); video.srcObject = canvasStream; video.play().catch(() => {}); } catch (e) {} }
+    if (!wakeLockSentinel) { try { const c = document.getElementById('noSleepCanvas'); const v = document.getElementById('noSleepVideo'); const ctx = c.getContext('2d'); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 2, 2); canvasStream = c.captureStream(1); v.srcObject = canvasStream; v.play().catch(() => {}); } catch (e) {} }
 }
 async function deactivateWakeLock() {
     if (wakeLockSentinel) { try { await wakeLockSentinel.release(); } catch (e) {} wakeLockSentinel = null; }
@@ -790,7 +470,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function setStatus(text) { const bar = document.getElementById('status-bar'); const txt = document.getElementById('status-text'); if (text) { bar.classList.add('visible'); txt.textContent = text; } else bar.classList.remove('visible'); }
 function formatTime(seconds) { if (seconds < 0) seconds = 0; const m = Math.floor(seconds / 60); const s = Math.round(seconds % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
-function playNotificationSound() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 880; osc.type = 'sine'; gain.gain.setValueAtTime(0.15, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); osc.start(); osc.stop(ctx.currentTime + 0.5); setTimeout(() => { const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain(); osc2.connect(gain2); gain2.connect(ctx.destination); osc2.frequency.value = 1320; osc2.type = 'sine'; gain2.gain.setValueAtTime(0.15, ctx.currentTime); gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); osc2.start(); osc2.stop(ctx.currentTime + 0.5); }, 180); } catch (e) {} }
+function playNotificationSound() { try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 880; o.type = 'sine'; g.gain.setValueAtTime(0.15, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.5); o.start(); o.stop(c.currentTime + 0.5); setTimeout(() => { const o2 = c.createOscillator(); const g2 = c.createGain(); o2.connect(g2); g2.connect(c.destination); o2.frequency.value = 1320; o2.type = 'sine'; g2.gain.setValueAtTime(0.15, c.currentTime); g2.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.5); o2.start(); o2.stop(c.currentTime + 0.5); }, 180); } catch (e) {} }
 
 let toastTimeout = null;
 function showToast(message, type = 'success', duration = 2500) {
@@ -806,7 +486,7 @@ function showToast(message, type = 'success', duration = 2500) {
 function logConsole(message, type = 'info') {
     const panel = document.getElementById('console-panel');
     const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const typeLabels = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', text: '[Texte]', heartbeat: '[En cours]', measure: '[Mesure]' };
+    const typeLabels = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', text: '[Texte]', heartbeat: '[En cours]', measure: '[Mesure]', autosave: '[Auto-save]' };
     const line = document.createElement('div'); line.className = 'log-line';
     line.innerHTML = '<span class="log-time">' + time + '</span><span class="log-' + type + '">' + (typeLabels[type] || '[Info]') + '</span> <span class="log-text">' + esc(message) + '</span>';
     panel.appendChild(line); panel.scrollTop = panel.scrollHeight;
@@ -826,8 +506,8 @@ function updateLimitsPanel() {
 }
 
 function getApiKey() { try { return (localStorage.getItem('agnes_api_key') || '').trim(); } catch (e) { return ''; } }
-function saveApiKey() { const input = document.getElementById('api-key-input'); const key = input.value.trim(); if (!key) { localStorage.removeItem('agnes_api_key'); updateApiPanel(); showToast('Clé supprimée', 'warn'); return; } localStorage.setItem('agnes_api_key', key); updateApiPanel(); showToast('Clé API enregistrée ✓', 'success'); input.blur(); }
-function updateApiPanel() { const statusLine = document.getElementById('api-status-line'); const statusText = document.getElementById('api-status-text'); const input = document.getElementById('api-key-input'); const key = getApiKey(); if (key) { statusLine.classList.add('ok'); statusText.textContent = 'Clé API active · ' + key.slice(0, 8) + '…' + key.slice(-4); input.value = key; } else { statusLine.classList.remove('ok'); statusText.textContent = 'Aucune clé API enregistrée'; input.value = ''; } updateGenerateBtn(); }
+function saveApiKey() { const i = document.getElementById('api-key-input'); const k = i.value.trim(); if (!k) { localStorage.removeItem('agnes_api_key'); updateApiPanel(); showToast('Clé supprimée', 'warn'); return; } localStorage.setItem('agnes_api_key', k); updateApiPanel(); showToast('Clé API enregistrée ✓', 'success'); i.blur(); }
+function updateApiPanel() { const sl = document.getElementById('api-status-line'); const st = document.getElementById('api-status-text'); const i = document.getElementById('api-key-input'); const k = getApiKey(); if (k) { sl.classList.add('ok'); st.textContent = 'Clé API active · ' + k.slice(0, 8) + '…' + k.slice(-4); i.value = k; } else { sl.classList.remove('ok'); st.textContent = 'Aucune clé API enregistrée'; i.value = ''; } updateGenerateBtn(); }
 function updateGenerateBtn() {
     const btn = document.getElementById('generate-btn');
     const hasKey = !!getApiKey();
@@ -837,6 +517,249 @@ function updateGenerateBtn() {
     else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
     else if (!hasIdea) btn.textContent = 'Décrivez votre idée';
     else btn.textContent = '🎬 Générer';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO-SAVE — SAUVEGARDE AUTOMATIQUE DE SESSION
+// ══════════════════════════════════════════════════════════════════
+let autoSaveTimer = null;
+let autoSaveCount = 0;
+
+function buildSnapshot() {
+    return {
+        version: 1,
+        savedAt: Date.now(),
+        projectName: document.getElementById('project-name').value || 'Mon projet',
+        idea: document.getElementById('idea-input').value || '',
+        selectedModeId: state.selectedMode.id,
+        selectedStyleId: state.selectedStyle.id,
+        clipCount: parseInt(document.getElementById('clip-count-select').value) || 5,
+        numFrames: parseInt(document.getElementById('clip-duration-select').value) || 241,
+        aspect: document.getElementById('aspect-select').value || 'landscape',
+        scenario: state.scenario,
+        sceneFrames: state.sceneFrames,
+        videos: state.videos,
+        femaleCharacters: state.femaleCharacters
+    };
+}
+
+function performAutoSave(force = false) {
+    try {
+        const snap = buildSnapshot();
+        const hasContent = snap.idea.trim().length > 0 || snap.scenario || snap.sceneFrames.length > 0 || snap.videos.length > 0;
+        if (!hasContent && !force) return;
+        localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snap));
+        state.lastSavedAt = snap.savedAt;
+        autoSaveCount++;
+        updateAutosaveStatus();
+        updateSessionButton();
+    } catch (e) {
+        // Quota dépassé → on retire les vidéos du snapshot
+        try {
+            const snap = buildSnapshot();
+            snap.videos = [];
+            localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snap));
+            logConsole('Auto-save : quota atteint, vidéos retirées du snapshot (les URLs restent dans la page)', 'warn');
+        } catch (e2) {
+            logConsole('Auto-save échoué : ' + e2.message, 'warn');
+        }
+    }
+}
+
+function scheduleAutoSave() {
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => performAutoSave(false), 800);
+}
+
+function loadAutoSavedSession() {
+    try {
+        const raw = localStorage.getItem(AUTOSAVE_KEY);
+        if (!raw) return null;
+        const snap = JSON.parse(raw);
+        if (!snap || !snap.savedAt) return null;
+        if (Date.now() - snap.savedAt > AUTOSAVE_MAX_AGE_MS) { localStorage.removeItem(AUTOSAVE_KEY); return null; }
+        return snap;
+    } catch (e) { return null; }
+}
+
+function clearAutoSavedSession() {
+    try { localStorage.removeItem(AUTOSAVE_KEY); } catch (e) {}
+    document.getElementById('autosave-banner').classList.remove('visible');
+    updateSessionButton();
+    updateAutosaveStatus();
+}
+
+function updateAutosaveStatus() {
+    const el = document.getElementById('autosave-status');
+    if (!el) return;
+    if (state.lastSavedAt) {
+        const t = new Date(state.lastSavedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        el.textContent = '✓ ' + t;
+    } else {
+        el.textContent = 'inactive';
+    }
+}
+
+function updateSessionButton() {
+    const btn = document.getElementById('session-btn');
+    const snap = loadAutoSavedSession();
+    if (snap) {
+        btn.classList.add('session-active');
+        btn.textContent = '🔓 Session';
+        btn.title = 'Sauvegardée le ' + new Date(snap.savedAt).toLocaleString('fr-FR');
+    } else {
+        btn.classList.remove('session-active');
+        btn.textContent = '🔓 Session';
+        btn.title = 'Aucune session sauvegardée';
+    }
+}
+
+function restoreSession(snap) {
+    // Restaurer champs
+    document.getElementById('project-name').value = snap.projectName || 'Mon projet';
+    document.getElementById('idea-input').value = snap.idea || '';
+    document.getElementById('clip-count-select').value = snap.clipCount || 5;
+    document.getElementById('clip-duration-select').value = snap.numFrames || 241;
+    document.getElementById('aspect-select').value = snap.aspect || 'landscape';
+
+    // Restaurer l'état
+    state.idea = snap.idea || '';
+    state.clipCount = snap.clipCount || 5;
+    state.numFrames = snap.numFrames || 241;
+    state.aspect = snap.aspect || 'landscape';
+    state.scenario = snap.scenario || null;
+    state.sceneFrames = snap.sceneFrames || [];
+    state.videos = snap.videos || [];
+    state.femaleCharacters = snap.femaleCharacters || [];
+    state.projectName = snap.projectName || 'Mon projet';
+    state.lastSavedAt = snap.savedAt;
+
+    // Restaurer les cartes sélectionnées
+    const m = MODES.find(x => x.id === snap.selectedModeId);
+    if (m) state.selectedMode = m;
+    const s = STYLES.find(x => x.id === snap.selectedStyleId);
+    if (s) state.selectedStyle = s;
+
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedMode.id));
+    document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedStyle.id));
+
+    // Restaurer les images-clés
+    document.getElementById('generated-images').innerHTML = '';
+    state.sceneFrames.forEach(sf => {
+        if (sf.startUrl) displayGeneratedImage(sf.startUrl, 'Scène ' + (sf.scene?.scene_number || '?') + ' — Début', 'start-frame');
+        if (sf.endUrl) displayGeneratedImage(sf.endUrl, 'Scène ' + (sf.scene?.scene_number || '?') + ' — Fin', 'end-frame');
+    });
+
+    // Restaurer les vidéos
+    document.getElementById('generated-videos').innerHTML = '';
+    state.videos.forEach((v, i) => {
+        if (v && v.url) replacePendingWithVideo(i, v.url, v.dialogue, v.sceneNumber, v.actualDuration);
+    });
+
+    // Restaurer le scénario
+    if (state.scenario) {
+        displayScenario(state.scenario);
+        document.getElementById('section-scenario').classList.remove('hidden');
+    }
+
+    // Visibilité des sections
+    if (state.sceneFrames.length > 0) document.getElementById('section-images').classList.remove('hidden');
+    if (state.videos.filter(v => v && v.url).length > 0) {
+        document.getElementById('section-videos').classList.remove('hidden');
+        document.getElementById('section-player').classList.remove('hidden');
+    }
+
+    updateGenerateBtn();
+    updateLimitsPanel();
+    updateAutosaveStatus();
+}
+
+function showSessionInfo() {
+    const snap = loadAutoSavedSession();
+    if (!snap) {
+        showToast('Aucune session sauvegardée', 'warn');
+        return;
+    }
+    const dateStr = new Date(snap.savedAt).toLocaleString('fr-FR');
+    const imgCount = (snap.sceneFrames || []).length * 2;
+    const vidCount = (snap.videos || []).filter(v => v && v.url).length;
+    const msg = 'Session sauvegardée le ' + dateStr + '\n\n' +
+        'Projet : ' + (snap.projectName || 'sans nom') + '\n' +
+        'Idée : ' + (snap.idea ? snap.idea.slice(0, 60) + '...' : '(vide)') + '\n' +
+        'Script : ' + (snap.scenario ? 'oui' : 'non') + '\n' +
+        'Images-clés : ' + imgCount + '\n' +
+        'Clips vidéo : ' + vidCount + '\n\n' +
+        'Cliquer sur OK pour restaurer cette session.\n' +
+        'Cliquer sur Annuler pour proposer de l\'effacer.';
+    if (confirm(msg)) {
+        restoreSession(snap);
+        document.getElementById('autosave-banner').classList.remove('visible');
+        showToast('Session restaurée ✓', 'success');
+        logConsole('Session restaurée (sauvegardée le ' + dateStr + ')', 'autosave');
+    } else {
+        if (confirm('Effacer cette session sauvegardée ?')) {
+            clearAutoSavedSession();
+            showToast('Session effacée', 'warn');
+            logConsole('Session effacée par l\'utilisateur', 'warn');
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROJETS NOMMÉS
+// ══════════════════════════════════════════════════════════════════
+function getProjects() { try { const r = localStorage.getItem(PROJECTS_KEY); return r ? JSON.parse(r) : {}; } catch (e) { return {}; } }
+
+function saveProject() {
+    const name = document.getElementById('project-name').value.trim() || 'Sans nom';
+    const p = getProjects();
+    const snap = buildSnapshot();
+    snap.name = name;
+    snap.savedAt = Date.now();
+    p[name] = snap;
+    try {
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(p));
+        showToast('Projet « ' + name + ' » sauvegardé ✓', 'success');
+        logConsole('Projet sauvegardé : ' + name, 'autosave');
+        performAutoSave(true);
+    } catch (e) {
+        showToast('Erreur : ' + e.message, 'error');
+    }
+}
+
+function loadProject() {
+    const p = getProjects();
+    const names = Object.keys(p);
+    if (names.length === 0) { showToast('Aucun projet sauvegardé', 'warn'); return; }
+    const list = names.map((n, i) => (i + 1) + '. ' + n + ' (' + new Date(p[n].savedAt).toLocaleDateString('fr-FR') + ')').join('\n');
+    const choice = prompt('Quel projet charger ?\n\n' + list + '\n\nEntrez le numéro :');
+    if (!choice) return;
+    const idx = parseInt(choice) - 1;
+    if (idx < 0 || idx >= names.length) { showToast('Choix invalide', 'error'); return; }
+    const name = names[idx];
+    restoreSession(p[name]);
+    document.getElementById('autosave-banner').classList.remove('visible');
+    showToast('Projet « ' + name + ' » chargé ✓', 'success');
+    logConsole('Projet chargé : ' + name, 'autosave');
+}
+
+function newProject() {
+    if (!confirm('Créer un nouveau projet ?\n\nLa session auto-sauvegardée actuelle sera conservée en mémoire mais un nouveau projet vide va s\'ouvrir.\n\nContinuer ?')) return;
+    state.scenario = null; state.sceneFrames = []; state.videos = []; state.femaleCharacters = [];
+    document.getElementById('project-name').value = 'Mon projet';
+    document.getElementById('idea-input').value = '';
+    document.getElementById('generated-images').innerHTML = '';
+    document.getElementById('generated-videos').innerHTML = '';
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('section-scenario').classList.add('hidden');
+    document.getElementById('section-images').classList.add('hidden');
+    document.getElementById('section-videos').classList.add('hidden');
+    document.getElementById('section-player').classList.add('hidden');
+    document.getElementById('autosave-banner').classList.remove('visible');
+    updateGenerateBtn();
+    // Sauvegarder l'état vide
+    performAutoSave(true);
+    showToast('Nouveau projet', 'success');
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -859,16 +782,13 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3, label = 'API') 
             return res;
         } catch (e) {
             if (e.message === 'Arrêt demandé') throw e;
-            if (attempt < maxRetries) { const wait = Math.pow(2, attempt) * 2000 + Math.random() * 1000; logConsole(label + ' : ' + (e.name === 'AbortError' ? 'timeout' : 'réseau') + ', retry…', 'warn'); await sleep(wait); }
+            if (attempt < maxRetries) { const wait = Math.pow(2, attempt) * 2000 + Math.random() * 1000; logConsole(label + ' : retry…', 'warn'); await sleep(wait); }
             else throw new Error(label + ' : échec — ' + e.message);
         }
     }
     throw new Error(label + ' : échec');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// APPELS API
-// ══════════════════════════════════════════════════════════════════
 async function callTextAPI(messages, options = {}) {
     const now = Date.now();
     if (now - state.lastTextRequestTime < 2000) await sleep(2000 - (now - state.lastTextRequestTime));
@@ -906,7 +826,7 @@ async function createVideoTaskOnly(item) {
     const width = isPortrait ? 576 : (isSquare ? 768 : 1024);
 
     const body = { model: MODEL_VIDEO, prompt: item.prompt, extra_body: { image: [item.startImage.url, item.endImage.url], mode: 'keyframes' }, num_frames: state.numFrames, frame_rate: 24, height, width };
-    logConsole('Requête vidéo → ' + MODEL_VIDEO + ' (keyframes, ' + state.numFrames + ' frames)', 'info');
+    logConsole('Requête vidéo → ' + MODEL_VIDEO + ' (' + state.numFrames + ' frames)', 'info');
     const res = await fetchWithRetry(API_BASE + '/videos', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Vidéo');
     if (!res.ok) { const err = await res.text(); throw new Error('Video API HTTP ' + res.status + ' — ' + err.slice(0, 250)); }
     const data = await res.json(); const videoId = data.video_id;
@@ -980,10 +900,14 @@ async function runFullPipeline() {
     if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
 
     state.isRunning = true; state.stopRequested = false; state.idea = idea;
-    state.sceneCount = parseInt(document.getElementById('scene-count-select').value);
+    state.clipCount = parseInt(document.getElementById('clip-count-select').value);
     state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
     state.aspect = document.getElementById('aspect-select').value;
-    state.images = []; state.videos = [];
+    state.sceneFrames = [];
+    state.videos = [];
+
+    const totalClips = state.clipCount;
+    const totalImagesNeeded = state.clipCount * 2;
 
     document.getElementById('stop-btn').classList.add('visible');
     document.getElementById('generate-btn').disabled = true;
@@ -996,11 +920,14 @@ async function runFullPipeline() {
     document.getElementById('section-images').classList.add('hidden');
     document.getElementById('section-videos').classList.add('hidden');
     document.getElementById('section-player').classList.add('hidden');
+    document.getElementById('autosave-banner').classList.remove('visible');
 
+    logConsole('🎬 Configuration : ' + state.clipCount + ' clips · ' + totalImagesNeeded + ' images-clés', 'success');
     logConsole('Genre : ' + state.selectedMode.name + ' · Style : ' + state.selectedStyle.name, 'info');
 
     await activateWakeLock();
     setStatus('Initialisation…');
+    performAutoSave(true);
 
     try {
         setStatus('L\'IA écrit le scénario…');
@@ -1013,14 +940,15 @@ Instruction : ${modeInstruction}
 Style visuel : ${state.selectedStyle.prompt}
 Format : ${aspectLabel}
 Idée de l'utilisateur : "${idea}"
-Nombre de scènes : ${state.sceneCount}
+NOMBRE DE SCÈNES : ${state.clipCount} (EXACTEMENT)
 Durée par scène : ${state.numFrames / 24} secondes
 
+⚠️ Chaque scène = 1 clip. Génère EXACTEMENT ${state.clipCount} scènes.
+
 RÈGLES :
-- Chaque scène doit avoir une description visuelle PRÉCISE et cinématographique
-- Les dialogues doivent être COURTS (max 15 mots) et percutants
-- Utilise un vocabulaire de mise en scène réel (cadrage, mouvement caméra, éclairage)
-- Adapte le ton au genre ${state.selectedMode.name}
+- Description visuelle PRÉCISE et cinématographique
+- Dialogues COURTS (max 15 mots)
+- Vocabulaire de mise en scène réel (cadrage, mouvement caméra, éclairage)
 
 Génère un JSON avec :
 {
@@ -1030,9 +958,10 @@ Génère un JSON avec :
   "scenes": [{
     "scene_number": 1,
     "description": "Description visuelle cinématographique",
-    "image_prompt": "Prompt en anglais pour générer l'image, ${aspectLabel}, style ${state.selectedStyle.id}",
+    "start_frame_prompt": "Prompt anglais image DÉBUT (t=0s), ${aspectLabel}, style ${state.selectedStyle.id}",
+    "end_frame_prompt": "Prompt anglais image FIN (t=${state.numFrames / 24}s, MÊME objet MÊME cadre, mouvement avancé), ${aspectLabel}, style ${state.selectedStyle.id}",
     "dialogue": { "character": "Nom", "text": "Phrase courte (max 15 mots)" },
-    "camera_movement": "Mouvement de caméra cinématographique (ex: slow dolly in, tracking shot, crane shot)"
+    "camera_movement": "Mouvement de caméra cinématographique"
   }]
 }
 Réponds UNIQUEMENT en JSON valide.`;
@@ -1046,42 +975,71 @@ Réponds UNIQUEMENT en JSON valide.`;
         try { scenario = JSON.parse(scenarioRaw.replace(/```json/g, '').replace(/```/g, '').trim()); }
         catch (e) { throw new Error('JSON invalide'); }
 
+        if (scenario.scenes.length > state.clipCount) {
+            logConsole('⚠ L\'IA a généré ' + scenario.scenes.length + ' scènes, on garde les ' + state.clipCount + ' premières.', 'warn');
+            scenario.scenes = scenario.scenes.slice(0, state.clipCount);
+        }
+
         state.scenario = scenario;
         state.femaleCharacters = scenario.characters.filter(c => c.gender === 'femme').map(c => c.name.toLowerCase());
-        logConsole('Scénario : « ' + scenario.title + ' »', 'success');
+        logConsole('Scénario : « ' + scenario.title + ' » — ' + scenario.scenes.length + ' scènes', 'success');
         displayScenario(scenario);
+        performAutoSave(true);
 
-        setStatus('L\'IA dessine…');
+        logConsole('ÉTAPE 2 — Génération des images-clés (' + totalImagesNeeded + ')', 'success');
+        setStatus('Génération des images-clés…');
         const charDesc = scenario.characters.map(c => c.name + ' (' + c.gender + ') : ' + c.appearance).join('. ');
         const imgSize = state.aspect === 'portrait' ? '768x1024' : state.aspect === 'landscape' ? '1024x576' : '768x768';
 
         for (let i = 0; i < scenario.scenes.length; i++) {
             if (state.stopRequested) break;
             const scene = scenario.scenes[i];
-            setStatus('Image ' + (i + 1) + '/' + scenario.scenes.length + '…');
-            const imagePrompt = scene.image_prompt + '. ' + charDesc + '. ' + (state.selectedStyle.prompt) + '. ' + (visualHint ? visualHint + '. ' : '') + 'No text.';
+            logConsole('──────────────────────────────', 'info');
+            logConsole('Scène ' + scene.scene_number + ' — image DÉBUT + image FIN', 'info');
+
+            setStatus('Scène ' + (i + 1) + ' — image début (' + (i * 2 + 1) + '/' + totalImagesNeeded + ')');
+            const startPrompt = (scene.start_frame_prompt || scene.image_prompt || scene.description) + '. ' + charDesc + '. ' + state.selectedStyle.prompt + '. ' + (visualHint ? visualHint + '. ' : '') + 'Opening frame of the shot, no text.';
+            let startUrl;
             try {
-                const imageUrl = await callImageAPI(imagePrompt, imgSize);
-                state.images.push({ sceneIndex: i, url: imageUrl, scene: scene });
-                logConsole('Image ' + (i + 1) + ' ✓', 'success');
-                displayGeneratedImage(imageUrl, 'Scène ' + scene.scene_number);
-            } catch (e) { logConsole('Erreur image ' + (i + 1) + ' : ' + e.message, 'error'); }
+                startUrl = await callImageAPI(startPrompt, imgSize);
+                logConsole('Scène ' + scene.scene_number + ' — image DÉBUT ✓', 'success');
+                displayGeneratedImage(startUrl, 'Scène ' + scene.scene_number + ' — Début', 'start-frame');
+            } catch (e) {
+                logConsole('Erreur image début scène ' + scene.scene_number + ' : ' + e.message, 'error');
+                throw new Error('Échec image début scène ' + scene.scene_number);
+            }
+
             await sleep(1500);
+
+            setStatus('Scène ' + (i + 1) + ' — image fin (' + (i * 2 + 2) + '/' + totalImagesNeeded + ')');
+            const endPrompt = (scene.end_frame_prompt || scene.image_prompt || scene.description) + '. ' + charDesc + '. ' + state.selectedStyle.prompt + '. ' + (visualHint ? visualHint + '. ' : '') + 'Closing frame of the SAME shot, same object, same framing, motion advanced, no text.';
+            let endUrl;
+            try {
+                endUrl = await callImageAPI(endPrompt, imgSize);
+                logConsole('Scène ' + scene.scene_number + ' — image FIN ✓', 'success');
+                displayGeneratedImage(endUrl, 'Scène ' + scene.scene_number + ' — Fin', 'end-frame');
+            } catch (e) {
+                logConsole('Erreur image fin scène ' + scene.scene_number + ' : ' + e.message + ' — fallback', 'warn');
+                endUrl = startUrl;
+            }
+
+            state.sceneFrames.push({ scene, startUrl, endUrl });
+            performAutoSave(true);
+            await sleep(1200);
         }
 
-        if (state.images.length < 2) throw new Error('Pas assez d\'images');
+        if (state.sceneFrames.length === 0) throw new Error('Aucune scène générée');
 
-        logConsole('ÉTAPE 3 — Clips vidéo', 'success');
-        const totalClips = state.images.length - 1;
-        for (let i = 0; i < totalClips; i++) createPendingVideoCard(i, totalClips);
+        logConsole('ÉTAPE 3 — Création des ' + state.sceneFrames.length + ' clips', 'success');
+        for (let i = 0; i < state.sceneFrames.length; i++) createPendingVideoCard(i, state.sceneFrames.length);
         document.getElementById('section-videos').classList.remove('hidden');
         document.getElementById('section-videos').classList.add('open');
 
         const pollingPromises = [];
-        for (let i = 0; i < totalClips; i++) {
+        for (let i = 0; i < state.sceneFrames.length; i++) {
             if (state.stopRequested) break;
-            const startImg = state.images[i]; const endImg = state.images[i + 1];
-            const scene = state.images[i].scene || {};
+            const sf = state.sceneFrames[i];
+            const scene = sf.scene;
             const cameraMove = scene.camera_movement || 'slow tracking shot';
             const dialogueText = scene.dialogue ? scene.dialogue.text : '';
             const dialogueChar = scene.dialogue ? scene.dialogue.character : '';
@@ -1096,7 +1054,7 @@ Réponds UNIQUEMENT en JSON valide.`;
                 'No text, no watermarks.'
             ].filter(Boolean).join('. ');
 
-            const item = { index: i, startImage: startImg, endImage: endImg, scene: scene, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
+            const item = { index: i, scene: scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
             updatePendingVideoCard(i, 'Création de la tâche…', 0, 0);
 
             try {
@@ -1110,12 +1068,13 @@ Réponds UNIQUEMENT en JSON valide.`;
                         replacePendingWithVideo(it.index, videoUrl, it.scene.dialogue, it.index + 1, actualDuration);
                         playNotificationSound();
                         showToast('Clip ' + (it.index + 1) + ' prêt !', 'success', 3000);
+                        performAutoSave(true);
                         return result;
                     }).catch(e => { logConsole('Erreur clip ' + (item.index + 1) + ' : ' + e.message, 'error'); markPendingFailed(item.index, e.message); return null; })
                 );
-            } catch (e) { logConsole('Échec création tâche ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
+            } catch (e) { logConsole('Échec création clip ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
 
-            if (i < totalClips - 1 && !state.stopRequested) {
+            if (i < state.sceneFrames.length - 1 && !state.stopRequested) {
                 for (let r = 62; r > 0; r--) { if (state.stopRequested) break; setStatus('Prochaine tâche dans ' + r + 's'); await sleep(1000); }
             }
         }
@@ -1129,9 +1088,12 @@ Réponds UNIQUEMENT en JSON valide.`;
 
         if (readyVideos.length > 0) document.getElementById('section-player').classList.remove('hidden');
 
+        performAutoSave(true);
+        logConsole('💾 Session sauvegardée automatiquement', 'autosave');
+
         setStatus('✦ Terminé ✦');
         await sleep(3000); setStatus(null);
-        showToast(readyVideos.length + ' clip(s) généré(s)', 'success');
+        showToast(readyVideos.length + ' clip(s) généré(s) sur ' + totalClips, 'success');
 
     } catch (e) {
         logConsole('ERREUR : ' + e.message, 'error');
@@ -1156,6 +1118,7 @@ function displayScenario(scenario) {
     let html = '<h3>🎬 ' + esc(scenario.title) + '</h3>';
     html += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline || '') + '</p>';
     html += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Personnages : ' + scenario.characters.map(c => esc(c.name) + ' (' + esc(c.gender) + ')').join(', ') + '</div>';
+    html += '<div style="font-size:0.72rem;color:var(--success);margin-bottom:0.6rem;">📊 ' + scenario.scenes.length + ' scènes → ' + scenario.scenes.length + ' clips</div>';
     scenario.scenes.forEach(s => {
         html += '<div class="scene-item"><span class="scene-num">Scène ' + s.scene_number + '</span>';
         html += esc(s.description);
@@ -1166,10 +1129,11 @@ function displayScenario(scenario) {
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function displayGeneratedImage(url, label) {
+function displayGeneratedImage(url, label, frameClass) {
     const section = document.getElementById('section-images'); const grid = document.getElementById('generated-images');
     section.classList.remove('hidden');
-    const card = document.createElement('div'); card.className = 'gen-image-card';
+    const card = document.createElement('div');
+    card.className = 'gen-image-card' + (frameClass ? ' ' + frameClass : '');
     card.innerHTML = '<img src="' + url + '" alt="" loading="lazy"><div class="gen-label">' + esc(label) + '</div>';
     grid.appendChild(card);
     document.getElementById('images-badge').textContent = grid.children.length;
@@ -1192,14 +1156,18 @@ function updatePendingVideoCard(index, label, progress, elapsed) {
 }
 
 function replacePendingWithVideo(index, videoUrl, dialogue, sceneNumber, actualDuration) {
-    const pending = document.getElementById('pending-video-' + index); if (!pending) return;
+    const pending = document.getElementById('pending-video-' + index);
     const card = document.createElement('div');
     card.className = 'gen-video-card newly-added'; card.id = 'video-card-' + index;
     card.innerHTML = '<video src="' + videoUrl + '" controls playsinline preload="metadata"></video>' +
         '<div class="gen-label">🎬 Clip ' + sceneNumber + '</div>' +
         (actualDuration ? '<div class="gen-timing">⚡ ' + actualDuration + 's</div>' : '') +
         (dialogue && dialogue.text ? '<div class="gen-dialogue">💬 ' + esc(dialogue.character) + ' : « ' + esc(dialogue.text) + ' »</div>' : '');
-    pending.parentNode.replaceChild(card, pending);
+    if (pending) {
+        pending.parentNode.replaceChild(card, pending);
+    } else {
+        document.getElementById('generated-videos').appendChild(card);
+    }
     setTimeout(() => card.classList.remove('newly-added'), 3000);
     document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
 }
@@ -1228,7 +1196,7 @@ function playVideoAt(index) {
     }
     const video = document.getElementById('player-video'); const v = state.videos[index];
     video.src = v.url; video.currentTime = 0; video.play().catch(() => {});
-    document.getElementById('player-info').textContent = 'Scène ' + (index + 1) + ' / ' + state.videos.length;
+    document.getElementById('player-info').textContent = 'Clip ' + (index + 1) + ' / ' + state.videos.length;
     document.getElementById('player-progress').style.width = ((index + 1) / state.videos.length * 100) + '%';
     if (v.dialogue && v.dialogue.text) setTimeout(() => speakText(v.dialogue.text, v.dialogue.character), 500);
     video.onended = () => { if (state.isPlayingSequence) setTimeout(() => playVideoAt(index + 1), 300); };
@@ -1279,6 +1247,7 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
     MODES.forEach((m, i) => {
         const card = document.createElement('div');
         card.className = 'mode-card' + (i === 0 ? ' selected' : '');
+        card.dataset.id = m.id;
         card.innerHTML = '<span class="mode-emoji">' + m.emoji + '</span><span class="mode-name">' + m.name + '</span><span class="mode-desc">' + m.desc + '</span>';
         card.addEventListener('click', () => {
             document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
@@ -1286,6 +1255,7 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
             state.selectedMode = m;
             document.getElementById('mode-description').textContent = m.desc + ' — ' + m.scenario.slice(0, 80) + '…';
             logConsole('Genre : ' + m.name, 'info');
+            scheduleAutoSave();
         });
         modeGrid.appendChild(card);
     });
@@ -1294,35 +1264,98 @@ function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
     STYLES.forEach((s, i) => {
         const card = document.createElement('div');
         card.className = 'style-card' + (i === 0 ? ' selected' : '');
+        card.dataset.id = s.id;
         card.innerHTML = '<span class="style-emoji">' + s.emoji + '</span><span class="style-name">' + s.name + '</span>' + (s.cat ? '<span class="style-cat">' + s.cat + '</span>' : '');
         card.addEventListener('click', () => {
             document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             state.selectedStyle = s;
             logConsole('Style : ' + s.name, 'info');
+            scheduleAutoSave();
         });
         styleGrid.appendChild(card);
     });
 
+    // Boutons API
     document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
     document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
+
+    // Boutons principaux
     document.getElementById('generate-btn').addEventListener('click', runFullPipeline);
     document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; logConsole('Arrêt demandé', 'warn'); setStatus('Arrêt en cours…'); });
-    document.getElementById('idea-input').addEventListener('input', updateGenerateBtn);
+
+    // Idée + auto-save
+    document.getElementById('idea-input').addEventListener('input', () => { updateGenerateBtn(); scheduleAutoSave(); });
+
+    // Sections
     document.querySelectorAll('[data-toggle]').forEach(header => {
         header.addEventListener('click', () => { document.getElementById(header.dataset.toggle).classList.toggle('open'); });
     });
+
+    // Lecture
     document.getElementById('play-all-btn').addEventListener('click', () => { if (state.isPlayingSequence) stopAllVideos(); else playAllVideos(); });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
 
+    // Projets / Session
+    document.getElementById('save-project-btn').addEventListener('click', saveProject);
+    document.getElementById('load-project-btn').addEventListener('click', loadProject);
+    document.getElementById('new-project-btn').addEventListener('click', newProject);
+    document.getElementById('session-btn').addEventListener('click', showSessionInfo);
+    document.getElementById('dismiss-autosave-btn').addEventListener('click', () => { document.getElementById('autosave-banner').classList.remove('visible'); });
+    document.getElementById('save-as-project-btn').addEventListener('click', () => { saveProject(); });
+    document.getElementById('clear-autosave-btn').addEventListener('click', () => { if (confirm('Effacer la session auto-sauvegardée ?\n\nLe travail en cours ne sera plus récupérable à la prochaine ouverture.')) { clearAutoSavedSession(); showToast('Session effacée', 'warn'); } });
+
+    // Champs techniques — auto-save
+    ['clip-count-select', 'clip-duration-select', 'aspect-select', 'project-name'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.addEventListener('change', scheduleAutoSave); el.addEventListener('input', scheduleAutoSave); }
+    });
+
+    // Sauvegarde avant fermeture
+    window.addEventListener('beforeunload', () => { performAutoSave(true); });
+    // Sauvegarde périodique (toutes les 60s)
+    setInterval(() => { if (!state.isRunning) performAutoSave(false); }, 60000);
+
     updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
+    document.getElementById('style-count-badge').textContent = STYLES.length;
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('api-key-input').value = savedKey;
 
-    // Mise à jour du badge de comptage de styles
-    document.getElementById('style-count-badge').textContent = STYLES.length;
+    logConsole('Application prête · ' + MODES.length + ' genres · ' + STYLES.length + ' styles', 'info');
+    logConsole('💾 Sauvegarde auto activée — votre travail est conservé', 'autosave');
 
-    logConsole('Application prête · ' + MODES.length + ' genres · ' + STYLES.length + ' styles visuels', 'info');
+    // ═══ RESTAURATION AUTOMATIQUE ═══
+    const snap = loadAutoSavedSession();
+    if (snap) {
+        const ageMin = Math.round((Date.now() - snap.savedAt) / 60000);
+        let ageStr;
+        if (ageMin < 1) ageStr = 'il y a quelques secondes';
+        else if (ageMin < 60) ageStr = 'il y a ' + ageMin + ' min';
+        else if (ageMin < 1440) ageStr = 'il y a ' + Math.round(ageMin / 60) + ' h';
+        else ageStr = 'il y a ' + Math.round(ageMin / 1440) + ' j';
+
+        logConsole('Session détectée (' + ageStr + ')', 'autosave');
+        restoreSession(snap);
+
+        // Bannière
+        const banner = document.getElementById('autosave-banner');
+        const info = document.getElementById('autosave-info');
+        const dateStr = new Date(snap.savedAt).toLocaleString('fr-FR');
+        const imgCount = (snap.sceneFrames || []).length * 2;
+        const vidCount = (snap.videos || []).filter(v => v && v.url).length;
+        const parts = [];
+        if (snap.scenario) parts.push('script');
+        if (imgCount > 0) parts.push(imgCount + ' image(s)');
+        if (vidCount > 0) parts.push(vidCount + ' clip(s)');
+        if (parts.length === 0) parts.push('paramètres');
+        info.textContent = 'Sauvegardée ' + ageStr + ' (' + dateStr + ') · ' + parts.join(', ') + '. Ton travail a été restauré automatiquement.';
+        banner.classList.add('visible');
+        showToast('Session restaurée automatiquement ✓', 'success', 4000);
+    } else {
+        logConsole('Aucune session antérieure', 'info');
+        updateAutosaveStatus();
+    }
+    updateSessionButton();
 })();
 </script>
 
