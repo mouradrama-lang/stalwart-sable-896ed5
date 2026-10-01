@@ -89,20 +89,19 @@
     select { width: 100%; padding: 0.68rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.86rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23a09880' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 10px; }
     select:focus { outline: none; border-color: var(--accent); }
 
-    .format-grid, .pillar-grid, .theme-grid, .style-grid, .structure-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
-    .format-card, .pillar-card, .theme-card, .style-card, .structure-card { padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; transition: all 0.15s; text-align: center; }
-    .format-card:active, .pillar-card:active, .theme-card:active, .style-card:active, .structure-card:active { transform: scale(0.97); }
-    .format-card.selected, .pillar-card.selected, .theme-card.selected, .style-card.selected, .structure-card.selected { background: var(--accent); border-color: var(--accent); color: #000; }
-    .format-card .fc-emoji, .pillar-card .pc-emoji, .theme-card .theme-emoji, .style-card .style-emoji, .structure-card .structure-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
-    .format-card .fc-name, .pillar-card .pc-name, .theme-card .theme-name, .style-card .style-name, .structure-card .structure-name { font-size: 0.74rem; font-weight: 600; }
-    .format-card .fc-desc, .theme-card .theme-desc, .structure-card .structure-desc { font-size: 0.62rem; color: var(--ink-dim); margin-top: 0.2rem; }
-    .format-card.selected .fc-desc, .theme-card.selected .theme-desc, .structure-card.selected .structure-desc { color: rgba(0,0,0,0.7); }
+    .format-grid, .pillar-grid, .theme-grid, .style-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+    .format-card, .pillar-card, .theme-card, .style-card { padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; transition: all 0.15s; text-align: center; }
+    .format-card:active, .pillar-card:active, .theme-card:active, .style-card:active { transform: scale(0.97); }
+    .format-card.selected, .pillar-card.selected, .theme-card.selected, .style-card.selected { background: var(--accent); border-color: var(--accent); color: #000; }
+    .format-card .fc-emoji, .pillar-card .pc-emoji, .theme-card .theme-emoji, .style-card .style-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .format-card .fc-name, .pillar-card .pc-name, .theme-card .theme-name, .style-card .style-name { font-size: 0.74rem; font-weight: 600; }
+    .format-card .fc-desc, .theme-card .theme-desc { font-size: 0.62rem; color: var(--ink-dim); margin-top: 0.2rem; }
+    .format-card.selected .fc-desc, .theme-card.selected .theme-desc { color: rgba(0,0,0,0.7); }
     .theme-card.done { border-color: var(--success); }
     .theme-card .theme-week { font-size: 0.58rem; color: var(--ink-faint); margin-top: 0.15rem; }
     .theme-card.selected .theme-week { color: rgba(0,0,0,0.6); }
-    .pillar-card { text-align: left; padding: 0.7rem 0.9rem; }
+    .pillar-card { text-align: left; padding: 0.7rem 0.9rem; cursor: default; }
     .pillar-card .pc-time { font-size: 0.65rem; color: var(--ink-dim); margin-top: 0.2rem; }
-    .pillar-card.selected .pc-time { color: rgba(0,0,0,0.6); }
     .style-card.flagship { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(212,160,23,0.3) inset; }
 
     .custom-input-panel { margin-top: 0.8rem; padding: 0.8rem; border-radius: 8px; background: var(--panel-2); border-left: 3px solid var(--accent); display: none; }
@@ -284,7 +283,7 @@
 
 <div class="section open" id="section-theme">
     <div class="section-header" data-toggle="section-theme">
-        <span class="section-title">🎭 Concept Mouradrama <span class="badge new">28 CONCEPTS</span></span>
+        <span class="section-title">🎭 Concept Mouradrama <span class="badge new">24+ CONCEPTS</span></span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body"><div class="section-content">
@@ -422,7 +421,7 @@
 
 <div class="section" id="section-tech">
     <div class="section-header" data-toggle="section-tech">
-        <span class="section-title">📷 Paramètres techniques — production vidéo</span>
+        <span class="section-title">📷 Paramètres techniques</span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body"><div class="section-content">
@@ -462,7 +461,6 @@
                 <option value="off">Non — scènes indépendantes</option>
                 <option value="on" selected>Oui — le dernier clip reprend le décor du 1er et se referme</option>
             </select>
-            <div class="control-hint">Reproduit l'effet de boucle validé sur la vidéo récap.</div>
         </div>
     </div></div>
 </div>
@@ -520,8 +518,8 @@ const INITIAL_WAIT_SECONDS = 105;
 const POLL_INTERVAL_SECONDS = 5;
 const SAFETY_MARGIN = 1.10;
 const LIMITS = { textRpm: 30, imagesPerDay: 4000, videoSecondsPerDay: 500, videoRpm: 1 };
-const AUTOSAVE_KEY = 'mouradrama_studio_autosave_v2';
-const PROJECTS_KEY = 'mouradrama_studio_projects_v2';
+const AUTOSAVE_KEY = 'mouradrama_studio_autosave_v3';
+const PROJECTS_KEY = 'mouradrama_studio_projects_v3';
 const AUTOSAVE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 let counters = { textRequests: 0, imagesGenerated: 0, videoSeconds: 0, videoRequestsThisMinute: 0, lastVideoRequestTime: 0, lastResetTime: Date.now() };
@@ -540,11 +538,11 @@ const FORMATS = [
 ];
 
 const PILLARS = [
-    { id: 'hook', name: 'العنصر الجاذب', emoji: '🎣', time: '0-3 s', desc: 'Ce qui capte l\'attention', prompt: 'Écris un HOOK court (1-2 phrases max) qui démarre IN MEDIAS RES. Pas d\'introduction, pas de "مرحبا بيكم".' },
-    { id: 'inciting', name: 'العنصر المحفز', emoji: '⚡', time: '3-8 s', desc: 'L\'événement déclencheur', prompt: 'Écris l\'ÉLÉMENT DÉCLENCHEUR en 1-2 phrases. Le fait qui change tout.' },
-    { id: 'goal', name: 'الهدف', emoji: '🎯', time: '8-18 s', desc: 'Le but du personnage', prompt: 'Formule LE BUT en 1-2 phrases. Peut être implicite mais clair.' },
-    { id: 'obstacle', name: 'العقبات / التوتر', emoji: '🔥', time: '18-40 s', desc: 'Le cœur de la story', prompt: 'Développe LE CONFLIT en 2-3 phrases. Vraie difficulté. La tension doit durer.' },
-    { id: 'resolution', name: 'الحل / CTA', emoji: '🎬', time: '40-60 s', desc: 'La fin + ce qui reste', prompt: 'Écris LA RÉSOLUTION en 2-3 phrases. Phrase forte finale. CTA en prolongement narratif.' }
+    { id: 'hook', name: 'العنصر الجاذب', emoji: '🎣', time: '0-3 s', desc: 'Ce qui capte l\'attention', prompt: 'Écris un HOOK court (1-2 phrases max) qui démarre IN MEDIAS RES.' },
+    { id: 'inciting', name: 'العنصر المحفز', emoji: '⚡', time: '3-8 s', desc: 'L\'événement déclencheur', prompt: 'Écris l\'ÉLÉMENT DÉCLENCHEUR en 1-2 phrases.' },
+    { id: 'goal', name: 'الهدف', emoji: '🎯', time: '8-18 s', desc: 'Le but du personnage', prompt: 'Formule LE BUT en 1-2 phrases.' },
+    { id: 'obstacle', name: 'العقبات / التوتر', emoji: '🔥', time: '18-40 s', desc: 'Le cœur de la story', prompt: 'Développe LE CONFLIT en 2-3 phrases.' },
+    { id: 'resolution', name: 'الحل / CTA', emoji: '🎬', time: '40-60 s', desc: 'La fin + ce qui reste', prompt: 'Écris LA RÉSOLUTION en 2-3 phrases.' }
 ];
 
 const HOOK_INTENSITIES = {
@@ -553,65 +551,65 @@ const HOOK_INTENSITIES = {
     'fort': { label: 'Fort', prompt: 'Le hook est CHOC : rupture visuelle, contraste brutal.' }
 };
 const ENDINGS = {
-    'revelation': { label: 'Révélation', prompt: 'La chute est une RÉVÉLATION : retournement de sens.' },
+    'revelation': { label: 'Révélation', prompt: 'La chute est une RÉVÉLATION.' },
     'citation': { label: 'Citation', prompt: 'La chute est une CITATION forte.' },
     'question': { label: 'Question ouverte', prompt: 'La chute pose une QUESTION OUVERTE.' },
-    'cta-guide': { label: 'CTA vers guide', prompt: 'La chute se termine par un CTA : "الدليل الكامل فالـ Bio 📖" ou "أكتب DRAMATURGIE فالتعليقات".' }
+    'cta-guide': { label: 'CTA vers guide', prompt: 'La chute se termine par un CTA : "الدليل الكامل فالـ Bio 📖".' }
 };
 
 const THEMES = [
     { id: 'aucun', name: 'Aucun / Personnalisé', emoji: '✏️', desc: 'Décrivez vous-même', week: '', done: false, focus: '' },
-    { id: 'dramaturgie', name: 'Qu\'est-ce que la dramaturgie', emoji: '🎬', desc: 'Le mécanisme commun', week: 'S1', done: true, focus: 'Expliquer que toute histoire repose sur le même mécanisme : un personnage veut quelque chose, rencontre des obstacles, se bat.' },
-    { id: 'protagoniste', name: 'Le protagoniste (البطل)', emoji: '🌑', desc: 'Celui dont les décisions changent la trame', week: 'S1', done: true, focus: 'Le héros n\'est pas celui qui parle le plus, mais celui dont les décisions font avancer l\'histoire.' },
-    { id: 'desir-objectif', name: 'Désir vs objectif (الهدف والرغبة)', emoji: '🎯', desc: 'Ce qu\'il veut vs ce qu\'il veut vraiment', week: 'S1', done: true, focus: 'Distinguer l\'objectif concret (poursuivi) du désir profond (ce qui le pousse).' },
-    { id: 'obstacle', name: 'L\'obstacle (العائق)', emoji: '⛓️', desc: 'Ce qui empêche d\'atteindre le but', week: 'S1', done: true, focus: 'Sans obstacle, le désir n\'a pas de sens dramatique : la collision entre but et obstacle crée le conflit.' },
-    { id: 'conflit', name: 'Le conflit', emoji: '⚔️', desc: 'La confrontation entre deux forces', week: 'S1', done: false, focus: 'Le conflit comme confrontation directe entre le but et ce qui s\'y oppose.' },
-    { id: 'enjeu', name: 'L\'enjeu', emoji: '⚖️', desc: 'Ce qui est en jeu si le héros échoue', week: 'S1', done: false, focus: 'L\'enjeu : ce que le personnage risque de perdre.' },
-    { id: 'exposition', name: 'L\'exposition', emoji: '🎭', desc: 'Le monde avant que tout bascule', week: 'S2', done: false, focus: 'L\'exposition plante tout ce qui va être bouleversé — sans se sentir comme une explication.' },
-    { id: 'declencheur', name: 'L\'élément déclencheur', emoji: '📜', desc: 'Ce qui brise l\'état stable', week: 'S2', done: true, focus: 'L\'élément déclencheur comme rupture de l\'état stable.' },
-    { id: 'action-montante', name: 'L\'action montante', emoji: '🪜', desc: 'La tension qui monte par paliers', week: 'S2', done: false, focus: 'L\'action montante empile des obstacles de plus en plus durs.' },
-    { id: 'point-culminant', name: 'Le point culminant', emoji: '🔆', desc: 'Le sommet de tension', week: 'S2', done: false, focus: 'Le point culminant : la tension accumulée explose dans une confrontation décisive.' },
-    { id: 'resolution-structure', name: 'La résolution', emoji: '🕯️', desc: 'Ce qui reste après la tempête', week: 'S2', done: false, focus: 'La résolution : le nouvel équilibre, ce que le personnage a gagné ou perdu.' },
-    { id: 'structure-3-actes', name: 'La structure en 3 actes', emoji: '🎪', desc: 'Exposition, confrontation, résolution', week: 'S2', done: false, focus: 'La structure en 3 actes et où se situe chaque concept déjà vu.' },
-    { id: 'antagoniste', name: 'L\'antagoniste (الخصم)', emoji: '🎭', desc: 'La force qui s\'oppose au héros', week: 'S3', done: true, focus: 'L\'antagoniste n\'est pas forcément un méchant : c\'est toute force qui s\'oppose au héros.' },
-    { id: 'motivation-objectif', name: 'Motivation vs objectif', emoji: '🔥', desc: 'Le pourquoi derrière le quoi', week: 'S3', done: false, focus: 'Distinguer la motivation (pourquoi) de l\'objectif (quoi).' },
-    { id: 'defaut-caractere', name: 'Le défaut de caractère', emoji: '💔', desc: 'La faille qui complique tout', week: 'S3', done: false, focus: 'Le défaut de caractère : faille interne qui aggrave les obstacles.' },
-    { id: 'arc-transformation', name: 'L\'arc de transformation', emoji: '🦋', desc: 'Qui il était vs qui il devient', week: 'S3', done: false, focus: 'L\'arc de transformation : le changement du personnage.' },
-    { id: 'sous-texte', name: 'Le sous-texte', emoji: '💭', desc: 'Ce qui se dit sans se dire', week: 'S3', done: false, focus: 'Le sous-texte : ce qu\'un personnage veut dire sans le dire.' },
-    { id: 'personnages-secondaires', name: 'Les personnages secondaires', emoji: '👥', desc: 'Leur fonction dans l\'histoire', week: 'S3', done: false, focus: 'Chaque personnage secondaire doit servir le voyage du héros.' },
-    { id: 'dialogue', name: 'Le dialogue efficace', emoji: '💬', desc: 'Dire plus en disant moins', week: 'S4', done: false, focus: 'Chaque ligne fait avancer soit l\'intrigue, soit le personnage.' },
-    { id: 'rythme', name: 'Le rythme (pacing)', emoji: '⏱️', desc: 'Accélérer, ralentir, respirer', week: 'S4', done: false, focus: 'Alternance entre tension et respiration qui garde l\'attention.' },
-    { id: 'retournement', name: 'Le retournement', emoji: '🔄', desc: 'Quand tout bascule', week: 'S4', done: false, focus: 'Changement brutal et inattendu de la trajectoire.' },
-    { id: 'theme', name: 'Le thème', emoji: '🧭', desc: 'L\'idée que l\'histoire défend', week: 'S4', done: false, focus: 'L\'idée ou la question explorée à travers l\'action.' },
-    { id: 'show-dont-tell', name: 'Le "show don\'t tell"', emoji: '👁️', desc: 'Montrer plutôt qu\'expliquer', week: 'S4', done: false, focus: 'Montrer par l\'action plutôt que d\'expliquer par le dialogue.' },
-    { id: 'format-court', name: 'Adapter au format court', emoji: '📱', desc: 'La dramaturgie en moins de 60s', week: 'S4', done: false, focus: 'Compresser les 5 piliers en moins de 60s sans perdre leur fonction.' }
+    { id: 'dramaturgie', name: 'Qu\'est-ce que la dramaturgie', emoji: '🎬', desc: 'Le mécanisme commun', week: 'S1', done: true, focus: 'Expliquer que toute histoire repose sur le même mécanisme.' },
+    { id: 'protagoniste', name: 'Le protagoniste', emoji: '🌑', desc: 'Celui dont les décisions changent la trame', week: 'S1', done: true, focus: 'Le héros n\'est pas celui qui parle le plus, mais celui dont les décisions font avancer.' },
+    { id: 'desir-objectif', name: 'Désir vs objectif', emoji: '🎯', desc: 'Ce qu\'il veut vs ce qu\'il veut vraiment', week: 'S1', done: true, focus: 'Distinguer objectif concret et désir profond.' },
+    { id: 'obstacle', name: 'L\'obstacle', emoji: '⛓️', desc: 'Ce qui empêche d\'atteindre le but', week: 'S1', done: true, focus: 'La collision entre but et obstacle crée le conflit.' },
+    { id: 'conflit', name: 'Le conflit', emoji: '⚔️', desc: 'La confrontation entre deux forces', week: 'S1', done: false, focus: 'Confrontation directe entre le but et ce qui s\'y oppose.' },
+    { id: 'enjeu', name: 'L\'enjeu', emoji: '⚖️', desc: 'Ce qui est en jeu si le héros échoue', week: 'S1', done: false, focus: 'Ce que le personnage risque de perdre.' },
+    { id: 'exposition', name: 'L\'exposition', emoji: '🎭', desc: 'Le monde avant que tout bascule', week: 'S2', done: false, focus: 'L\'exposition plante tout ce qui va être bouleversé.' },
+    { id: 'declencheur', name: 'L\'élément déclencheur', emoji: '📜', desc: 'Ce qui brise l\'état stable', week: 'S2', done: true, focus: 'Rupture de l\'état stable établi par l\'exposition.' },
+    { id: 'action-montante', name: 'L\'action montante', emoji: '🪜', desc: 'La tension qui monte par paliers', week: 'S2', done: false, focus: 'Obstacles empilés de plus en plus durs.' },
+    { id: 'point-culminant', name: 'Le point culminant', emoji: '🔆', desc: 'Le sommet de tension', week: 'S2', done: false, focus: 'La tension accumulée explose.' },
+    { id: 'resolution-structure', name: 'La résolution', emoji: '🕯️', desc: 'Ce qui reste après la tempête', week: 'S2', done: false, focus: 'Le nouvel équilibre, ce que le personnage a gagné ou perdu.' },
+    { id: 'structure-3-actes', name: 'La structure en 3 actes', emoji: '🎪', desc: 'Exposition, confrontation, résolution', week: 'S2', done: false, focus: 'Structure en 3 actes et où se situe chaque concept.' },
+    { id: 'antagoniste', name: 'L\'antagoniste', emoji: '🎭', desc: 'La force qui s\'oppose au héros', week: 'S3', done: true, focus: 'Pas forcément un méchant : toute force qui s\'oppose au héros.' },
+    { id: 'motivation-objectif', name: 'Motivation vs objectif', emoji: '🔥', desc: 'Le pourquoi derrière le quoi', week: 'S3', done: false, focus: 'Distinguer motivation et objectif.' },
+    { id: 'defaut-caractere', name: 'Le défaut de caractère', emoji: '💔', desc: 'La faille qui complique tout', week: 'S3', done: false, focus: 'Faille interne qui aggrave les obstacles.' },
+    { id: 'arc-transformation', name: 'L\'arc de transformation', emoji: '🦋', desc: 'Qui il était vs qui il devient', week: 'S3', done: false, focus: 'Changement du personnage entre début et fin.' },
+    { id: 'sous-texte', name: 'Le sous-texte', emoji: '💭', desc: 'Ce qui se dit sans se dire', week: 'S3', done: false, focus: 'Ce qu\'un personnage veut dire sans le dire.' },
+    { id: 'personnages-secondaires', name: 'Les personnages secondaires', emoji: '👥', desc: 'Leur fonction', week: 'S3', done: false, focus: 'Ils doivent servir le voyage du héros.' },
+    { id: 'dialogue', name: 'Le dialogue efficace', emoji: '💬', desc: 'Dire plus en disant moins', week: 'S4', done: false, focus: 'Chaque ligne fait avancer l\'intrigue ou le personnage.' },
+    { id: 'rythme', name: 'Le rythme', emoji: '⏱️', desc: 'Accélérer, ralentir, respirer', week: 'S4', done: false, focus: 'Alternance entre tension et respiration.' },
+    { id: 'retournement', name: 'Le retournement', emoji: '🔄', desc: 'Quand tout bascule', week: 'S4', done: false, focus: 'Changement brutal et inattendu.' },
+    { id: 'theme', name: 'Le thème', emoji: '🧭', desc: 'L\'idée défendue', week: 'S4', done: false, focus: 'L\'idée ou la question explorée à travers l\'action.' },
+    { id: 'show-dont-tell', name: 'Le "show don\'t tell"', emoji: '👁️', desc: 'Montrer plutôt qu\'expliquer', week: 'S4', done: false, focus: 'Montrer par l\'action plutôt qu\'expliquer par le dialogue.' },
+    { id: 'format-court', name: 'Adapter au format court', emoji: '📱', desc: 'La dramaturgie en moins de 60s', week: 'S4', done: false, focus: 'Compresser les 5 piliers en moins de 60s.' }
 ];
 
 const CONCEPT_SYMBOLS = {
-    'dramaturgie': { object: 'Un clap de cinéma ouvert et des bobines de film empilées, posés sur une table en bois.', camera: 'Cadrer le clap à environ 45°, ardoise JAMAIS de face (angle trois-quarts) pour éviter tout texte parasite. Travelling avant très léger (max 15%).' },
-    'protagoniste': { object: 'Une seule silhouette humaine floue, debout dans un couloir de théâtre sombre.', camera: 'Toujours de dos ou à contre-jour total. Jamais de face. Jamais une deuxième figure dans le plan.' },
+    'dramaturgie': { object: 'Un clap de cinéma ouvert et des bobines de film empilées, posés sur une table en bois.', camera: 'Cadrer le clap à 45°, ardoise JAMAIS de face. Travelling avant très léger (max 15%).' },
+    'protagoniste': { object: 'Une seule silhouette humaine floue, debout dans un couloir de théâtre sombre.', camera: 'Toujours de dos ou à contre-jour. Jamais de face. Jamais deux figures.' },
     'desir-objectif': { object: 'Une cible d\'archerie ronde en bois à anneaux concentriques, avec une flèche à empennage.', camera: 'La flèche s\'approche du centre doré et s\'y plante PRÈS du centre, jamais pile dessus.' },
-    'obstacle': { object: 'Une ou plusieurs chaînes dorées tendues, qui s\'entrelacent progressivement.', camera: 'AUCUNE main, aucun doigt, aucune silhouette humaine. L\'obstacle se renforce seul.' },
+    'obstacle': { object: 'Une ou plusieurs chaînes dorées tendues, qui s\'entrelacent progressivement.', camera: 'AUCUNE main, aucun doigt, aucune silhouette humaine.' },
     'conflit': { object: 'Deux faisceaux de lumière dorée qui se croisent et se repoussent au centre du cadre.', camera: 'Cadre fixe, symétrique. Le conflit est montré par la lumière elle-même.' },
-    'enjeu': { object: 'Une balance ancienne en bois et métal doré, légèrement déséquilibrée.', camera: 'Plan fixe. Le déséquilibre s\'accentue légèrement sur la durée du plan.' },
+    'enjeu': { object: 'Une balance ancienne en bois et métal doré, légèrement déséquilibrée.', camera: 'Plan fixe. Le déséquilibre s\'accentue légèrement.' },
     'exposition': { object: 'Une scène de théâtre vide, rideau fermé, un seul objet posé au centre.', camera: 'Plan large et stable. Aucun mouvement brusque.' },
-    'declencheur': { object: 'Une bande de pellicule 35mm qui se déchire progressivement en son centre.', camera: 'La bande reste plate et rigide. Ne JAMAIS la laisser se courber en silhouette humaine.' },
-    'action-montante': { object: 'Un escalier de pellicule qui monte dans l\'obscurité, chaque marche plus éclairée.', camera: 'Travelling avant lent qui suit la montée. Un seul mouvement continu.' },
-    'point-culminant': { object: 'Un unique faisceau de lumière doré qui atteint son intensité maximale sur un objet central.', camera: 'L\'intensité lumineuse monte progressivement jusqu\'à un pic net en fin de plan.' },
-    'resolution-structure': { object: 'Le même clap que l\'ouverture, qui se referme complètement à plat.', camera: 'Cadrer le clap de profil ou trois-quarts serré. Fermeture progressive et mesurable.' },
-    'structure-3-actes': { object: 'Trois rideaux de théâtre successifs qui s\'ouvrent l\'un après l\'autre.', camera: 'Un seul mouvement de caméra continu qui traverse les trois rideaux.' },
-    'antagoniste': { object: 'Deux masques de théâtre DORÉS ornementés (jamais blancs), face à face.', camera: 'Rapprochement lent et continu. Ils finissent presque nez à nez, sans jamais se toucher.' },
-    'motivation-objectif': { object: 'Une flamme de bougie protégée par la main en silhouette, avec une cible flou en arrière-plan.', camera: 'Si une main apparaît, elle doit rester une masse sombre sans détail de peau.' },
+    'declencheur': { object: 'Une bande de pellicule 35mm qui se déchire progressivement en son centre.', camera: 'La bande reste plate et rigide.' },
+    'action-montante': { object: 'Un escalier de pellicule qui monte dans l\'obscurité, chaque marche plus éclairée.', camera: 'Travelling avant lent. Un seul mouvement continu.' },
+    'point-culminant': { object: 'Un unique faisceau de lumière doré qui atteint son intensité maximale sur un objet central.', camera: 'L\'intensité lumineuse monte progressivement.' },
+    'resolution-structure': { object: 'Le même clap que l\'ouverture, qui se referme complètement à plat.', camera: 'Cadrer le clap de profil ou trois-quarts serré.' },
+    'structure-3-actes': { object: 'Trois rideaux de théâtre successifs qui s\'ouvrent l\'un après l\'autre.', camera: 'Un seul mouvement continu qui traverse les trois rideaux.' },
+    'antagoniste': { object: 'Deux masques de théâtre DORÉS ornementés (jamais blancs), face à face.', camera: 'Rapprochement lent. Ils finissent presque nez à nez, sans jamais se toucher.' },
+    'motivation-objectif': { object: 'Une flamme de bougie protégée par une main en silhouette, avec une cible floue en arrière-plan.', camera: 'La main doit rester une masse sombre sans détail de peau.' },
     'defaut-caractere': { object: 'Une fissure fine qui traverse lentement un miroir doré ancien.', camera: 'Plan fixe, la fissure progresse de façon continue.' },
-    'arc-transformation': { object: 'Un masque de théâtre qui change progressivement de teinte (sombre vers doré).', camera: 'Transformation de couleur uniquement — jamais de changement de forme ou d\'identité.' },
-    'sous-texte': { object: 'Deux ombres projetées qui se chevauchent sans que les objets ne se touchent.', camera: 'Cadrage fixe sur le jeu d\'ombres, pas sur les objets.' },
-    'personnages-secondaires': { object: 'Plusieurs silhouettes floues en arrière-plan, orientées vers une silhouette nette au premier plan.', camera: 'Les silhouettes secondaires restent hors focus, jamais de visage.' },
-    'dialogue': { object: 'Deux faisceaux de lumière qui alternent, l\'un s\'éteignant quand l\'autre s\'allume.', camera: 'Alternance régulière et lisible, rythme constant.' },
-    'rythme': { object: 'Un métronome ancien en bois et laiton, dont le balancier accélère puis ralentit.', camera: 'Un seul mouvement continu de caméra, synchronisé avec le balancier.' },
-    'retournement': { object: 'Une pièce de monnaie dorée qui tourne sur elle-même en plein vol.', camera: 'Ralenti progressif sur la rotation, elle ne touche jamais le sol dans le plan.' },
-    'theme': { object: 'Un livre ancien ouvert dont les pages tournent seules sous un faisceau de lumière.', camera: 'Plan fixe, pages qui tournent lentement, aucune page ne doit afficher de texte lisible.' },
-    'show-dont-tell': { object: 'Une paire de chaussures usées posée à l\'entrée d\'une scène de théâtre vide.', camera: 'Plan fixe et long, aucun texte, aucune explication visuelle superflue.' },
-    'format-court': { object: 'Un sablier doré dont le sable s\'écoule rapidement.', camera: 'Travelling avant modéré sur le sablier, écoulement visible sur toute la durée.' }
+    'arc-transformation': { object: 'Un masque de théâtre qui change progressivement de teinte.', camera: 'Transformation de couleur uniquement.' },
+    'sous-texte': { object: 'Deux ombres projetées qui se chevauchent sans que les objets ne se touchent.', camera: 'Cadrage fixe sur le jeu d\'ombres.' },
+    'personnages-secondaires': { object: 'Plusieurs silhouettes floues en arrière-plan, orientées vers une silhouette nette.', camera: 'Les silhouettes secondaires restent hors focus.' },
+    'dialogue': { object: 'Deux faisceaux de lumière qui alternent, l\'un s\'éteignant quand l\'autre s\'allume.', camera: 'Alternance régulière et lisible.' },
+    'rythme': { object: 'Un métronome ancien en bois et laiton, dont le balancier accélère puis ralentit.', camera: 'Mouvement continu synchronisé avec le balancier.' },
+    'retournement': { object: 'Une pièce de monnaie dorée qui tourne sur elle-même en plein vol.', camera: 'Ralenti progressif sur la rotation.' },
+    'theme': { object: 'Un livre ancien ouvert dont les pages tournent seules sous un faisceau de lumière.', camera: 'Plan fixe, aucune page ne doit afficher de texte lisible.' },
+    'show-dont-tell': { object: 'Une paire de chaussures usées posée à l\'entrée d\'une scène de théâtre vide.', camera: 'Plan fixe et long.' },
+    'format-court': { object: 'Un sablier doré dont le sable s\'écoule rapidement.', camera: 'Travelling avant modéré sur le sablier.' }
 };
 
 function buildMouradramaRulesBlock() {
@@ -622,13 +620,13 @@ function buildMouradramaRulesBlock() {
     const rNearMiss = document.getElementById('rule-near-miss')?.checked ?? true;
     const rCamera = document.getElementById('rule-fixed-camera')?.checked ?? true;
     let b = '\n\n═══ 🛡️ RÈGLES STRICTES MOURADRAMA — NON NÉGOCIABLES ═══\n';
-    if (r3q) b += '- Toute surface plane pouvant recevoir du texte (ardoise, pellicule, étiquette) : cadrage TROIS-QUARTS ou PROFIL, jamais de face. Sinon, répéter "completely blank, no inscriptions, smooth surface".\n';
-    if (rHand) b += '- AUCUNE main, doigt ou peau sur un objet manipulé. L\'objet évolue seul (ex. une 2e chaîne qui s\'entrelace).\n';
-    if (rSingle) b += '- Un seul concept, un seul objet symbolique par plan. INTERDICTION de transition, fondu ou morphing vers un second objet en cours de plan.\n';
-    if (rFigure) b += '- Maximum UNE silhouette humaine par plan, toujours de dos/contre-jour/profil. Jamais de visage net, jamais deux personnages.\n';
-    if (rNearMiss) b += '- Ne jamais montrer une résolution totale avant la fin de l\'histoire (flèche PRÈS du centre, masques SANS se toucher).\n';
-    if (rCamera) b += '- Mouvement caméra lent et modéré UNIQUEMENT (max ~15%). Jamais de sur-zoom. L\'objet reste entièrement visible du début à la fin.\n';
-    b += '- Palette stricte navy/noir + unique projecteur doré chaud. Poussière en suspension permanente. Sol sombre légèrement réfléchissant. Rendu photoréaliste uniquement.\n';
+    if (r3q) b += '- Toute surface plane pouvant recevoir du texte : cadrage TROIS-QUARTS ou PROFIL, jamais de face.\n';
+    if (rHand) b += '- AUCUNE main, doigt ou peau sur un objet manipulé.\n';
+    if (rSingle) b += '- Un seul concept, un seul objet symbolique par plan.\n';
+    if (rFigure) b += '- Maximum UNE silhouette humaine par plan, toujours de dos/contre-jour/profil.\n';
+    if (rNearMiss) b += '- Ne jamais montrer une résolution totale avant la fin de l\'histoire.\n';
+    if (rCamera) b += '- Mouvement caméra lent et modéré UNIQUEMENT (max ~15%).\n';
+    b += '- Palette stricte navy/noir + unique projecteur doré chaud. Poussière en suspension. Rendu photoréaliste uniquement.\n';
     b += '- Vidéo silencieuse : aucun son généré.\n';
     b += '═══ FIN RÈGLES MOURADRAMA ═══\n';
     return b;
@@ -636,16 +634,16 @@ function buildMouradramaRulesBlock() {
 
 const STYLES = [
     { id: 'mouradrama', name: 'Mouradrama (officiel)', emoji: '🏛️', flagship: true, prompt: 'Vertical 9:16 cinematic short, dark navy and black color palette, single warm golden spotlight as the only strong light source, floating dust particles suspended throughout, dark reflective floor with subtle diffuse reflections, shallow depth of field, photorealistic cinema-grade rendering with light film grain, empty theater or film studio atmosphere at night. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and inanimate symbolic objects only.' },
-    { id: 'mouradrama-pluie', name: 'Mouradrama — nuit de pluie', emoji: '🌧️', flagship: true, prompt: 'Same Mouradrama visual bible (navy/black, single golden spotlight, dust, reflective dark floor, photorealistic, no faces) with a subtle rain-soaked reflective floor adding extra highlights.' },
-    { id: 'mouradrama-intense', name: 'Mouradrama — contraste intense', emoji: '🔥', flagship: true, prompt: 'Same Mouradrama visual bible but higher contrast: deeper blacks, more saturated gold highlights, slightly more visible dust. Photorealistic, no faces.' },
-    { id: 'silhouette-theatre', name: 'Silhouette Théâtre (générique)', emoji: '🌑', prompt: 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, back-lit against dramatic single spotlight, empty stage, deep shadows, high contrast' },
-    { id: 'theatre-grec', name: 'Théâtre Grec', emoji: '🏛️', prompt: 'Ancient Greek theatre aesthetic, marble columns, Greek masks, amphitheater, terracotta and gold tones, no human faces' },
-    { id: 'puppet-shadow', name: 'Ombres Chinoises', emoji: '🎭', prompt: 'Chinese shadow puppet style, black paper-cut silhouettes on illuminated screen, NO FACIAL FEATURES, theatrical backlighting' },
-    { id: 'minimal-symbolique', name: 'Minimal Symbolique', emoji: '⬛', prompt: 'Minimalist symbolic illustration, geometric shapes, flat colors, icons, no human figures' },
-    { id: 'theatre-barock', name: 'Théâtre Baroque', emoji: '⚜️', prompt: 'Baroque theatre aesthetic, ornate red velvet curtains, gilded frames, chiaroscuro, crimson and gold, no human faces' },
-    { id: 'theatre-noir', name: 'Théâtre Noir', emoji: '🖤', prompt: 'Film noir theatrical style, stark black and white, harsh shadows, silhouette figures with NO FACIAL FEATURES' },
-    { id: 'blueprint', name: 'Schéma Technique', emoji: '📊', prompt: 'Technical blueprint diagram style, white lines on dark blue background, geometric precision, arrows, labels' },
-    { id: 'vitrail', name: 'Vitrail', emoji: '🪟', prompt: 'Stained glass window aesthetic, fragmented colored glass, black lead lines, symbolic figures without facial features' },
+    { id: 'mouradrama-pluie', name: 'Mouradrama — nuit de pluie', emoji: '🌧️', flagship: true, prompt: 'Same Mouradrama visual bible with subtle rain-soaked reflective floor.' },
+    { id: 'mouradrama-intense', name: 'Mouradrama — contraste intense', emoji: '🔥', flagship: true, prompt: 'Same Mouradrama visual bible but higher contrast: deeper blacks, more saturated gold highlights, more visible dust.' },
+    { id: 'silhouette-theatre', name: 'Silhouette Théâtre', emoji: '🌑', prompt: 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, back-lit against dramatic single spotlight' },
+    { id: 'theatre-grec', name: 'Théâtre Grec', emoji: '🏛️', prompt: 'Ancient Greek theatre aesthetic, marble columns, Greek masks, amphitheater, terracotta and gold tones' },
+    { id: 'puppet-shadow', name: 'Ombres Chinoises', emoji: '🎭', prompt: 'Chinese shadow puppet style, black paper-cut silhouettes on illuminated screen' },
+    { id: 'minimal-symbolique', name: 'Minimal Symbolique', emoji: '⬛', prompt: 'Minimalist symbolic illustration, geometric shapes, flat colors, icons' },
+    { id: 'theatre-barock', name: 'Théâtre Baroque', emoji: '⚜️', prompt: 'Baroque theatre aesthetic, ornate red velvet curtains, gilded frames, chiaroscuro' },
+    { id: 'theatre-noir', name: 'Théâtre Noir', emoji: '🖤', prompt: 'Film noir theatrical style, stark black and white, harsh shadows' },
+    { id: 'blueprint', name: 'Schéma Technique', emoji: '📊', prompt: 'Technical blueprint diagram style, white lines on dark blue background' },
+    { id: 'vitrail', name: 'Vitrail', emoji: '🪟', prompt: 'Stained glass window aesthetic, fragmented colored glass, black lead lines' },
     { id: 'custom', name: 'Personnalisé', emoji: '✏️', prompt: '' }
 ];
 
@@ -657,10 +655,10 @@ const NARRATORS = {
 };
 
 const LANGUAGES = {
-    'fr': { label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'], promptInstruction: 'IMPORTANT : Écris TOUTE la narration en français académique et précis.' },
-    'ar': { label: 'Arabe classique (Fusha)', ttsLang: 'ar-SA', ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'], promptInstruction: 'IMPORTANT : Écris TOUTE la narration en arabe classique académique.' },
+    'fr': { label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'], promptInstruction: 'IMPORTANT : Écris TOUTE la narration en français académique.' },
+    'ar': { label: 'Arabe classique', ttsLang: 'ar-SA', ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'], promptInstruction: 'IMPORTANT : Écris TOUTE la narration en arabe classique académique.' },
     'ar-dz': { label: 'Daridja algérienne', ttsLang: 'ar-DZ', ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'], promptInstruction: `⚠️ RÈGLE ABSOLUE ⚠️
-Tu DOIS écrire TOUTE la narration en DARIDJA ALGÉRIENNE (الدارجة الجزائرية) en alphabet arabe.
+Écris TOUTE la narration en DARIDJA ALGÉRIENNE (الدارجة الجزائرية) en alphabet arabe.
 - JAMAIS d'arabe classique (فصحى).
 - Vocabulaire : واش، كيفاش، بزاف، برك، غالط، بصح، درك، هاد، هادا، ديالي، ديالك، ماشي، كي، باش، شكون، علاش، فين، كيما، وليت، صار، يحوس، يخلي...
 - Terminologie : "الخصم" (PAS الأنتاغونيست).
@@ -670,15 +668,12 @@ Tu DOIS écrire TOUTE la narration en DARIDJA ALGÉRIENNE (الدارجة الج
 
 const state = {
     isRunning: false, stopRequested: false, idea: '',
-    selectedFormat: FORMATS[0],
-    selectedTheme: THEMES[0],
-    selectedStyle: STYLES[0],
+    selectedFormat: FORMATS[0], selectedTheme: THEMES[0], selectedStyle: STYLES[0],
     customConcept: '', customStyle: '',
     hookIntensity: 'moyen', endingType: 'cta-guide',
     narrationStyle: 'universitaire', narratorVoice: 'male-deep',
     narrationLanguage: 'ar-dz',
-    clipCount: 5, numFrames: 241, aspect: 'portrait',
-    mirrorClosing: true,
+    clipCount: 5, numFrames: 241, aspect: 'portrait', mirrorClosing: true,
     scenario: null, sceneFrames: [], videos: [],
     constraints: { objects: '', concepts: '', references: '', forbidden: '', free: '' },
     currentSceneIndex: 0, isPlayingSequence: false, lastTextRequestTime: 0,
@@ -778,11 +773,10 @@ function updateGenerateBtn() {
     else { const c = getActiveConstraints(); b.textContent = c.total > 0 ? '🎭 Générer (' + c.total + ' contrainte' + (c.total > 1 ? 's' : '') + ')' : '🎭 Générer la leçon de dramaturgie'; }
 }
 
-// AUTO-SAVE
 let autoSaveTimer = null;
 function buildSnapshot() {
     return {
-        version: 2, savedAt: Date.now(),
+        version: 3, savedAt: Date.now(),
         projectName: document.getElementById('project-name').value || 'Leçon Mouradrama',
         idea: document.getElementById('idea-input').value || '',
         selectedFormatId: state.selectedFormat.id,
@@ -1003,11 +997,32 @@ function downloadScript() {
     showToast('Script téléchargé ✓', 'success');
 }
 
+// ══════════════════════════════════════════════════════════════════
+// CORRECTION 1 : extractJsonFromString robuste (répare les retours à la ligne)
+// ══════════════════════════════════════════════════════════════════
 function extractJsonFromString(str) {
-    let c = str.replace(/```json/gi, '').replace(/```/g, '');
+    if (!str) return '';
+    let c = str.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
     const f = c.indexOf('{'); const l = c.lastIndexOf('}');
-    if (f !== -1 && l !== -1 && l > f) c = c.substring(f, l + 1);
-    return c;
+    if (f === -1 || l === -1 || l <= f) return c;
+    c = c.substring(f, l + 1);
+    c = c.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
+    let out = '';
+    let inString = false;
+    let escaped = false;
+    for (let i = 0; i < c.length; i++) {
+        const ch = c[i];
+        if (escaped) { out += ch; escaped = false; continue; }
+        if (ch === '\\') { out += ch; escaped = true; continue; }
+        if (ch === '"') { inString = !inString; out += ch; continue; }
+        if (inString) {
+            if (ch === '\n') { out += '\\n'; continue; }
+            if (ch === '\r') { continue; }
+            if (ch === '\t') { out += '\\t'; continue; }
+        }
+        out += ch;
+    }
+    return out;
 }
 
 async function fetchWithRetry(url, options = {}, maxRetries = 3, label = 'API') {
@@ -1028,11 +1043,14 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3, label = 'API') 
     throw new Error(label + ' : échec');
 }
 
+// ══════════════════════════════════════════════════════════════════
+// CORRECTION 2 : max_tokens 8000 par défaut
+// ══════════════════════════════════════════════════════════════════
 async function callTextAPI(messages, options = {}) {
     const now = Date.now();
     if (now - state.lastTextRequestTime < 2000) await sleep(2000 - (now - state.lastTextRequestTime));
     state.lastTextRequestTime = Date.now(); counters.textRequests++; updateLimitsPanel();
-    const body = { model: MODEL_TEXT, messages, temperature: options.temperature ?? 0.65, max_tokens: options.maxTokens ?? 4096 };
+    const body = { model: MODEL_TEXT, messages, temperature: options.temperature ?? 0.65, max_tokens: options.maxTokens ?? 8000 };
     logConsole('Requête texte → ' + MODEL_TEXT, 'info');
     const res = await fetchWithRetry(API_BASE + '/chat/completions', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Texte');
     if (!res.ok) throw new Error('Text API HTTP ' + res.status);
@@ -1122,9 +1140,6 @@ async function pollVideoForItem(item) {
     throw new Error('Délai maximal dépassé');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PIPELINE
-// ══════════════════════════════════════════════════════════════════
 async function runPipeline() {
     if (state.isRunning) return;
     const idea = document.getElementById('idea-input').value.trim();
@@ -1197,7 +1212,6 @@ async function runPipeline() {
     logConsole('Style : ' + styleName, 'info');
     logConsole('Langue : ' + langInfo.label + ' · Narrateur : ' + NARRATORS[state.narratorVoice].label, 'info');
     logConsole('Hook : ' + hookInfo.label + ' · Résolution : ' + endingInfo.label, 'pillar');
-    logConsole('⚜ Aucun visage humain · Silhouettes uniquement', 'lock');
     if (conceptSymbol) logConsole('🔒 Symbole verrouillé : ' + conceptSymbol.object.slice(0, 60) + '…', 'lock');
 
     const activeConstraints = getActiveConstraints();
@@ -1215,7 +1229,7 @@ async function runPipeline() {
 
         const aspectLabel = state.aspect === 'portrait' ? 'portrait 9:16' : state.aspect === 'landscape' ? 'paysage 16:9' : 'carré 1:1';
         const constraintBlock = buildConstraintBlock();
-        const mirrorInstruction = state.mirrorClosing && state.clipCount >= 2 ? '\n⚠️ CLÔTURE MIROIR : la DERNIÈRE scène doit reprendre le décor, les objets et le cadrage de la PREMIÈRE scène, avec une action de fermeture (ex. le clap qui se referme, la boucle qui se boucle).' : '';
+        const mirrorInstruction = state.mirrorClosing && state.clipCount >= 2 ? '\n⚠️ CLÔTURE MIROIR : la DERNIÈRE scène doit reprendre le décor, les objets et le cadrage de la PREMIÈRE scène, avec une action de fermeture.' : '';
 
         const scriptPrompt = `Tu es le réalisateur de la série Mouradrama. Tu produis des leçons pédagogiques sur la dramaturgie, en darija algérienne.
 
@@ -1250,7 +1264,7 @@ Génère EXACTEMENT ${state.clipCount} scènes narratives.
 Chaque scène = 1 clip. Fournis 2 prompts d'image (début + fin) par scène.
 
 {
-  "title": "Titre",
+  "title": "Titre court",
   "logline": "Résumé en une phrase",
   "concept": "${conceptName}",
   "theorician": "Théoricien(s) de référence",
@@ -1278,13 +1292,25 @@ Chaque scène = 1 clip. Fournis 2 prompts d'image (début + fin) par scène.
 
 ⚠️ Vérifications : "scenes" = EXACTEMENT ${state.clipCount} entrées. Texte en darija si choisie. JSON valide uniquement.`;
 
+        // ═══════════════════════════════════════════════════════════════
+        // CORRECTION 3 : system prompt renforcé + max_tokens 8000
+        // ═══════════════════════════════════════════════════════════════
         const scriptRaw = await callTextAPI([
-            { role: 'system', content: 'Tu es le réalisateur de Mouradrama. Tu réponds UNIQUEMENT en JSON valide. Tu utilises "الخصم" et non "الأنتاغونيست".' },
+            { role: 'system', content: 'Tu es le réalisateur de Mouradrama. Tu réponds UNIQUEMENT avec un objet JSON brut, SANS balises Markdown, SANS ```json, SANS commentaire avant ou après. Commence ta réponse par { et termine par }. Tu utilises "الخصم" et non "الأنتاغونيست". Pour les objets en darija, utilise "لي" au lieu de "التي". N\'utilise JAMAIS de retour à la ligne à l\'intérieur des valeurs de chaînes JSON — utilise des espaces.' },
             { role: 'user', content: scriptPrompt }
-        ], { temperature: 0.65, maxTokens: 4096 });
+        ], { temperature: 0.65, maxTokens: 8000 });
 
         let scenario;
-        try { scenario = JSON.parse(extractJsonFromString(scriptRaw)); } catch (e) { logConsole('Erreur JSON : ' + scriptRaw.slice(0, 300), 'warn'); throw new Error('JSON invalide.'); }
+        try {
+            const cleaned = extractJsonFromString(scriptRaw);
+            logConsole('Longueur JSON nettoyé : ' + cleaned.length + ' caractères', 'info');
+            scenario = JSON.parse(cleaned);
+        } catch (e) {
+            logConsole('Erreur JSON après nettoyage : ' + e.message, 'warn');
+            logConsole('Extrait : ' + scriptRaw.slice(0, 400), 'warn');
+            throw new Error('JSON invalide.');
+        }
+
         if (!scenario.scenes || scenario.scenes.length === 0) throw new Error('Aucune scène générée.');
         if (scenario.scenes.length > state.clipCount) scenario.scenes = scenario.scenes.slice(0, state.clipCount);
         if (!scenario.symbols) scenario.symbols = [];
@@ -1428,7 +1454,6 @@ function displayScript(scenario) {
     if (scenario.logline) h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;direction:auto;">' + esc(scenario.logline) + '</p>';
     if (scenario.concept) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.4rem;">Concept : ' + esc(scenario.concept) + '</div>';
     if (scenario.theorician) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Théoricien(s) : ' + esc(scenario.theorician) + '</div>';
-
     if (scenario.pillars && scenario.pillars.length > 0) {
         h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--accent);text-transform:uppercase;">📐 Les 5 piliers narratifs</strong>';
         scenario.pillars.forEach(p => {
@@ -1441,13 +1466,11 @@ function displayScript(scenario) {
         });
         h += '</div>';
     }
-
     if (scenario.symbols && scenario.symbols.length > 0) {
         h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--success);text-transform:uppercase;">⚜ Symboles visuels</strong>';
         scenario.symbols.forEach(x => { h += '<div class="scene-block" style="border-left-color:var(--success);"><strong>' + esc(x.name) + '</strong> — ' + esc(x.description) + '</div>'; });
         h += '</div>';
     }
-
     if (scenario.scenes && scenario.scenes.length > 0) {
         h += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.72rem;color:var(--info);text-transform:uppercase;">🎬 ' + scenario.scenes.length + ' Scènes = ' + scenario.scenes.length + ' Clips</strong></div>';
         scenario.scenes.forEach(sc => {
@@ -1460,7 +1483,6 @@ function displayScript(scenario) {
             h += '</div>';
         });
     }
-
     d.innerHTML = h;
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -1595,14 +1617,10 @@ function testVoice() {
     speakText(t);
 }
 
-// ══════════════════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════════════════
 (function init() {
     initSpeech();
     loadMeasuredSpeed();
 
-    // Formats
     const fg = document.getElementById('format-grid');
     FORMATS.forEach((f, i) => {
         const c = document.createElement('div');
@@ -1620,17 +1638,14 @@ function testVoice() {
         fg.appendChild(c);
     });
 
-    // Piliers
     const pg = document.getElementById('pillar-grid');
     PILLARS.forEach(p => {
         const c = document.createElement('div');
         c.className = 'pillar-card';
         c.innerHTML = '<div style="font-weight:700;font-size:0.85rem;direction:rtl;text-align:right;">' + p.emoji + ' ' + p.name + '</div><div class="pc-time">' + p.time + '</div>';
-        c.style.cursor = 'default';
         pg.appendChild(c);
     });
 
-    // Concepts
     const tg = document.getElementById('theme-grid');
     THEMES.forEach((t, i) => {
         const c = document.createElement('div');
@@ -1650,7 +1665,6 @@ function testVoice() {
         tg.appendChild(c);
     });
 
-    // Styles
     const syg = document.getElementById('style-grid');
     STYLES.forEach((s, i) => {
         const c = document.createElement('div');
@@ -1668,27 +1682,16 @@ function testVoice() {
         syg.appendChild(c);
     });
 
-    // Boutons API
     document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
     document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
-
-    // Générer / Stop
     document.getElementById('generate-btn').addEventListener('click', runPipeline);
     document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; logConsole('Arrêt demandé', 'warn'); setStatus('Arrêt en cours…'); });
-
-    // Idée
     document.getElementById('idea-input').addEventListener('input', () => { updateGenerateBtn(); scheduleAutoSave(); });
-
-    // Sections toggle
     document.querySelectorAll('[data-toggle]').forEach(header => {
         header.addEventListener('click', () => { document.getElementById(header.dataset.toggle).classList.toggle('open'); });
     });
-
-    // Lecture
     document.getElementById('play-all-btn').addEventListener('click', () => { if (state.isPlayingSequence) stopAllVideos(); else playAllVideos(); });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
-
-    // Projets / session
     document.getElementById('save-project-btn').addEventListener('click', saveProject);
     document.getElementById('load-project-btn').addEventListener('click', loadProject);
     document.getElementById('new-project-btn').addEventListener('click', newProject);
@@ -1697,7 +1700,6 @@ function testVoice() {
     document.getElementById('save-as-project-btn').addEventListener('click', () => { saveProject(); });
     document.getElementById('clear-autosave-btn').addEventListener('click', () => { if (confirm('Effacer la session auto-sauvegardée ?')) { clearAutoSavedSession(); showToast('Session effacée', 'warn'); } });
 
-    // Constraints
     ['constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free'].forEach(id => {
         document.getElementById(id).addEventListener('input', () => {
             state.constraints = {
@@ -1711,18 +1713,13 @@ function testVoice() {
         });
     });
     document.getElementById('clear-constraints-btn').addEventListener('click', clearConstraints);
-
-    // Custom inputs
     document.getElementById('custom-concept-input').addEventListener('input', (e) => { state.customConcept = e.target.value.trim(); scheduleAutoSave(); });
     document.getElementById('custom-style-input').addEventListener('input', (e) => { state.customStyle = e.target.value.trim(); scheduleAutoSave(); });
-
-    // Narration
     document.getElementById('language-select').addEventListener('change', (e) => { state.narrationLanguage = e.target.value; logConsole('Langue : ' + LANGUAGES[state.narrationLanguage].label, 'info'); scheduleAutoSave(); });
     document.getElementById('narrator-select').addEventListener('change', (e) => { state.narratorVoice = e.target.value; logConsole('Voix : ' + NARRATORS[state.narratorVoice].label, 'info'); scheduleAutoSave(); });
     document.getElementById('test-voice-btn').addEventListener('click', testVoice);
     document.getElementById('download-script-btn').addEventListener('click', downloadScript);
 
-    // Champs techniques — auto-save
     ['clip-count-select', 'clip-duration-select', 'aspect-select', 'mirror-closing-select', 'project-name', 'hook-intensity-select', 'ending-type-select', 'narration-select'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.addEventListener('change', scheduleAutoSave); el.addEventListener('input', scheduleAutoSave); }
@@ -1732,9 +1729,7 @@ function testVoice() {
         if (el) el.addEventListener('change', scheduleAutoSave);
     });
 
-    // Save before close
     window.addEventListener('beforeunload', () => { performAutoSave(true); });
-    // Save toutes les 60s
     setInterval(() => { if (!state.isRunning) performAutoSave(false); }, 60000);
 
     updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
@@ -1744,8 +1739,8 @@ function testVoice() {
     logConsole('Mouradrama Studio prêt.', 'info');
     logConsole('🎭 ' + THEMES.length + ' concepts · ' + STYLES.length + ' styles · 6 règles strictes', 'pillar');
     logConsole('💾 Sauvegarde auto activée', 'autosave');
+    logConsole('✅ Corrections JSON appliquées (extract robuste + max_tokens 8000 + system prompt renforcé)', 'success');
 
-    // Restauration automatique
     const snap = loadAutoSavedSession();
     if (snap) {
         const ageMin = Math.round((Date.now() - snap.savedAt) / 60000);
