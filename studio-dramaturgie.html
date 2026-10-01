@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mouradrama Studio — Production dramaturgie</title>
+<title>Mouradrama Studio — v4</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -37,7 +37,7 @@
     .section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s; }
     .section.open .section-header .chevron { transform: rotate(180deg); }
     .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s; }
-    .section.open .section-body { max-height: 14000px; }
+    .section.open .section-body { max-height: 20000px; }
     .section-content { padding: 0 1.1rem 1.1rem; }
 
     .project-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
@@ -111,7 +111,9 @@
     .symbol-lock-panel.visible { display: block; }
     .symbol-lock-panel .sl-title { color: var(--gold); font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.35rem; }
     .symbol-lock-panel .sl-object { color: var(--ink); margin-bottom: 0.3rem; }
-    .symbol-lock-panel .sl-camera { color: var(--ink-dim); font-size: 0.72rem; }
+    .symbol-lock-panel .sl-camera { color: var(--ink-dim); font-size: 0.72rem; margin-bottom: 0.3rem; }
+    .symbol-lock-panel .sl-forbidden { color: var(--error); font-size: 0.72rem; padding-top: 0.3rem; border-top: 1px solid #2a1a0a; }
+    .symbol-lock-panel .sl-forbidden strong { color: #ff6644; }
 
     .rule-toggle-grid { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.6rem; }
     .rule-toggle { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.7rem; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--border); }
@@ -124,6 +126,9 @@
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
     .btn-stop { width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid var(--error); background: transparent; color: var(--error); font-size: 0.85rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; display: none; }
     .btn-stop.visible { display: block; }
+    .btn-validate { width: 100%; padding: 0.85rem; border-radius: 10px; border: none; background: linear-gradient(135deg, #2d8a4e, #1a5a30); color: #fff; font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 0.5rem; }
+    .btn-regen { width: 100%; padding: 0.85rem; border-radius: 10px; border: 1px solid var(--warn); background: transparent; color: var(--warn); font-size: 0.85rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; }
+    .btn-download-all { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--info); background: transparent; color: var(--info); font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 0.6rem; }
 
     .console-panel { background: #04040a; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; max-height: 280px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 0.7rem; line-height: 1.55; }
     .console-panel .log-line { padding: 0.12rem 0; }
@@ -156,22 +161,28 @@
     .scene-block .sb-content { font-size: 0.76rem; color: var(--ink-dim); direction: auto; }
     .scene-block .sb-symbol { font-size: 0.7rem; color: var(--gold); margin-top: 0.3rem; }
 
-    .generated-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
-    .gen-image-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.4s; }
+    .generated-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
+    .gen-image-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.4s; position: relative; }
     .gen-image-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
     .gen-image-card .gen-label { padding: 0.3rem 0.5rem; font-size: 0.62rem; color: var(--ink-dim); text-align: center; }
     .gen-image-card.start-frame { border-color: var(--info); }
     .gen-image-card.end-frame { border-color: var(--warn); }
+    .gen-image-card .gen-actions-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.25rem; padding: 0.3rem 0.4rem 0.5rem; background: var(--panel); border-top: 1px solid var(--border); }
+    .gen-image-card .gen-actions-bar button { padding: 0.35rem 0.2rem; border-radius: 5px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.6rem; font-weight: 600; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gen-image-card .gen-actions-bar button:active { background: var(--border); }
+    .conformance-badge { position: absolute; top: 6px; right: 6px; background: rgba(45,138,78,0.9); color: #fff; font-size: 0.55rem; padding: 0.15rem 0.4rem; border-radius: 8px; font-weight: 700; z-index: 2; letter-spacing: 0.03em; cursor: help; }
 
-    .generated-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
+    .generated-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
     .gen-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.5s; }
     .gen-video-card.newly-added { border-color: var(--success); box-shadow: 0 0 16px rgba(45,138,78,0.5); }
     .gen-video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #000; }
     .gen-video-card .gen-label { padding: 0.4rem 0.5rem; font-size: 0.66rem; color: var(--ink); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-weight: 600; }
     .gen-video-card .gen-narration { padding: 0.4rem 0.6rem; font-size: 0.66rem; color: var(--accent); font-style: italic; background: var(--panel); border-top: 1px solid var(--border); direction: rtl; text-align: right; }
-    .gen-video-card .gen-actions { display: flex; gap: 0.4rem; padding: 0.4rem 0.6rem; background: var(--panel); border-top: 1px solid var(--border); }
-    .gen-video-card .gen-actions button { flex: 1; padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.65rem; font-weight: 600; cursor: pointer; }
+    .gen-video-card .gen-actions { display: flex; flex-wrap: wrap; gap: 0.3rem; padding: 0.4rem 0.5rem; background: var(--panel); border-top: 1px solid var(--border); }
+    .gen-video-card .gen-actions button { flex: 1; min-width: 60px; padding: 0.4rem 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.62rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .gen-video-card .gen-actions button:active { background: var(--border); }
     .gen-video-card .gen-actions button.playing { background: var(--accent); color: #000; border-color: var(--accent); }
+    .gen-video-card .gen-actions button.danger { border-color: var(--warn); color: var(--warn); }
     .gen-video-card .gen-timing { padding: 0.32rem 0.5rem; font-size: 0.62rem; color: var(--warn); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-family: ui-monospace, monospace; }
 
     .pending-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; text-align: center; }
@@ -190,6 +201,19 @@
     .progress-bar { height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
     .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #d4a017, #8b6b3d); border-radius: 2px; transition: width 0.3s; }
 
+    .history-panel { background: var(--panel-2); border-radius: 8px; padding: 0.9rem; font-size: 0.78rem; }
+    .history-row { display: grid; grid-template-columns: 60px 1fr 100px; gap: 0.6rem; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); align-items: center; }
+    .history-row:last-child { border-bottom: none; }
+    .history-row .h-week { color: var(--gold); font-weight: 700; font-size: 0.68rem; font-family: ui-monospace, monospace; }
+    .history-row .h-concept { color: var(--ink); font-weight: 600; font-size: 0.72rem; }
+    .history-row .h-concept .h-symbol { color: var(--ink-dim); font-size: 0.65rem; display: block; font-weight: 400; margin-top: 0.15rem; }
+    .history-row .h-date { color: var(--ink-faint); font-size: 0.62rem; text-align: right; font-family: ui-monospace, monospace; }
+    .history-row.reuse { background: rgba(192,57,43,0.1); border-left: 3px solid var(--error); }
+
+    .validation-panel { background: #140f05; border: 1px solid var(--gold); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; display: none; }
+    .validation-panel.visible { display: block; }
+    .validation-panel .val-title { color: var(--gold); font-weight: 700; font-size: 0.78rem; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
     .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--border); color: var(--ink); padding: 0.75rem 1.1rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.6rem; transform: translateY(100%); transition: transform 0.3s; z-index: 100; }
     .status-bar.visible { transform: translateY(0); }
     .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
@@ -202,8 +226,8 @@
 <body>
 
 <header>
-    <h1>Mouradrama Studio</h1>
-    <p class="subtitle">Série darija · symboles verrouillés · navy &amp; or · aucun visage</p>
+    <h1>Mouradrama Studio v4</h1>
+    <p class="subtitle">Série darija · symboles verrouillés · interdictions auto · téléchargements</p>
 </header>
 
 <div class="project-bar">
@@ -264,9 +288,9 @@
         <div class="control-row" style="margin-top:1rem;">
             <label class="control-label">⚡ Intensité du Hook (0-3s)</label>
             <select id="hook-intensity-select">
-                <option value="doux">🌱 Doux — intrigue calme mais captivante</option>
-                <option value="moyen" selected>⚡ Moyen — question intrigante</option>
-                <option value="fort">🔥 Fort — choc visuel, rupture</option>
+                <option value="doux">🌱 Doux</option>
+                <option value="moyen" selected>⚡ Moyen</option>
+                <option value="fort">🔥 Fort</option>
             </select>
         </div>
         <div class="control-row">
@@ -288,7 +312,7 @@
     </div>
     <div class="section-body"><div class="section-content">
         <div style="font-size:0.72rem;color:var(--ink-dim);margin-bottom:0.6rem;">
-            Les concepts déjà traités dans la série sont marqués ✓. Chaque concept a un <strong style="color:var(--gold);">symbole verrouillé</strong> — l'IA ne peut pas en inventer un autre.
+            Les concepts déjà traités sont marqués ✓. Chaque concept a un <strong style="color:var(--gold);">symbole verrouillé</strong> + des <strong style="color:#ff6644;">interdictions automatiques</strong> déduites de la consigne caméra.
         </div>
         <div class="theme-grid" id="theme-grid"></div>
         <div style="font-size:0.72rem;color:var(--ink-dim);margin-top:0.6rem;" id="theme-description">
@@ -298,11 +322,11 @@
             <div class="sl-title">🔒 Symbole verrouillé pour ce concept</div>
             <div class="sl-object" id="symbol-lock-object"></div>
             <div class="sl-camera" id="symbol-lock-camera"></div>
+            <div class="sl-forbidden" id="symbol-lock-forbidden"></div>
         </div>
         <div class="custom-input-panel" id="custom-concept-panel">
             <label class="control-label">✏️ Décrivez votre concept personnalisé</label>
             <textarea id="custom-concept-input" placeholder="Ex: le rôle du narrateur fiable et non-fiable..." class="darija" style="min-height:80px;"></textarea>
-            <div class="control-hint">Pensez à proposer vous-même un symbole unique et cohérent avec navy/or.</div>
         </div>
     </div></div>
 </div>
@@ -327,7 +351,6 @@
         <div class="custom-input-panel" id="custom-style-panel">
             <label class="control-label">✏️ Décrivez votre style visuel personnalisé</label>
             <textarea id="custom-style-input" placeholder="Ex: Style théâtre de marionnettes siciliennes... No human faces." style="min-height:80px;"></textarea>
-            <div class="control-hint">Terminez toujours par « no human faces ».</div>
         </div>
     </div></div>
 </div>
@@ -338,47 +361,44 @@
         <span class="chevron">▼</span>
     </div>
     <div class="section-body"><div class="section-content">
-        <div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">
-            Chaque règle ci-dessous vient d'un problème réellement rencontré en production. Désactiver une règle réintroduit le risque correspondant.
-        </div>
         <div class="rule-toggle-grid">
-            <label class="rule-toggle"><input type="checkbox" id="rule-three-quarter" checked><span class="rt-text"><strong>Angle trois-quarts obligatoire</strong> pour toute surface plane (ardoise de clap, pellicule) — jamais de face, pour éviter que l'IA n'y ajoute du texte glitché.</span></label>
-            <label class="rule-toggle"><input type="checkbox" id="rule-no-hand" checked><span class="rt-text"><strong>Aucune main / doigt / peau</strong> sur un objet manipulé (ex. la chaîne de l'obstacle) — l'objet évolue seul, jamais par contact humain.</span></label>
-            <label class="rule-toggle"><input type="checkbox" id="rule-single-concept" checked><span class="rt-text"><strong>Un seul concept, un seul objet par plan</strong> — interdiction de transition ou de morphing vers un second objet en cours de plan.</span></label>
-            <label class="rule-toggle"><input type="checkbox" id="rule-single-figure" checked><span class="rt-text"><strong>Une seule silhouette maximum</strong>, toujours de dos / contre-jour / profil — jamais un visage net, jamais deux personnages dans le même plan.</span></label>
-            <label class="rule-toggle"><input type="checkbox" id="rule-near-miss" checked><span class="rt-text"><strong>Pas de résolution totale</strong> (flèche près du centre mais pas dedans, masques presque mais pas tout à fait au contact) — garder la tension pour la suite.</span></label>
-            <label class="rule-toggle"><input type="checkbox" id="rule-fixed-camera" checked><span class="rt-text"><strong>Mouvement de caméra modéré</strong> (max ~15% de déplacement) — un sur-zoom déforme les objets et les fait apparaître disproportionnés.</span></label>
+            <label class="rule-toggle"><input type="checkbox" id="rule-three-quarter" checked><span class="rt-text"><strong>Angle trois-quarts obligatoire</strong> pour toute surface plane — jamais de face.</span></label>
+            <label class="rule-toggle"><input type="checkbox" id="rule-no-hand" checked><span class="rt-text"><strong>Aucune main / doigt / peau</strong> sur un objet manipulé.</span></label>
+            <label class="rule-toggle"><input type="checkbox" id="rule-single-concept" checked><span class="rt-text"><strong>Un seul concept, un seul objet par plan</strong>.</span></label>
+            <label class="rule-toggle"><input type="checkbox" id="rule-single-figure" checked><span class="rt-text"><strong>Une seule silhouette maximum</strong>, toujours de dos.</span></label>
+            <label class="rule-toggle"><input type="checkbox" id="rule-near-miss" checked><span class="rt-text"><strong>Pas de résolution totale</strong> — garder la tension.</span></label>
+            <label class="rule-toggle"><input type="checkbox" id="rule-fixed-camera" checked><span class="rt-text"><strong>Mouvement caméra modéré</strong> (max ~15%).</span></label>
         </div>
     </div></div>
 </div>
 
 <div class="section" id="section-constraints">
     <div class="section-header" data-toggle="section-constraints">
-        <span class="section-title">🔒 Contraintes personnalisées <span class="badge lock">RÈGLES ABSOLUES</span> <span class="badge count" id="constraint-counter">0</span></span>
+        <span class="section-title">🔒 Contraintes personnalisées <span class="badge lock">MANUELLES</span> <span class="badge count" id="constraint-counter">0</span></span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body"><div class="section-content">
         <div class="control-row">
             <label class="control-label">🎭 Objets obligatoires</label>
-            <textarea id="constraint-objects" placeholder="Objets qui DOIVENT apparaître (un par ligne)." style="min-height:70px;"></textarea>
+            <textarea id="constraint-objects" placeholder="Un par ligne." style="min-height:60px;"></textarea>
         </div>
         <div class="control-row">
             <label class="control-label">📚 Concepts obligatoires</label>
-            <textarea id="constraint-concepts" placeholder="Concepts qui DOIVENT être expliqués." style="min-height:70px;"></textarea>
+            <textarea id="constraint-concepts" placeholder="Un par ligne." style="min-height:60px;"></textarea>
         </div>
         <div class="control-row">
             <label class="control-label">📖 Références obligatoires</label>
-            <textarea id="constraint-references" placeholder="Œuvres / exemples à citer." style="min-height:70px;"></textarea>
+            <textarea id="constraint-references" placeholder="Un par ligne." style="min-height:60px;"></textarea>
         </div>
         <div class="control-row">
-            <label class="control-label">🚫 Symboles interdits</label>
-            <textarea id="constraint-forbidden" placeholder="Éléments à NE PAS utiliser." style="min-height:60px;"></textarea>
+            <label class="control-label">🚫 Symboles interdits (manuel)</label>
+            <textarea id="constraint-forbidden" placeholder="Un par ligne — fusionné auto avec les interdictions du symbole." style="min-height:60px;"></textarea>
         </div>
         <div class="control-row">
             <label class="control-label">✏️ Contraintes libres</label>
-            <textarea id="constraint-free" placeholder="Toute autre règle." style="min-height:60px;"></textarea>
+            <textarea id="constraint-free" placeholder="Un par ligne." style="min-height:60px;"></textarea>
         </div>
-        <button type="button" id="clear-constraints-btn" style="width:100%;padding:0.65rem;border-radius:8px;border:1px solid var(--error);background:transparent;color:var(--error);font-family:inherit;font-size:0.75rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🗑️ Effacer toutes les contraintes</button>
+        <button type="button" id="clear-constraints-btn" style="width:100%;padding:0.65rem;border-radius:8px;border:1px solid var(--error);background:transparent;color:var(--error);font-family:inherit;font-size:0.75rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🗑️ Effacer</button>
     </div></div>
 </div>
 
@@ -389,33 +409,34 @@
     </div>
     <div class="section-body"><div class="section-content">
         <div class="control-row">
-            <label class="control-label">🌐 Langue de la narration</label>
+            <label class="control-label">🌐 Langue</label>
             <select id="language-select">
-                <option value="ar-dz" selected>🇩🇿 Daridja algérienne (recommandé)</option>
-                <option value="ar">🇸🇦 Arabe classique (Fusha)</option>
+                <option value="ar-dz" selected>🇩🇿 Daridja algérienne</option>
+                <option value="ar">🇸🇦 Arabe classique</option>
                 <option value="fr">🇫🇷 Français</option>
             </select>
         </div>
         <div class="control-row">
-            <label class="control-label">🎤 Voix du narrateur</label>
+            <label class="control-label">🎤 Voix</label>
             <select id="narrator-select">
-                <option value="male-deep" selected>🎙️ Voix grave (documentaire)</option>
-                <option value="male-soft">🎙️ Voix douce et posée</option>
+                <option value="male-deep" selected>🎙️ Voix grave</option>
+                <option value="male-soft">🎙️ Voix douce</option>
                 <option value="female">🎙️ Voix féminine</option>
                 <option value="elderly">🎙️ Voix professorale</option>
             </select>
         </div>
         <div class="control-row">
-            <label class="control-label">Registre de narration</label>
+            <label class="control-label">Registre</label>
             <select id="narration-select">
-                <option value="universitaire" selected>🎓 Universitaire / Conférence</option>
-                <option value="vulgarisation">📖 Vulgarisation accessible</option>
-                <option value="poetique">🌙 Poétique / Littéraire</option>
+                <option value="universitaire" selected>🎓 Universitaire</option>
+                <option value="vulgarisation">📖 Vulgarisation</option>
+                <option value="poetique">🌙 Poétique</option>
                 <option value="journalistique">📰 Journalistique</option>
             </select>
         </div>
         <button type="button" id="test-voice-btn" style="width:100%;padding:0.65rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🔊 Tester la voix</button>
         <button type="button" id="download-script-btn" style="width:100%;padding:0.65rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">💾 Télécharger le script (.txt)</button>
+        <button type="button" id="download-everything-btn" style="width:100%;padding:0.65rem;border-radius:8px;border:1px solid var(--info);background:transparent;color:var(--info);font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">📦 Télécharger toute la leçon (script + images + vidéos)</button>
     </div></div>
 </div>
 
@@ -426,18 +447,16 @@
     </div>
     <div class="section-body"><div class="section-content">
         <div class="control-row">
-            <label class="control-label">🎬 Nombre de clips à générer</label>
+            <label class="control-label">🎬 Nombre de clips</label>
             <select id="clip-count-select">
                 <option value="3">3 clips</option>
                 <option value="4">4 clips</option>
-                <option value="5" selected>5 clips (recommandé)</option>
+                <option value="5" selected>5 clips</option>
                 <option value="6">6 clips</option>
-                <option value="7">7 clips (récap + clôture)</option>
-                <option value="8">8 clips (long)</option>
+                <option value="7">7 clips</option>
+                <option value="8">8 clips</option>
                 <option value="10">10 clips</option>
-                <option value="12">12 clips</option>
             </select>
-            <div class="control-hint">💡 L'app génère 2 images-clés par scène pour produire exactement le nombre de clips demandé.</div>
         </div>
         <div class="control-row">
             <label class="control-label">Durée par clip</label>
@@ -450,17 +469,25 @@
         <div class="control-row">
             <label class="control-label">Format d'image</label>
             <select id="aspect-select">
-                <option value="portrait" selected>📱 Portrait 9:16 (Shorts / Reels / TikTok)</option>
-                <option value="landscape">📺 Paysage 16:9 (YouTube)</option>
-                <option value="square">⬜ Carré 1:1 (réseaux)</option>
+                <option value="portrait" selected>📱 Portrait 9:16</option>
+                <option value="landscape">📺 Paysage 16:9</option>
+                <option value="square">⬜ Carré 1:1</option>
             </select>
         </div>
         <div class="control-row">
-            <label class="control-label">🔁 Dernier clip = clôture miroir du 1er clip</label>
+            <label class="control-label">🔁 Clôture miroir du 1er clip</label>
             <select id="mirror-closing-select">
-                <option value="off">Non — scènes indépendantes</option>
-                <option value="on" selected>Oui — le dernier clip reprend le décor du 1er et se referme</option>
+                <option value="off">Non</option>
+                <option value="on" selected>Oui</option>
             </select>
+        </div>
+        <div class="control-row">
+            <label class="control-label">⏸ Aperçu avant génération</label>
+            <select id="preview-mode-select">
+                <option value="on" selected>Oui — pause après le script</option>
+                <option value="off">Non — enchaîner automatiquement</option>
+            </select>
+            <div class="control-hint">Si activé, tu pourras relire et valider le script avant de payer des images.</div>
         </div>
     </div></div>
 </div>
@@ -474,17 +501,31 @@
 
 <div class="section hidden" id="section-script">
     <div class="section-header" data-toggle="section-script"><span class="section-title">📜 Script de la leçon</span><span class="chevron">▼</span></div>
-    <div class="section-body"><div class="section-content"><div class="story-display" id="script-display"></div></div></div>
+    <div class="section-body"><div class="section-content">
+        <div class="story-display" id="script-display"></div>
+        <div class="validation-panel" id="validation-panel">
+            <div class="val-title">⏸ Aperçu — En attente de validation</div>
+            <div style="font-size:0.78rem;color:var(--ink-dim);margin-bottom:0.7rem;">Le script est généré mais aucune image n'a encore été produite. Relis-le, ajuste si besoin, puis valide pour lancer la génération des images et vidéos.</div>
+            <button type="button" class="btn-validate" id="validate-script-btn">✓ Valider et continuer vers les images</button>
+            <button type="button" class="btn-regen" id="regen-script-btn">✗ Régénérer le script complet</button>
+        </div>
+    </div></div>
 </div>
 
 <div class="section hidden" id="section-images">
     <div class="section-header" data-toggle="section-images"><span class="section-title">🖼️ Images-clés (2 par clip) <span class="badge count" id="images-badge">0</span></span><span class="chevron">▼</span></div>
-    <div class="section-body"><div class="section-content"><div class="generated-images" id="generated-images"></div></div></div>
+    <div class="section-body"><div class="section-content">
+        <button type="button" class="btn-download-all" id="download-all-images-btn">📦 Télécharger toutes les images</button>
+        <div class="generated-images" id="generated-images"></div>
+    </div></div>
 </div>
 
 <div class="section hidden open" id="section-videos">
     <div class="section-header" data-toggle="section-videos"><span class="section-title">🎞️ Clips vidéo <span class="badge count" id="videos-badge">0</span></span><span class="chevron">▼</span></div>
-    <div class="section-body"><div class="section-content"><div class="generated-videos" id="generated-videos"></div></div></div>
+    <div class="section-body"><div class="section-content">
+        <button type="button" class="btn-download-all" id="download-all-videos-btn">📦 Télécharger toutes les vidéos</button>
+        <div class="generated-videos" id="generated-videos"></div>
+    </div></div>
 </div>
 
 <div class="section hidden" id="section-player">
@@ -497,6 +538,17 @@
         </div>
         <div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div>
         <div style="font-size:0.72rem;color:var(--ink-dim);margin-top:0.5rem;text-align:center;" id="player-info">Clip 1 / 5</div>
+    </div></div>
+</div>
+
+<div class="section" id="section-history">
+    <div class="section-header" data-toggle="section-history">
+        <span class="section-title">📚 Historique des symboles utilisés</span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div class="history-panel" id="history-panel"><div style="font-size:0.72rem;color:var(--ink-dim);">Aucun historique pour le moment. L'historique se construit à chaque leçon générée.</div></div>
+        <button type="button" id="clear-history-btn" style="width:100%;margin-top:0.6rem;padding:0.5rem;border-radius:6px;border:1px solid var(--error);background:transparent;color:var(--error);font-family:inherit;font-size:0.72rem;font-weight:600;cursor:pointer;">🗑️ Effacer l'historique</button>
     </div></div>
 </div>
 
@@ -518,8 +570,9 @@ const INITIAL_WAIT_SECONDS = 105;
 const POLL_INTERVAL_SECONDS = 5;
 const SAFETY_MARGIN = 1.10;
 const LIMITS = { textRpm: 30, imagesPerDay: 4000, videoSecondsPerDay: 500, videoRpm: 1 };
-const AUTOSAVE_KEY = 'mouradrama_studio_autosave_v3';
-const PROJECTS_KEY = 'mouradrama_studio_projects_v3';
+const AUTOSAVE_KEY = 'mouradrama_studio_autosave_v4';
+const PROJECTS_KEY = 'mouradrama_studio_projects_v4';
+const HISTORY_KEY = 'mouradrama_studio_history_v1';
 const AUTOSAVE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 let counters = { textRequests: 0, imagesGenerated: 0, videoSeconds: 0, videoRequestsThisMinute: 0, lastVideoRequestTime: 0, lastResetTime: Date.now() };
@@ -533,7 +586,7 @@ function getEstimatedWaitSeconds() { return measuredSpeed.usedForEstimate !== nu
 const FORMATS = [
     { id: 'carousel', name: 'Carrousel 6 slides', emoji: '📇', desc: 'Format quotidien', outputType: 'images', slides: 6 },
     { id: 'video-30', name: 'Vidéo 30 secondes', emoji: '🎬', desc: 'Format optimal', outputType: 'video', clipCount: 3, frameCount: 241 },
-    { id: 'video-70', name: 'Vidéo récap 70s', emoji: '🎥', desc: '7 clips, miroir clôture', outputType: 'video', clipCount: 7, frameCount: 241 },
+    { id: 'video-70', name: 'Vidéo récap 70s', emoji: '🎥', desc: '7 clips', outputType: 'video', clipCount: 7, frameCount: 241 },
     { id: 'video-15', name: 'Vidéo 15 secondes', emoji: '⚡', desc: 'Short ultra-court', outputType: 'video', clipCount: 2, frameCount: 121 }
 ];
 
@@ -547,8 +600,8 @@ const PILLARS = [
 
 const HOOK_INTENSITIES = {
     'doux': { label: 'Doux', prompt: 'Le hook est doux mais intrigant.' },
-    'moyen': { label: 'Moyen', prompt: 'Le hook est percutant : question directe ou image forte.' },
-    'fort': { label: 'Fort', prompt: 'Le hook est CHOC : rupture visuelle, contraste brutal.' }
+    'moyen': { label: 'Moyen', prompt: 'Le hook est percutant.' },
+    'fort': { label: 'Fort', prompt: 'Le hook est CHOC.' }
 };
 const ENDINGS = {
     'revelation': { label: 'Révélation', prompt: 'La chute est une RÉVÉLATION.' },
@@ -560,57 +613,161 @@ const ENDINGS = {
 const THEMES = [
     { id: 'aucun', name: 'Aucun / Personnalisé', emoji: '✏️', desc: 'Décrivez vous-même', week: '', done: false, focus: '' },
     { id: 'dramaturgie', name: 'Qu\'est-ce que la dramaturgie', emoji: '🎬', desc: 'Le mécanisme commun', week: 'S1', done: true, focus: 'Expliquer que toute histoire repose sur le même mécanisme.' },
-    { id: 'protagoniste', name: 'Le protagoniste', emoji: '🌑', desc: 'Celui dont les décisions changent la trame', week: 'S1', done: true, focus: 'Le héros n\'est pas celui qui parle le plus, mais celui dont les décisions font avancer.' },
+    { id: 'protagoniste', name: 'Le protagoniste', emoji: '🌑', desc: 'Celui dont les décisions changent la trame', week: 'S1', done: true, focus: 'Le héros n\'est pas celui qui parle le plus.' },
     { id: 'desir-objectif', name: 'Désir vs objectif', emoji: '🎯', desc: 'Ce qu\'il veut vs ce qu\'il veut vraiment', week: 'S1', done: true, focus: 'Distinguer objectif concret et désir profond.' },
     { id: 'obstacle', name: 'L\'obstacle', emoji: '⛓️', desc: 'Ce qui empêche d\'atteindre le but', week: 'S1', done: true, focus: 'La collision entre but et obstacle crée le conflit.' },
     { id: 'conflit', name: 'Le conflit', emoji: '⚔️', desc: 'La confrontation entre deux forces', week: 'S1', done: false, focus: 'Confrontation directe entre le but et ce qui s\'y oppose.' },
     { id: 'enjeu', name: 'L\'enjeu', emoji: '⚖️', desc: 'Ce qui est en jeu si le héros échoue', week: 'S1', done: false, focus: 'Ce que le personnage risque de perdre.' },
     { id: 'exposition', name: 'L\'exposition', emoji: '🎭', desc: 'Le monde avant que tout bascule', week: 'S2', done: false, focus: 'L\'exposition plante tout ce qui va être bouleversé.' },
-    { id: 'declencheur', name: 'L\'élément déclencheur', emoji: '📜', desc: 'Ce qui brise l\'état stable', week: 'S2', done: true, focus: 'Rupture de l\'état stable établi par l\'exposition.' },
-    { id: 'action-montante', name: 'L\'action montante', emoji: '🪜', desc: 'La tension qui monte par paliers', week: 'S2', done: false, focus: 'Obstacles empilés de plus en plus durs.' },
+    { id: 'declencheur', name: 'L\'élément déclencheur', emoji: '📜', desc: 'Ce qui brise l\'état stable', week: 'S2', done: true, focus: 'Rupture de l\'état stable.' },
+    { id: 'action-montante', name: 'L\'action montante', emoji: '🪜', desc: 'La tension qui monte par paliers', week: 'S2', done: false, focus: 'Obstacles empilés.' },
     { id: 'point-culminant', name: 'Le point culminant', emoji: '🔆', desc: 'Le sommet de tension', week: 'S2', done: false, focus: 'La tension accumulée explose.' },
-    { id: 'resolution-structure', name: 'La résolution', emoji: '🕯️', desc: 'Ce qui reste après la tempête', week: 'S2', done: false, focus: 'Le nouvel équilibre, ce que le personnage a gagné ou perdu.' },
-    { id: 'structure-3-actes', name: 'La structure en 3 actes', emoji: '🎪', desc: 'Exposition, confrontation, résolution', week: 'S2', done: false, focus: 'Structure en 3 actes et où se situe chaque concept.' },
-    { id: 'antagoniste', name: 'L\'antagoniste', emoji: '🎭', desc: 'La force qui s\'oppose au héros', week: 'S3', done: true, focus: 'Pas forcément un méchant : toute force qui s\'oppose au héros.' },
+    { id: 'resolution-structure', name: 'La résolution', emoji: '🕯️', desc: 'Ce qui reste après la tempête', week: 'S2', done: false, focus: 'Le nouvel équilibre.' },
+    { id: 'structure-3-actes', name: 'La structure en 3 actes', emoji: '🎪', desc: 'Exposition, confrontation, résolution', week: 'S2', done: false, focus: 'Structure en 3 actes.' },
+    { id: 'antagoniste', name: 'L\'antagoniste', emoji: '🎭', desc: 'La force qui s\'oppose au héros', week: 'S3', done: true, focus: 'Pas forcément un méchant.' },
     { id: 'motivation-objectif', name: 'Motivation vs objectif', emoji: '🔥', desc: 'Le pourquoi derrière le quoi', week: 'S3', done: false, focus: 'Distinguer motivation et objectif.' },
-    { id: 'defaut-caractere', name: 'Le défaut de caractère', emoji: '💔', desc: 'La faille qui complique tout', week: 'S3', done: false, focus: 'Faille interne qui aggrave les obstacles.' },
-    { id: 'arc-transformation', name: 'L\'arc de transformation', emoji: '🦋', desc: 'Qui il était vs qui il devient', week: 'S3', done: false, focus: 'Changement du personnage entre début et fin.' },
+    { id: 'defaut-caractere', name: 'Le défaut de caractère', emoji: '💔', desc: 'La faille qui complique tout', week: 'S3', done: false, focus: 'Faille interne.' },
+    { id: 'arc-transformation', name: 'L\'arc de transformation', emoji: '🦋', desc: 'Qui il était vs qui il devient', week: 'S3', done: false, focus: 'Changement du personnage.' },
     { id: 'sous-texte', name: 'Le sous-texte', emoji: '💭', desc: 'Ce qui se dit sans se dire', week: 'S3', done: false, focus: 'Ce qu\'un personnage veut dire sans le dire.' },
-    { id: 'personnages-secondaires', name: 'Les personnages secondaires', emoji: '👥', desc: 'Leur fonction', week: 'S3', done: false, focus: 'Ils doivent servir le voyage du héros.' },
-    { id: 'dialogue', name: 'Le dialogue efficace', emoji: '💬', desc: 'Dire plus en disant moins', week: 'S4', done: false, focus: 'Chaque ligne fait avancer l\'intrigue ou le personnage.' },
-    { id: 'rythme', name: 'Le rythme', emoji: '⏱️', desc: 'Accélérer, ralentir, respirer', week: 'S4', done: false, focus: 'Alternance entre tension et respiration.' },
-    { id: 'retournement', name: 'Le retournement', emoji: '🔄', desc: 'Quand tout bascule', week: 'S4', done: false, focus: 'Changement brutal et inattendu.' },
-    { id: 'theme', name: 'Le thème', emoji: '🧭', desc: 'L\'idée défendue', week: 'S4', done: false, focus: 'L\'idée ou la question explorée à travers l\'action.' },
-    { id: 'show-dont-tell', name: 'Le "show don\'t tell"', emoji: '👁️', desc: 'Montrer plutôt qu\'expliquer', week: 'S4', done: false, focus: 'Montrer par l\'action plutôt qu\'expliquer par le dialogue.' },
-    { id: 'format-court', name: 'Adapter au format court', emoji: '📱', desc: 'La dramaturgie en moins de 60s', week: 'S4', done: false, focus: 'Compresser les 5 piliers en moins de 60s.' }
+    { id: 'personnages-secondaires', name: 'Les personnages secondaires', emoji: '👥', desc: 'Leur fonction', week: 'S3', done: false, focus: 'Ils doivent servir le héros.' },
+    { id: 'dialogue', name: 'Le dialogue efficace', emoji: '💬', desc: 'Dire plus en disant moins', week: 'S4', done: false, focus: 'Chaque ligne fait avancer.' },
+    { id: 'rythme', name: 'Le rythme', emoji: '⏱️', desc: 'Accélérer, ralentir, respirer', week: 'S4', done: false, focus: 'Alternance tension/respiration.' },
+    { id: 'retournement', name: 'Le retournement', emoji: '🔄', desc: 'Quand tout bascule', week: 'S4', done: false, focus: 'Changement brutal.' },
+    { id: 'theme', name: 'Le thème', emoji: '🧭', desc: 'L\'idée défendue', week: 'S4', done: false, focus: 'L\'idée explorée à travers l\'action.' },
+    { id: 'show-dont-tell', name: 'Le "show don\'t tell"', emoji: '👁️', desc: 'Montrer plutôt qu\'expliquer', week: 'S4', done: false, focus: 'Montrer par l\'action.' },
+    { id: 'format-court', name: 'Adapter au format court', emoji: '📱', desc: 'La dramaturgie en moins de 60s', week: 'S4', done: false, focus: 'Compresser les 5 piliers.' }
 ];
 
+// ══════════════════════════════════════════════════════════════════
+// CONCEPT_SYMBOLS — avec autoForbidden déduit de la consigne caméra
+// ══════════════════════════════════════════════════════════════════
 const CONCEPT_SYMBOLS = {
-    'dramaturgie': { object: 'Un clap de cinéma ouvert et des bobines de film empilées, posés sur une table en bois.', camera: 'Cadrer le clap à 45°, ardoise JAMAIS de face. Travelling avant très léger (max 15%).' },
-    'protagoniste': { object: 'Une seule silhouette humaine floue, debout dans un couloir de théâtre sombre.', camera: 'Toujours de dos ou à contre-jour. Jamais de face. Jamais deux figures.' },
-    'desir-objectif': { object: 'Une cible d\'archerie ronde en bois à anneaux concentriques, avec une flèche à empennage.', camera: 'La flèche s\'approche du centre doré et s\'y plante PRÈS du centre, jamais pile dessus.' },
-    'obstacle': { object: 'Une ou plusieurs chaînes dorées tendues, qui s\'entrelacent progressivement.', camera: 'AUCUNE main, aucun doigt, aucune silhouette humaine.' },
-    'conflit': { object: 'Deux faisceaux de lumière dorée qui se croisent et se repoussent au centre du cadre.', camera: 'Cadre fixe, symétrique. Le conflit est montré par la lumière elle-même.' },
-    'enjeu': { object: 'Une balance ancienne en bois et métal doré, légèrement déséquilibrée.', camera: 'Plan fixe. Le déséquilibre s\'accentue légèrement.' },
-    'exposition': { object: 'Une scène de théâtre vide, rideau fermé, un seul objet posé au centre.', camera: 'Plan large et stable. Aucun mouvement brusque.' },
-    'declencheur': { object: 'Une bande de pellicule 35mm qui se déchire progressivement en son centre.', camera: 'La bande reste plate et rigide.' },
-    'action-montante': { object: 'Un escalier de pellicule qui monte dans l\'obscurité, chaque marche plus éclairée.', camera: 'Travelling avant lent. Un seul mouvement continu.' },
-    'point-culminant': { object: 'Un unique faisceau de lumière doré qui atteint son intensité maximale sur un objet central.', camera: 'L\'intensité lumineuse monte progressivement.' },
-    'resolution-structure': { object: 'Le même clap que l\'ouverture, qui se referme complètement à plat.', camera: 'Cadrer le clap de profil ou trois-quarts serré.' },
-    'structure-3-actes': { object: 'Trois rideaux de théâtre successifs qui s\'ouvrent l\'un après l\'autre.', camera: 'Un seul mouvement continu qui traverse les trois rideaux.' },
-    'antagoniste': { object: 'Deux masques de théâtre DORÉS ornementés (jamais blancs), face à face.', camera: 'Rapprochement lent. Ils finissent presque nez à nez, sans jamais se toucher.' },
-    'motivation-objectif': { object: 'Une flamme de bougie protégée par une main en silhouette, avec une cible floue en arrière-plan.', camera: 'La main doit rester une masse sombre sans détail de peau.' },
-    'defaut-caractere': { object: 'Une fissure fine qui traverse lentement un miroir doré ancien.', camera: 'Plan fixe, la fissure progresse de façon continue.' },
-    'arc-transformation': { object: 'Un masque de théâtre qui change progressivement de teinte.', camera: 'Transformation de couleur uniquement.' },
-    'sous-texte': { object: 'Deux ombres projetées qui se chevauchent sans que les objets ne se touchent.', camera: 'Cadrage fixe sur le jeu d\'ombres.' },
-    'personnages-secondaires': { object: 'Plusieurs silhouettes floues en arrière-plan, orientées vers une silhouette nette.', camera: 'Les silhouettes secondaires restent hors focus.' },
-    'dialogue': { object: 'Deux faisceaux de lumière qui alternent, l\'un s\'éteignant quand l\'autre s\'allume.', camera: 'Alternance régulière et lisible.' },
-    'rythme': { object: 'Un métronome ancien en bois et laiton, dont le balancier accélère puis ralentit.', camera: 'Mouvement continu synchronisé avec le balancier.' },
-    'retournement': { object: 'Une pièce de monnaie dorée qui tourne sur elle-même en plein vol.', camera: 'Ralenti progressif sur la rotation.' },
-    'theme': { object: 'Un livre ancien ouvert dont les pages tournent seules sous un faisceau de lumière.', camera: 'Plan fixe, aucune page ne doit afficher de texte lisible.' },
-    'show-dont-tell': { object: 'Une paire de chaussures usées posée à l\'entrée d\'une scène de théâtre vide.', camera: 'Plan fixe et long.' },
-    'format-court': { object: 'Un sablier doré dont le sable s\'écoule rapidement.', camera: 'Travelling avant modéré sur le sablier.' }
+    'dramaturgie': {
+        object: 'Un clap de cinéma ouvert et des bobines de film empilées, posés sur une table en bois.',
+        camera: 'Cadrer le clap à 45°, ardoise JAMAIS de face. Travelling avant très léger.',
+        autoForbidden: ['text on slate', 'letters on clapperboard', 'inscriptions on slate', 'writing on clapperboard', 'numbers on slate', 'human hand', 'human silhouette']
+    },
+    'protagoniste': {
+        object: 'Une seule silhouette humaine floue, debout dans un couloir de théâtre sombre.',
+        camera: 'Toujours de dos ou à contre-jour. Jamais de face.',
+        autoForbidden: ['visible face', 'frontal face', 'identifiable facial features', 'two human figures', 'second person in frame', 'eyes', 'nose', 'mouth']
+    },
+    'desir-objectif': {
+        object: 'Une cible d\'archerie ronde en bois à anneaux concentriques, avec une flèche à empennage.',
+        camera: 'La flèche s\'approche du centre doré et s\'y plante PRÈS du centre, jamais pile dessus.',
+        autoForbidden: ['arrow exactly in bullseye', 'arrow perfectly centered', 'arrow far from target', 'human hand holding bow', 'human archer']
+    },
+    'obstacle': {
+        object: 'Une ou plusieurs chaînes dorées tendues, qui s\'entrelacent progressivement.',
+        camera: 'AUCUNE main, aucun doigt, aucune silhouette humaine.',
+        autoForbidden: ['human hand', 'fingers', 'skin', 'human silhouette', 'human figure', 'arm', 'sleeve', 'body part', 'hand touching chain']
+    },
+    'conflit': {
+        object: 'Deux faisceaux de lumière dorée qui se croisent et se repoussent au centre du cadre.',
+        camera: 'Cadre fixe, symétrique.',
+        autoForbidden: ['human figure', 'human silhouette', 'human hand', 'text', 'letters']
+    },
+    'enjeu': {
+        object: 'Une balance ancienne en bois et métal doré, légèrement déséquilibrée.',
+        camera: 'Plan fixe. Le déséquilibre s\'accentue légèrement.',
+        autoForbidden: ['human hand', 'human silhouette', 'text', 'letters', 'numerical values']
+    },
+    'exposition': {
+        object: 'Une scène de théâtre vide, rideau fermé, un seul objet posé au centre.',
+        camera: 'Plan large et stable. Aucun mouvement brusque.',
+        autoForbidden: ['human figure', 'human silhouette', 'human hand', 'second object', 'additional prop', 'text', 'letters']
+    },
+    'declencheur': {
+        object: 'Une bande de pellicule 35mm qui se déchire progressivement en son centre.',
+        camera: 'La bande reste plate et rigide.',
+        autoForbidden: ['human silhouette', 'human figure', 'human hand', 'bending into human shape', 'curving into figure', 'second object appearing', 'text', 'letters']
+    },
+    'action-montante': {
+        object: 'Un escalier de pellicule qui monte dans l\'obscurité, chaque marche plus éclairée.',
+        camera: 'Travelling avant lent. Un seul mouvement continu.',
+        autoForbidden: ['human figure', 'human silhouette', 'human hand', 'multiple objects', 'text', 'letters']
+    },
+    'point-culminant': {
+        object: 'Un unique faisceau de lumière doré qui atteint son intensité maximale sur un objet central.',
+        camera: 'L\'intensité lumineuse monte progressivement.',
+        autoForbidden: ['human figure', 'human silhouette', 'human hand', 'text', 'letters', 'multiple light sources']
+    },
+    'resolution-structure': {
+        object: 'Le même clap que l\'ouverture, qui se referme complètement à plat.',
+        camera: 'Cadrer le clap de profil ou trois-quarts serré.',
+        autoForbidden: ['text on slate', 'letters on clapperboard', 'inscriptions on slate', 'writing on clapperboard', 'numbers on slate', 'human hand', 'human silhouette', 'half-closed state']
+    },
+    'structure-3-actes': {
+        object: 'Trois rideaux de théâtre successifs qui s\'ouvrent l\'un après l\'autre.',
+        camera: 'Un seul mouvement continu qui traverse les trois rideaux.',
+        autoForbidden: ['human figure', 'human silhouette', 'human hand', 'text', 'letters']
+    },
+    'antagoniste': {
+        object: 'Deux masques de théâtre DORÉS ornementés (jamais blancs), face à face.',
+        camera: 'Rapprochement lent. Ils finissent presque nez à nez, sans jamais se toucher.',
+        autoForbidden: ['white masks', 'ceramic masks', 'painted masks', 'red painted cheeks', 'greek comedy tragedy masks', 'human face', 'human hand', 'complete contact between masks']
+    },
+    'motivation-objectif': {
+        object: 'Une flamme de bougie protégée par une main en silhouette, avec une cible floue en arrière-plan.',
+        camera: 'La main doit rester une masse sombre sans détail de peau.',
+        autoForbidden: ['visible skin on hand', 'detailed fingers', 'nails', 'pores', 'wrinkles', 'facial features']
+    },
+    'defaut-caractere': {
+        object: 'Une fissure fine qui traverse lentement un miroir doré ancien.',
+        camera: 'Plan fixe, la fissure progresse de façon continue.',
+        autoForbidden: ['complete broken mirror', 'shattered mirror', 'many cracks', 'human reflection', 'human figure', 'human hand', 'text']
+    },
+    'arc-transformation': {
+        object: 'Un masque de théâtre qui change progressivement de teinte.',
+        camera: 'Transformation de couleur uniquement.',
+        autoForbidden: ['shape change', 'form change', 'human face', 'human hand', 'text', 'letters']
+    },
+    'sous-texte': {
+        object: 'Deux ombres projetées qui se chevauchent sans que les objets ne se touchent.',
+        camera: 'Cadrage fixe sur le jeu d\'ombres.',
+        autoForbidden: ['visible objects at first plan', 'human figure', 'human hand', 'text', 'letters']
+    },
+    'personnages-secondaires': {
+        object: 'Plusieurs silhouettes floues en arrière-plan, orientées vers une silhouette nette.',
+        camera: 'Les silhouettes secondaires restent hors focus.',
+        autoForbidden: ['visible faces on background figures', 'detailed facial features', 'text', 'letters']
+    },
+    'dialogue': {
+        object: 'Deux faisceaux de lumière qui alternent, l\'un s\'éteignant quand l\'autre s\'allume.',
+        camera: 'Alternance régulière et lisible.',
+        autoForbidden: ['human figure', 'human silhouette', 'human hand', 'text', 'letters', 'speech bubbles']
+    },
+    'rythme': {
+        object: 'Un métronome ancien en bois et laiton, dont le balancier accélère puis ralentit.',
+        camera: 'Mouvement continu synchronisé avec le balancier.',
+        autoForbidden: ['human figure', 'human hand', 'text', 'letters', 'numbers']
+    },
+    'retournement': {
+        object: 'Une pièce de monnaie dorée qui tourne sur elle-même en plein vol.',
+        camera: 'Ralenti progressif sur la rotation.',
+        autoForbidden: ['coin touching the ground', 'coin landing', 'human hand', 'human figure', 'text', 'letters']
+    },
+    'theme': {
+        object: 'Un livre ancien ouvert dont les pages tournent seules sous un faisceau de lumière.',
+        camera: 'Plan fixe, pages qui tournent lentement.',
+        autoForbidden: ['legible text on pages', 'readable words', 'letters', 'numbers', 'human hand', 'human figure']
+    },
+    'show-dont-tell': {
+        object: 'Une paire de chaussures usées posée à l\'entrée d\'une scène de théâtre vide.',
+        camera: 'Plan fixe et long.',
+        autoForbidden: ['text', 'captions', 'subtitles', 'human figure', 'human hand', 'human body']
+    },
+    'format-court': {
+        object: 'Un sablier doré dont le sable s\'écoule rapidement.',
+        camera: 'Travelling avant modéré sur le sablier.',
+        autoForbidden: ['human figure', 'human hand', 'text', 'letters', 'numbers', 'clock hands']
+    }
 };
+
+function getSymbolAutoForbidden(themeId) {
+    const sym = CONCEPT_SYMBOLS[themeId];
+    return (sym && sym.autoForbidden) ? sym.autoForbidden : [];
+}
 
 function buildMouradramaRulesBlock() {
     const r3q = document.getElementById('rule-three-quarter')?.checked ?? true;
@@ -620,30 +777,30 @@ function buildMouradramaRulesBlock() {
     const rNearMiss = document.getElementById('rule-near-miss')?.checked ?? true;
     const rCamera = document.getElementById('rule-fixed-camera')?.checked ?? true;
     let b = '\n\n═══ 🛡️ RÈGLES STRICTES MOURADRAMA — NON NÉGOCIABLES ═══\n';
-    if (r3q) b += '- Toute surface plane pouvant recevoir du texte : cadrage TROIS-QUARTS ou PROFIL, jamais de face.\n';
+    if (r3q) b += '- Toute surface plane pouvant recevoir du texte : cadrage TROIS-QUARTS ou PROFIL.\n';
     if (rHand) b += '- AUCUNE main, doigt ou peau sur un objet manipulé.\n';
     if (rSingle) b += '- Un seul concept, un seul objet symbolique par plan.\n';
     if (rFigure) b += '- Maximum UNE silhouette humaine par plan, toujours de dos/contre-jour/profil.\n';
     if (rNearMiss) b += '- Ne jamais montrer une résolution totale avant la fin de l\'histoire.\n';
     if (rCamera) b += '- Mouvement caméra lent et modéré UNIQUEMENT (max ~15%).\n';
-    b += '- Palette stricte navy/noir + unique projecteur doré chaud. Poussière en suspension. Rendu photoréaliste uniquement.\n';
+    b += '- Palette stricte navy/noir + unique projecteur doré chaud. Poussière en suspension.\n';
     b += '- Vidéo silencieuse : aucun son généré.\n';
     b += '═══ FIN RÈGLES MOURADRAMA ═══\n';
     return b;
 }
 
 const STYLES = [
-    { id: 'mouradrama', name: 'Mouradrama (officiel)', emoji: '🏛️', flagship: true, prompt: 'Vertical 9:16 cinematic short, dark navy and black color palette, single warm golden spotlight as the only strong light source, floating dust particles suspended throughout, dark reflective floor with subtle diffuse reflections, shallow depth of field, photorealistic cinema-grade rendering with light film grain, empty theater or film studio atmosphere at night. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and inanimate symbolic objects only.' },
-    { id: 'mouradrama-pluie', name: 'Mouradrama — nuit de pluie', emoji: '🌧️', flagship: true, prompt: 'Same Mouradrama visual bible with subtle rain-soaked reflective floor.' },
-    { id: 'mouradrama-intense', name: 'Mouradrama — contraste intense', emoji: '🔥', flagship: true, prompt: 'Same Mouradrama visual bible but higher contrast: deeper blacks, more saturated gold highlights, more visible dust.' },
-    { id: 'silhouette-theatre', name: 'Silhouette Théâtre', emoji: '🌑', prompt: 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, back-lit against dramatic single spotlight' },
-    { id: 'theatre-grec', name: 'Théâtre Grec', emoji: '🏛️', prompt: 'Ancient Greek theatre aesthetic, marble columns, Greek masks, amphitheater, terracotta and gold tones' },
-    { id: 'puppet-shadow', name: 'Ombres Chinoises', emoji: '🎭', prompt: 'Chinese shadow puppet style, black paper-cut silhouettes on illuminated screen' },
-    { id: 'minimal-symbolique', name: 'Minimal Symbolique', emoji: '⬛', prompt: 'Minimalist symbolic illustration, geometric shapes, flat colors, icons' },
-    { id: 'theatre-barock', name: 'Théâtre Baroque', emoji: '⚜️', prompt: 'Baroque theatre aesthetic, ornate red velvet curtains, gilded frames, chiaroscuro' },
-    { id: 'theatre-noir', name: 'Théâtre Noir', emoji: '🖤', prompt: 'Film noir theatrical style, stark black and white, harsh shadows' },
-    { id: 'blueprint', name: 'Schéma Technique', emoji: '📊', prompt: 'Technical blueprint diagram style, white lines on dark blue background' },
-    { id: 'vitrail', name: 'Vitrail', emoji: '🪟', prompt: 'Stained glass window aesthetic, fragmented colored glass, black lead lines' },
+    { id: 'mouradrama', name: 'Mouradrama (officiel)', emoji: '🏛️', flagship: true, prompt: 'Vertical 9:16 cinematic short, dark navy and black color palette, single warm golden spotlight, floating dust particles, dark reflective floor, shallow depth of field, photorealistic cinema-grade rendering, empty theater at night. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and inanimate symbolic objects only.' },
+    { id: 'mouradrama-pluie', name: 'Mouradrama — pluie', emoji: '🌧️', flagship: true, prompt: 'Same Mouradrama visual bible with rain-soaked reflective floor.' },
+    { id: 'mouradrama-intense', name: 'Mouradrama — contraste', emoji: '🔥', flagship: true, prompt: 'Same Mouradrama visual bible, higher contrast.' },
+    { id: 'silhouette-theatre', name: 'Silhouette Théâtre', emoji: '🌑', prompt: 'Theatrical silhouette style, black humanoid shapes with NO FACIAL FEATURES, single spotlight' },
+    { id: 'theatre-grec', name: 'Théâtre Grec', emoji: '🏛️', prompt: 'Ancient Greek theatre aesthetic, marble columns, Greek masks' },
+    { id: 'puppet-shadow', name: 'Ombres Chinoises', emoji: '🎭', prompt: 'Chinese shadow puppet style, black paper-cut silhouettes' },
+    { id: 'minimal-symbolique', name: 'Minimal Symbolique', emoji: '⬛', prompt: 'Minimalist symbolic illustration, geometric shapes' },
+    { id: 'theatre-barock', name: 'Théâtre Baroque', emoji: '⚜️', prompt: 'Baroque theatre aesthetic, ornate red velvet curtains' },
+    { id: 'theatre-noir', name: 'Théâtre Noir', emoji: '🖤', prompt: 'Film noir theatrical style, stark black and white' },
+    { id: 'blueprint', name: 'Schéma Technique', emoji: '📊', prompt: 'Technical blueprint diagram style' },
+    { id: 'vitrail', name: 'Vitrail', emoji: '🪟', prompt: 'Stained glass window aesthetic' },
     { id: 'custom', name: 'Personnalisé', emoji: '✏️', prompt: '' }
 ];
 
@@ -674,22 +831,47 @@ const state = {
     narrationStyle: 'universitaire', narratorVoice: 'male-deep',
     narrationLanguage: 'ar-dz',
     clipCount: 5, numFrames: 241, aspect: 'portrait', mirrorClosing: true,
+    previewMode: true,
     scenario: null, sceneFrames: [], videos: [],
     constraints: { objects: '', concepts: '', references: '', forbidden: '', free: '' },
     currentSceneIndex: 0, isPlayingSequence: false, lastTextRequestTime: 0,
-    femaleCharacters: [], projectName: 'Leçon Mouradrama', lastSavedAt: null
+    femaleCharacters: [], projectName: 'Leçon Mouradrama', lastSavedAt: null,
+    pendingValidateResolve: null,
+    imageHistory: []
 };
 
+// ══════════════════════════════════════════════════════════════════
+// CONTRAINTES — fusion auto forbidden
+// ══════════════════════════════════════════════════════════════════
 function parseConstraintLines(text) { if (!text) return []; return text.split(/[\n,;]+/).map(s => s.trim().replace(/^[-•*]\s*/, '')).filter(s => s.length > 0); }
+
+function getMergedForbiddenList() {
+    const manual = parseConstraintLines(state.constraints.forbidden);
+    const auto = getSymbolAutoForbidden(state.selectedTheme.id);
+    const seen = new Set();
+    const merged = [];
+    [...manual, ...auto].forEach(item => {
+        const key = item.toLowerCase().trim();
+        if (!seen.has(key)) { seen.add(key); merged.push(item); }
+    });
+    return { manual, auto, merged };
+}
+
 function getActiveConstraints() {
     const o = parseConstraintLines(state.constraints.objects);
     const c = parseConstraintLines(state.constraints.concepts);
     const r = parseConstraintLines(state.constraints.references);
-    const f = parseConstraintLines(state.constraints.forbidden);
+    const fMerged = getMergedForbiddenList();
     const fr = parseConstraintLines(state.constraints.free);
-    return { objects: o, concepts: c, references: r, forbidden: f, free: fr, total: o.length + c.length + r.length + f.length + fr.length };
+    return { objects: o, concepts: c, references: r, forbidden: fMerged.merged, forbiddenAuto: fMerged.auto, forbiddenManual: fMerged.manual, free: fr, total: o.length + c.length + r.length + fMerged.merged.length + fr.length };
 }
-function updateConstraintCounter() { const c = getActiveConstraints(); const el = document.getElementById('constraint-counter'); if (el) el.textContent = c.total; }
+
+function updateConstraintCounter() {
+    const c = getActiveConstraints();
+    const el = document.getElementById('constraint-counter');
+    if (el) el.textContent = c.total;
+}
+
 function buildConstraintBlock() {
     const c = getActiveConstraints();
     if (c.total === 0) return '';
@@ -697,20 +879,36 @@ function buildConstraintBlock() {
     if (c.objects.length) { b += '🎭 OBJETS OBLIGATOIRES :\n'; c.objects.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '\n'; }
     if (c.concepts.length) { b += '📚 CONCEPTS OBLIGATOIRES :\n'; c.concepts.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '\n'; }
     if (c.references.length) { b += '📖 RÉFÉRENCES OBLIGATOIRES :\n'; c.references.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '\n'; }
-    if (c.forbidden.length) { b += '🚫 INTERDITS :\n'; c.forbidden.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '\n'; }
-    if (c.free.length) { b += '✏️ RÈGLES LIBRES :\n'; c.free.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); }
+    if (c.forbidden.length) {
+        b += '🚫 INTERDITS ABSOLUS (fusion manuel + déduits du symbole verrouillé) :\n';
+        if (c.forbiddenAuto.length) {
+            b += '   [AUTO-DÉDUITS du symbole — NE PAS DÉROGER] :\n';
+            c.forbiddenAuto.forEach((o, i) => { b += '   A' + (i+1) + '. ' + o + '\n'; });
+        }
+        if (c.forbiddenManual.length) {
+            b += '   [MANUELS] :\n';
+            c.forbiddenManual.forEach((o, i) => { b += '   M' + (i+1) + '. ' + o + '\n'; });
+        }
+        b += '\n';
+    }
+    if (c.free.length) { b += '✏️ RÈGLES LIBRES :\n'; c.free.forEach((o, i) => { b += (i+1) + '. ' + o + '\n'; }); b += '\n'; }
     b += '═══ FIN ═══\n';
     return b;
 }
+
 function buildConstraintBlockForImage() {
     const c = getActiveConstraints();
     let b = '';
     if (c.objects.length) b += ' MANDATORY OBJECTS: ' + c.objects.join(', ') + '.';
-    if (c.forbidden.length) b += ' FORBIDDEN: ' + c.forbidden.join(', ') + '.';
+    if (c.forbidden.length) b += ' STRICTLY FORBIDDEN ELEMENTS (never show, never hint): ' + c.forbidden.join(', ') + '.';
     return b;
 }
+
 function isMouradramaStyle() { return state.selectedStyle.id && state.selectedStyle.id.indexOf('mouradrama') === 0; }
 
+// ══════════════════════════════════════════════════════════════════
+// ANTI-VEILLE
+// ══════════════════════════════════════════════════════════════════
 let wakeLockSentinel = null, canvasStream = null;
 async function activateWakeLock() {
     if ('wakeLock' in navigator) { try { wakeLockSentinel = await navigator.wakeLock.request('screen'); } catch (e) {} }
@@ -770,13 +968,144 @@ function updateGenerateBtn() {
     if (state.isRunning) b.textContent = 'Génération en cours…';
     else if (!hk) b.textContent = 'Ajoutez votre clé API';
     else if (!hi) b.textContent = 'Décrivez votre sujet';
-    else { const c = getActiveConstraints(); b.textContent = c.total > 0 ? '🎭 Générer (' + c.total + ' contrainte' + (c.total > 1 ? 's' : '') + ')' : '🎭 Générer la leçon de dramaturgie'; }
+    else { const c = getActiveConstraints(); b.textContent = c.total > 0 ? '🎭 Générer (' + c.total + ' contraintes)' : '🎭 Générer la leçon de dramaturgie'; }
 }
 
+// ══════════════════════════════════════════════════════════════════
+// TÉLÉCHARGEMENTS (blob)
+// ══════════════════════════════════════════════════════════════════
+async function downloadUrl(url, filename) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const blob = await res.blob();
+        const objUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objUrl; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(objUrl), 5000);
+        return true;
+    } catch (e) {
+        // Fallback : ouvrir dans un nouvel onglet
+        try { window.open(url, '_blank'); return false; } catch (e2) { return false; }
+    }
+}
+
+function slugify(s) { return String(s || 'fichier').replace(/[^a-z0-9\u0600-\u06FF]/gi, '_').slice(0, 60); }
+
+async function downloadImage(url, label) {
+    const name = slugify(label || 'image') + '.jpg';
+    showToast('Téléchargement…', 'success', 1200);
+    const ok = await downloadUrl(url, name);
+    if (ok) showToast('Image téléchargée ✓', 'success', 1500);
+}
+
+async function downloadAllImages() {
+    if (state.sceneFrames.length === 0) { showToast('Aucune image à télécharger', 'warn'); return; }
+    let count = 0;
+    for (let i = 0; i < state.sceneFrames.length; i++) {
+        const sf = state.sceneFrames[i];
+        const sceneNum = sf.scene?.scene_number || (i + 1);
+        if (sf.startUrl) { await downloadUrl(sf.startUrl, 'scene-' + sceneNum + '-debut.jpg'); await sleep(300); count++; }
+        if (sf.endUrl && sf.endUrl !== sf.startUrl) { await downloadUrl(sf.endUrl, 'scene-' + sceneNum + '-fin.jpg'); await sleep(300); count++; }
+    }
+    showToast(count + ' image(s) téléchargée(s)', 'success', 2000);
+}
+
+async function downloadVideo(url, label) {
+    const name = slugify(label || 'clip') + '.mp4';
+    showToast('Téléchargement vidéo…', 'success', 1500);
+    const ok = await downloadUrl(url, name);
+    if (ok) showToast('Vidéo téléchargée ✓', 'success', 1500);
+}
+
+async function downloadAllVideos() {
+    const ready = state.videos.filter(v => v && v.url);
+    if (ready.length === 0) { showToast('Aucune vidéo à télécharger', 'warn'); return; }
+    let count = 0;
+    for (let i = 0; i < ready.length; i++) {
+        const v = ready[i];
+        await downloadUrl(v.url, 'clip-' + (v.sceneNumber || i + 1) + '.mp4');
+        await sleep(400);
+        count++;
+    }
+    showToast(count + ' vidéo(s) téléchargée(s)', 'success', 2000);
+}
+
+async function downloadEverything() {
+    showToast('Téléchargement complet en cours…', 'success', 2500);
+    if (state.scenario) downloadScript();
+    await sleep(500);
+    await downloadAllImages();
+    await sleep(500);
+    await downloadAllVideos();
+    showToast('Téléchargement complet terminé ✓', 'success', 2500);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// COPIER PROMPT
+// ══════════════════════════════════════════════════════════════════
+async function copyToClipboard(text) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+        }
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        return true;
+    } catch (e) { return false; }
+}
+
+async function copyPrompt(text, label) {
+    const ok = await copyToClipboard(text);
+    if (ok) showToast((label || 'Prompt') + ' copié ✓', 'success', 1500);
+    else showToast('Copie impossible', 'error', 1500);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HISTORIQUE
+// ══════════════════════════════════════════════════════════════════
+function getHistory() { try { const r = localStorage.getItem(HISTORY_KEY); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
+function saveHistory(h) { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch (e) {} }
+
+function recordHistory(conceptId, conceptName, symbolObject) {
+    const h = getHistory();
+    h.push({ conceptId, conceptName, symbol: symbolObject || '', date: Date.now() });
+    if (h.length > 200) h.splice(0, h.length - 200);
+    saveHistory(h);
+    renderHistory();
+}
+
+function renderHistory() {
+    const panel = document.getElementById('history-panel');
+    const h = getHistory();
+    if (!h.length) { panel.innerHTML = '<div style="font-size:0.72rem;color:var(--ink-dim);">Aucun historique pour le moment. L\'historique se construit à chaque leçon générée.</div>'; return; }
+    const counts = {};
+    h.forEach(x => { counts[x.conceptId] = (counts[x.conceptId] || 0) + 1; });
+    let html = '';
+    h.slice().reverse().slice(0, 30).forEach(x => {
+        const reuse = counts[x.conceptId] > 1;
+        const d = new Date(x.date);
+        const dateStr = d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        html += '<div class="history-row' + (reuse ? ' reuse' : '') + '">';
+        html += '<div class="h-week">' + esc(x.conceptId === 'aucun' ? '—' : (THEMES.find(t => t.id === x.conceptId)?.week || '—')) + '</div>';
+        html += '<div class="h-concept">' + esc(x.conceptName) + (x.symbol ? '<span class="h-symbol">🔒 ' + esc(x.symbol.slice(0, 80)) + (x.symbol.length > 80 ? '…' : '') + '</span>' : '') + '</div>';
+        html += '<div class="h-date">' + dateStr + (reuse ? '<br>⚠ réutilisation' : '') + '</div>';
+        html += '</div>';
+    });
+    panel.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO-SAVE
+// ══════════════════════════════════════════════════════════════════
 let autoSaveTimer = null;
 function buildSnapshot() {
     return {
-        version: 3, savedAt: Date.now(),
+        version: 4, savedAt: Date.now(),
         projectName: document.getElementById('project-name').value || 'Leçon Mouradrama',
         idea: document.getElementById('idea-input').value || '',
         selectedFormatId: state.selectedFormat.id,
@@ -793,6 +1122,7 @@ function buildSnapshot() {
         numFrames: parseInt(document.getElementById('clip-duration-select').value) || 241,
         aspect: document.getElementById('aspect-select').value,
         mirrorClosing: document.getElementById('mirror-closing-select').value === 'on',
+        previewMode: document.getElementById('preview-mode-select').value === 'on',
         rules: {
             threeQuarter: document.getElementById('rule-three-quarter').checked,
             noHand: document.getElementById('rule-no-hand').checked,
@@ -814,7 +1144,7 @@ function performAutoSave(force = false) {
         state.lastSavedAt = snap.savedAt;
         updateAutosaveStatus(); updateSessionButton();
     } catch (e) {
-        try { const snap = buildSnapshot(); snap.videos = []; localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snap)); logConsole('Auto-save : quota atteint, vidéos retirées du snapshot', 'warn'); }
+        try { const snap = buildSnapshot(); snap.videos = []; localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snap)); logConsole('Auto-save : quota atteint, vidéos retirées', 'warn'); }
         catch (e2) { logConsole('Auto-save échoué : ' + e2.message, 'warn'); }
     }
 }
@@ -843,6 +1173,7 @@ function restoreSession(snap) {
     document.getElementById('clip-duration-select').value = snap.numFrames || 241;
     document.getElementById('aspect-select').value = snap.aspect || 'portrait';
     document.getElementById('mirror-closing-select').value = (snap.mirrorClosing === false) ? 'off' : 'on';
+    document.getElementById('preview-mode-select').value = (snap.previewMode === false) ? 'off' : 'on';
     document.getElementById('custom-concept-input').value = snap.customConcept || '';
     document.getElementById('custom-style-input').value = snap.customStyle || '';
     document.getElementById('constraint-objects').value = snap.constraints?.objects || '';
@@ -870,6 +1201,7 @@ function restoreSession(snap) {
     state.numFrames = snap.numFrames || 241;
     state.aspect = snap.aspect || 'portrait';
     state.mirrorClosing = snap.mirrorClosing !== false;
+    state.previewMode = snap.previewMode !== false;
     state.scenario = snap.scenario || null;
     state.sceneFrames = snap.sceneFrames || [];
     state.videos = snap.videos || [];
@@ -885,9 +1217,9 @@ function restoreSession(snap) {
     document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedStyle.id));
     updateConstraintCounter(); updateCustomPanels(); updateSymbolLockPanel();
     document.getElementById('generated-images').innerHTML = '';
-    state.sceneFrames.forEach(sf => {
-        if (sf.startUrl) displayGeneratedImage(sf.startUrl, 'Scène ' + (sf.scene?.scene_number || '?') + ' — Début', 'start-frame');
-        if (sf.endUrl) displayGeneratedImage(sf.endUrl, 'Scène ' + (sf.scene?.scene_number || '?') + ' — Fin', 'end-frame');
+    state.sceneFrames.forEach((sf, i) => {
+        if (sf.startUrl) displayGeneratedImage(sf.startUrl, 'Scène ' + (sf.scene?.scene_number || i + 1) + ' — Début', 'start-frame', i, 'start');
+        if (sf.endUrl) displayGeneratedImage(sf.endUrl, 'Scène ' + (sf.scene?.scene_number || i + 1) + ' — Fin', 'end-frame', i, 'end');
     });
     document.getElementById('generated-videos').innerHTML = '';
     state.videos.forEach((v, i) => { if (v && v.url) replacePendingWithVideo(i, v.url, v.narration, v.sceneNumber, v.actualDuration); });
@@ -908,7 +1240,6 @@ function showSessionInfo() {
         restoreSession(snap);
         document.getElementById('autosave-banner').classList.remove('visible');
         showToast('Session restaurée ✓', 'success');
-        logConsole('Session restaurée (' + dateStr + ')', 'autosave');
     } else if (confirm('Effacer cette session ?')) { clearAutoSavedSession(); showToast('Session effacée', 'warn'); }
 }
 
@@ -917,7 +1248,7 @@ function saveProject() {
     const name = document.getElementById('project-name').value.trim() || 'Sans nom';
     const p = getProjects(); const snap = buildSnapshot(); snap.name = name; snap.savedAt = Date.now();
     p[name] = snap;
-    try { localStorage.setItem(PROJECTS_KEY, JSON.stringify(p)); showToast('Projet « ' + name + ' » sauvegardé ✓', 'success'); logConsole('Projet sauvegardé : ' + name, 'autosave'); performAutoSave(true); }
+    try { localStorage.setItem(PROJECTS_KEY, JSON.stringify(p)); showToast('Projet « ' + name + ' » sauvegardé ✓', 'success'); performAutoSave(true); }
     catch (e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 function loadProject() {
@@ -945,16 +1276,17 @@ function newProject() {
     document.getElementById('section-images').classList.add('hidden');
     document.getElementById('section-videos').classList.add('hidden');
     document.getElementById('section-player').classList.add('hidden');
+    document.getElementById('validation-panel').classList.remove('visible');
     document.getElementById('autosave-banner').classList.remove('visible');
     updateConstraintCounter(); updateCustomPanels();
     updateGenerateBtn(); performAutoSave(true);
     showToast('Nouveau projet', 'success');
 }
 function clearConstraints() {
-    if (!confirm('Effacer toutes les contraintes ?')) return;
+    if (!confirm('Effacer toutes les contraintes manuelles ? Les interdictions auto restent actives.')) return;
     state.constraints = { objects: '', concepts: '', references: '', forbidden: '', free: '' };
     ['constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free'].forEach(id => document.getElementById(id).value = '');
-    updateConstraintCounter(); updateGenerateBtn(); showToast('Contraintes effacées', 'success');
+    updateConstraintCounter(); updateGenerateBtn(); showToast('Contraintes manuelles effacées', 'success');
 }
 function updateCustomPanels() {
     document.getElementById('custom-concept-panel').classList.toggle('visible', state.selectedTheme.id === 'aucun');
@@ -963,10 +1295,17 @@ function updateCustomPanels() {
 function updateSymbolLockPanel() {
     const panel = document.getElementById('symbol-lock-panel');
     const sym = CONCEPT_SYMBOLS[state.selectedTheme.id];
+    const forbiddenEl = document.getElementById('symbol-lock-forbidden');
     if (!sym) { panel.classList.remove('visible'); return; }
     document.getElementById('symbol-lock-object').textContent = '🎭 ' + sym.object;
     document.getElementById('symbol-lock-camera').textContent = '📷 ' + sym.camera;
+    if (sym.autoForbidden && sym.autoForbidden.length) {
+        forbiddenEl.innerHTML = '🚫 <strong>Interdits automatiques :</strong> ' + esc(sym.autoForbidden.join(' · '));
+    } else {
+        forbiddenEl.innerHTML = '🚫 <strong>Interdits automatiques :</strong> aucun pour ce concept.';
+    }
     panel.classList.add('visible');
+    updateConstraintCounter();
 }
 
 function downloadScript() {
@@ -997,9 +1336,6 @@ function downloadScript() {
     showToast('Script téléchargé ✓', 'success');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// CORRECTION 1 : extractJsonFromString robuste (répare les retours à la ligne)
-// ══════════════════════════════════════════════════════════════════
 function extractJsonFromString(str) {
     if (!str) return '';
     let c = str.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
@@ -1043,9 +1379,6 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3, label = 'API') 
     throw new Error(label + ' : échec');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// CORRECTION 2 : max_tokens 8000 par défaut
-// ══════════════════════════════════════════════════════════════════
 async function callTextAPI(messages, options = {}) {
     const now = Date.now();
     if (now - state.lastTextRequestTime < 2000) await sleep(2000 - (now - state.lastTextRequestTime));
@@ -1140,6 +1473,243 @@ async function pollVideoForItem(item) {
     throw new Error('Délai maximal dépassé');
 }
 
+// ══════════════════════════════════════════════════════════════════
+// WAIT FOR VALIDATION
+// ══════════════════════════════════════════════════════════════════
+function waitForValidation() {
+    return new Promise((resolve) => { state.pendingValidateResolve = resolve; });
+}
+function resolveValidation(choice) {
+    if (state.pendingValidateResolve) {
+        const r = state.pendingValidateResolve;
+        state.pendingValidateResolve = null;
+        document.getElementById('validation-panel').classList.remove('visible');
+        r(choice);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE
+// ══════════════════════════════════════════════════════════════════
+async function generateScript() {
+    const idea = document.getElementById('idea-input').value.trim();
+    let conceptName, conceptFocus, conceptSymbol = null;
+    if (state.selectedTheme.id === 'aucun') {
+        if (state.customConcept.length > 3) { conceptName = 'Concept personnalisé'; conceptFocus = state.customConcept; }
+        else { conceptName = 'Analyse libre'; conceptFocus = 'Analyse le sujet selon une approche dramaturgique.'; }
+    } else {
+        conceptName = state.selectedTheme.name;
+        conceptFocus = state.selectedTheme.focus;
+        conceptSymbol = CONCEPT_SYMBOLS[state.selectedTheme.id] || null;
+    }
+    let styleName, stylePrompt;
+    if (state.selectedStyle.id === 'custom') {
+        if (state.customStyle.length > 5) { styleName = 'Style personnalisé'; stylePrompt = state.customStyle + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes only'; }
+        else { styleName = 'Mouradrama (défaut)'; stylePrompt = STYLES[0].prompt; }
+    } else { styleName = state.selectedStyle.name; stylePrompt = state.selectedStyle.prompt; }
+    const langInfo = LANGUAGES[state.narrationLanguage];
+    const aspectLabel = state.aspect === 'portrait' ? 'portrait 9:16' : state.aspect === 'landscape' ? 'paysage 16:9' : 'carré 1:1';
+    const constraintBlock = buildConstraintBlock();
+    const mirrorInstruction = state.mirrorClosing && state.clipCount >= 2 ? '\n⚠️ CLÔTURE MIROIR : la DERNIÈRE scène doit reprendre le décor, les objets et le cadrage de la PREMIÈRE.' : '';
+    const rulesBlock = isMouradramaStyle() ? buildMouradramaRulesBlock() : '';
+    const symbolBlock = conceptSymbol ? '\n\n═══ 🔒 SYMBOLE VERROUILLÉ POUR CE CONCEPT ═══\nObjet obligatoire : ' + conceptSymbol.object + '\nConsigne caméra : ' + conceptSymbol.camera + '\nInterdits absolus : ' + (conceptSymbol.autoForbidden || []).join(', ') + '\n→ Tu DOIS utiliser ce symbole. Tu ne peux pas en inventer un autre.\n═══ FIN ═══\n' : '';
+
+    const scriptPrompt = `Tu es le réalisateur de la série Mouradrama. Tu produis des leçons pédagogiques sur la dramaturgie, en darija algérienne.
+
+CONCEPT : "${conceptName}"
+FOCUS THÉORIQUE : ${conceptFocus}
+SUJET PRÉCIS : "${idea}"
+
+Contraintes :
+- Style visuel : ${styleName} — ${stylePrompt}
+- Nombre de clips : ${state.clipCount}
+- Durée par clip : ${state.numFrames / 24} secondes
+- Format : ${aspectLabel}
+
+${langInfo.promptInstruction}
+${rulesBlock}${symbolBlock}${constraintBlock}
+═══ LES 5 PILIERS NARRATIFS — OBLIGATOIRES ═══
+1. ${PILLARS[0].name} (${PILLARS[0].time}) — ${PILLARS[0].prompt}
+2. ${PILLARS[1].name} (${PILLARS[1].time}) — ${PILLARS[1].prompt}
+3. ${PILLARS[2].name} (${PILLARS[2].time}) — ${PILLARS[2].prompt}
+4. ${PILLARS[3].name} (${PILLARS[3].time}) — ${PILLARS[3].prompt}
+5. ${PILLARS[4].name} (${PILLARS[4].time}) — ${PILLARS[4].prompt}
+
+═══ RÈGLES ABSOLUES VISUELLES ═══
+AUCUN VISAGE HUMAIN. Silhouettes, symboles, objets uniquement.
+Dans chaque image_prompt, écris : "NO FACIAL FEATURES, NO FACES, silhouettes only".
+${mirrorInstruction}
+
+═══ STRUCTURE JSON ═══
+Génère EXACTEMENT ${state.clipCount} scènes narratives.
+
+{
+  "title": "Titre court",
+  "logline": "Résumé en une phrase",
+  "concept": "${conceptName}",
+  "theorician": "Théoricien(s) de référence",
+  "master_style_prompt": "English visual style anchor — MUST specify NO FACIAL FEATURES",
+  "pillars": [
+    { "id": "hook", "content": "..." },
+    { "id": "inciting", "content": "..." },
+    { "id": "goal", "content": "..." },
+    { "id": "obstacle", "content": "..." },
+    { "id": "resolution", "content": "..." }
+  ],
+  "symbols": [{ "name": "Symbole", "description": "Description en anglais" }],
+  "scenes": [{
+    "scene_number": 1,
+    "sequence_title": "Titre",
+    "description": "Description visuelle symbolique (en français)",
+    "start_frame_prompt": "English prompt for OPENING FRAME (t=0s), NO FACIAL FEATURES",
+    "end_frame_prompt": "English prompt for CLOSING FRAME (SAME object SAME framing, motion advanced), NO FACIAL FEATURES",
+    "narration": "Texte voix-off DANS LA LANGUE CHOISIE (2-3 phrases)",
+    "symbolism": "Symbole utilisé et pourquoi",
+    "camera_movement": "Mouvement caméra lent"
+  }]
+}
+
+⚠️ Vérifications : "scenes" = EXACTEMENT ${state.clipCount} entrées. JSON valide uniquement.`;
+
+    const scriptRaw = await callTextAPI([
+        { role: 'system', content: 'Tu es le réalisateur de Mouradrama. Tu réponds UNIQUEMENT avec un objet JSON brut, SANS balises Markdown, SANS ```json. Commence par { et termine par }. Tu utilises "الخصم" et non "الأنتاغونيست". Pour les objets en darija, utilise "لي". N\'utilise JAMAIS de retour à la ligne à l\'intérieur des valeurs JSON.' },
+        { role: 'user', content: scriptPrompt }
+    ], { temperature: 0.65, maxTokens: 8000 });
+
+    let scenario;
+    try {
+        const cleaned = extractJsonFromString(scriptRaw);
+        logConsole('Longueur JSON nettoyé : ' + cleaned.length + ' caractères', 'info');
+        scenario = JSON.parse(cleaned);
+    } catch (e) {
+        logConsole('Erreur JSON après nettoyage : ' + e.message, 'warn');
+        logConsole('Extrait : ' + scriptRaw.slice(0, 400), 'warn');
+        throw new Error('JSON invalide.');
+    }
+    if (!scenario.scenes || scenario.scenes.length === 0) throw new Error('Aucune scène générée.');
+    if (scenario.scenes.length > state.clipCount) scenario.scenes = scenario.scenes.slice(0, state.clipCount);
+    if (!scenario.symbols) scenario.symbols = [];
+    if (!scenario.master_style_prompt) scenario.master_style_prompt = stylePrompt;
+    if (scenario.pillars) scenario.pillars.forEach(p => { p.time = PILLARS.find(x => x.id === p.id)?.time || ''; p.name = PILLARS.find(x => x.id === p.id)?.name || p.id; });
+    state.scenario = scenario;
+    displayScript(scenario);
+    document.getElementById('section-script').classList.remove('hidden');
+    performAutoSave(true);
+    return scenario;
+}
+
+async function generateImagesForScenes() {
+    const scenario = state.scenario;
+    if (!scenario) throw new Error('Pas de script');
+    const totalImagesNeeded = scenario.scenes.length * 2;
+    const activeConstraints = getActiveConstraints();
+
+    logConsole('══════════════════════════════', 'pillar');
+    logConsole('ÉTAPE 2/3 — Images-clés (' + totalImagesNeeded + ')', 'success');
+    logConsole('══════════════════════════════', 'pillar');
+    setStatus('L\'IA compose les visuels…');
+
+    const imgSize = state.aspect === 'portrait' ? '576x1024' : state.aspect === 'landscape' ? '1024x576' : '768x768';
+    const masterAnchor = 'STYLE ANCHOR: ' + scenario.master_style_prompt + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and symbols only. ';
+    const symbolBlockImg = scenario.symbols.length > 0 ? ' RECURRING SYMBOLS: ' + scenario.symbols.map(s => s.name + ' — ' + s.description).join(' || ') + '. ' : ' ';
+    const constraintImageBlock = buildConstraintBlockForImage();
+
+    for (let i = 0; i < scenario.scenes.length; i++) {
+        if (state.stopRequested) break;
+        const scene = scenario.scenes[i];
+        logConsole('──────────────────────────────', 'info');
+        logConsole('Scène ' + scene.scene_number + ' — image DÉBUT + FIN', 'info');
+
+        setStatus('Scène ' + (i + 1) + ' — image début (' + (i * 2 + 1) + '/' + totalImagesNeeded + ')');
+        const startPrompt = masterAnchor + symbolBlockImg + constraintImageBlock + (scene.start_frame_prompt || scene.image_prompt || scene.description) + '. NO HUMAN FACES, silhouettes only, cinematic composition, high quality, no text, no watermarks.';
+        let startUrl;
+        try {
+            startUrl = await callImageAPI(startPrompt, imgSize);
+            logConsole('Scène ' + scene.scene_number + ' — image DÉBUT ✓', 'success');
+            state.sceneFrames[i] = { scene, startUrl, endUrl: null };
+            displayGeneratedImage(startUrl, 'Scène ' + scene.scene_number + ' — Début', 'start-frame', i, 'start');
+        } catch (e) {
+            logConsole('Erreur image début scène ' + scene.scene_number + ' : ' + e.message, 'error');
+            throw new Error('Échec image début scène ' + scene.scene_number);
+        }
+        await sleep(1500);
+
+        setStatus('Scène ' + (i + 1) + ' — image fin (' + (i * 2 + 2) + '/' + totalImagesNeeded + ')');
+        const endPrompt = masterAnchor + symbolBlockImg + constraintImageBlock + (scene.end_frame_prompt || scene.image_prompt || scene.description) + '. NO HUMAN FACES, silhouettes only, closing frame of the SAME shot, no text.';
+        let endUrl;
+        try {
+            endUrl = await callImageAPI(endPrompt, imgSize);
+            logConsole('Scène ' + scene.scene_number + ' — image FIN ✓', 'success');
+            state.sceneFrames[i].endUrl = endUrl;
+            displayGeneratedImage(endUrl, 'Scène ' + scene.scene_number + ' — Fin', 'end-frame', i, 'end');
+        } catch (e) {
+            logConsole('Erreur image fin scène ' + scene.scene_number + ' : ' + e.message + ' — fallback', 'warn');
+            endUrl = startUrl;
+            state.sceneFrames[i].endUrl = endUrl;
+        }
+        performAutoSave(true);
+        await sleep(1200);
+    }
+}
+
+async function generateVideosForScenes() {
+    const scenario = state.scenario;
+    if (!scenario) throw new Error('Pas de script');
+    const activeConstraints = getActiveConstraints();
+
+    logConsole('══════════════════════════════', 'pillar');
+    logConsole('ÉTAPE 3/3 — Clips vidéo (' + state.sceneFrames.length + ')', 'success');
+    logConsole('══════════════════════════════', 'pillar');
+
+    for (let i = 0; i < state.sceneFrames.length; i++) createPendingVideoCard(i, state.sceneFrames.length);
+    document.getElementById('section-videos').classList.remove('hidden');
+    document.getElementById('section-videos').classList.add('open');
+
+    const pollingPromises = [];
+    for (let i = 0; i < state.sceneFrames.length; i++) {
+        if (state.stopRequested) break;
+        const sf = state.sceneFrames[i];
+        const scene = sf.scene;
+        const cameraMove = scene.camera_movement || 'slow contemplative zoom';
+        const narration = scene.narration || '';
+        const objM = activeConstraints.objects.length > 0 ? 'MANDATORY OBJECTS: ' + activeConstraints.objects.join(', ') + '. ' : '';
+        const forbM = activeConstraints.forbidden.length > 0 ? 'STRICTLY FORBIDDEN: ' + activeConstraints.forbidden.join(', ') + '. ' : '';
+        const hookM = i === 0 ? 'OPENING HOOK SHOT. ' : '';
+        const endM = i === state.sceneFrames.length - 1 ? 'CLOSING SHOT with strong memorable image. ' : '';
+        const mirrorM = (i === state.sceneFrames.length - 1 && state.mirrorClosing) ? 'MIRROR CLOSING: same set and framing as the FIRST shot. ' : '';
+
+        const videoPrompt = ['DRAMATURGY EXPLANATION VIDEO. ONE UNBROKEN SHOT.', hookM, endM, mirrorM, 'Slow cinematic camera.', 'NO FACIAL FEATURES, NO HUMAN FACES, silhouettes only.', objM, forbM, 'Camera: ' + cameraMove, 'Style: ' + scenario.master_style_prompt, narration ? 'The scene illustrates: ' + narration.slice(0, 150) : '', 'No text, no watermarks.'].filter(Boolean).join(' ');
+
+        const item = { index: i, scene: scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
+        updatePendingVideoCard(i, 'Création de la tâche…', 0, 0);
+
+        try {
+            await createVideoTaskOnly(item);
+            updatePendingVideoCard(i, 'Tâche en file…', 0, 0);
+            pollingPromises.push(
+                pollVideoForItem(item).then(result => {
+                    const { item: it, videoUrl, actualDuration } = result;
+                    state.videos[it.index] = { sceneIndex: it.index, url: videoUrl, narration: it.scene.narration || null, sceneNumber: it.scene.scene_number || it.index + 1, actualDuration: actualDuration };
+                    logConsole('✅ Clip ' + (it.index + 1) + ' prêt en ' + actualDuration + 's !', 'success');
+                    replacePendingWithVideo(it.index, videoUrl, it.scene.narration, it.index + 1, actualDuration);
+                    playNotificationSound();
+                    showToast('Clip ' + (it.index + 1) + ' prêt !', 'success', 3000);
+                    performAutoSave(true);
+                    return result;
+                }).catch(e => { logConsole('Erreur clip ' + (item.index + 1) + ' : ' + e.message, 'error'); markPendingFailed(item.index, e.message); return null; })
+            );
+        } catch (e) { logConsole('Échec création clip ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
+
+        if (i < state.sceneFrames.length - 1 && !state.stopRequested) {
+            for (let r = 62; r > 0; r--) { if (state.stopRequested) break; setStatus('Prochain clip dans ' + r + 's'); await sleep(1000); }
+        }
+    }
+
+    logConsole('Attente des clips en parallèle…', 'info');
+    setStatus('Attente des ' + pollingPromises.length + ' clips…');
+    await Promise.allSettled(pollingPromises);
+}
+
 async function runPipeline() {
     if (state.isRunning) return;
     const idea = document.getElementById('idea-input').value.trim();
@@ -1166,30 +1736,8 @@ async function runPipeline() {
     state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
     state.aspect = document.getElementById('aspect-select').value;
     state.mirrorClosing = document.getElementById('mirror-closing-select').value === 'on';
+    state.previewMode = document.getElementById('preview-mode-select').value === 'on';
     state.sceneFrames = []; state.videos = [];
-
-    let conceptName, conceptFocus, conceptSymbol = null;
-    if (state.selectedTheme.id === 'aucun') {
-        if (state.customConcept.length > 3) { conceptName = 'Concept personnalisé'; conceptFocus = state.customConcept; }
-        else { conceptName = 'Analyse libre'; conceptFocus = 'Analyse le sujet selon une approche dramaturgique.'; }
-    } else {
-        conceptName = state.selectedTheme.name;
-        conceptFocus = state.selectedTheme.focus;
-        conceptSymbol = CONCEPT_SYMBOLS[state.selectedTheme.id] || null;
-    }
-
-    let styleName, stylePrompt;
-    if (state.selectedStyle.id === 'custom') {
-        if (state.customStyle.length > 5) { styleName = 'Style personnalisé'; stylePrompt = state.customStyle + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes only'; }
-        else { styleName = 'Mouradrama (défaut)'; stylePrompt = STYLES[0].prompt; }
-    } else { styleName = state.selectedStyle.name; stylePrompt = state.selectedStyle.prompt; }
-
-    const langInfo = LANGUAGES[state.narrationLanguage];
-    const hookInfo = HOOK_INTENSITIES[state.hookIntensity];
-    const endingInfo = ENDINGS[state.endingType];
-    const totalImagesNeeded = state.clipCount * 2;
-    const rulesBlock = isMouradramaStyle() ? buildMouradramaRulesBlock() : '';
-    const symbolBlock = conceptSymbol ? '\n\n═══ 🔒 SYMBOLE VERROUILLÉ POUR CE CONCEPT ═══\nObjet obligatoire : ' + conceptSymbol.object + '\nConsigne caméra : ' + conceptSymbol.camera + '\n→ Tu DOIS utiliser ce symbole. Tu ne peux pas en inventer un autre.\n═══ FIN ═══\n' : '';
 
     document.getElementById('stop-btn').classList.add('visible');
     document.getElementById('generate-btn').disabled = true;
@@ -1202,226 +1750,65 @@ async function runPipeline() {
     document.getElementById('section-images').classList.add('hidden');
     document.getElementById('section-videos').classList.add('hidden');
     document.getElementById('section-player').classList.add('hidden');
+    document.getElementById('validation-panel').classList.remove('visible');
     document.getElementById('autosave-banner').classList.remove('visible');
 
     logConsole('══════════════════════════════', 'pillar');
-    logConsole('🎭 MOURADRAMA STUDIO', 'pillar');
+    logConsole('🎭 MOURADRAMA STUDIO v4', 'pillar');
     logConsole('══════════════════════════════', 'pillar');
-    logConsole('Format : ' + state.clipCount + ' clips · ' + totalImagesNeeded + ' images-clés', 'pillar');
-    logConsole('Concept : ' + conceptName, 'info');
-    logConsole('Style : ' + styleName, 'info');
-    logConsole('Langue : ' + langInfo.label + ' · Narrateur : ' + NARRATORS[state.narratorVoice].label, 'info');
-    logConsole('Hook : ' + hookInfo.label + ' · Résolution : ' + endingInfo.label, 'pillar');
-    if (conceptSymbol) logConsole('🔒 Symbole verrouillé : ' + conceptSymbol.object.slice(0, 60) + '…', 'lock');
+    logConsole('Format : ' + state.clipCount + ' clips · Aperçu : ' + (state.previewMode ? 'ON' : 'OFF'), 'pillar');
 
     const activeConstraints = getActiveConstraints();
-    if (activeConstraints.total > 0) logConsole('🔒 ' + activeConstraints.total + ' contraintes actives', 'lock');
+    if (activeConstraints.forbiddenAuto.length > 0) {
+        logConsole('🔒 Interdictions auto du symbole : ' + activeConstraints.forbiddenAuto.length, 'lock');
+        logConsole('   → ' + activeConstraints.forbiddenAuto.join(', '), 'lock');
+    }
 
     await activateWakeLock();
     setStatus('Initialisation…');
     performAutoSave(true);
 
     try {
-        logConsole('══════════════════════════════', 'pillar');
-        logConsole('ÉTAPE 1/3 — Script + 5 piliers narratifs', 'success');
-        logConsole('══════════════════════════════', 'pillar');
+        logConsole('ÉTAPE 1/3 — Script + 5 piliers', 'success');
         setStatus('L\'IA écrit le script…');
+        await generateScript();
 
-        const aspectLabel = state.aspect === 'portrait' ? 'portrait 9:16' : state.aspect === 'landscape' ? 'paysage 16:9' : 'carré 1:1';
-        const constraintBlock = buildConstraintBlock();
-        const mirrorInstruction = state.mirrorClosing && state.clipCount >= 2 ? '\n⚠️ CLÔTURE MIROIR : la DERNIÈRE scène doit reprendre le décor, les objets et le cadrage de la PREMIÈRE scène, avec une action de fermeture.' : '';
+        // Enregistrer l'historique
+        const conceptId = state.selectedTheme.id;
+        const conceptName = state.selectedTheme.name || 'Personnalisé';
+        const symbolObj = CONCEPT_SYMBOLS[conceptId]?.object || '';
+        recordHistory(conceptId, conceptName, symbolObj);
 
-        const scriptPrompt = `Tu es le réalisateur de la série Mouradrama. Tu produis des leçons pédagogiques sur la dramaturgie, en darija algérienne.
-
-CONCEPT : "${conceptName}"
-FOCUS THÉORIQUE : ${conceptFocus}
-SUJET PRÉCIS : "${idea}"
-
-Contraintes :
-- Style visuel : ${styleName} — ${stylePrompt}
-- Nombre de clips : ${state.clipCount}
-- Durée par clip : ${state.numFrames / 24} secondes
-- Format : ${aspectLabel}
-
-${langInfo.promptInstruction}
-${rulesBlock}${symbolBlock}${constraintBlock}
-═══ LES 5 PILIERS NARRATIFS — OBLIGATOIRES ═══
-1. ${PILLARS[0].name} (${PILLARS[0].time}) — ${PILLARS[0].prompt}
-2. ${PILLARS[1].name} (${PILLARS[1].time}) — ${PILLARS[1].prompt}
-3. ${PILLARS[2].name} (${PILLARS[2].time}) — ${PILLARS[2].prompt}
-4. ${PILLARS[3].name} (${PILLARS[3].time}) — ${PILLARS[3].prompt}
-5. ${PILLARS[4].name} (${PILLARS[4].time}) — ${PILLARS[4].prompt}
-
-═══ RÈGLES ABSOLUES VISUELLES ═══
-AUCUN VISAGE HUMAIN. Silhouettes, symboles, objets uniquement.
-Dans chaque image_prompt, écris : "NO FACIAL FEATURES, NO FACES, silhouettes only".
-- Hook : ${hookInfo.prompt}
-- Résolution : ${endingInfo.prompt}
-${mirrorInstruction}
-
-═══ STRUCTURE JSON ═══
-Génère EXACTEMENT ${state.clipCount} scènes narratives.
-Chaque scène = 1 clip. Fournis 2 prompts d'image (début + fin) par scène.
-
-{
-  "title": "Titre court",
-  "logline": "Résumé en une phrase",
-  "concept": "${conceptName}",
-  "theorician": "Théoricien(s) de référence",
-  "master_style_prompt": "English visual style anchor — MUST specify NO FACIAL FEATURES",
-  "pillars": [
-    { "id": "hook", "content": "..." },
-    { "id": "inciting", "content": "..." },
-    { "id": "goal", "content": "..." },
-    { "id": "obstacle", "content": "..." },
-    { "id": "resolution", "content": "..." }
-  ],
-  "symbols": [{ "name": "Symbole", "description": "Description en anglais" }],
-  "scenes": [{
-    "scene_number": 1,
-    "sequence_title": "Titre",
-    "description": "Description visuelle symbolique (en français)",
-    "start_frame_prompt": "English prompt for OPENING FRAME (t=0s), NO FACIAL FEATURES, ${aspectLabel}",
-    "end_frame_prompt": "English prompt for CLOSING FRAME (SAME object SAME framing, motion advanced), NO FACIAL FEATURES, ${aspectLabel}",
-    "narration": "Texte voix-off DANS LA LANGUE CHOISIE (2-3 phrases)",
-    "symbolism": "Symbole utilisé et pourquoi",
-    "camera_movement": "Mouvement caméra lent",
-    "sound_design": "Ambiance sonore"
-  }]
-}
-
-⚠️ Vérifications : "scenes" = EXACTEMENT ${state.clipCount} entrées. Texte en darija si choisie. JSON valide uniquement.`;
-
-        // ═══════════════════════════════════════════════════════════════
-        // CORRECTION 3 : system prompt renforcé + max_tokens 8000
-        // ═══════════════════════════════════════════════════════════════
-        const scriptRaw = await callTextAPI([
-            { role: 'system', content: 'Tu es le réalisateur de Mouradrama. Tu réponds UNIQUEMENT avec un objet JSON brut, SANS balises Markdown, SANS ```json, SANS commentaire avant ou après. Commence ta réponse par { et termine par }. Tu utilises "الخصم" et non "الأنتاغونيست". Pour les objets en darija, utilise "لي" au lieu de "التي". N\'utilise JAMAIS de retour à la ligne à l\'intérieur des valeurs de chaînes JSON — utilise des espaces.' },
-            { role: 'user', content: scriptPrompt }
-        ], { temperature: 0.65, maxTokens: 8000 });
-
-        let scenario;
-        try {
-            const cleaned = extractJsonFromString(scriptRaw);
-            logConsole('Longueur JSON nettoyé : ' + cleaned.length + ' caractères', 'info');
-            scenario = JSON.parse(cleaned);
-        } catch (e) {
-            logConsole('Erreur JSON après nettoyage : ' + e.message, 'warn');
-            logConsole('Extrait : ' + scriptRaw.slice(0, 400), 'warn');
-            throw new Error('JSON invalide.');
+        // Aperçu : pause pour validation
+        if (state.previewMode) {
+            document.getElementById('validation-panel').classList.add('visible');
+            setStatus('⏸ Aperçu — En attente de validation');
+            logConsole('⏸ Aperçu activé — clique sur "✓ Valider" pour lancer les images', 'warn');
+            const choice = await waitForValidation();
+            if (choice === 'regen') {
+                logConsole('Régénération du script demandée', 'warn');
+                state.sceneFrames = []; state.videos = [];
+                document.getElementById('generated-images').innerHTML = '';
+                document.getElementById('generated-videos').innerHTML = '';
+                await sleep(500);
+                // Boucle pour permettre plusieurs régénérations
+                while (!state.stopRequested) {
+                    await generateScript();
+                    document.getElementById('validation-panel').classList.add('visible');
+                    setStatus('⏸ Aperçu — En attente de validation');
+                    const c2 = await waitForValidation();
+                    if (c2 === 'validate') break;
+                    if (c2 === 'regen') continue;
+                }
+            }
+            setStatus('Génération des images…');
         }
 
-        if (!scenario.scenes || scenario.scenes.length === 0) throw new Error('Aucune scène générée.');
-        if (scenario.scenes.length > state.clipCount) scenario.scenes = scenario.scenes.slice(0, state.clipCount);
-        if (!scenario.symbols) scenario.symbols = [];
-        if (!scenario.master_style_prompt) scenario.master_style_prompt = stylePrompt;
-        if (scenario.pillars) scenario.pillars.forEach(p => { p.time = PILLARS.find(x => x.id === p.id)?.time || ''; p.name = PILLARS.find(x => x.id === p.id)?.name || p.id; });
-
-        state.scenario = scenario;
-        logConsole('Script : « ' + scenario.title + ' »', 'success');
-        logConsole('Scènes : ' + scenario.scenes.length + ' → ' + scenario.scenes.length + ' clips', 'pillar');
-        displayScript(scenario);
-        performAutoSave(true);
-
-        logConsole('══════════════════════════════', 'pillar');
-        logConsole('ÉTAPE 2/3 — Images-clés (' + totalImagesNeeded + ')', 'success');
-        logConsole('══════════════════════════════', 'pillar');
-        setStatus('L\'IA compose les visuels…');
-
-        const imgSize = state.aspect === 'portrait' ? '576x1024' : state.aspect === 'landscape' ? '1024x576' : '768x768';
-        const masterAnchor = 'STYLE ANCHOR: ' + scenario.master_style_prompt + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and symbols only. ';
-        const symbolBlockImg = scenario.symbols.length > 0 ? ' RECURRING SYMBOLS: ' + scenario.symbols.map(s => s.name + ' — ' + s.description).join(' || ') + '. ' : ' ';
-        const constraintImageBlock = buildConstraintBlockForImage();
-
-        for (let i = 0; i < scenario.scenes.length; i++) {
-            if (state.stopRequested) break;
-            const scene = scenario.scenes[i];
-            logConsole('──────────────────────────────', 'info');
-            logConsole('Scène ' + scene.scene_number + ' — image DÉBUT + FIN', 'info');
-
-            setStatus('Scène ' + (i + 1) + ' — image début (' + (i * 2 + 1) + '/' + totalImagesNeeded + ')');
-            const startPrompt = masterAnchor + symbolBlockImg + constraintImageBlock + (scene.start_frame_prompt || scene.image_prompt || scene.description) + '. NO HUMAN FACES, silhouettes only, cinematic composition, high quality, no text, no watermarks.';
-            let startUrl;
-            try {
-                startUrl = await callImageAPI(startPrompt, imgSize);
-                logConsole('Scène ' + scene.scene_number + ' — image DÉBUT ✓', 'success');
-                displayGeneratedImage(startUrl, 'Scène ' + scene.scene_number + ' — Début', 'start-frame');
-            } catch (e) {
-                logConsole('Erreur image début scène ' + scene.scene_number + ' : ' + e.message, 'error');
-                throw new Error('Échec image début scène ' + scene.scene_number);
-            }
-            await sleep(1500);
-
-            setStatus('Scène ' + (i + 1) + ' — image fin (' + (i * 2 + 2) + '/' + totalImagesNeeded + ')');
-            const endPrompt = masterAnchor + symbolBlockImg + constraintImageBlock + (scene.end_frame_prompt || scene.image_prompt || scene.description) + '. NO HUMAN FACES, silhouettes only, closing frame of the SAME shot, no text.';
-            let endUrl;
-            try {
-                endUrl = await callImageAPI(endPrompt, imgSize);
-                logConsole('Scène ' + scene.scene_number + ' — image FIN ✓', 'success');
-                displayGeneratedImage(endUrl, 'Scène ' + scene.scene_number + ' — Fin', 'end-frame');
-            } catch (e) {
-                logConsole('Erreur image fin scène ' + scene.scene_number + ' : ' + e.message + ' — fallback', 'warn');
-                endUrl = startUrl;
-            }
-
-            state.sceneFrames.push({ scene, startUrl, endUrl });
-            performAutoSave(true);
-            await sleep(1200);
-        }
+        await generateImagesForScenes();
 
         if (state.sceneFrames.length === 0) throw new Error('Aucune scène générée');
 
-        logConsole('══════════════════════════════', 'pillar');
-        logConsole('ÉTAPE 3/3 — Clips vidéo (' + state.sceneFrames.length + ')', 'success');
-        logConsole('══════════════════════════════', 'pillar');
-
-        for (let i = 0; i < state.sceneFrames.length; i++) createPendingVideoCard(i, state.sceneFrames.length);
-        document.getElementById('section-videos').classList.remove('hidden');
-        document.getElementById('section-videos').classList.add('open');
-
-        const pollingPromises = [];
-        for (let i = 0; i < state.sceneFrames.length; i++) {
-            if (state.stopRequested) break;
-            const sf = state.sceneFrames[i];
-            const scene = sf.scene;
-            const cameraMove = scene.camera_movement || 'slow contemplative zoom';
-            const narration = scene.narration || '';
-            const objM = activeConstraints.objects.length > 0 ? 'MANDATORY OBJECTS: ' + activeConstraints.objects.join(', ') + '. ' : '';
-            const forbM = activeConstraints.forbidden.length > 0 ? 'FORBIDDEN: ' + activeConstraints.forbidden.join(', ') + '. ' : '';
-            const hookM = i === 0 ? 'OPENING HOOK SHOT. ' : '';
-            const endM = i === state.sceneFrames.length - 1 ? 'CLOSING SHOT with strong memorable image. ' : '';
-            const mirrorM = (i === state.sceneFrames.length - 1 && state.mirrorClosing) ? 'MIRROR CLOSING: same set and framing as the FIRST shot, action of closure. ' : '';
-
-            const videoPrompt = ['DRAMATURGY EXPLANATION VIDEO. ONE UNBROKEN SHOT.', hookM, endM, mirrorM, 'Slow cinematic camera.', 'NO FACIAL FEATURES, NO HUMAN FACES, silhouettes only.', objM, forbM, 'Camera: ' + cameraMove, 'Style: ' + scenario.master_style_prompt, narration ? 'The scene illustrates: ' + narration.slice(0, 150) : '', 'No text, no watermarks.'].filter(Boolean).join(' ');
-
-            const item = { index: i, scene: scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
-            updatePendingVideoCard(i, 'Création de la tâche…', 0, 0);
-
-            try {
-                await createVideoTaskOnly(item);
-                updatePendingVideoCard(i, 'Tâche en file…', 0, 0);
-                pollingPromises.push(
-                    pollVideoForItem(item).then(result => {
-                        const { item: it, videoUrl, actualDuration } = result;
-                        state.videos[it.index] = { sceneIndex: it.index, url: videoUrl, narration: it.scene.narration || null, sceneNumber: it.scene.scene_number || it.index + 1, actualDuration: actualDuration };
-                        logConsole('✅ Clip ' + (it.index + 1) + ' prêt en ' + actualDuration + 's !', 'success');
-                        replacePendingWithVideo(it.index, videoUrl, it.scene.narration, it.index + 1, actualDuration);
-                        playNotificationSound();
-                        showToast('Clip ' + (it.index + 1) + ' prêt !', 'success', 3000);
-                        performAutoSave(true);
-                        return result;
-                    }).catch(e => { logConsole('Erreur clip ' + (item.index + 1) + ' : ' + e.message, 'error'); markPendingFailed(item.index, e.message); return null; })
-                );
-            } catch (e) { logConsole('Échec création clip ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
-
-            if (i < state.sceneFrames.length - 1 && !state.stopRequested) {
-                for (let r = 62; r > 0; r--) { if (state.stopRequested) break; setStatus('Prochain clip dans ' + r + 's'); await sleep(1000); }
-            }
-        }
-
-        logConsole('Attente des clips en parallèle…', 'info');
-        setStatus('Attente des ' + pollingPromises.length + ' clips…');
-        await Promise.allSettled(pollingPromises);
+        await generateVideosForScenes();
 
         const readyVideos = state.videos.filter(v => v && v.url);
         logConsole('Clips prêts : ' + readyVideos.length + '/' + state.sceneFrames.length, 'pillar');
@@ -1447,11 +1834,104 @@ Chaque scène = 1 clip. Fournis 2 prompts d'image (début + fin) par scène.
     await deactivateWakeLock();
 }
 
+// ══════════════════════════════════════════════════════════════════
+// RÉGÉNÉRATION CIBLÉE
+// ══════════════════════════════════════════════════════════════════
+async function regenerateImage(sceneIdx, which) {
+    if (!state.sceneFrames[sceneIdx] || !state.scenario) { showToast('Scène introuvable', 'error'); return; }
+    if (state.isRunning) { showToast('Attends la fin de la génération', 'warn'); return; }
+    const scene = state.sceneFrames[sceneIdx].scene || state.scenario.scenes[sceneIdx];
+    if (!scene) { showToast('Scène introuvable', 'error'); return; }
+    if (!getApiKey()) { showToast('Clé API manquante', 'error'); return; }
+
+    state.isRunning = true;
+    updateGenerateBtn();
+    showToast('Régénération de l\'image…', 'success', 1500);
+
+    const scenario = state.scenario;
+    const imgSize = state.aspect === 'portrait' ? '576x1024' : state.aspect === 'landscape' ? '1024x576' : '768x768';
+    const masterAnchor = 'STYLE ANCHOR: ' + scenario.master_style_prompt + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and symbols only. ';
+    const symbolBlockImg = scenario.symbols.length > 0 ? ' RECURRING SYMBOLS: ' + scenario.symbols.map(s => s.name + ' — ' + s.description).join(' || ') + '. ' : ' ';
+    const constraintImageBlock = buildConstraintBlockForImage();
+
+    const isStart = which === 'start';
+    const basePrompt = isStart ? (scene.start_frame_prompt || scene.image_prompt || scene.description) : (scene.end_frame_prompt || scene.image_prompt || scene.description);
+    const fullPrompt = masterAnchor + symbolBlockImg + constraintImageBlock + basePrompt + (isStart ? '. NO HUMAN FACES, silhouettes only, opening frame of the shot, no text.' : '. NO HUMAN FACES, silhouettes only, closing frame of the SAME shot, no text.');
+
+    try {
+        logConsole('Régénération scène ' + scene.scene_number + ' (' + which + ')', 'info');
+        const url = await callImageAPI(fullPrompt, imgSize);
+        const card = document.getElementById('gen-image-' + sceneIdx + '-' + which);
+        if (card) card.remove();
+        if (isStart) state.sceneFrames[sceneIdx].startUrl = url;
+        else state.sceneFrames[sceneIdx].endUrl = url;
+        displayGeneratedImage(url, 'Scène ' + scene.scene_number + ' — ' + (isStart ? 'Début' : 'Fin'), isStart ? 'start-frame' : 'end-frame', sceneIdx, which);
+        performAutoSave(true);
+        showToast('Image régénérée ✓', 'success');
+    } catch (e) {
+        logConsole('Erreur régénération : ' + e.message, 'error');
+        showToast('Erreur : ' + e.message.slice(0, 50), 'error');
+    }
+    state.isRunning = false;
+    updateGenerateBtn();
+}
+
+async function regenerateVideo(sceneIdx) {
+    if (!state.sceneFrames[sceneIdx] || !state.scenario) { showToast('Scène introuvable', 'error'); return; }
+    if (state.isRunning) { showToast('Attends la fin de la génération', 'warn'); return; }
+    if (!getApiKey()) { showToast('Clé API manquante', 'error'); return; }
+
+    state.isRunning = true;
+    updateGenerateBtn();
+    showToast('Régénération du clip…', 'success', 1500);
+
+    const sf = state.sceneFrames[sceneIdx];
+    const scenario = state.scenario;
+    const activeConstraints = getActiveConstraints();
+    const scene = sf.scene;
+    const cameraMove = scene.camera_movement || 'slow contemplative zoom';
+    const narration = scene.narration || '';
+    const objM = activeConstraints.objects.length > 0 ? 'MANDATORY OBJECTS: ' + activeConstraints.objects.join(', ') + '. ' : '';
+    const forbM = activeConstraints.forbidden.length > 0 ? 'STRICTLY FORBIDDEN: ' + activeConstraints.forbidden.join(', ') + '. ' : '';
+    const hookM = sceneIdx === 0 ? 'OPENING HOOK SHOT. ' : '';
+    const endM = sceneIdx === state.sceneFrames.length - 1 ? 'CLOSING SHOT. ' : '';
+    const mirrorM = (sceneIdx === state.sceneFrames.length - 1 && state.mirrorClosing) ? 'MIRROR CLOSING. ' : '';
+
+    const videoPrompt = ['DRAMATURGY EXPLANATION VIDEO. ONE UNBROKEN SHOT.', hookM, endM, mirrorM, 'Slow cinematic camera.', 'NO FACIAL FEATURES, NO HUMAN FACES, silhouettes only.', objM, forbM, 'Camera: ' + cameraMove, 'Style: ' + scenario.master_style_prompt, narration ? 'The scene illustrates: ' + narration.slice(0, 150) : '', 'No text, no watermarks.'].filter(Boolean).join(' ');
+
+    const item = { index: sceneIdx, scene: scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
+
+    // Remettre une pending card
+    const oldCard = document.getElementById('video-card-' + sceneIdx);
+    if (oldCard) oldCard.remove();
+    createPendingVideoCard(sceneIdx, state.sceneFrames.length);
+    updatePendingVideoCard(sceneIdx, 'Régénération…', 0, 0);
+
+    try {
+        await createVideoTaskOnly(item);
+        const result = await pollVideoForItem(item);
+        const { videoUrl, actualDuration } = result;
+        state.videos[sceneIdx] = { sceneIndex: sceneIdx, url: videoUrl, narration: scene.narration || null, sceneNumber: scene.scene_number || sceneIdx + 1, actualDuration: actualDuration };
+        replacePendingWithVideo(sceneIdx, videoUrl, scene.narration, scene.scene_number || sceneIdx + 1, actualDuration);
+        performAutoSave(true);
+        showToast('Clip régénéré ✓', 'success');
+    } catch (e) {
+        logConsole('Erreur régénération clip : ' + e.message, 'error');
+        markPendingFailed(sceneIdx, e.message);
+        showToast('Erreur : ' + e.message.slice(0, 50), 'error');
+    }
+    state.isRunning = false;
+    updateGenerateBtn();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AFFICHAGE
+// ══════════════════════════════════════════════════════════════════
 function displayScript(scenario) {
     const s = document.getElementById('section-script'); const d = document.getElementById('script-display');
     s.classList.remove('hidden'); s.classList.add('open');
     let h = '<h3>🎭 ' + esc(scenario.title || 'Leçon') + '</h3>';
-    if (scenario.logline) h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;direction:auto;">' + esc(scenario.logline) + '</p>';
+    if (scenario.logline) h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline) + '</p>';
     if (scenario.concept) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.4rem;">Concept : ' + esc(scenario.concept) + '</div>';
     if (scenario.theorician) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Théoricien(s) : ' + esc(scenario.theorician) + '</div>';
     if (scenario.pillars && scenario.pillars.length > 0) {
@@ -1487,18 +1967,84 @@ function displayScript(scenario) {
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function displayGeneratedImage(url, label, frameClass) {
+function buildImagePromptForScene(scene, which) {
+    const scenario = state.scenario;
+    if (!scenario) return '';
+    const masterAnchor = 'STYLE ANCHOR: ' + scenario.master_style_prompt + '. NO FACIAL FEATURES, NO FACES VISIBLE, silhouettes and symbols only. ';
+    const symbolBlockImg = scenario.symbols.length > 0 ? ' RECURRING SYMBOLS: ' + scenario.symbols.map(s => s.name + ' — ' + s.description).join(' || ') + '. ' : ' ';
+    const constraintImageBlock = buildConstraintBlockForImage();
+    const isStart = which === 'start';
+    const basePrompt = isStart ? (scene.start_frame_prompt || scene.image_prompt || scene.description) : (scene.end_frame_prompt || scene.image_prompt || scene.description);
+    return masterAnchor + symbolBlockImg + constraintImageBlock + basePrompt + (isStart ? '. NO HUMAN FACES, silhouettes only, opening frame of the shot, no text.' : '. NO HUMAN FACES, silhouettes only, closing frame of the SAME shot, no text.');
+}
+
+function buildVideoPromptForScene(sceneIdx) {
+    const scenario = state.scenario;
+    if (!scenario) return '';
+    const sf = state.sceneFrames[sceneIdx];
+    const scene = sf ? sf.scene : {};
+    const activeConstraints = getActiveConstraints();
+    const cameraMove = scene.camera_movement || 'slow contemplative zoom';
+    const narration = scene.narration || '';
+    const objM = activeConstraints.objects.length > 0 ? 'MANDATORY OBJECTS: ' + activeConstraints.objects.join(', ') + '. ' : '';
+    const forbM = activeConstraints.forbidden.length > 0 ? 'STRICTLY FORBIDDEN: ' + activeConstraints.forbidden.join(', ') + '. ' : '';
+    const hookM = sceneIdx === 0 ? 'OPENING HOOK SHOT. ' : '';
+    const endM = sceneIdx === state.sceneFrames.length - 1 ? 'CLOSING SHOT. ' : '';
+    const mirrorM = (sceneIdx === state.sceneFrames.length - 1 && state.mirrorClosing) ? 'MIRROR CLOSING. ' : '';
+    return ['DRAMATURGY EXPLANATION VIDEO. ONE UNBROKEN SHOT.', hookM, endM, mirrorM, 'Slow cinematic camera.', 'NO FACIAL FEATURES, NO HUMAN FACES, silhouettes only.', objM, forbM, 'Camera: ' + cameraMove, 'Style: ' + scenario.master_style_prompt, narration ? 'The scene illustrates: ' + narration.slice(0, 150) : '', 'No text, no watermarks.'].filter(Boolean).join(' ');
+}
+
+function displayGeneratedImage(url, label, frameClass, sceneIdx, which) {
     const s = document.getElementById('section-images'); const g = document.getElementById('generated-images');
     s.classList.remove('hidden');
     const c = document.createElement('div');
     c.className = 'gen-image-card' + (frameClass ? ' ' + frameClass : '');
-    c.innerHTML = '<img src="' + url + '" alt="" loading="lazy"><div class="gen-label">' + esc(label) + '</div>';
+    if (sceneIdx !== undefined && which) c.id = 'gen-image-' + sceneIdx + '-' + which;
+
+    // Badge de conformité : nombre de règles actives + interdits
+    const activeConstraints = getActiveConstraints();
+    const rulesActive = [];
+    if (document.getElementById('rule-three-quarter').checked) rulesActive.push('3/4');
+    if (document.getElementById('rule-no-hand').checked) rulesActive.push('no-hand');
+    if (document.getElementById('rule-single-concept').checked) rulesActive.push('1-concept');
+    if (document.getElementById('rule-single-figure').checked) rulesActive.push('1-figure');
+    if (document.getElementById('rule-near-miss').checked) rulesActive.push('near-miss');
+    if (document.getElementById('rule-fixed-camera').checked) rulesActive.push('fixed-cam');
+    const badgeTitle = 'Règles : ' + rulesActive.join(', ') + ' | Interdits auto : ' + (activeConstraints.forbiddenAuto.join(', ') || 'aucun');
+
+    c.innerHTML = '<div class="conformance-badge" title="' + esc(badgeTitle) + '">🛡️ ' + rulesActive.length + '+' + activeConstraints.forbiddenAuto.length + '</div>' +
+        '<img src="' + url + '" alt="" loading="lazy">' +
+        '<div class="gen-label">' + esc(label) + '</div>' +
+        '<div class="gen-actions-bar">' +
+            '<button class="img-dl-btn" title="Télécharger">💾 DL</button>' +
+            '<button class="img-copy-btn" title="Copier le prompt">📋</button>' +
+            '<button class="img-regen-btn" title="Régénérer cette image">🔁</button>' +
+        '</div>';
     g.appendChild(c);
     document.getElementById('images-badge').textContent = g.children.length;
+
+    const dlBtn = c.querySelector('.img-dl-btn');
+    if (dlBtn) dlBtn.addEventListener('click', () => downloadImage(url, label));
+
+    const copyBtn = c.querySelector('.img-copy-btn');
+    if (copyBtn) copyBtn.addEventListener('click', () => {
+        if (sceneIdx !== undefined && which && state.scenario) {
+            const scene = state.sceneFrames[sceneIdx]?.scene || state.scenario.scenes[sceneIdx];
+            const prompt = buildImagePromptForScene(scene, which);
+            copyPrompt(prompt, 'Prompt image');
+        }
+    });
+
+    const regenBtn = c.querySelector('.img-regen-btn');
+    if (regenBtn) regenBtn.addEventListener('click', () => {
+        if (sceneIdx !== undefined && which) regenerateImage(sceneIdx, which);
+    });
 }
 
 function createPendingVideoCard(index, total) {
     const g = document.getElementById('generated-videos');
+    const existing = document.getElementById('pending-video-' + index);
+    if (existing) existing.remove();
     const c = document.createElement('div');
     c.className = 'pending-video-card'; c.id = 'pending-video-' + index;
     c.innerHTML = '<div class="pending-spinner"></div><div class="pending-label">Clip ' + (index + 1) + ' / ' + total + '</div><div class="pending-progress-text" id="pending-progress-' + index + '">En attente…</div><div class="pending-eta" id="pending-eta-' + index + '"></div><div class="pending-progress-bar"><div class="pending-progress-fill" id="pending-fill-' + index + '"></div></div>';
@@ -1522,7 +2068,12 @@ function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actual
         '<div class="gen-label">🎭 Clip ' + sceneNumber + '</div>' +
         (actualDuration ? '<div class="gen-timing">⚡ ' + actualDuration + 's</div>' : '') +
         (narration ? '<div class="gen-narration">🎙️ ' + esc(narration.slice(0, 130)) + (narration.length > 130 ? '…' : '') + '</div>' : '') +
-        '<div class="gen-actions">' + (narration ? '<button class="narration-play-btn" data-index="' + index + '">▶ Écouter</button>' : '') + '<button class="download-narration-single-btn" data-index="' + index + '">💾 .txt</button></div>';
+        '<div class="gen-actions">' +
+            (narration ? '<button class="narration-play-btn" data-index="' + index + '">▶ Écouter</button>' : '') +
+            '<button class="video-dl-btn" data-index="' + index + '">💾 DL</button>' +
+            '<button class="video-copy-btn" data-index="' + index + '">📋</button>' +
+            '<button class="video-regen-btn danger" data-index="' + index + '">🔁 Régén</button>' +
+        '</div>';
     if (p) p.parentNode.replaceChild(c, p);
     else document.getElementById('generated-videos').appendChild(c);
     setTimeout(() => c.classList.remove('newly-added'), 3000);
@@ -1534,14 +2085,22 @@ function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actual
         if (pb.classList.contains('playing')) { stopSpeech(); pb.classList.remove('playing'); pb.textContent = '▶ Écouter'; }
         else { document.querySelectorAll('.narration-play-btn.playing').forEach(b => { b.classList.remove('playing'); b.textContent = '▶ Écouter'; }); pb.classList.add('playing'); pb.textContent = '⏸ Arrêter'; speakText(v.narration).then(() => { pb.classList.remove('playing'); pb.textContent = '▶ Écouter'; }); }
     });
-    const db = c.querySelector('.download-narration-single-btn');
-    if (db) db.addEventListener('click', () => {
-        const v = state.videos[index]; if (!v || !v.narration) return;
-        const content = 'CLIP ' + v.sceneNumber + '\n\n' + v.narration;
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob); const a = document.createElement('a');
-        a.href = url; a.download = 'clip_' + v.sceneNumber + '.txt';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+
+    const dlBtn = c.querySelector('.video-dl-btn');
+    if (dlBtn) dlBtn.addEventListener('click', () => {
+        const v = state.videos[index]; if (!v || !v.url) return;
+        downloadVideo(v.url, 'clip-' + (v.sceneNumber || index + 1));
+    });
+
+    const cpBtn = c.querySelector('.video-copy-btn');
+    if (cpBtn) cpBtn.addEventListener('click', () => {
+        const prompt = buildVideoPromptForScene(index);
+        copyPrompt(prompt, 'Prompt vidéo');
+    });
+
+    const rgBtn = c.querySelector('.video-regen-btn');
+    if (rgBtn) rgBtn.addEventListener('click', () => {
+        if (confirm('Régénérer ce clip ? Cette action relance uniquement ce clip.')) regenerateVideo(index);
     });
 }
 
@@ -1609,14 +2168,15 @@ function speakText(text) {
 }
 function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
 function testVoice() {
-    const lt = LANGUAGES[state.narrationLanguage]; const nt = NARRATORS[state.narratorVoice];
-    const t = state.narrationLanguage === 'ar-dz'
-        ? 'كيفاش الدراماتورجيا كتبنى قصة تجذب؟ كل فيلم ناجح، بنا على نفس القواعد: شخصية تحب حاجة، عندها عوائق، وتحارب باش توصلها.'
-        : (state.narrationLanguage === 'ar' ? 'كيف تُبنى الدراماتورجيا؟' : 'Comment se construit la dramaturgie ?');
-    logConsole('Test voix : ' + nt.label + ' · ' + lt.label, 'info');
+    const nt = NARRATORS[state.narratorVoice];
+    const t = state.narrationLanguage === 'ar-dz' ? 'كيفاش الدراماتورجيا كتبنى قصة تجذب؟ كل فيلم ناجح، بنا على نفس القواعد: شخصية تحب حاجة، عندها عوائق، وتحارب باش توصلها.' : 'Comment se construit la dramaturgie ?';
+    logConsole('Test voix : ' + nt.label, 'info');
     speakText(t);
 }
 
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
 (function init() {
     initSpeech();
     loadMeasuredSpeed();
@@ -1685,13 +2245,25 @@ function testVoice() {
     document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
     document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
     document.getElementById('generate-btn').addEventListener('click', runPipeline);
-    document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; logConsole('Arrêt demandé', 'warn'); setStatus('Arrêt en cours…'); });
+    document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; logConsole('Arrêt demandé', 'warn'); setStatus('Arrêt en cours…'); resolveValidation('stop'); });
     document.getElementById('idea-input').addEventListener('input', () => { updateGenerateBtn(); scheduleAutoSave(); });
     document.querySelectorAll('[data-toggle]').forEach(header => {
         header.addEventListener('click', () => { document.getElementById(header.dataset.toggle).classList.toggle('open'); });
     });
     document.getElementById('play-all-btn').addEventListener('click', () => { if (state.isPlayingSequence) stopAllVideos(); else playAllVideos(); });
     document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
+
+    // Validation script
+    document.getElementById('validate-script-btn').addEventListener('click', () => resolveValidation('validate'));
+    document.getElementById('regen-script-btn').addEventListener('click', () => resolveValidation('regen'));
+
+    // Téléchargements globaux
+    document.getElementById('download-all-images-btn').addEventListener('click', downloadAllImages);
+    document.getElementById('download-all-videos-btn').addEventListener('click', downloadAllVideos);
+    document.getElementById('download-script-btn').addEventListener('click', downloadScript);
+    document.getElementById('download-everything-btn').addEventListener('click', downloadEverything);
+
+    // Projets / session
     document.getElementById('save-project-btn').addEventListener('click', saveProject);
     document.getElementById('load-project-btn').addEventListener('click', loadProject);
     document.getElementById('new-project-btn').addEventListener('click', newProject);
@@ -1700,6 +2272,7 @@ function testVoice() {
     document.getElementById('save-as-project-btn').addEventListener('click', () => { saveProject(); });
     document.getElementById('clear-autosave-btn').addEventListener('click', () => { if (confirm('Effacer la session auto-sauvegardée ?')) { clearAutoSavedSession(); showToast('Session effacée', 'warn'); } });
 
+    // Contraintes
     ['constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free'].forEach(id => {
         document.getElementById(id).addEventListener('input', () => {
             state.constraints = {
@@ -1715,18 +2288,22 @@ function testVoice() {
     document.getElementById('clear-constraints-btn').addEventListener('click', clearConstraints);
     document.getElementById('custom-concept-input').addEventListener('input', (e) => { state.customConcept = e.target.value.trim(); scheduleAutoSave(); });
     document.getElementById('custom-style-input').addEventListener('input', (e) => { state.customStyle = e.target.value.trim(); scheduleAutoSave(); });
-    document.getElementById('language-select').addEventListener('change', (e) => { state.narrationLanguage = e.target.value; logConsole('Langue : ' + LANGUAGES[state.narrationLanguage].label, 'info'); scheduleAutoSave(); });
-    document.getElementById('narrator-select').addEventListener('change', (e) => { state.narratorVoice = e.target.value; logConsole('Voix : ' + NARRATORS[state.narratorVoice].label, 'info'); scheduleAutoSave(); });
+    document.getElementById('language-select').addEventListener('change', (e) => { state.narrationLanguage = e.target.value; scheduleAutoSave(); });
+    document.getElementById('narrator-select').addEventListener('change', (e) => { state.narratorVoice = e.target.value; scheduleAutoSave(); });
     document.getElementById('test-voice-btn').addEventListener('click', testVoice);
-    document.getElementById('download-script-btn').addEventListener('click', downloadScript);
 
-    ['clip-count-select', 'clip-duration-select', 'aspect-select', 'mirror-closing-select', 'project-name', 'hook-intensity-select', 'ending-type-select', 'narration-select'].forEach(id => {
+    ['clip-count-select', 'clip-duration-select', 'aspect-select', 'mirror-closing-select', 'preview-mode-select', 'project-name', 'hook-intensity-select', 'ending-type-select', 'narration-select'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.addEventListener('change', scheduleAutoSave); el.addEventListener('input', scheduleAutoSave); }
     });
     ['rule-three-quarter', 'rule-no-hand', 'rule-single-concept', 'rule-single-figure', 'rule-near-miss', 'rule-fixed-camera'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('change', scheduleAutoSave);
+        if (el) el.addEventListener('change', () => { updateConstraintCounter(); scheduleAutoSave(); });
+    });
+
+    // Historique
+    document.getElementById('clear-history-btn').addEventListener('click', () => {
+        if (confirm('Effacer tout l\'historique ?')) { saveHistory([]); renderHistory(); showToast('Historique effacé', 'warn'); }
     });
 
     window.addEventListener('beforeunload', () => { performAutoSave(true); });
@@ -1734,12 +2311,11 @@ function testVoice() {
 
     updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
     updateConstraintCounter(); updateCustomPanels(); updateSymbolLockPanel();
+    renderHistory();
     const sk = getApiKey(); if (sk) document.getElementById('api-key-input').value = sk;
 
-    logConsole('Mouradrama Studio prêt.', 'info');
-    logConsole('🎭 ' + THEMES.length + ' concepts · ' + STYLES.length + ' styles · 6 règles strictes', 'pillar');
-    logConsole('💾 Sauvegarde auto activée', 'autosave');
-    logConsole('✅ Corrections JSON appliquées (extract robuste + max_tokens 8000 + system prompt renforcé)', 'success');
+    logConsole('Mouradrama Studio v4 prêt.', 'info');
+    logConsole('✅ Interdictions auto · téléchargements · régénération ciblée · aperçu', 'success');
 
     const snap = loadAutoSavedSession();
     if (snap) {
@@ -1761,9 +2337,9 @@ function testVoice() {
         if (imgCount > 0) parts.push(imgCount + ' image(s)');
         if (vidCount > 0) parts.push(vidCount + ' clip(s)');
         if (parts.length === 0) parts.push('paramètres');
-        info.textContent = 'Sauvegardée ' + ageStr + ' (' + dateStr + ') · ' + parts.join(', ') + '. Ton travail a été restauré automatiquement.';
+        info.textContent = 'Sauvegardée ' + ageStr + ' (' + dateStr + ') · ' + parts.join(', ') + '.';
         banner.classList.add('visible');
-        showToast('Session restaurée automatiquement ✓', 'success', 4000);
+        showToast('Session restaurée ✓', 'success', 4000);
     } else {
         logConsole('Aucune session antérieure', 'info');
         updateAutosaveStatus();
