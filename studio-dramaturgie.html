@@ -1351,3 +1351,431 @@ Chaque scène = 1 clip. Fournis 2 prompts d'image (début + fin) par scène.
 
         for (let i = 0; i < state.sceneFrames.length; i++) createPendingVideoCard(i, state.sceneFrames.length);
         document.getElementById('section-videos').classList.remove('hidden');
+        document.getElementById('section-videos').classList.add('open');
+
+        const pollingPromises = [];
+        for (let i = 0; i < state.sceneFrames.length; i++) {
+            if (state.stopRequested) break;
+            const sf = state.sceneFrames[i];
+            const scene = sf.scene;
+            const cameraMove = scene.camera_movement || 'slow contemplative zoom';
+            const narration = scene.narration || '';
+            const objM = activeConstraints.objects.length > 0 ? 'MANDATORY OBJECTS: ' + activeConstraints.objects.join(', ') + '. ' : '';
+            const forbM = activeConstraints.forbidden.length > 0 ? 'FORBIDDEN: ' + activeConstraints.forbidden.join(', ') + '. ' : '';
+            const hookM = i === 0 ? 'OPENING HOOK SHOT. ' : '';
+            const endM = i === state.sceneFrames.length - 1 ? 'CLOSING SHOT with strong memorable image. ' : '';
+            const mirrorM = (i === state.sceneFrames.length - 1 && state.mirrorClosing) ? 'MIRROR CLOSING: same set and framing as the FIRST shot, action of closure. ' : '';
+
+            const videoPrompt = ['DRAMATURGY EXPLANATION VIDEO. ONE UNBROKEN SHOT.', hookM, endM, mirrorM, 'Slow cinematic camera.', 'NO FACIAL FEATURES, NO HUMAN FACES, silhouettes only.', objM, forbM, 'Camera: ' + cameraMove, 'Style: ' + scenario.master_style_prompt, narration ? 'The scene illustrates: ' + narration.slice(0, 150) : '', 'No text, no watermarks.'].filter(Boolean).join(' ');
+
+            const item = { index: i, scene: scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
+            updatePendingVideoCard(i, 'Création de la tâche…', 0, 0);
+
+            try {
+                await createVideoTaskOnly(item);
+                updatePendingVideoCard(i, 'Tâche en file…', 0, 0);
+                pollingPromises.push(
+                    pollVideoForItem(item).then(result => {
+                        const { item: it, videoUrl, actualDuration } = result;
+                        state.videos[it.index] = { sceneIndex: it.index, url: videoUrl, narration: it.scene.narration || null, sceneNumber: it.scene.scene_number || it.index + 1, actualDuration: actualDuration };
+                        logConsole('✅ Clip ' + (it.index + 1) + ' prêt en ' + actualDuration + 's !', 'success');
+                        replacePendingWithVideo(it.index, videoUrl, it.scene.narration, it.index + 1, actualDuration);
+                        playNotificationSound();
+                        showToast('Clip ' + (it.index + 1) + ' prêt !', 'success', 3000);
+                        performAutoSave(true);
+                        return result;
+                    }).catch(e => { logConsole('Erreur clip ' + (item.index + 1) + ' : ' + e.message, 'error'); markPendingFailed(item.index, e.message); return null; })
+                );
+            } catch (e) { logConsole('Échec création clip ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
+
+            if (i < state.sceneFrames.length - 1 && !state.stopRequested) {
+                for (let r = 62; r > 0; r--) { if (state.stopRequested) break; setStatus('Prochain clip dans ' + r + 's'); await sleep(1000); }
+            }
+        }
+
+        logConsole('Attente des clips en parallèle…', 'info');
+        setStatus('Attente des ' + pollingPromises.length + ' clips…');
+        await Promise.allSettled(pollingPromises);
+
+        const readyVideos = state.videos.filter(v => v && v.url);
+        logConsole('Clips prêts : ' + readyVideos.length + '/' + state.sceneFrames.length, 'pillar');
+        if (readyVideos.length > 0) document.getElementById('section-player').classList.remove('hidden');
+
+        performAutoSave(true);
+        logConsole('💾 Session sauvegardée automatiquement', 'autosave');
+
+        setStatus('✦ Leçon terminée ✦');
+        await sleep(3000); setStatus(null);
+        showToast(readyVideos.length + ' clip(s) généré(s) sur ' + state.sceneFrames.length, 'success');
+
+    } catch (e) {
+        logConsole('ERREUR : ' + e.message, 'error');
+        setStatus('Erreur : ' + e.message.slice(0, 50));
+        await sleep(4000); setStatus(null);
+        showToast('Erreur : ' + e.message.slice(0, 60), 'error');
+    }
+
+    state.isRunning = false; state.stopRequested = false;
+    document.getElementById('stop-btn').classList.remove('visible');
+    updateGenerateBtn();
+    await deactivateWakeLock();
+}
+
+function displayScript(scenario) {
+    const s = document.getElementById('section-script'); const d = document.getElementById('script-display');
+    s.classList.remove('hidden'); s.classList.add('open');
+    let h = '<h3>🎭 ' + esc(scenario.title || 'Leçon') + '</h3>';
+    if (scenario.logline) h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;direction:auto;">' + esc(scenario.logline) + '</p>';
+    if (scenario.concept) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.4rem;">Concept : ' + esc(scenario.concept) + '</div>';
+    if (scenario.theorician) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Théoricien(s) : ' + esc(scenario.theorician) + '</div>';
+
+    if (scenario.pillars && scenario.pillars.length > 0) {
+        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--accent);text-transform:uppercase;">📐 Les 5 piliers narratifs</strong>';
+        scenario.pillars.forEach(p => {
+            const info = PILLARS.find(x => x.id === p.id) || {};
+            h += '<div class="pillar-block ' + p.id + '">';
+            h += '<div class="pb-title">' + esc(info.emoji || '') + ' ' + esc(info.name || p.id) + '</div>';
+            h += '<div class="pb-time">' + esc(info.time || '') + '</div>';
+            h += '<div class="pb-content" style="direction:rtl;text-align:right;">' + esc(p.content || '') + '</div>';
+            h += '</div>';
+        });
+        h += '</div>';
+    }
+
+    if (scenario.symbols && scenario.symbols.length > 0) {
+        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--success);text-transform:uppercase;">⚜ Symboles visuels</strong>';
+        scenario.symbols.forEach(x => { h += '<div class="scene-block" style="border-left-color:var(--success);"><strong>' + esc(x.name) + '</strong> — ' + esc(x.description) + '</div>'; });
+        h += '</div>';
+    }
+
+    if (scenario.scenes && scenario.scenes.length > 0) {
+        h += '<div style="margin-bottom:0.6rem;"><strong style="font-size:0.72rem;color:var(--info);text-transform:uppercase;">🎬 ' + scenario.scenes.length + ' Scènes = ' + scenario.scenes.length + ' Clips</strong></div>';
+        scenario.scenes.forEach(sc => {
+            h += '<div class="scene-block">';
+            h += '<div class="sb-num">SCÈNE ' + sc.scene_number + '</div>';
+            if (sc.sequence_title) h += '<div class="sb-title">' + esc(sc.sequence_title) + '</div>';
+            if (sc.description) h += '<div class="sb-content">' + esc(sc.description) + '</div>';
+            if (sc.narration) h += '<div style="font-size:0.76rem;color:var(--accent);font-style:italic;direction:rtl;text-align:right;margin-top:0.3rem;">🎙️ « ' + esc(sc.narration) + ' »</div>';
+            if (sc.symbolism) h += '<div class="sb-symbol">⚜ ' + esc(sc.symbolism) + '</div>';
+            h += '</div>';
+        });
+    }
+
+    d.innerHTML = h;
+    s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function displayGeneratedImage(url, label, frameClass) {
+    const s = document.getElementById('section-images'); const g = document.getElementById('generated-images');
+    s.classList.remove('hidden');
+    const c = document.createElement('div');
+    c.className = 'gen-image-card' + (frameClass ? ' ' + frameClass : '');
+    c.innerHTML = '<img src="' + url + '" alt="" loading="lazy"><div class="gen-label">' + esc(label) + '</div>';
+    g.appendChild(c);
+    document.getElementById('images-badge').textContent = g.children.length;
+}
+
+function createPendingVideoCard(index, total) {
+    const g = document.getElementById('generated-videos');
+    const c = document.createElement('div');
+    c.className = 'pending-video-card'; c.id = 'pending-video-' + index;
+    c.innerHTML = '<div class="pending-spinner"></div><div class="pending-label">Clip ' + (index + 1) + ' / ' + total + '</div><div class="pending-progress-text" id="pending-progress-' + index + '">En attente…</div><div class="pending-eta" id="pending-eta-' + index + '"></div><div class="pending-progress-bar"><div class="pending-progress-fill" id="pending-fill-' + index + '"></div></div>';
+    g.appendChild(c);
+}
+
+function updatePendingVideoCard(index, label, progress, elapsed) {
+    const p = document.getElementById('pending-progress-' + index);
+    const e = document.getElementById('pending-eta-' + index);
+    const f = document.getElementById('pending-fill-' + index);
+    if (p) { let t = label; if (progress > 0) t += ' ' + progress + '%'; if (elapsed > 0) t += ' · ' + elapsed + 's'; p.textContent = t; }
+    if (e && elapsed > 0) { const w = getEstimatedWaitSeconds(); const r = Math.max(0, w - elapsed); e.textContent = r > 0 ? '≈ ' + formatTime(r) + ' restantes' : 'Bientôt…'; }
+    if (f && progress > 0) f.style.width = progress + '%';
+}
+
+function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actualDuration) {
+    const p = document.getElementById('pending-video-' + index);
+    const c = document.createElement('div');
+    c.className = 'gen-video-card newly-added'; c.id = 'video-card-' + index;
+    c.innerHTML = '<video src="' + videoUrl + '" controls playsinline preload="metadata"></video>' +
+        '<div class="gen-label">🎭 Clip ' + sceneNumber + '</div>' +
+        (actualDuration ? '<div class="gen-timing">⚡ ' + actualDuration + 's</div>' : '') +
+        (narration ? '<div class="gen-narration">🎙️ ' + esc(narration.slice(0, 130)) + (narration.length > 130 ? '…' : '') + '</div>' : '') +
+        '<div class="gen-actions">' + (narration ? '<button class="narration-play-btn" data-index="' + index + '">▶ Écouter</button>' : '') + '<button class="download-narration-single-btn" data-index="' + index + '">💾 .txt</button></div>';
+    if (p) p.parentNode.replaceChild(c, p);
+    else document.getElementById('generated-videos').appendChild(c);
+    setTimeout(() => c.classList.remove('newly-added'), 3000);
+    document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
+
+    const pb = c.querySelector('.narration-play-btn');
+    if (pb) pb.addEventListener('click', () => {
+        const v = state.videos[index]; if (!v || !v.narration) return;
+        if (pb.classList.contains('playing')) { stopSpeech(); pb.classList.remove('playing'); pb.textContent = '▶ Écouter'; }
+        else { document.querySelectorAll('.narration-play-btn.playing').forEach(b => { b.classList.remove('playing'); b.textContent = '▶ Écouter'; }); pb.classList.add('playing'); pb.textContent = '⏸ Arrêter'; speakText(v.narration).then(() => { pb.classList.remove('playing'); pb.textContent = '▶ Écouter'; }); }
+    });
+    const db = c.querySelector('.download-narration-single-btn');
+    if (db) db.addEventListener('click', () => {
+        const v = state.videos[index]; if (!v || !v.narration) return;
+        const content = 'CLIP ' + v.sceneNumber + '\n\n' + v.narration;
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a');
+        a.href = url; a.download = 'clip_' + v.sceneNumber + '.txt';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    });
+}
+
+function markPendingFailed(index, msg) {
+    const p = document.getElementById('pending-video-' + index); if (!p) return;
+    p.innerHTML = '<div style="color:var(--error);font-size:2rem;">✕</div><div class="pending-label" style="color:var(--error);">Échec</div><div class="pending-progress-text">' + esc(msg.slice(0, 80)) + '</div>';
+}
+
+function playAllVideos() {
+    const rv = state.videos.filter(v => v && v.url); if (!rv.length) return;
+    state.isPlayingSequence = true; state.currentSceneIndex = 0;
+    document.getElementById('play-all-btn').textContent = '⏸ Lecture…';
+    document.getElementById('play-all-btn').classList.add('playing');
+    document.getElementById('section-player').classList.add('open');
+    playVideoAt(0);
+}
+function playVideoAt(index) {
+    while (index < state.videos.length && (!state.videos[index] || !state.videos[index].url)) index++;
+    if (index >= state.videos.length || !state.isPlayingSequence) {
+        state.isPlayingSequence = false;
+        document.getElementById('play-all-btn').textContent = '▶ Lire la leçon';
+        document.getElementById('play-all-btn').classList.remove('playing'); return;
+    }
+    const v = document.getElementById('player-video'); const d = state.videos[index];
+    v.src = d.url; v.currentTime = 0; v.play().catch(() => {});
+    document.getElementById('player-info').textContent = 'Clip ' + (index + 1) + ' / ' + state.videos.length;
+    document.getElementById('player-progress').style.width = ((index + 1) / state.videos.length * 100) + '%';
+    if (d.narration) setTimeout(() => speakText(d.narration), 800);
+    v.onended = () => { if (state.isPlayingSequence) setTimeout(() => playVideoAt(index + 1), 600); };
+}
+function stopAllVideos() {
+    state.isPlayingSequence = false;
+    const v = document.getElementById('player-video'); v.pause(); v.currentTime = 0;
+    stopSpeech();
+    document.getElementById('play-all-btn').textContent = '▶ Lire la leçon';
+    document.getElementById('play-all-btn').classList.remove('playing');
+    document.querySelectorAll('.narration-play-btn.playing').forEach(b => { b.classList.remove('playing'); b.textContent = '▶ Écouter'; });
+}
+
+let speechSynth = null;
+function initSpeech() { if ('speechSynthesis' in window) { speechSynth = window.speechSynthesis; speechSynth.getVoices(); if (speechSynth.onvoiceschanged !== undefined) speechSynth.onvoiceschanged = () => { speechSynth.getVoices(); }; } }
+function findVoice(lc, nc) {
+    if (!speechSynth) return null;
+    const vs = speechSynth.getVoices(); if (!vs.length) return null;
+    const lt = [lc.ttsLang, ...lc.ttsFallbacks];
+    for (const l of lt) {
+        const m = vs.filter(v => v.lang && v.lang.toLowerCase().startsWith(l.toLowerCase().split('-')[0]));
+        if (m.length) { const p = m.find(v => nc.patterns.test(v.name)); if (p) return p; return m[0]; }
+    }
+    return null;
+}
+function speakText(text) {
+    return new Promise((resolve) => {
+        if (!speechSynth || !text) { resolve(); return; }
+        speechSynth.cancel();
+        setTimeout(() => {
+            const lc = LANGUAGES[state.narrationLanguage]; const nc = NARRATORS[state.narratorVoice];
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = lc.ttsLang; u.pitch = nc.pitch; u.rate = nc.rate; u.volume = nc.volume;
+            const v = findVoice(lc, nc); if (v) { u.voice = v; u.lang = v.lang; }
+            u.onend = resolve; u.onerror = resolve;
+            speechSynth.speak(u);
+        }, 150);
+    });
+}
+function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
+function testVoice() {
+    const lt = LANGUAGES[state.narrationLanguage]; const nt = NARRATORS[state.narratorVoice];
+    const t = state.narrationLanguage === 'ar-dz'
+        ? 'كيفاش الدراماتورجيا كتبنى قصة تجذب؟ كل فيلم ناجح، بنا على نفس القواعد: شخصية تحب حاجة، عندها عوائق، وتحارب باش توصلها.'
+        : (state.narrationLanguage === 'ar' ? 'كيف تُبنى الدراماتورجيا؟' : 'Comment se construit la dramaturgie ?');
+    logConsole('Test voix : ' + nt.label + ' · ' + lt.label, 'info');
+    speakText(t);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+    initSpeech();
+    loadMeasuredSpeed();
+
+    // Formats
+    const fg = document.getElementById('format-grid');
+    FORMATS.forEach((f, i) => {
+        const c = document.createElement('div');
+        c.className = 'format-card' + (i === 0 ? ' selected' : '');
+        c.dataset.id = f.id;
+        c.innerHTML = '<span class="fc-emoji">' + f.emoji + '</span><span class="fc-name">' + f.name + '</span><span class="fc-desc">' + f.desc + '</span>';
+        c.addEventListener('click', () => {
+            document.querySelectorAll('.format-card').forEach(x => x.classList.remove('selected'));
+            c.classList.add('selected');
+            state.selectedFormat = f;
+            document.getElementById('format-description').textContent = f.desc;
+            logConsole('Format : ' + f.name, 'info');
+            scheduleAutoSave();
+        });
+        fg.appendChild(c);
+    });
+
+    // Piliers
+    const pg = document.getElementById('pillar-grid');
+    PILLARS.forEach(p => {
+        const c = document.createElement('div');
+        c.className = 'pillar-card';
+        c.innerHTML = '<div style="font-weight:700;font-size:0.85rem;direction:rtl;text-align:right;">' + p.emoji + ' ' + p.name + '</div><div class="pc-time">' + p.time + '</div>';
+        c.style.cursor = 'default';
+        pg.appendChild(c);
+    });
+
+    // Concepts
+    const tg = document.getElementById('theme-grid');
+    THEMES.forEach((t, i) => {
+        const c = document.createElement('div');
+        c.className = 'theme-card' + (i === 0 ? ' selected' : '') + (t.done ? ' done' : '');
+        c.dataset.id = t.id;
+        c.innerHTML = '<span class="theme-emoji">' + t.emoji + '</span><span class="theme-name">' + t.name + '</span>' + (t.desc ? '<span class="theme-desc">' + t.desc + '</span>' : '') + (t.week ? '<span class="theme-week">' + t.week + (t.done ? ' ✓' : '') + '</span>' : '');
+        c.addEventListener('click', () => {
+            document.querySelectorAll('.theme-card').forEach(x => x.classList.remove('selected'));
+            c.classList.add('selected');
+            state.selectedTheme = t;
+            document.getElementById('theme-description').textContent = t.id === 'aucun' ? 'Décrivez vous-même votre concept ci-dessous.' : t.desc + ' — ' + (t.focus || '').slice(0, 100) + '…';
+            updateCustomPanels();
+            updateSymbolLockPanel();
+            logConsole('Concept : ' + t.name, 'info');
+            scheduleAutoSave();
+        });
+        tg.appendChild(c);
+    });
+
+    // Styles
+    const syg = document.getElementById('style-grid');
+    STYLES.forEach((s, i) => {
+        const c = document.createElement('div');
+        c.className = 'style-card' + (i === 0 ? ' selected' : '') + (s.flagship ? ' flagship' : '');
+        c.dataset.id = s.id;
+        c.innerHTML = '<span class="style-emoji">' + s.emoji + '</span><span class="style-name">' + s.name + '</span>';
+        c.addEventListener('click', () => {
+            document.querySelectorAll('.style-card').forEach(x => x.classList.remove('selected'));
+            c.classList.add('selected');
+            state.selectedStyle = s;
+            updateCustomPanels();
+            logConsole('Style : ' + s.name, 'info');
+            scheduleAutoSave();
+        });
+        syg.appendChild(c);
+    });
+
+    // Boutons API
+    document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
+    document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
+
+    // Générer / Stop
+    document.getElementById('generate-btn').addEventListener('click', runPipeline);
+    document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; logConsole('Arrêt demandé', 'warn'); setStatus('Arrêt en cours…'); });
+
+    // Idée
+    document.getElementById('idea-input').addEventListener('input', () => { updateGenerateBtn(); scheduleAutoSave(); });
+
+    // Sections toggle
+    document.querySelectorAll('[data-toggle]').forEach(header => {
+        header.addEventListener('click', () => { document.getElementById(header.dataset.toggle).classList.toggle('open'); });
+    });
+
+    // Lecture
+    document.getElementById('play-all-btn').addEventListener('click', () => { if (state.isPlayingSequence) stopAllVideos(); else playAllVideos(); });
+    document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
+
+    // Projets / session
+    document.getElementById('save-project-btn').addEventListener('click', saveProject);
+    document.getElementById('load-project-btn').addEventListener('click', loadProject);
+    document.getElementById('new-project-btn').addEventListener('click', newProject);
+    document.getElementById('session-btn').addEventListener('click', showSessionInfo);
+    document.getElementById('dismiss-autosave-btn').addEventListener('click', () => { document.getElementById('autosave-banner').classList.remove('visible'); });
+    document.getElementById('save-as-project-btn').addEventListener('click', () => { saveProject(); });
+    document.getElementById('clear-autosave-btn').addEventListener('click', () => { if (confirm('Effacer la session auto-sauvegardée ?')) { clearAutoSavedSession(); showToast('Session effacée', 'warn'); } });
+
+    // Constraints
+    ['constraint-objects', 'constraint-concepts', 'constraint-references', 'constraint-forbidden', 'constraint-free'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+            state.constraints = {
+                objects: document.getElementById('constraint-objects').value,
+                concepts: document.getElementById('constraint-concepts').value,
+                references: document.getElementById('constraint-references').value,
+                forbidden: document.getElementById('constraint-forbidden').value,
+                free: document.getElementById('constraint-free').value
+            };
+            updateConstraintCounter(); updateGenerateBtn();
+        });
+    });
+    document.getElementById('clear-constraints-btn').addEventListener('click', clearConstraints);
+
+    // Custom inputs
+    document.getElementById('custom-concept-input').addEventListener('input', (e) => { state.customConcept = e.target.value.trim(); scheduleAutoSave(); });
+    document.getElementById('custom-style-input').addEventListener('input', (e) => { state.customStyle = e.target.value.trim(); scheduleAutoSave(); });
+
+    // Narration
+    document.getElementById('language-select').addEventListener('change', (e) => { state.narrationLanguage = e.target.value; logConsole('Langue : ' + LANGUAGES[state.narrationLanguage].label, 'info'); scheduleAutoSave(); });
+    document.getElementById('narrator-select').addEventListener('change', (e) => { state.narratorVoice = e.target.value; logConsole('Voix : ' + NARRATORS[state.narratorVoice].label, 'info'); scheduleAutoSave(); });
+    document.getElementById('test-voice-btn').addEventListener('click', testVoice);
+    document.getElementById('download-script-btn').addEventListener('click', downloadScript);
+
+    // Champs techniques — auto-save
+    ['clip-count-select', 'clip-duration-select', 'aspect-select', 'mirror-closing-select', 'project-name', 'hook-intensity-select', 'ending-type-select', 'narration-select'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.addEventListener('change', scheduleAutoSave); el.addEventListener('input', scheduleAutoSave); }
+    });
+    ['rule-three-quarter', 'rule-no-hand', 'rule-single-concept', 'rule-single-figure', 'rule-near-miss', 'rule-fixed-camera'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', scheduleAutoSave);
+    });
+
+    // Save before close
+    window.addEventListener('beforeunload', () => { performAutoSave(true); });
+    // Save toutes les 60s
+    setInterval(() => { if (!state.isRunning) performAutoSave(false); }, 60000);
+
+    updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
+    updateConstraintCounter(); updateCustomPanels(); updateSymbolLockPanel();
+    const sk = getApiKey(); if (sk) document.getElementById('api-key-input').value = sk;
+
+    logConsole('Mouradrama Studio prêt.', 'info');
+    logConsole('🎭 ' + THEMES.length + ' concepts · ' + STYLES.length + ' styles · 6 règles strictes', 'pillar');
+    logConsole('💾 Sauvegarde auto activée', 'autosave');
+
+    // Restauration automatique
+    const snap = loadAutoSavedSession();
+    if (snap) {
+        const ageMin = Math.round((Date.now() - snap.savedAt) / 60000);
+        let ageStr;
+        if (ageMin < 1) ageStr = 'il y a quelques secondes';
+        else if (ageMin < 60) ageStr = 'il y a ' + ageMin + ' min';
+        else if (ageMin < 1440) ageStr = 'il y a ' + Math.round(ageMin / 60) + ' h';
+        else ageStr = 'il y a ' + Math.round(ageMin / 1440) + ' j';
+        logConsole('Session détectée (' + ageStr + ')', 'autosave');
+        restoreSession(snap);
+        const banner = document.getElementById('autosave-banner');
+        const info = document.getElementById('autosave-info');
+        const dateStr = new Date(snap.savedAt).toLocaleString('fr-FR');
+        const imgCount = (snap.sceneFrames || []).length * 2;
+        const vidCount = (snap.videos || []).filter(v => v && v.url).length;
+        const parts = [];
+        if (snap.scenario) parts.push('script');
+        if (imgCount > 0) parts.push(imgCount + ' image(s)');
+        if (vidCount > 0) parts.push(vidCount + ' clip(s)');
+        if (parts.length === 0) parts.push('paramètres');
+        info.textContent = 'Sauvegardée ' + ageStr + ' (' + dateStr + ') · ' + parts.join(', ') + '. Ton travail a été restauré automatiquement.';
+        banner.classList.add('visible');
+        showToast('Session restaurée automatiquement ✓', 'success', 4000);
+    } else {
+        logConsole('Aucune session antérieure', 'info');
+        updateAutosaveStatus();
+    }
+    updateSessionButton();
+})();
+</script>
+
+</body>
+</html>
