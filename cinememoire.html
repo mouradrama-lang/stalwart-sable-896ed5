@@ -122,6 +122,22 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
 .project-item .pi-meta{font-size:.65rem;color:var(--ink-dim);margin-top:.15rem}
 .progress-ring{display:inline-block;width:38px;height:38px;border-radius:50%;background:conic-gradient(var(--success) calc(var(--pct)*1%), var(--panel-2) 0);position:relative;flex-shrink:0}
 .progress-ring::after{content:attr(data-pct)'%';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.55rem;font-weight:800;color:var(--ink)}
+
+/* ═══ MODAL D'ÉDITION ═══ */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:1.2rem}
+.modal-box h3{font-size:1rem;font-weight:800;margin-bottom:1rem;color:var(--accent);display:flex;justify-content:space-between;align-items:center}
+.modal-box h3 button{background:transparent;border:none;color:var(--ink-dim);font-size:1.2rem;cursor:pointer;padding:.2rem .5rem}
+.modal-box .field{margin-bottom:.8rem}
+.modal-box .field label{font-size:.7rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:.3rem;display:block}
+.modal-box .field input,.modal-box .field textarea,.modal-box .field select{width:100%;padding:.6rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.85rem}
+.modal-box .field textarea{min-height:70px;resize:vertical;line-height:1.5}
+.modal-box .field input:focus,.modal-box .field textarea:focus,.modal-box .field select:focus{outline:none;border-color:var(--accent)}
+.modal-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+.modal-actions .btn{flex:1;min-width:120px;margin:0}
+.scene-edit-btn{background:var(--info);color:#fff;border:none;border-radius:6px;padding:.3rem .6rem;font-size:.65rem;font-weight:700;cursor:pointer;margin-left:.3rem}
+.scene-edit-btn:active{opacity:.7}
+.scene-del-btn{background:var(--error);color:#fff;border:none;border-radius:6px;padding:.3rem .6rem;font-size:.65rem;font-weight:700;cursor:pointer;margin-left:.3rem}
 </style>
 </head>
 <body>
@@ -417,7 +433,6 @@ async function callTextAPI(messages,options={}){
 }
 
 async function callImageAPI(prompt,size){
-    // ✅ Sizes valides Agnès : 768x1024, 1024x1024, 1024x576, 576x1024, etc.
     const validSizes=['768x1024','1024x1024','1024x576','576x1024','768x768','512x512'];
     if(!validSizes.includes(size))size='768x1024';
     state.counters.images++;updateCounters();
@@ -641,7 +656,7 @@ function renderMemory(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// SCÈNES — RENDU INCREMENTAL (sans détruire le player)
+// SCÈNES — RENDU AVEC BOUTONS MODIFIER / SUPPRIMER
 // ══════════════════════════════════════════════════════════════════
 function renderScenes(){
     const list=document.getElementById('scenes-list');
@@ -659,7 +674,14 @@ function renderScenes(){
         const card=document.createElement('div');
         card.className='scene-card '+(s.status||'pending');
         const statusLabel=s.status==='done'?'✅ Terminée':s.status==='processing'?'⏳ En cours':s.status==='failed'?'❌ Échec':'⏸ En attente';
-        let html='<div class="scene-header"><span class="scene-num">SCÈNE '+(s.numero||'?')+'</span><span class="scene-status '+(s.status||'pending')+'">'+statusLabel+'</span></div>';
+        let html='<div class="scene-header"><span class="scene-num">SCÈNE '+(s.numero||'?')+'</span><div style="display:flex;align-items:center;gap:.2rem;flex-wrap:wrap;"><span class="scene-status '+(s.status||'pending')+'">'+statusLabel+'</span>';
+
+        if(s.status!=='processing'){
+            html+='<button type="button" class="scene-edit-btn" data-edit="'+s.id+'">✏️ Modifier</button>';
+            html+='<button type="button" class="scene-del-btn" data-del="'+s.id+'">🗑</button>';
+        }
+        html+='</div></div>';
+
         if(s.narration)html+='<div class="scene-field"><span class="sf-label">Narration</span><span class="sf-value">« '+esc(s.narration)+' »</span></div>';
         if(s.plan)html+='<div class="scene-field"><span class="sf-label">Plan</span><span class="sf-value plan">'+esc(s.plan)+'</span></div>';
         if(s.mouvement_camera)html+='<div class="scene-field"><span class="sf-label">Caméra</span><span class="sf-value camera">'+esc(s.mouvement_camera)+'</span></div>';
@@ -668,6 +690,20 @@ function renderScenes(){
         if(s.videoUrl)html+='<div class="scene-field"><span class="sf-label">Vidéo</span><video src="'+s.videoUrl+'" controls style="width:100%;border-radius:6px;margin-top:.3rem;background:#000;max-height:400px;" preload="metadata" playsinline></video></div>';
         card.innerHTML=html;
         list.appendChild(card);
+    });
+
+    // Attacher les événements aux boutons
+    list.querySelectorAll('[data-edit]').forEach(btn=>{
+        btn.addEventListener('click',e=>{
+            e.stopPropagation();
+            openEditModal(btn.dataset.edit);
+        });
+    });
+    list.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click',e=>{
+            e.stopPropagation();
+            deleteScene(btn.dataset.del);
+        });
     });
 }
 
@@ -782,7 +818,6 @@ async function generateNextScenes(){
         const newScenes=await generateSceneScripts(nextNum,batch);
         if(!newScenes||newScenes.length===0)throw new Error('Aucune scène générée');
 
-        // Sauvegarder les scènes
         for(const s of newScenes){
             s.id=uid();
             s.projectId=state.currentProject.id;
@@ -916,10 +951,12 @@ async function generateNextScenes(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// BIBLE + SCÉNARIO
+// BIBLE + SCÉNARIO (avec garde-fous anti-latin)
 // ══════════════════════════════════════════════════════════════════
 async function createStoryBible(idea,genre){
-    const prompt=`Tu es un scénariste professionnel. Crée la bible d'un film long.
+    const prompt=`Tu es un scénariste professionnel francophone. Crée la bible d'un film long.
+
+RÈGLE ABSOLUE : Tout le contenu textuel (titres, descriptions, dialogues, narrations) DOIT être en FRANÇAIS. Interdiction formelle d'utiliser du latin, de l'anglais ou des langues anciennes dans les champs textuels. Les noms propres de personnages et de lieux historiques sont autorisés.
 
 IDÉE : "${idea}"
 GENRE : ${genre}
@@ -927,21 +964,21 @@ FORMAT : vertical 9:16 (style TikTok cinématographique)
 
 Génère un JSON :
 {
-  "title": "Titre du film",
-  "logline": "Résumé en une phrase",
+  "title": "Titre du film en français",
+  "logline": "Résumé en une phrase en français",
   "totalScenes": 20,
   "characters": [
-    {"name":"Nom","gender":"homme ou femme","appearance":"Description physique TRÈS précise (âge, cheveux, yeux, vêtements, traits distinctifs)"}
+    {"name":"Nom","gender":"homme ou femme","appearance":"Description physique TRÈS précise en français (âge, cheveux, yeux, vêtements, traits distinctifs)"}
   ],
   "locations": [
-    {"name":"Nom du lieu","description":"Description visuelle"}
+    {"name":"Nom du lieu","description":"Description visuelle en français"}
   ],
-  "arc": "Structure en 3 actes",
-  "visualStyle": "Style visuel constant (palette, lumière, ambiance)"
+  "arc": "Structure en 3 actes en français",
+  "visualStyle": "Style visuel constant (palette, lumière, ambiance) en français"
 }
 
 Réponds UNIQUEMENT en JSON valide.`;
-    const raw=await callTextAPI([{role:'system',content:'Tu réponds UNIQUEMENT en JSON valide.'},{role:'user',content:prompt}],{temperature:0.7,maxTokens:3000});
+    const raw=await callTextAPI([{role:'system',content:'Tu réponds UNIQUEMENT en JSON valide. Tous les textes doivent être en français. Jamais de latin.'},{role:'user',content:prompt}],{temperature:0.7,maxTokens:3000});
     return parseJsonSafe(raw);
 }
 
@@ -952,7 +989,11 @@ async function generateSceneScripts(startNum,count){
     const doneScenes=state.scenes.filter(s=>s.status==='done').sort((a,b)=>(a.numero||0)-(b.numero||0));
     const lastNarr=doneScenes.length>0?doneScenes[doneScenes.length-1].narration||'':'';
 
-    const prompt=`Tu es un scénariste. Continue l'écriture des scènes.
+    const prompt=`Tu es un scénariste professionnel francophone. Tu écris un film.
+
+RÈGLE ABSOLUE DE LANGUE : TOUS les textes de narration, de dialogue ou de description parlée dans ce JSON DOIVENT être STRICTEMENT EN FRANÇAIS MODERNE.
+INTERDICTION FORMELLE d'utiliser du latin, de l'anglais, du numide ou toute autre langue ancienne pour les narrations. Le public doit comprendre chaque mot.
+Seuls les champs "image_prompt", "image_prompt_end" et "video_prompt" doivent être en anglais (car ce sont des instructions pour un générateur d'images).
 
 TITRE : ${bible.title||state.currentProject.title}
 LOGLINE : ${bible.logline||state.currentProject.idea}
@@ -979,24 +1020,28 @@ JSON :
   "scenes": [
     {
       "numero": ${startNum},
-      "narration": "Texte de narration en français (max 30 mots)",
-      "description_visuelle": "Description visuelle détaillée",
+      "narration": "Texte de narration STRICTEMENT EN FRANÇAIS (max 30 mots). Aucun mot latin.",
+      "description_visuelle": "Description visuelle détaillée en français",
       "plan": "Large|Rapproché|Moyen|Général|Gros plan|Aérien",
       "mouvement_camera": "Statique|Panoramique|Tilt|Travelling|Zoom|Grue|Steadicam",
-      "image_prompt": "PROMPT EN ANGLAIS pour l'image de départ",
+      "image_prompt": "PROMPT EN ANGLAIS pour l'image de départ (détails visuels, époque, lumière)",
       "image_prompt_end": "PROMPT EN ANGLAIS pour l'image de fin (léger mouvement)",
-      "video_prompt": "PROMPT EN ANGLAIS pour la vidéo",
-      "narrative_link": "Lien avec la scène précédente",
+      "video_prompt": "PROMPT EN ANGLAIS pour la vidéo (mouvement de caméra, ambiance)",
+      "narrative_link": "Lien avec la scène précédente en français",
       "characters_in_scene": ["Nom1"],
       "location": "Nom du lieu"
     }
   ]
 }
 
-Utilise EXACTEMENT les descriptions physiques des personnages.
+VÉRIFIE AVANT DE RÉPONDRE : Y a-t-il du latin dans "narration" ou "description_visuelle" ? Si oui, traduis-le en français immédiatement.
 Réponds UNIQUEMENT en JSON valide.`;
 
-    const raw=await callTextAPI([{role:'system',content:'Tu réponds UNIQUEMENT en JSON valide.'},{role:'user',content:prompt}],{temperature:0.75,maxTokens:4000});
+    const raw=await callTextAPI([
+        {role:'system',content:'Tu es un assistant strict. Tu réponds UNIQUEMENT en JSON valide. Tu ne génères JAMAIS de latin ou de langue étrangère dans les champs de narration ou de dialogue, uniquement du français moderne.'},
+        {role:'user',content:prompt}
+    ],{temperature:0.7,maxTokens:4000});
+
     const data=parseJsonSafe(raw);
     return data.scenes||[];
 }
@@ -1045,11 +1090,206 @@ async function updateNarrativeSummary(){
 ${scenesText}
 
 Mentionne les personnages principaux, les lieux, les événements clés.
-Réponds UNIQUEMENT par le résumé.`;
+Réponds UNIQUEMENT par le résumé en français.`;
     try{
         const raw=await callTextAPI([{role:'user',content:prompt}],{temperature:0.5,maxTokens:300});
         return raw.trim().slice(0,600);
     }catch(e){return scenesText.slice(0,400);}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MODAL D'ÉDITION DE SCÈNE
+// ══════════════════════════════════════════════════════════════════
+function openEditModal(sceneId){
+    const scene=state.scenes.find(s=>s.id===sceneId);
+    if(!scene){toast('Scène introuvable','error');return;}
+
+    const overlay=document.createElement('div');
+    overlay.className='modal-overlay';
+    overlay.id='edit-modal';
+    overlay.innerHTML=`
+        <div class="modal-box">
+            <h3>✏️ Modifier la scène ${scene.numero||'?'} <button type="button" id="modal-close">✕</button></h3>
+            <div class="field">
+                <label>Narration (voix off / texte à l'écran)</label>
+                <textarea id="edit-narration">${esc(scene.narration||'')}</textarea>
+            </div>
+            <div class="field">
+                <label>Description visuelle</label>
+                <textarea id="edit-description">${esc(scene.description_visuelle||'')}</textarea>
+            </div>
+            <div class="grid-2">
+                <div class="field">
+                    <label>Type de plan</label>
+                    <select id="edit-plan">
+                        ${['Large','Rapproché','Moyen','Général','Gros plan','Aérien'].map(p=>`<option ${scene.plan===p?'selected':''}>${p}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Mouvement caméra</label>
+                    <select id="edit-camera">
+                        ${['Statique','Panoramique','Tilt','Travelling','Zoom','Grue','Steadicam'].map(c=>`<option ${scene.mouvement_camera===c?'selected':''}>${c}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label>Prompt image de départ (anglais)</label>
+                <textarea id="edit-img-start" style="font-family:ui-monospace,monospace;font-size:.75rem;">${esc(scene.image_prompt||'')}</textarea>
+            </div>
+            <div class="field">
+                <label>Prompt image de fin (anglais)</label>
+                <textarea id="edit-img-end" style="font-family:ui-monospace,monospace;font-size:.75rem;">${esc(scene.image_prompt_end||'')}</textarea>
+            </div>
+            <div class="field">
+                <label>Prompt vidéo (anglais)</label>
+                <textarea id="edit-video" style="font-family:ui-monospace,monospace;font-size:.75rem;">${esc(scene.video_prompt||'')}</textarea>
+            </div>
+            <div class="field">
+                <label>Lieu</label>
+                <input type="text" id="edit-location" value="${esc(scene.location||'')}">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline btn-sm" id="modal-cancel">Annuler</button>
+                <button type="button" class="btn btn-info btn-sm" id="modal-save">💾 Sauvegarder</button>
+                <button type="button" class="btn btn-success btn-sm" id="modal-regen">🔄 Régénérer (images+vidéo)</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    document.getElementById('modal-close').addEventListener('click',closeEditModal);
+    document.getElementById('modal-cancel').addEventListener('click',closeEditModal);
+    overlay.addEventListener('click',e=>{if(e.target===overlay)closeEditModal();});
+
+    document.getElementById('modal-save').addEventListener('click',()=>{
+        saveSceneFromModal(scene);
+        toast('Scène modifiée ✓','success');
+        closeEditModal();
+    });
+
+    document.getElementById('modal-regen').addEventListener('click',async()=>{
+        saveSceneFromModal(scene);
+        closeEditModal();
+        await regenerateScene(scene);
+    });
+}
+
+function closeEditModal(){
+    const m=document.getElementById('edit-modal');
+    if(m)m.remove();
+}
+
+function saveSceneFromModal(scene){
+    scene.narration=document.getElementById('edit-narration').value.trim();
+    scene.description_visuelle=document.getElementById('edit-description').value.trim();
+    scene.plan=document.getElementById('edit-plan').value;
+    scene.mouvement_camera=document.getElementById('edit-camera').value;
+    scene.image_prompt=document.getElementById('edit-img-start').value.trim();
+    scene.image_prompt_end=document.getElementById('edit-img-end').value.trim();
+    scene.video_prompt=document.getElementById('edit-video').value.trim();
+    scene.location=document.getElementById('edit-location').value.trim();
+    scene.updatedAt=Date.now();
+    dbPut('scenes',scene);
+    renderScenes();
+    renderMemory();
+}
+
+async function deleteScene(sceneId){
+    if(!confirm('Supprimer cette scène ? Cette action est irréversible.'))return;
+    const idx=state.scenes.findIndex(s=>s.id===sceneId);
+    if(idx===-1)return;
+    await dbDelete('scenes',sceneId);
+    state.scenes.splice(idx,1);
+    renderScenes();
+    renderMemory();
+    renderProjectsList();
+    toast('Scène supprimée','warn');
+}
+
+async function regenerateScene(scene){
+    if(state.isRunning){toast('Une session est déjà en cours','warn');return;}
+    if(!getApiKey()){toast('Ajoutez votre clé API','error');return;}
+
+    state.isRunning=true;
+    state.stopRequested=false;
+    const noHumans=document.getElementById('no-humans-toggle').checked;
+    const genVideos=document.getElementById('videos-toggle').checked;
+    const imgSize=state.format==='16:9'?'1024x576':state.format==='1:1'?'1024x1024':'768x1024';
+
+    document.getElementById('generate-btn').disabled=true;
+    document.getElementById('stop-btn').style.display='block';
+    await activateWakeLock();
+    log('═══════════════════════','info');
+    log('RÉGÉNÉRATION SCÈNE '+scene.numero,'info');
+    log('═══════════════════════','info');
+
+    try{
+        scene.status='processing';
+        scene.imageStartUrl=null;
+        scene.imageEndUrl=null;
+        scene.videoUrl=null;
+        scene.videoDuration=null;
+        await dbPut('scenes',scene);
+        renderScenes();
+        createPendingCard(scene.numero);
+
+        setStatus('Images scène '+scene.numero+'…');
+        updatePending(scene.numero,'Image de départ…',10);
+        const startPrompt=buildImagePrompt(scene,'start',noHumans);
+        scene.imageStartUrl=await callImageAPI(startPrompt,imgSize);
+        updatePending(scene.numero,'Image de fin…',50);
+
+        if(genVideos){
+            const endPrompt=buildImagePrompt(scene,'end',noHumans);
+            scene.imageEndUrl=await callImageAPI(endPrompt,imgSize);
+        }
+        updatePending(scene.numero,'Images prêtes',80);
+        await dbPut('scenes',scene);
+        renderScenes();
+        log('Images scène '+scene.numero+' ✓','success');
+
+        if(genVideos&&!state.stopRequested){
+            setStatus('Vidéo scène '+scene.numero+'…');
+            const prompt=buildVideoPrompt(scene,noHumans);
+            const vid=await createVideoTask(scene.imageStartUrl,scene.imageEndUrl,prompt,state.duration);
+            const result=await pollVideo(vid,scene.numero);
+            scene.videoUrl=result.url;
+            scene.videoDuration=result.duration;
+            scene.status='done';
+            await dbPut('scenes',scene);
+            removePending(scene.numero);
+            log('✅ Scène '+scene.numero+' régénérée en '+result.duration+'s','success');
+            renderScenes();
+            renderMemory();
+            renderProjectsList();
+            playNotificationSound();
+            toast('Scène '+scene.numero+' régénérée !','success');
+        } else {
+            scene.status='done';
+            await dbPut('scenes',scene);
+            removePending(scene.numero);
+            renderScenes();
+        }
+
+        setStatus('✦ Régénération terminée ✦');
+        await sleep(1500);
+        setStatus(null);
+
+    }catch(e){
+        log('ERREUR régénération : '+e.message,'error');
+        scene.status='failed';
+        await dbPut('scenes',scene);
+        removePending(scene.numero);
+        renderScenes();
+        toast('Erreur : '+e.message.slice(0,60),'error');
+        setStatus(null);
+    }
+
+    state.isRunning=false;
+    state.stopRequested=false;
+    document.getElementById('stop-btn').style.display='none';
+    document.getElementById('generate-btn').disabled=false;
+    await deactivateWakeLock();
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1224,7 +1464,7 @@ function fallbackCopy(txt){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// SUPPRESSION
+// SUPPRESSION PROJET
 // ══════════════════════════════════════════════════════════════════
 async function deleteCurrentProject(){
     if(!state.currentProject)return;
@@ -1288,7 +1528,6 @@ function updateApiStatus(){
         if(s)state.measuredSpeed=JSON.parse(s);
     }catch(e){}
 
-    // API
     document.getElementById('api-save-btn').addEventListener('click',()=>{
         const i=document.getElementById('api-key-input');
         const k=i.value.trim();
@@ -1307,13 +1546,11 @@ function updateApiStatus(){
         if(e.key==='Enter'){e.preventDefault();document.getElementById('api-save-btn').click();}
     });
 
-    // Projet
     document.getElementById('new-project-btn').addEventListener('click',()=>{
         document.getElementById('new-project-field').classList.toggle('hidden');
     });
     document.getElementById('create-project-btn').addEventListener('click',createProject);
 
-    // Génération
     document.getElementById('generate-btn').addEventListener('click',generateNextScenes);
     document.getElementById('stop-btn').addEventListener('click',()=>{
         state.stopRequested=true;
@@ -1321,26 +1558,22 @@ function updateApiStatus(){
         setStatus('Arrêt en cours…');
     });
 
-    // Export
     document.getElementById('export-txt-btn').addEventListener('click',exportTxt);
     document.getElementById('export-json-btn').addEventListener('click',exportJson);
     document.getElementById('delete-project-btn').addEventListener('click',deleteCurrentProject);
 
-    // Accordéons
     document.querySelectorAll('[data-toggle]').forEach(h=>{
         h.addEventListener('click',()=>{
             document.getElementById(h.dataset.toggle).classList.toggle('open');
         });
     });
 
-    // Player
     document.getElementById('play-all-btn').addEventListener('click',()=>{
         if(state.isPlayingSequence)stopAll();
         else playAll();
     });
     document.getElementById('stop-all-btn').addEventListener('click',stopAll);
 
-    // Formats
     document.getElementById('format-select').addEventListener('change',e=>{
         state.format=e.target.value;
         if(state.currentProject){
