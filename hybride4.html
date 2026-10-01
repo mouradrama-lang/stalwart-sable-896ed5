@@ -3,112 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agnes Video Generator</title>
+  <title>Agnes - Image to Video</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #090b12;
+      background: #0a0d14;
       color: white;
-      padding: 24px;
+      padding: 20px;
     }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
+    .container { max-width: 600px; margin: 0 auto; }
     .card {
-      background: #121722;
-      border: 1px solid #2b3347;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
+      background: #141820;
+      border: 1px solid #2a3447;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
     label {
       display: block;
       font-size: 11px;
-      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #b5bfd3;
-      margin-bottom: 8px;
+      color: #a5afc0;
+      margin-bottom: 6px;
+      letter-spacing: 0.1em;
     }
     input, textarea, select, button {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #2d374d;
-      background: #1a2233;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #2a3447;
+      background: #1a2230;
       color: white;
-      font-size: 14px;
+      font-size: 13px;
+      font-family: Arial, sans-serif;
     }
-    textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
+    textarea { min-height: 80px; resize: vertical; }
     button {
-      background: linear-gradient(135deg, #d9af63, #f2d68a);
-      color: #111;
+      background: linear-gradient(135deg, #d4a853, #f0d078);
+      color: #000;
       border: none;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 6px;
     }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .upload-zone {
+      border: 2px dashed #2a3447;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      background: #0f1620;
+      transition: all 0.3s;
     }
-    .status {
+    .upload-zone:hover { border-color: #d4a853; background: #1a2230; }
+    .upload-zone.active { border-color: #4ec97a; background: #1a2230; }
+    .upload-icon { font-size: 24px; margin-bottom: 8px; }
+    .upload-text { font-size: 12px; color: #a5afc0; }
+    #fileInput { display: none; }
+    .image-preview {
       margin-top: 12px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #121722;
-      border: 1px solid #2c384d;
-      font-size: 14px;
-      color: #dfe6f7;
+      border-radius: 8px;
+      overflow: hidden;
+      max-width: 200px;
+      margin-left: auto;
+      margin-right: auto;
     }
+    .image-preview img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #2a3447;
+    }
+    .remove-btn {
+      background: #c0392b;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 8px;
+      width: 100%;
+    }
+    .log {
+      background: #0a0d14;
+      border: 1px solid #2a3447;
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #b5c1d6;
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+    }
+    .log-line { margin: 2px 0; }
+    .log-ok { color: #4ec97a; }
+    .log-err { color: #ff6b7a; }
+    .log-warn { color: #ffb55a; }
+    .log-info { color: #67d5ff; }
     .result {
       display: none;
-      margin-top: 16px;
-      background: #0f1420;
-      border: 1px solid #d9af63;
-      border-radius: 12px;
-      padding: 12px;
-    }
-    .result.visible {
-      display: block;
-    }
-    video {
-      width: 100%;
-      border-radius: 10px;
-      background: #000;
       margin-top: 12px;
+      background: #0f1420;
+      border: 1px solid #d4a853;
+      border-radius: 10px;
+      padding: 10px;
     }
+    .result.visible { display: block; }
+    video { width: 100%; border-radius: 8px; background: #000; margin-top: 10px; }
+    .hint { font-size: 11px; color: #888; margin-top: 4px; }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .tab-btn {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #2a3447;
+      background: #1a2230;
+      color: #a5afc0;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #d4a853, #f0d078);
+      color: #000;
+      border: none;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body>
   <div class="container">
+    <h2 style="text-align:center;margin-top:0">Agnes - Image to Video</h2>
+
     <div class="card">
-      <label for="key">Clé API Agnes</label>
+      <label>Clé API Agnes</label>
       <input id="key" type="password" placeholder="sk-..." />
     </div>
 
     <div class="card">
-      <label for="prompt">Description de la vidéo</label>
-      <textarea id="prompt" placeholder="Ex: Un chat dans un jardin, lumière dorée, cinématographique"></textarea>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="text">📝 Texte → Vidéo</button>
+        <button class="tab-btn" data-tab="image">🖼️ Image → Vidéo</button>
+      </div>
+
+      <!-- TAB 1: Text to Video -->
+      <div class="tab-content active" id="tab-text">
+        <label>Description du Personnage & Décor</label>
+        <textarea id="character" placeholder="Ex: Un chat gris avec des yeux bleus, chapeau rouge, dans un jardin français..."></textarea>
+        <div class="hint">Cette description sera ajoutée à chaque scène</div>
+
+        <label style="margin-top:12px">Action / Scène</label>
+        <textarea id="prompt" placeholder="Ex: Le personnage marche lentement..."></textarea>
+        <div class="hint">Décrivez l'action de cette scène</div>
+      </div>
+
+      <!-- TAB 2: Image to Video -->
+      <div class="tab-content" id="tab-image">
+        <label>Image Source</label>
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-icon">📸</div>
+          <div class="upload-text">Glisse une image ou clique pour choisir</div>
+          <div class="hint">Portrait 9:16 recommandé</div>
+        </div>
+        <input id="fileInput" type="file" accept="image/*" />
+        <div id="imagePreview"></div>
+
+        <label style="margin-top:12px">Description du Mouvement</label>
+        <textarea id="imagePrompt" placeholder="Ex: Anime doucement ce personnage en train de marcher..."></textarea>
+        <div class="hint">Décrivez le mouvement souhaité</div>
+      </div>
     </div>
 
     <div class="card">
-      <label for="duration">Durée</label>
+      <label>Durée</label>
       <select id="duration">
-        <option value="5" selected>5 secondes</option>
-        <option value="6">6 secondes</option>
-        <option value="10">10 secondes</option>
+        <option value="5">5 sec</option>
+        <option value="6">6 sec</option>
+        <option value="10">10 sec</option>
       </select>
     </div>
 
-    <button id="generateBtn">Générer la vidéo</button>
-    <div id="status" class="status">Prêt</div>
+    <button id="btn">Générer Vidéo</button>
 
-    <div class="result" id="resultBox">
+    <div class="log" id="log"></div>
+
+    <div class="result" id="result">
       <strong>Vidéo générée</strong>
       <video id="video" controls playsinline></video>
     </div>
@@ -118,138 +206,293 @@
     const AGNES_API = 'https://apihub.agnes-ai.com/v1';
     const AGNES_POLL = 'https://apihub.agnes-ai.com/agnesapi';
     const AGNES_MODEL = 'agnes-video-v2.0';
-    const KEY_STORAGE = 'agnes_key';
 
-    const keyInput = document.getElementById('key');
-    const promptInput = document.getElementById('prompt');
-    const durationInput = document.getElementById('duration');
-    const generateBtn = document.getElementById('generateBtn');
-    const statusEl = document.getElementById('status');
-    const resultBox = document.getElementById('resultBox');
-    const videoEl = document.getElementById('video');
+    const key = document.getElementById('key');
+    const character = document.getElementById('character');
+    const prompt = document.getElementById('prompt');
+    const imagePrompt = document.getElementById('imagePrompt');
+    const duration = document.getElementById('duration');
+    const btn = document.getElementById('btn');
+    const log = document.getElementById('log');
+    const result = document.getElementById('result');
+    const video = document.getElementById('video');
 
-    function setStatus(msg) {
-      statusEl.textContent = msg;
-    }
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
 
-    function loadKey() {
-      const key = localStorage.getItem(KEY_STORAGE) || '';
-      keyInput.value = key;
-    }
+    const logs = [];
+    let currentTab = 'text';
+    let uploadedImageBase64 = null;
 
-    function saveKey() {
-      const key = keyInput.value.trim();
-      if (key) {
-        localStorage.setItem(KEY_STORAGE, key);
-      }
-    }
-
-    function getKey() {
-      return keyInput.value.trim();
-    }
-
-    async function generateWithAgnes(prompt, duration) {
-      const key = getKey();
-      if (!key) throw new Error('Clé Agnes manquante');
-
-      saveKey();
-
-      const frames = duration === 5 ? 121 : (duration === 10 ? 241 : 153);
-      const body = {
-        model: AGNES_MODEL,
-        prompt,
-        num_frames: frames,
-        frame_rate: 24,
-        ratio: '9:16',
-        resolution: '480p'
-      };
-
-      setStatus('Agnes : envoi…');
-
-      const res = await fetch(AGNES_API + '/videos', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + key,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        e.target.classList.add('active');
+        currentTab = e.target.dataset.tab;
+        document.getElementById('tab-' + currentTab).classList.add('active');
       });
+    });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error('Agnes HTTP ' + res.status + ' : ' + text.slice(0, 200));
-      }
+    // Image upload
+    uploadZone.addEventListener('click', () => fileInput.click());
 
-      const data = await res.json();
-      const id = data.video_id || data.id || data.task_id || data.data?.video_id || data.data?.id || data.task?.id;
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('active');
+    });
 
-      if (!id) {
-        throw new Error('Aucune video_id reçue de Agnes');
-      }
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('active');
+    });
 
-      setStatus('Agnes : en attente de génération…');
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('active');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) handleImageFile(files[0]);
+    });
 
-      for (let i = 0; i < 40; i++) {
-        await new Promise(r => setTimeout(r, 2000));
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) handleImageFile(e.target.files[0]);
+    });
 
-        const pollUrl = AGNES_POLL + '?video_id=' + encodeURIComponent(id) + '&model_name=' + encodeURIComponent(AGNES_MODEL);
-
-        const pollRes = await fetch(pollUrl, {
-          headers: {
-            'Authorization': 'Bearer ' + key
-          }
-        });
-
-        const pollData = await pollRes.json();
-
-        const state = (pollData.status || pollData.state || pollData.job_status || 'unknown').toLowerCase();
-        setStatus('Agnes : ' + state);
-
-        const url =
-          pollData.metadata?.url ||
-          pollData.url ||
-          pollData.output?.url ||
-          pollData.result?.url ||
-          pollData.data?.url;
-
-        if (state === 'completed' || state === 'succeeded' || state === 'done' || state === 'success') {
-          if (!url) throw new Error('URL vidéo introuvable dans la réponse Agnes');
-          return url;
-        }
-
-        if (state === 'failed' || state === 'error' || state === 'cancelled' || state === 'canceled') {
-          throw new Error('Agnes a échoué : ' + state);
-        }
-      }
-
-      throw new Error('Timeout Agnes');
-    }
-
-    generateBtn.addEventListener('click', async () => {
-      const prompt = promptInput.value.trim();
-      if (!prompt) {
-        setStatus('Écrire une description');
+    function handleImageFile(file) {
+      if (!file.type.startsWith('image/')) {
+        addLog('Fichier invalide', 'err');
         return;
       }
 
-      const duration = Number(durationInput.value);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        uploadedImageBase64 = e.target.result;
+        showImagePreview(e.target.result);
+        addLog('Image chargée: ' + file.name, 'ok');
+      };
+      reader.readAsDataURL(file);
+    }
 
-      generateBtn.disabled = true;
+    function showImagePreview(dataUri) {
+      imagePreview.innerHTML = `
+        <div class="image-preview">
+          <img src="${dataUri}" />
+        </div>
+        <button class="remove-btn" onclick="removeImage()">Supprimer l'image</button>
+      `;
+    }
 
-      try {
-        const url = await generateWithAgnes(prompt, duration);
-        videoEl.src = url;
-        resultBox.classList.add('visible');
-        setStatus('Vidéo prête');
-      } catch (err) {
-        console.error(err);
-        setStatus(err.message || 'Erreur');
-      } finally {
-        generateBtn.disabled = false;
+    window.removeImage = () => {
+      uploadedImageBase64 = null;
+      imagePreview.innerHTML = '';
+      fileInput.value = '';
+    };
+
+    function addLog(msg, type = 'info') {
+      const line = document.createElement('div');
+      line.className = 'log-line log-' + type;
+      line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+      logs.push(line);
+      if (logs.length > 25) logs.shift();
+      log.innerHTML = '';
+      logs.forEach(l => log.appendChild(l));
+      log.scrollTop = log.scrollHeight;
+      console.log(msg);
+    }
+
+    btn.addEventListener('click', async () => {
+      const k = key.value.trim();
+      const d = Number(duration.value);
+
+      if (!k) { addLog('Clé manquante', 'err'); return; }
+
+      if (currentTab === 'text') {
+        const c = character.value.trim();
+        const p = prompt.value.trim();
+        if (!c || !p) { addLog('Description ou action manquante', 'err'); return; }
+        await generateTextToVideo(k, c, p, d);
+      } else {
+        const p = imagePrompt.value.trim();
+        if (!uploadedImageBase64) { addLog('Image manquante', 'err'); return; }
+        if (!p) { addLog('Description du mouvement manquante', 'err'); return; }
+        await generateImageToVideo(k, uploadedImageBase64, p, d);
       }
     });
 
-    loadKey();
+    async function generateTextToVideo(k, character, prompt, d) {
+      btn.disabled = true;
+      result.classList.remove('visible');
+      logs.length = 0;
+      log.innerHTML = '';
+      addLog('Démarrage (Text to Video)...', 'warn');
+
+      try {
+        const frames = d === 5 ? 121 : (d === 10 ? 241 : 153);
+        const fullPrompt = character + "\n\nACTION: " + prompt;
+
+        addLog('Prompt: ' + fullPrompt.slice(0, 80) + '...', 'info');
+        addLog('POST → /videos', 'info');
+
+        const createRes = await fetch(AGNES_API + '/videos', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + k,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: AGNES_MODEL,
+            prompt: fullPrompt,
+            num_frames: frames,
+            frame_rate: 24,
+            ratio: '9:16',
+            resolution: '480p'
+          })
+        });
+
+        if (!createRes.ok) {
+          const errText = await createRes.text();
+          throw new Error('HTTP ' + createRes.status + ': ' + errText.slice(0, 100));
+        }
+
+        const createData = await createRes.json();
+        const id = createData.video_id || createData.id || createData.task_id || 
+                   createData.data?.video_id || createData.data?.id;
+
+        if (!id) throw new Error('Pas d\'ID');
+
+        addLog('ID: ' + id, 'ok');
+        await pollVideo(k, id);
+
+      } catch (err) {
+        addLog('ERREUR: ' + err.message, 'err');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function generateImageToVideo(k, imageBase64, promptText, d) {
+      btn.disabled = true;
+      result.classList.remove('visible');
+      logs.length = 0;
+      log.innerHTML = '';
+      addLog('Démarrage (Image to Video)...', 'warn');
+
+      try {
+        const frames = d === 5 ? 121 : (d === 10 ? 241 : 153);
+
+        addLog('Prompt: ' + promptText.slice(0, 80) + '...', 'info');
+        addLog('POST → /videos (avec image)', 'info');
+
+        const createRes = await fetch(AGNES_API + '/videos', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + k,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: AGNES_MODEL,
+            image_url: imageBase64,
+            prompt: promptText,
+            num_frames: frames,
+            frame_rate: 24,
+            ratio: '9:16',
+            resolution: '480p'
+          })
+        });
+
+        if (!createRes.ok) {
+          const errText = await createRes.text();
+          throw new Error('HTTP ' + createRes.status + ': ' + errText.slice(0, 100));
+        }
+
+        const createData = await createRes.json();
+        const id = createData.video_id || createData.id || createData.task_id || 
+                   createData.data?.video_id || createData.data?.id;
+
+        if (!id) throw new Error('Pas d\'ID');
+
+        addLog('ID: ' + id, 'ok');
+        await pollVideo(k, id);
+
+      } catch (err) {
+        addLog('ERREUR: ' + err.message, 'err');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function pollVideo(k, id) {
+      addLog('Polling...', 'warn');
+
+      let url = null;
+      const startTime = Date.now();
+
+      for (let attempt = 0; attempt < 120; attempt++) {
+        if (Date.now() - startTime > 600000) throw new Error('Timeout 10min');
+
+        await new Promise(r => setTimeout(r, 1000));
+
+        const pollUrl = AGNES_POLL + '?video_id=' + encodeURIComponent(id) + 
+                       '&model_name=' + encodeURIComponent(AGNES_MODEL);
+
+        const pollRes = await fetch(pollUrl, {
+          headers: { 'Authorization': 'Bearer ' + k }
+        });
+
+        if (!pollRes.ok) {
+          addLog('Poll HTTP ' + pollRes.status, 'warn');
+          continue;
+        }
+
+        const pollData = await pollRes.json();
+        const state = String(pollData.status || pollData.state || pollData.job_status || 'unknown').toLowerCase();
+        const progress = pollData.progress || pollData.percent || 0;
+
+        if (attempt % 3 === 0) {
+          addLog('Tentative ' + (attempt + 1) + ': ' + state + ' (' + progress + '%)', 'info');
+        }
+
+        url = pollData.metadata?.url || pollData.url || pollData.output?.url || 
+              pollData.result?.url || pollData.data?.url;
+
+        if (state === 'completed' || state === 'succeeded' || state === 'done' || state === 'success') {
+          if (!url) throw new Error('Pas d\'URL');
+          addLog('Succès!', 'ok');
+          break;
+        }
+
+        if (state === 'failed' || state === 'error' || state === 'cancelled') {
+          throw new Error('Échec: ' + state);
+        }
+      }
+
+      if (!url) throw new Error('Pas d\'URL');
+
+      video.src = url;
+      result.classList.add('visible');
+      addLog('Vidéo affichée', 'ok');
+    }
+
+    // Load from localStorage
+    try {
+      const saved = localStorage.getItem('agnes_key');
+      if (saved) key.value = saved;
+      const savedChar = localStorage.getItem('agnes_character');
+      if (savedChar) character.value = savedChar;
+      const savedPrompt = localStorage.getItem('agnes_prompt');
+      if (savedPrompt) prompt.value = savedPrompt;
+    } catch (e) {}
+
+    key.addEventListener('change', () => {
+      try { localStorage.setItem('agnes_key', key.value); } catch (e) {}
+    });
+    character.addEventListener('change', () => {
+      try { localStorage.setItem('agnes_character', character.value); } catch (e) {}
+    });
+    prompt.addEventListener('change', () => {
+      try { localStorage.setItem('agnes_prompt', prompt.value); } catch (e) {}
+    });
   </script>
 </body>
 </html>
