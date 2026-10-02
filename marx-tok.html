@@ -29,9 +29,13 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
 .api-row input{flex:1;padding:.7rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:ui-monospace,monospace;font-size:.8rem;min-width:0}
 .api-row input:focus{outline:none;border-color:var(--accent)}
 .api-row button{padding:.7rem 1rem;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:700;font-family:inherit;font-size:.8rem;cursor:pointer;white-space:nowrap}
-.api-status{font-size:.72rem;color:var(--ink-dim);display:flex;align-items:center;gap:.4rem}
+.api-status{font-size:.72rem;color:var(--ink-dim);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
 .api-status .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex-shrink:0}
 .api-status.ok .dot{background:var(--success)}.api-status.ok{color:var(--success)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-top:.6rem}
+.stat-box{background:var(--panel-2);border-radius:8px;padding:.4rem .5rem;text-align:center}
+.stat-box .sv{font-size:.9rem;font-weight:800;color:var(--accent);font-family:ui-monospace,monospace}
+.stat-box .sl{font-size:.55rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem}
 .field{margin-bottom:.7rem}
 .field label{display:block;font-size:.68rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:.35rem}
 .field select,.field textarea,.field input[type=text]{width:100%;padding:.7rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.88rem;-webkit-appearance:none;appearance:none}
@@ -177,7 +181,17 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
         <input type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false">
         <button type="button" id="api-save-btn">OK</button>
     </div>
-    <div class="api-status" id="api-status"><span class="dot"></span><span id="api-status-text">Aucune clé</span></div>
+    <div class="api-status" id="api-status">
+        <span class="dot"></span>
+        <span id="api-status-text">Aucune clé</span>
+        <span id="limit-speed" style="margin-left:auto;font-size:.65rem;color:var(--ink-faint);font-family:ui-monospace,monospace;"></span>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-box"><div class="sv" id="limit-text">0</div><div class="sl">Textes</div></div>
+        <div class="stat-box"><div class="sv" id="limit-img">0</div><div class="sl">Images</div></div>
+        <div class="stat-box"><div class="sv" id="limit-vid">0</div><div class="sl">Sec. vidéo</div></div>
+        <div class="stat-box"><div class="sv" id="limit-rpm">0</div><div class="sl">RPM</div></div>
+    </div>
 </div>
 
 <!-- ═══ CONCEPT ═══ -->
@@ -273,10 +287,10 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
 <div class="panel">
     <h2>⚙️ Paramètres de production</h2>
     <div class="grid-2">
-        <div class="field"><label>Langue</label><select id="lang-select"><option value="darija">🇩🇿 Darija</option><option value="arabe-standard">🇸🇦 Arabe standard</option><option value="francais">🇫🇷 Français</option></select></div>
-        <div class="field"><label>Durée</label><select id="duration-select"><option value="30">30s</option><option value="45" selected>45s</option><option value="60">60s</option></select></div>
-        <div class="field"><label>Scènes</label><select id="scenes-select"><option value="5">5</option><option value="6" selected>6</option><option value="8">8</option><option value="10">10</option></select></div>
-        <div class="field"><label>Durée scène</label><select id="scene-duration-select"><option value="121">5s</option><option value="241" selected>10s</option><option value="361">15s</option></select></div>
+        <div class="field"><label>Langue</label><select id="lang-select"><option value="darija">🇩🇿 Darija</option><option value="arabe-standard">🇸🇦 Arabe standard</option><option value="francais" selected>🇫🇷 Français</option></select></div>
+        <div class="field"><label>Durée totale</label><select id="duration-select"><option value="30">30s</option><option value="45" selected>45s</option><option value="60">60s</option></select></div>
+        <div class="field"><label>Nombre de scènes</label><select id="scenes-select"><option value="5">5</option><option value="6" selected>6</option><option value="8">8</option><option value="10">10</option></select></div>
+        <div class="field"><label>Durée par scène</label><select id="scene-duration-select"><option value="121">5s (121 frames)</option><option value="241" selected>10s (241 frames)</option><option value="361">15s (361 frames)</option></select></div>
     </div>
     <div class="toggle-row"><div><div class="tl">Sans personnages humains</div><div class="th">Objets, paysages, symboles</div></div><label class="switch"><input type="checkbox" id="no-humans-toggle"><span class="slider"></span></label></div>
     <div class="toggle-row"><div><div class="tl">Symboles visuels principaux</div><div class="th">Métaphores visuelles</div></div><label class="switch"><input type="checkbox" id="symbols-toggle"><span class="slider"></span></label></div>
@@ -337,7 +351,7 @@ const API_BASE='https://apihub.agnes-ai.com/v1';
 const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
 const MODEL_TEXT='agnes-2.5-flash';
 const MODEL_IMAGE='agnes-image-2.5-flash';
-const MODEL_VIDEO='agnes-video-2.5-flash';
+const MODEL_VIDEO='agnes-video-v2.0'; // Utilise la version stable éprouvée
 const INITIAL_WAIT=105;
 const POLL_INTERVAL=5;
 const SAFETY=1.10;
@@ -575,7 +589,7 @@ concept:'',customConcept:'',
 artStyle:ART_STYLES[0],
 visualMode:'realiste',
 clarity:70,complexity:50,
-lang:'darija',duration:45,scenes:6,sceneDuration:241,
+lang:'francais',duration:45,scenes:6,sceneDuration:241,
 noHumans:false,symbols:false,generateVideos:true,expertMode:false,
 continuity:'soft',refFrame:false,refChar:true,refEnv:false,
 results:null,images:[],videos:[],characters:[],
@@ -603,8 +617,18 @@ function copyToClipboard(txt){if(navigator.clipboard){navigator.clipboard.writeT
 function fallbackCopy(txt){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copié !','success');}catch(e){toast('Échec copie','error');}document.body.removeChild(ta);}
 function downloadTxt(name,content){const blob=new Blob([content],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
 
-function updateCounters(){document.getElementById('limit-text').textContent=state.counters.text;document.getElementById('limit-img').textContent=state.counters.images;document.getElementById('limit-vid').textContent=Math.round(state.counters.videoSeconds);document.getElementById('limit-rpm').textContent=state.counters.videoRpm;updateSpeedDisplay();}
-function updateSpeedDisplay(){const el=document.getElementById('limit-speed');if(!el)return;el.textContent=state.measuredSpeed.value===null?'en attente':Math.round(state.measuredSpeed.value)+'s';}
+function updateCounters(){
+    const elText=document.getElementById('limit-text');
+    const elImg=document.getElementById('limit-img');
+    const elVid=document.getElementById('limit-vid');
+    const elRpm=document.getElementById('limit-rpm');
+    const elSpeed=document.getElementById('limit-speed');
+    if(elText)elText.textContent=state.counters.text;
+    if(elImg)elImg.textContent=state.counters.images;
+    if(elVid)elVid.textContent=Math.round(state.counters.videoSeconds);
+    if(elRpm)elRpm.textContent=state.counters.videoRpm;
+    if(elSpeed)elSpeed.textContent=state.measuredSpeed.value===null?'en attente':Math.round(state.measuredSpeed.value)+'s';
+}
 
 // ══════════════════════════════════════════════════════════════════
 // API
@@ -649,7 +673,19 @@ async function createVideoTask(startUrl,endUrl,prompt,seconds){
 const now=Date.now();
 if(state.counters.videoRpm>=1){const wait=Math.ceil((60000-(now-state.counters.lastReset))/1000);if(wait>0){log('RPM vidéo — attente '+wait+'s','warn');await sleep(wait*1000);state.counters.videoRpm=0;state.counters.lastReset=Date.now();}}
 state.counters.videoRpm++;state.counters.videoSeconds+=seconds;updateCounters();
-const body={model:MODEL_VIDEO,prompt:prompt,seconds:String(seconds),mode:'keyframe',size:'720P',aspect_ratio:'9:16',image:[startUrl,endUrl]};
+
+// Format éprouvé et stable pour l'API Agnès
+const numFrames = Math.round(seconds * 24);
+const body={
+    model:MODEL_VIDEO,
+    prompt:prompt,
+    extra_body:{image:[startUrl,endUrl],mode:'keyframes'},
+    num_frames:numFrames,
+    frame_rate:24,
+    height:1024,
+    width:576
+};
+
 log('Création tâche vidéo → '+MODEL_VIDEO,'info');
 const res=await fetchWithRetry(API_BASE+'/videos',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},body:JSON.stringify(body)},3,'Vidéo');
 if(!res.ok){const err=await res.text();throw new Error('Vidéo HTTP '+res.status+' — '+err.slice(0,200));}
@@ -676,7 +712,7 @@ if(st==='completed'||st==='succeeded'||st==='done'){
 const vUrl=d.url||(d.metadata&&d.metadata.url)||(d.output&&d.output.url);
 if(!vUrl)throw new Error('URL manquante');
 const dur=Math.round((Date.now()-start)/1000);
-state.measuredSpeed.value=dur;state.measuredSpeed.usedForEstimate=Math.round(dur*SAFETY);saveMeasuredSpeed();updateSpeedDisplay();
+state.measuredSpeed.value=dur;state.measuredSpeed.usedForEstimate=Math.round(dur*SAFETY);saveMeasuredSpeed();updateCounters();
 log('⚡ Scène '+(sceneIndex+1)+' générée en '+dur+'s','measure');
 return {url:vUrl,duration:dur};
 }
@@ -789,7 +825,7 @@ PARAMÈTRES :
 - Langue narration : ${langLabel}
 - Durée : ${state.duration}s
 - Scènes : ${state.scenes}
-- Durée scène : ${state.sceneDuration/24}s
+- Durée scène : ${Math.round(state.sceneDuration/24)}s
 - ${noHumans}
 - ${continuityRule}
 - ${refRule}
@@ -838,8 +874,8 @@ Réponds UNIQUEMENT en JSON valide :
   "scenes": [
     {
       "numero": 1,
-      "duree": ${state.sceneDuration/24},
-      "narration": "Texte en ${state.lang}",
+      "duree": ${Math.round(state.sceneDuration/24)},
+      "narration": "Texte en français simple",
       "concept_explique": "Ce que la scène explique",
       "fonction_narrative": "établir-environnement|présenter-personnage|montrer-objet|montrer-relation|montrer-action|montrer-émotion|montrer-système|montrer-transformation",
       "plan": "Large|Rapproché|Moyen|Général|Gros plan|Aérien",
@@ -934,7 +970,7 @@ catch(e){const m=raw.match(/\{[\s\S]*\}/);if(m)data=JSON.parse(m[0]);else throw 
 // Normaliser
 data.scenes=(data.scenes||[]).map((s,i)=>{
 s.numero=s.numero||(i+1);
-s.duree=s.duree||state.sceneDuration/24;
+s.duree=s.duree||Math.round(state.sceneDuration/24);
 if(!s.plan||!s.mouvement_camera){const f=s.fonction_narrative||'montrer-action';const g=VISUAL_GRAMMAR[f]||{plan:'Moyen',camera:'Travelling'};s.plan=s.plan||g.plan;s.mouvement_camera=s.mouvement_camera||g.camera;}
 return s;
 });
@@ -1115,7 +1151,7 @@ document.getElementById('stop-all-btn')?.addEventListener('click',stopAll);
 
 function renderPendingVideos(total){
 let sec=document.getElementById('video-pending-section');
-if(!sec){const c=document.getElementById('results-container');sec=document.createElement('div');sec.className='result-section open';sec.id='video-pending-section';sec.innerHTML='<div class="result-header" data-toggle><span class="result-title">🎞️ Clips (génération)</span><span class="chevron">▼</span></div><div class="result-body"><div class="result-content"><div class="video-grid" id="video-grid"></div></div></div></div>';c.insertBefore(sec,c.firstChild);sec.querySelector('[data-toggle]').addEventListener('click',()=>sec.classList.toggle('open'));}
+if(!sec){const c=document.getElementById('results-container');sec=document.createElement('div');sec.className='result-section open';sec.id='video-pending-section';sec.innerHTML='<div class="result-header" data-toggle><span class="result-title">🎞️ Clips (génération)</span><span class="chevron">▼</span></div><div class="result-body"><div class="result-content"><div class="video-grid" id="video-grid"></div></div></div></div>';c.appendChild(sec);sec.querySelector('[data-toggle]').addEventListener('click',()=>sec.classList.toggle('open'));}
 const grid=document.getElementById('video-grid');
 grid.innerHTML='';
 for(let i=0;i<total;i++){
