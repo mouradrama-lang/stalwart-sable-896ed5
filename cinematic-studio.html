@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cinematic Studio — Générateur Vidéo Hyper Réaliste</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+        --bg: #050508; --panel: #0f0f16; --panel-2: #16161f; --border: #26263a;
+        --ink: #eaeaf0; --ink-dim: #8a8a9a; --ink-faint: #50506a;
+        --success: #2d8a4e; --error: #c0392b; --warn: #d4a017; --info: #4a6cf7;
+        --accent: #e94560; --accent-2: #4a6cf7; --gold: #d4a017; --radius: 12px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; padding: 1.5rem 1rem 8rem; font-size: 15px; line-height: 1.5; max-width: 1000px; margin: 0 auto; }
+    header { margin-bottom: 1.5rem; text-align: center; }
+    h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.35rem; background: linear-gradient(135deg, #e94560, #4a6cf7, #d4a017); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { font-size: 0.85rem; color: var(--ink-dim); }
+
+    .toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--panel); color: var(--ink); padding: 0.85rem 1.4rem; border-radius: 10px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 4px 30px rgba(0,0,0,0.6); border: 1px solid var(--border); z-index: 1000; opacity: 0; transition: transform 0.35s ease, opacity 0.35s ease; max-width: 90vw; text-align: center; display: flex; align-items: center; gap: 0.5rem; }
+    .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+    .toast.warn { border-color: var(--warn); }
+
+    .section { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+    .section-header { padding: 1rem 1.2rem; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+    .section-header:active { background: var(--panel-2); }
+    .section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-dim); font-weight: 700; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .section-title .badge { display: inline-block; padding: 0.15rem 0.5rem; background: var(--accent); color: #fff; border-radius: 10px; font-size: 0.65rem; letter-spacing: 0; }
+    .section-title .badge.soft { background: var(--info); }
+    .section-title .badge.count { background: var(--success); }
+    .section-title .badge.gold { background: var(--gold); color: #000; }
+    .section-title .badge.new { background: #8a4cf7; }
+    .section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.2s; }
+    .section.open .section-header .chevron { transform: rotate(180deg); }
+    .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .section.open .section-body { max-height: 25000px; }
+    .section-content { padding: 0 1.2rem 1.2rem; }
+
+    .project-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .project-bar input { flex: 1; min-width: 140px; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.85rem; }
+    .project-bar input:focus { outline: none; border-color: var(--accent); }
+    .project-bar button { padding: 0.7rem 0.95rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.72rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .project-bar button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .project-bar button.session-active { background: linear-gradient(135deg, #2d8a4e, #1a5a30); color: #fff; }
+    .project-bar button.danger { border-color: var(--error); color: var(--error); }
+
+    .autosave-banner { background: linear-gradient(135deg, #1a2e1a, #0f1626); border: 1px solid var(--success); border-radius: var(--radius); padding: 0.9rem 1.1rem; margin-bottom: 1rem; display: none; }
+    .autosave-banner.visible { display: block; animation: fadeIn 0.4s ease; }
+    .autosave-banner .as-title { color: var(--success); font-weight: 700; margin-bottom: 0.4rem; font-size: 0.85rem; }
+    .autosave-banner .as-info { color: var(--ink-dim); font-size: 0.72rem; line-height: 1.5; }
+    .autosave-banner .as-stats { color: var(--ink); font-size: 0.7rem; font-family: ui-monospace, monospace; margin-top: 0.5rem; padding: 0.5rem 0.7rem; background: rgba(0,0,0,0.35); border-radius: 6px; line-height: 1.6; }
+    .autosave-banner .as-actions { display: flex; gap: 0.4rem; margin-top: 0.7rem; flex-wrap: wrap; }
+    .autosave-banner .as-actions button { padding: 0.5rem 0.9rem; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+    .autosave-banner .as-actions button.primary { background: var(--success); color: #fff; border-color: var(--success); }
+    .autosave-banner .as-actions button.danger { border-color: var(--error); color: var(--error); }
+
+    .api-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
+    .api-key-input { width: 100%; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: ui-monospace, monospace; font-size: 0.85rem; margin-bottom: 0.6rem; }
+    .api-key-input:focus { outline: none; border-color: var(--accent); }
+    .api-save-btn { width: 100%; padding: 0.8rem 1.2rem; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 0.9rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 0.6rem; }
+    .api-status-line { font-size: 0.75rem; padding: 0.55rem 0.85rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem; background: var(--panel-2); color: var(--ink-dim); }
+    .api-status-line.ok { background: #1a2e1a; color: var(--success); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
+    .api-status-line.ok .status-dot { background: var(--success); }
+
+    .limits-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
+    .limits-panel h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-dim); margin-bottom: 0.7rem; font-weight: 700; }
+    .limit-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; font-size: 0.78rem; border-bottom: 1px solid var(--border); }
+    .limit-row:last-child { border-bottom: none; }
+    .limit-label { color: var(--ink-dim); }
+    .limit-value { font-family: ui-monospace, monospace; color: var(--ink); font-weight: 600; }
+
+    textarea, input[type="text"] { width: 100%; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.9rem; resize: vertical; }
+    textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); }
+    textarea { min-height: 100px; line-height: 1.5; }
+    textarea.darija, textarea.rtl { direction: rtl; text-align: right; }
+
+    .control-row { margin-bottom: 0.9rem; }
+    .control-label { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .control-hint { font-size: 0.68rem; color: var(--ink-faint); margin-top: 0.3rem; font-style: italic; }
+    select { width: 100%; padding: 0.7rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.88rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238a8a9a' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 10px; }
+    select:focus { outline: none; border-color: var(--accent); }
+
+    .genre-grid, .style-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+    .genre-card, .style-card { padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; transition: all 0.15s; text-align: center; }
+    .genre-card.selected, .style-card.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .genre-card .genre-emoji, .style-card .style-emoji { font-size: 1.6rem; display: block; margin-bottom: 0.3rem; }
+    .genre-card .genre-name, .style-card .style-name { font-size: 0.75rem; font-weight: 600; }
+    .genre-card .genre-desc { font-size: 0.62rem; color: var(--ink-dim); margin-top: 0.2rem; }
+    .genre-card.selected .genre-desc { color: rgba(255,255,255,0.85); }
+    .style-card.flagship { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(212,160,23,0.35) inset; }
+
+    .btn-primary { width: 100%; padding: 1.15rem; border-radius: var(--radius); border: none; background: linear-gradient(135deg, #e94560, #4a6cf7); color: #fff; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; letter-spacing: 0.02em; }
+    .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-stop { width: 100%; padding: 0.8rem; border-radius: var(--radius); border: 1px solid var(--error); background: transparent; color: var(--error); font-size: 0.85rem; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1rem; display: none; }
+    .btn-stop.visible { display: block; }
+    .btn-secondary { padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+    .btn-secondary.danger { border-color: var(--error); color: var(--error); }
+    .btn-secondary.gold { border-color: var(--gold); color: var(--gold); }
+
+    .console-panel { background: #050510; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; max-height: 300px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 0.72rem; line-height: 1.6; }
+    .console-panel .log-line { padding: 0.15rem 0; }
+    .console-panel .log-time { color: var(--ink-faint); margin-right: 0.5rem; }
+    .console-panel .log-info { color: var(--info); }
+    .console-panel .log-success { color: var(--success); }
+    .console-panel .log-error { color: var(--error); }
+    .console-panel .log-warn { color: var(--warn); }
+    .console-panel .log-text { color: var(--ink); }
+    .console-panel .log-heartbeat { color: #8a8aff; }
+    .console-panel .log-measure { color: #ffb84d; font-weight: 700; }
+    .console-panel .log-autosave { color: #a8e0a8; font-weight: 700; }
+    .console-panel .log-idb { color: #c8a8e0; font-weight: 700; }
+
+    .scenario-display { background: var(--panel-2); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .scenario-display h3 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
+    .scenario-display .scene-item { padding: 0.65rem 0.85rem; border-left: 3px solid var(--info); margin-bottom: 0.45rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.8rem; }
+    .scenario-display .scene-item .scene-num { font-weight: 700; color: var(--info); margin-right: 0.3rem; }
+
+    .generated-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.55rem; margin-bottom: 1rem; }
+    .gen-image-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.4s; }
+    .gen-image-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
+    .gen-image-card.cinema img { aspect-ratio: 16/9; }
+    .gen-image-card.anamorphic img { aspect-ratio: 21/9; }
+    .gen-image-card .gen-label { padding: 0.35rem 0.5rem; font-size: 0.65rem; color: var(--ink-dim); text-align: center; }
+    .gen-image-card.start-frame { border-color: var(--info); }
+    .gen-image-card.end-frame { border-color: var(--warn); }
+    .gen-image-card .gen-actions-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.25rem; padding: 0.35rem; background: var(--panel); border-top: 1px solid var(--border); }
+    .gen-image-card .gen-actions-bar button { padding: 0.4rem 0.2rem; border-radius: 5px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.6rem; font-weight: 600; cursor: pointer; }
+
+    .generated-videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.85rem; margin-bottom: 1rem; }
+    .gen-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.5s; }
+    .gen-video-card.newly-added { border-color: var(--success); box-shadow: 0 0 16px rgba(45,138,78,0.5); }
+    .gen-video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #000; }
+    .gen-video-card.cinema video { aspect-ratio: 16/9; }
+    .gen-video-card.anamorphic video { aspect-ratio: 21/9; }
+    .gen-video-card .gen-label { padding: 0.45rem 0.55rem; font-size: 0.68rem; color: var(--ink); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-weight: 600; }
+    .gen-video-card .gen-narration { padding: 0.4rem 0.6rem; font-size: 0.68rem; color: var(--accent); font-style: italic; background: var(--panel); border-top: 1px solid var(--border); }
+    .gen-video-card .gen-actions { display: flex; gap: 0.35rem; padding: 0.45rem; background: var(--panel); border-top: 1px solid var(--border); flex-wrap: wrap; }
+    .gen-video-card .gen-actions button { flex: 1; min-width: 55px; padding: 0.42rem 0.3rem; border-radius: 6px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.62rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .gen-video-card .gen-actions button.playing { background: var(--accent); color: #fff; }
+    .gen-video-card .gen-actions button.danger { border-color: var(--error); color: var(--error); }
+    .gen-video-card .gen-timing { padding: 0.35rem 0.5rem; font-size: 0.65rem; color: var(--warn); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-family: ui-monospace, monospace; }
+
+    .pending-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; text-align: center; }
+    .pending-video-card .pending-spinner { width: 42px; height: 42px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+    .pending-video-card .pending-label { font-size: 0.85rem; color: var(--ink); font-weight: 700; margin-bottom: 0.5rem; }
+    .pending-video-card .pending-progress-text { font-size: 0.72rem; color: var(--ink-dim); font-family: ui-monospace, monospace; margin-bottom: 0.6rem; }
+    .pending-video-card .pending-eta { font-size: 0.7rem; color: var(--warn); font-weight: 600; margin-bottom: 0.8rem; }
+    .pending-video-card .pending-progress-bar { width: 100%; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+    .pending-video-card .pending-progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #4a6cf7); border-radius: 4px; transition: width 0.5s; width: 0%; }
+
+    .video-player-container { background: #000; border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+    .video-player-container video { width: 100%; display: block; max-height: 75vh; object-fit: contain; background: #000; }
+    .player-controls { display: flex; gap: 0.5rem; padding: 0.75rem; background: var(--panel); flex-wrap: wrap; }
+    .player-controls button { flex: 1; min-width: 80px; padding: 0.65rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+    .player-controls button.playing { background: var(--accent); color: #fff; }
+    .progress-bar { height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #e94560, #4a6cf7); border-radius: 2px; transition: width 0.3s; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.visible { display: flex; animation: fadeIn 0.25s ease; }
+    .modal-content { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); max-width: 720px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.3rem; }
+    .modal-content h2 { font-size: 1.15rem; margin-bottom: 1rem; color: var(--accent); }
+    .modal-content .modal-row { margin-bottom: 0.95rem; }
+    .modal-content .modal-row label { display: block; font-size: 0.7rem; color: var(--ink-dim); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    .modal-content .modal-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    .modal-content .modal-actions button { flex: 1; min-width: 110px; padding: 0.8rem; border-radius: 8px; border: none; font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+    .modal-content .modal-actions .primary { background: var(--accent); color: #fff; }
+    .modal-content .modal-actions .secondary { background: var(--panel-2); color: var(--ink); border: 1px solid var(--border); }
+    .modal-content .modal-actions .gold { background: var(--gold); color: #000; }
+
+    .status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--border); color: var(--ink); padding: 0.8rem 1.2rem; font-size: 0.78rem; display: flex; align-items: center; gap: 0.6rem; transform: translateY(100%); transition: transform 0.3s; z-index: 100; }
+    .status-bar.visible { transform: translateY(0); }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .hidden { display: none !important; }
+    #noSleepCanvas, #noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Cinematic Studio</h1>
+    <p class="subtitle">Générateur vidéo hyper réaliste · Rendu cinématographique · Sauvegarde robuste</p>
+</header>
+
+<div class="project-bar">
+    <input type="text" id="project-name" placeholder="Nom du projet..." value="Mon film cinématique">
+    <button type="button" id="save-project-btn" class="primary">💾 Sauvegarder</button>
+    <button type="button" id="load-project-btn">📂 Charger</button>
+    <button type="button" id="export-project-btn">📤 Exporter</button>
+    <button type="button" id="import-project-btn">📥 Importer</button>
+    <button type="button" id="session-btn">🔓 Session</button>
+    <button type="button" id="new-project-btn" class="danger">✨ Nouveau</button>
+</div>
+
+<div class="autosave-banner" id="autosave-banner">
+    <div class="as-title">💾 Session restaurée automatiquement</div>
+    <div class="as-info" id="autosave-info"></div>
+    <div class="as-stats" id="autosave-stats"></div>
+    <div class="as-actions">
+        <button type="button" id="dismiss-autosave-btn" class="primary">✓ Continuer le travail</button>
+        <button type="button" id="save-as-project-btn">💾 Sauvegarder comme projet nommé</button>
+        <button type="button" id="clear-autosave-btn" class="danger">🗑️ Effacer la session</button>
+    </div>
+</div>
+
+<div class="api-panel">
+    <input type="password" class="api-key-input" id="api-key-input" placeholder="Collez votre clé API Agnès (sk-...)" autocomplete="off" spellcheck="false">
+    <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+    <div class="api-status-line" id="api-status-line"><span class="status-dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
+</div>
+
+<div class="limits-panel">
+    <h3>📊 Limites API &amp; Stockage</h3>
+    <div class="limit-row"><span class="limit-label">Requêtes texte</span><span class="limit-value"><span id="limit-text-count">0</span></span></div>
+    <div class="limit-row"><span class="limit-label">Images générées</span><span class="limit-value"><span id="limit-image-count">0</span></span></div>
+    <div class="limit-row"><span class="limit-label">Vidéo (secondes)</span><span class="limit-value"><span id="limit-video-count">0</span>s</span></div>
+    <div class="limit-row"><span class="limit-label">Vidéo RPM</span><span class="limit-value"><span id="limit-video-rpm">0</span>/1</span></div>
+    <div class="limit-row"><span class="limit-label">⚡ Vitesse mesurée</span><span class="limit-value"><span id="limit-measured-speed">en attente</span></span></div>
+    <div class="limit-row"><span class="limit-label">💾 Assets stockés (IDB)</span><span class="limit-value"><span id="idb-asset-count">0</span></span></div>
+    <div class="limit-row"><span class="limit-label">📦 Taille stockage</span><span class="limit-value"><span id="idb-size">0 Mo</span></span></div>
+    <div class="limit-row"><span class="limit-label">🕒 Dernière sauvegarde</span><span class="limit-value"><span id="autosave-status">—</span></span></div>
+</div>
+
+<div class="section open" id="section-genre">
+    <div class="section-header" data-toggle="section-genre">
+        <span class="section-title">🎬 Genre cinématographique <span class="badge">essentiel</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div class="genre-grid" id="genre-grid"></div>
+        <div style="font-size:0.72rem;color:var(--ink-dim);margin-top:0.6rem;" id="genre-description">Choisissez un genre pour orienter le scénario et les visuels.</div>
+    </div></div>
+</div>
+
+<div class="section open" id="section-sujet">
+    <div class="section-header" data-toggle="section-sujet">
+        <span class="section-title">🎯 Sujet de la séquence <span class="badge">obligatoire</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <textarea id="idea-input" placeholder="Décrivez la scène ou la séquence (ex: un détective solitaire traverse une ville sous la pluie à la recherche d'un indice, un astronaute découvre une structure alien sur une planète gelée, un cavalier traverse le désert au coucher du soleil...)"></textarea>
+    </div></div>
+</div>
+
+<div class="section open" id="section-style">
+    <div class="section-header" data-toggle="section-style">
+        <span class="section-title">🎥 Style visuel &amp; Rendu <span class="badge gold">cinéma</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div style="font-size:0.72rem;color:var(--ink-dim);margin-bottom:0.6rem;">Les styles avec bordure dorée sont les plus photoréalistes (rendu caméra réelle).</div>
+        <div class="style-grid" id="style-grid"></div>
+    </div></div>
+</div>
+
+<div class="section open" id="section-camera">
+    <div class="section-header" data-toggle="section-camera">
+        <span class="section-title">📽️ Caméra &amp; Composition</span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div class="control-row">
+            <label class="control-label">Type de plan</label>
+            <select id="shot-type-select">
+                <option value="auto" selected>🎬 Auto (variation par le réalisateur IA)</option>
+                <option value="wide">🌄 Plan large (wide shot)</option>
+                <option value="medium">👤 Plan moyen (medium shot)</option>
+                <option value="closeup">😊 Gros plan (close-up)</option>
+                <option value="extreme-closeup">👁️ Très gros plan (extreme close-up)</option>
+                <option value="over-shoulder">👥 Par-dessus l'épaule (over-the-shoulder)</option>
+                <option value="establishing">🏙️ Plan d'ensemble (establishing shot)</option>
+                <option value="pov">👤 Vue subjective (POV)</option>
+                <option value="aerial">🚁 Plan aérien (aerial)</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label class="control-label">Mouvement de caméra</label>
+            <select id="camera-move-select">
+                <option value="auto" selected>🎬 Auto</option>
+                <option value="static">📷 Statique (fixed)</option>
+                <option value="dolly-in">➡️ Dolly in (travelling avant)</option>
+                <option value="dolly-out">⬅️ Dolly out (travelling arrière)</option>
+                <option value="tracking">🛤️ Tracking shot (suivi latéral)</option>
+                <option value="crane-up">⬆️ Crane up (grue ascendante)</option>
+                <option value="crane-down">⬇️ Crane down (grue descendante)</option>
+                <option value="handheld">📹 Caméra à l'épaule (handheld)</option>
+                <option value="steadicam">🎥 Steadicam fluide</option>
+                <option value="whip-pan">💫 Whip pan (panoramique rapide)</option>
+                <option value="zoom-in">🔍 Zoom in lent</option>
+                <option value="drone-flyover">🚁 Drone flyover</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label class="control-label">Éclairage</label>
+            <select id="lighting-select">
+                <option value="auto" selected>💡 Auto</option>
+                <option value="golden-hour">🌅 Golden hour (coucher de soleil)</option>
+                <option value="blue-hour">🌆 Blue hour (crépuscule)</option>
+                <option value="natural-daylight">☀️ Lumière naturelle jour</option>
+                <option value="overcast">☁️ Couvert / diffus</option>
+                <option value="chiaroscuro">🎭 Clair-obscur (chiaroscuro)</option>
+                <option value="neon-noir">🌃 Néon noir</option>
+                <option value="low-key">🌑 Low key (obscurité dominante)</option>
+                <option value="high-key">⚪ High key (lumière dominante)</option>
+                <option value="moonlight">🌙 Clair de lune</option>
+                <option value="fire-light">🔥 Lumière de feu</option>
+                <option value="candle-light">🕯️ Lumière de bougie</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label class="control-label">Étalonnage couleur (color grading)</label>
+            <select id="grading-select">
+                <option value="auto" selected>🎨 Auto</option>
+                <option value="teal-orange">🟠🔵 Teal &amp; Orange (blockbuster)</option>
+                <option value="desaturated">⬜ Désaturé (gris / sérieux)</option>
+                <option value="sepia">🟤 Sépia (vintage)</option>
+                <option value="bleach-bypass">⚪ Bleach Bypass (guerre)</option>
+                <option value="cool-tones">🔵 Tons froids (SF / thriller)</option>
+                <option value="warm-tones">🟠 Tons chauds (drame)</option>
+                <option value="high-contrast">⬛⬜ Contraste élevé</option>
+                <option value="filmic">🎞️ Rendu filmique naturel</option>
+            </select>
+        </div>
+    </div></div>
+</div>
+
+<div class="section open" id="section-narration">
+    <div class="section-header" data-toggle="section-narration">
+        <span class="section-title">🎙️ Voix &amp; Langue</span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div class="control-row">
+            <label class="control-label">🌐 Langue de la narration (optionnelle)</label>
+            <select id="language-select">
+                <option value="fr" selected>🇫🇷 Français</option>
+                <option value="en">🇬🇧 Anglais</option>
+                <option value="ar">🇸🇦 Arabe classique</option>
+                <option value="ar-dz">🇩🇿 Daridja algérienne</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label class="control-label">🎤 Voix du narrateur</label>
+            <select id="narrator-select">
+                <option value="male-deep" selected>🎙️ Voix grave (documentaire)</option>
+                <option value="male-soft">🎙️ Voix douce et posée</option>
+                <option value="female">🎙️ Voix féminine</option>
+                <option value="elderly">🎙️ Voix âgée</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label class="control-label">Style de narration</label>
+            <select id="narration-style-select">
+                <option value="cinematic" selected>🎬 Cinématographique (bande-annonce)</option>
+                <option value="documentary">📖 Documentaire</option>
+                <option value="none">🔇 Aucune narration (scène muette)</option>
+            </select>
+        </div>
+        <button type="button" id="test-voice-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🔊 Tester la voix</button>
+        <button type="button" id="download-narration-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">💾 Télécharger la narration (.txt)</button>
+    </div></div>
+</div>
+
+<div class="section" id="section-tech">
+    <div class="section-header" data-toggle="section-tech">
+        <span class="section-title">📷 Paramètres techniques</span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div class="control-row">
+            <label class="control-label">🎬 Nombre de plans à générer</label>
+            <select id="clip-count-select">
+                <option value="3">3 plans</option>
+                <option value="4">4 plans</option>
+                <option value="5" selected>5 plans</option>
+                <option value="6">6 plans</option>
+                <option value="8">8 plans</option>
+                <option value="10">10 plans</option>
+                <option value="12">12 plans</option>
+            </select>
+            <div class="control-hint">💡 2 keyframes par plan (début + fin) → N plans exacts.</div>
+        </div>
+        <div class="control-row">
+            <label class="control-label">Durée par plan</label>
+            <select id="clip-duration-select">
+                <option value="121">5 secondes</option>
+                <option value="241" selected>10 secondes</option>
+                <option value="361">15 secondes</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label class="control-label">Format cinématographique</label>
+            <select id="aspect-select">
+                <option value="cinema">🎥 16:9 cinéma (large)</option>
+                <option value="anamorphic">🎞️ 21:9 anamorphique (scope 2.39:1)</option>
+                <option value="portrait" selected>📱 9:16 vertical (Shorts / Reels)</option>
+                <option value="square">⬜ 1:1 carré</option>
+                <option value="classic">📽️ 4:3 classique</option>
+            </select>
+            <div class="control-hint">💡 L'anamorphique 21:9 donne un rendu très cinéma (scope large).</div>
+        </div>
+        <div class="control-row">
+            <label class="control-label">Finesse du rendu</label>
+            <select id="quality-select">
+                <option value="ultra" selected>✨ Ultra (photoréaliste cinéma)</option>
+                <option value="standard">⚖️ Standard</option>
+            </select>
+        </div>
+    </div></div>
+</div>
+
+<button type="button" class="btn-primary" id="generate-btn" disabled>🎬 Générer la séquence cinématique</button>
+<button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+
+<div class="console-panel" id="console-panel">
+    <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">Initialisation…</span></div>
+</div>
+
+<div class="section hidden" id="section-script">
+    <div class="section-header" data-toggle="section-script"><span class="section-title">📜 Script de la séquence</span><span class="chevron">▼</span></div>
+    <div class="section-body"><div class="section-content"><div class="scenario-display" id="script-display"></div></div></div>
+</div>
+
+<div class="section hidden" id="section-images">
+    <div class="section-header" data-toggle="section-images"><span class="section-title">🖼️ Keyframes (2 par plan) <span class="badge count" id="images-badge">0</span></span><span class="chevron">▼</span></div>
+    <div class="section-body"><div class="section-content">
+        <div style="margin-bottom:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap;">
+            <button type="button" class="btn-secondary" id="download-all-images-btn">📦 Télécharger toutes les keyframes</button>
+        </div>
+        <div class="generated-images" id="generated-images"></div>
+    </div></div>
+</div>
+
+<div class="section hidden open" id="section-videos">
+    <div class="section-header" data-toggle="section-videos"><span class="section-title">🎞️ Plans cinématographiques <span class="badge count" id="videos-badge">0</span></span><span class="chevron">▼</span></div>
+    <div class="section-body"><div class="section-content">
+        <div style="margin-bottom:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap;">
+            <button type="button" class="btn-secondary" id="download-all-videos-btn">📦 Télécharger tous les plans</button>
+            <button type="button" class="btn-secondary" id="download-everything-btn">📦 Tout télécharger (script + keyframes + plans)</button>
+        </div>
+        <div class="generated-videos" id="generated-videos"></div>
+    </div></div>
+</div>
+
+<div class="section hidden" id="section-player">
+    <div class="section-header" data-toggle="section-player"><span class="section-title">🎬 Projection de la séquence</span><span class="chevron">▼</span></div>
+    <div class="section-body"><div class="section-content">
+        <div class="video-player-container"><video id="player-video" controls playsinline></video></div>
+        <div class="player-controls">
+            <button type="button" id="play-all-btn">▶ Projeter</button>
+            <button type="button" id="stop-all-btn">⏹ Arrêter</button>
+        </div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div>
+        <div style="font-size:0.75rem;color:var(--ink-dim);margin-top:0.5rem;text-align:center;" id="player-info">Plan 1 / 5</div>
+    </div></div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal-content">
+        <h2 id="modal-title">Modifier le plan</h2>
+        <div class="modal-row">
+            <label>Narration (voix-off, optionnel)</label>
+            <textarea id="modal-narration" style="min-height:70px;"></textarea>
+        </div>
+        <div class="modal-row">
+            <label>Prompt vidéo (avancé)</label>
+            <textarea id="modal-prompt" style="min-height:130px;font-family:ui-monospace,monospace;font-size:0.75rem;"></textarea>
+            <div class="control-hint">Modifier ce prompt change le mouvement caméra, l'éclairage et le rendu visuel.</div>
+        </div>
+        <div class="modal-row">
+            <label>Description de la scène</label>
+            <textarea id="modal-description" style="min-height:70px;font-size:0.82rem;"></textarea>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="secondary" id="modal-cancel-btn">Annuler</button>
+            <button type="button" class="primary" id="modal-save-btn">✓ Enregistrer</button>
+            <button type="button" class="gold" id="modal-save-regen-btn">🔁 Enregistrer &amp; régénérer</button>
+        </div>
+    </div>
+</div>
+
+<div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.5-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+
+const INITIAL_WAIT_SECONDS = 105;
+const POLL_INTERVAL_SECONDS = 5;
+const SAFETY_MARGIN = 1.10;
+const LIMITS = { textRpm: 30, imagesPerDay: 4000, videoSecondsPerDay: 500, videoRpm: 1 };
+
+const DB_NAME = 'cinematic_studio_db_v1';
+const DB_VERSION = 1;
+const AUTOSAVE_ID = 'autosave_current';
+const AUTOSAVE_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+
+let counters = { textRequests: 0, imagesGenerated: 0, videoSeconds: 0, videoRequestsThisMinute: 0, lastVideoRequestTime: 0, lastResetTime: Date.now() };
+let measuredSpeed = { value: null, usedForEstimate: null, sampleCount: 0 };
+
+function loadMeasuredSpeed() { try { const r = localStorage.getItem('cinematic_measured_speed'); if (r) measuredSpeed = JSON.parse(r); } catch (e) {} }
+function saveMeasuredSpeed() { try { localStorage.setItem('cinematic_measured_speed', JSON.stringify(measuredSpeed)); } catch (e) {} }
+function updateMeasuredSpeedDisplay() { const el = document.getElementById('limit-measured-speed'); if (!el) return; el.textContent = measuredSpeed.value === null ? 'en attente' : Math.round(measuredSpeed.value) + 's réel / ' + Math.round(measuredSpeed.usedForEstimate) + 's estimé'; }
+
+// ══════════════════════════════════════════════════════════════════
+// INDEXEDDB
+// ══════════════════════════════════════════════════════════════════
+let _db = null;
+function openDB() {
+    return new Promise((resolve, reject) => {
+        if (_db) { resolve(_db); return; }
+        if (!window.indexedDB) { reject(new Error('IndexedDB non supporté')); return; }
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+            const d = e.target.result;
+            if (!d.objectStoreNames.contains('snapshots')) d.createObjectStore('snapshots', { keyPath: 'id' });
+            if (!d.objectStoreNames.contains('projects')) d.createObjectStore('projects', { keyPath: 'name' });
+            if (!d.objectStoreNames.contains('assets')) d.createObjectStore('assets', { keyPath: 'id' });
+        };
+        req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
+        req.onerror = () => reject(req.error);
+    });
+}
+async function idbPut(store, value) { const d = await openDB(); return new Promise((res, rej) => { const tx = d.transaction(store, 'readwrite'); tx.objectStore(store).put(value); tx.oncomplete = () => res(true); tx.onerror = () => rej(tx.error); }); }
+async function idbGet(store, key) { const d = await openDB(); return new Promise((res, rej) => { const tx = d.transaction(store, 'readonly'); const r = tx.objectStore(store).get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function idbDelete(store, key) { const d = await openDB(); return new Promise((res, rej) => { const tx = d.transaction(store, 'readwrite'); tx.objectStore(store).delete(key); tx.oncomplete = () => res(true); tx.onerror = () => rej(tx.error); }); }
+async function idbGetAll(store) { const d = await openDB(); return new Promise((res, rej) => { const tx = d.transaction(store, 'readonly'); const r = tx.objectStore(store).getAll(); r.onsuccess = () => res(r.result || []); r.onerror = () => rej(r.error); }); }
+
+async function storeAssetFromUrl(remoteUrl, type, label) {
+    try {
+        const res = await fetch(remoteUrl);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const blob = await res.blob();
+        const id = 'asset_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        await idbPut('assets', { id, blob, type, label, createdAt: Date.now(), size: blob.size });
+        logConsole('Asset stocké : ' + id + ' (' + Math.round(blob.size / 1024) + ' Ko)', 'idb');
+        return id;
+    } catch (e) {
+        logConsole('Échec stockage asset : ' + e.message, 'warn');
+        return null;
+    }
+}
+async function getAssetObjectUrl(id) {
+    if (!id) return null;
+    try { const a = await idbGet('assets', id); if (!a || !a.blob) return null; return URL.createObjectURL(a.blob); } catch (e) { return null; }
+}
+async function updateStorageStats() {
+    try {
+        const all = await idbGetAll('assets');
+        document.getElementById('idb-asset-count').textContent = all.length;
+        const total = all.reduce((s, a) => s + (a.size || 0), 0);
+        document.getElementById('idb-size').textContent = (total / 1024 / 1024).toFixed(2) + ' Mo';
+    } catch (e) {}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GENRES CINÉMATOGRAPHIQUES
+// ══════════════════════════════════════════════════════════════════
+const GENRES = [
+    { id: 'neo-noir', name: 'Néo-noir', emoji: '🕵️', desc: 'Enquête sombre, pluie, néons',
+      prompt: 'Crée une séquence néo-noir : ville nocturne sous la pluie, détective solitaire, néons reflétés dans les flaques, tension morale, monologue intérieur possible.',
+      visual: 'neo-noir cinematic, rain-soaked streets, neon reflections, high contrast shadows' },
+    { id: 'scifi', name: 'Science-fiction', emoji: '🚀', desc: 'Futur, espace, IA',
+      prompt: 'Crée une séquence de science-fiction cinématographique : univers futuriste cohérent, technologie avancée, questionnement philosophique, mise en scène grandiose.',
+      visual: 'epic science-fiction cinematography, sleek futuristic design, volumetric light, epic scale' },
+    { id: 'thriller', name: 'Thriller', emoji: '🔪', desc: 'Suspense et tension',
+      prompt: 'Crée une séquence de thriller : montée de tension progressive, menace implicite, cadres serrés, mouvements de caméra perturbants.',
+      visual: 'tense thriller cinematography, cold color grade, tight framing, unsettling composition' },
+    { id: 'horror', name: 'Horreur', emoji: '👁️', desc: 'Angoisse et terreur',
+      prompt: 'Crée une séquence d\'horreur cinématographique : ambiance oppressante, sons étranges, ombres mouvantes, tension croissante sans jumpscare brutal.',
+      visual: 'atmospheric horror cinematography, deep shadows, cold desaturated palette, unsettling stillness' },
+    { id: 'western', name: 'Western', emoji: '🤠', desc: 'Désert, duel, solitude',
+      prompt: 'Crée une séquence western : paysages désertiques, silence tendu, duel, cadrages larges, regards qui pèsent.',
+      visual: 'classic western cinematography, wide vistas, harsh sunlight, dusty atmosphere, Monument Valley' },
+    { id: 'drama', name: 'Drame', emoji: '🎭', desc: 'Émotion, relations humaines',
+      prompt: 'Crée une séquence dramatique : moments intimes, émotions à fleur de peau, silences lourds de sens, cadres rapprochés sur les visages.',
+      visual: 'intimate drama cinematography, naturalistic lighting, warm tones, close framing on expressions' },
+    { id: 'epic-fantasy', name: 'Fantasy épique', emoji: '🐉', desc: 'Mondes, batailles, quêtes',
+      prompt: 'Crée une séquence de fantasy épique : paysages grandioses, créatures mythiques, quête héroïque, mise en scène spectaculaire.',
+      visual: 'epic fantasy cinematography, sweeping landscapes, dramatic scale, rich textures' },
+    { id: 'war', name: 'Guerre', emoji: '💥', desc: 'Combat, sacrifice',
+      prompt: 'Crée une séquence de film de guerre : camaraderie, peur, sacrifice, sons des combats, boue et sueur.',
+      visual: 'war film cinematography, desaturated palette, handheld camera, dust and smoke, natural light' },
+    { id: 'historical', name: 'Historique', emoji: '🏛️', desc: 'Époques révolues',
+      prompt: 'Crée une séquence historique : reconstitution minutieuse, costumes d\'époque, décors fidèles, enjeux politiques.',
+      visual: 'historical film cinematography, period-accurate design, warm torchlight, rich costumes' },
+    { id: 'documentary', name: 'Docufiction', emoji: '📖', desc: 'Réalisme documentaire',
+      prompt: 'Crée une séquence docufiction : narration informative, plans larges contemplatifs, sentiment d\'authenticité et d\'observation.',
+      visual: 'documentary cinematography, natural lighting, wide contemplative shots, candid moments' },
+    { id: 'romance', name: 'Romance', emoji: '💕', desc: 'Amour, gestes, silences',
+      prompt: 'Crée une séquence romantique : rencontre, tension amoureuse, gestes retenus, lumière douce et chaude.',
+      visual: 'romantic cinematography, warm golden hour, soft focus, intimate framing' },
+    { id: 'cyberpunk', name: 'Cyberpunk', emoji: '🌃', desc: 'Néon, futur dystopique',
+      prompt: 'Crée une séquence cyberpunk : ville futuriste, néons, pluie, haute technologie et basse vie, ambiance Blade Runner.',
+      visual: 'cyberpunk cinematography, neon pink and cyan, rain-soaked streets, futuristic cityscape' }
+];
+
+// ══════════════════════════════════════════════════════════════════
+// STYLES HYPER RÉALISTES / CINÉMATOGRAPHIQUES
+// ══════════════════════════════════════════════════════════════════
+const STYLES = [
+    { id: 'arri-alexa', name: 'ARRI Alexa 65', emoji: '🎥', flagship: true,
+      prompt: 'Shot on ARRI Alexa 65, cinema-grade dynamic range, natural color science, sharp but filmic rendering, subtle grain, professional high-end production look, hyper-realistic detail' },
+    { id: 'red-8k', name: 'RED Monstro 8K', emoji: '🔴', flagship: true,
+      prompt: 'Shot on RED Monstro 8K VV, ultra-sharp hyper-realistic image, wide latitude, precise skin tones, professional cinema quality, subtle highlight roll-off' },
+    { id: 'k65-imax', name: 'IMAX 15/70', emoji: '🎞️', flagship: true,
+      prompt: 'Shot on IMAX 15/70mm film, massive scale, striking clarity, deep rich blacks, wide aspect ratio, epic cinematic look, subtle film grain, photorealistic depth' },
+    { id: 'kodak-35', name: 'Kodak 35mm', emoji: '📽️', flagship: true,
+      prompt: 'Shot on Kodak Vision3 35mm film, organic film grain, soft highlight roll-off, natural skin tones, warm analog feel, cinematic grain structure' },
+    { id: 'anamorphic-scope', name: 'Anamorphique 2.39:1', emoji: '🎬', flagship: true,
+      prompt: 'Anamorphic widescreen, 2.39:1 aspect ratio, characteristic lens flares, oval bokeh, subtle distortion at edges, cinematic scope look, photorealistic' },
+    { id: 'deakins', name: 'Style Roger Deakins', emoji: '🌅', flagship: true,
+      prompt: 'Cinematography in the style of Roger Deakins, naturalistic lighting, deep shadows, painterly compositions, subtle colors, Blade Runner 2049 / 1917 mood, hyper-realistic detail' },
+    { id: 'lubezki', name: 'Style Emmanuel Lubezki', emoji: '🌿', flagship: true,
+      prompt: 'Cinematography in the style of Emmanuel Lubezki, natural magic-hour light, handheld fluid camera, long takes, poetic realism, hyper-realistic, Tree of Life / Birdman mood' },
+    { id: 'storaro', name: 'Style Vittorio Storaro', emoji: '🎨', flagship: true,
+      prompt: 'Cinematography in the style of Vittorio Storaro, rich saturated color, dramatic chiaroscuro, theatrical lighting, hyper-realistic detail, Apocalypse Now / Last Emperor mood' },
+    { id: 'doyle', name: 'Style Christopher Doyle', emoji: '🌃', flagship: true,
+      prompt: 'Cinematography in the style of Christopher Doyle, moody neon, saturated colors, expressive blur, Hong Kong cinema mood, hyper-realistic detail' },
+    { id: 'hyperreal-clean', name: 'Hyperréaliste clean', emoji: '✨', flagship: true,
+      prompt: 'Ultra photorealistic rendering, 8K resolution, natural daylight, no stylization, no illustration feel, sharp physical accuracy, documentary precision' },
+    { id: 'chiaroscuro', name: 'Chiaroscuro classique', emoji: '🎭',
+      prompt: 'Classical chiaroscuro lighting, deep blacks and stark highlights, baroque influence, photorealistic oil-painting-like quality, dramatic shadows' },
+    { id: 'desaturated-real', name: 'Désaturé réaliste', emoji: '⬜',
+      prompt: 'Desaturated realistic palette, muted colors, photorealistic rendering, serious dramatic tone, subtle color grading' }
+];
+
+const NARRATORS = {
+    'male-deep': { label: 'Voix grave', pitch: 0.62, rate: 0.85, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i },
+    'male-soft': { label: 'Voix douce', pitch: 0.95, rate: 0.92, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male/i },
+    'female': { label: 'Voix féminine', pitch: 1.15, rate: 0.90, volume: 1.0, patterns: /amelie|marie|audrey|female|julie|denise/i },
+    'elderly': { label: 'Voix âgée', pitch: 0.70, rate: 0.78, volume: 1.0, patterns: /thomas|nicolas|henri|paul|male|denise/i }
+};
+
+const LANGUAGES = {
+    'fr': { label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'], promptInstruction: 'IMPORTANT : Écris la narration en français cinématographique, avec un ton adapté au genre.' },
+    'en': { label: 'Anglais', ttsLang: 'en-US', ttsFallbacks: ['en-GB', 'en-AU', 'en'], promptInstruction: 'IMPORTANT : Écris la narration en anglais cinématographique.' },
+    'ar': { label: 'Arabe classique', ttsLang: 'ar-SA', ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'], promptInstruction: 'IMPORTANT : Écris la narration en arabe classique littéraire.' },
+    'ar-dz': { label: 'Daridja algérienne', ttsLang: 'ar-DZ', ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'], promptInstruction: 'IMPORTANT : Écris la narration en daridja algérienne cultivée.' }
+};
+
+const ASPECT_RATIOS = {
+    'cinema': { label: '16:9 cinéma', width: 1024, height: 576, videoWidth: 1024, videoHeight: 576, cssClass: 'cinema' },
+    'anamorphic': { label: '21:9 anamorphique', width: 1024, height: 432, videoWidth: 1024, videoHeight: 448, cssClass: 'anamorphic' },
+    'portrait': { label: '9:16 vertical', width: 576, height: 1024, videoWidth: 576, videoHeight: 1024, cssClass: '' },
+    'square': { label: '1:1 carré', width: 768, height: 768, videoWidth: 768, videoHeight: 768, cssClass: 'square' },
+    'classic': { label: '4:3 classique', width: 1024, height: 768, videoWidth: 1024, videoHeight: 768, cssClass: 'classic' }
+};
+
+const state = {
+    isRunning: false, stopRequested: false, idea: '',
+    selectedGenre: GENRES[0], selectedStyle: STYLES[0],
+    shotType: 'auto', cameraMove: 'auto', lighting: 'auto', grading: 'auto',
+    language: 'fr', narratorVoice: 'male-deep', narrationStyle: 'cinematic',
+    clipCount: 5, numFrames: 241, aspect: 'portrait', quality: 'ultra',
+    scenario: null,
+    sceneFrames: [], videos: [],
+    currentSceneIndex: 0, isPlayingSequence: false, lastTextRequestTime: 0,
+    projectName: 'Mon film cinématique', lastSavedAt: null,
+    editingVideoIndex: null
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ANTI-VEILLE
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel = null, canvasStream = null;
+async function activateWakeLock() {
+    if ('wakeLock' in navigator) { try { wakeLockSentinel = await navigator.wakeLock.request('screen'); } catch (e) {} }
+    if (!wakeLockSentinel) { try { const c = document.getElementById('noSleepCanvas'); const v = document.getElementById('noSleepVideo'); const ctx = c.getContext('2d'); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 2, 2); canvasStream = c.captureStream(1); v.srcObject = canvasStream; v.play().catch(() => {}); } catch (e) {} }
+}
+async function deactivateWakeLock() {
+    if (wakeLockSentinel) { try { await wakeLockSentinel.release(); } catch (e) {} wakeLockSentinel = null; }
+    if (canvasStream) { try { canvasStream.getTracks().forEach(t => t.stop()); } catch (e) {} canvasStream = null; }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function setStatus(t) { const b = document.getElementById('status-bar'); const x = document.getElementById('status-text'); if (t) { b.classList.add('visible'); x.textContent = t; } else b.classList.remove('visible'); }
+function formatTime(s) { if (s < 0) s = 0; const m = Math.floor(s / 60); const sec = Math.round(s % 60); return m + ':' + (sec < 10 ? '0' : '') + sec; }
+function playNotificationSound() { try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 660; o.type = 'sine'; g.gain.setValueAtTime(0.15, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.7); o.start(); o.stop(c.currentTime + 0.7); } catch (e) {} }
+
+let toastTimeout = null;
+function showToast(m, t = 'success', d = 2500) {
+    const el = document.getElementById('toast'); const i = document.getElementById('toast-icon'); const x = document.getElementById('toast-text');
+    el.classList.remove('visible', 'success', 'error', 'warn'); void el.offsetWidth;
+    i.textContent = { success: '✓', error: '✕', warn: '⚠' }[t] || '✓';
+    x.textContent = m; el.classList.add(t);
+    requestAnimationFrame(() => el.classList.add('visible'));
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => el.classList.remove('visible'), d);
+}
+
+function logConsole(m, t = 'info') {
+    const p = document.getElementById('console-panel');
+    const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const tl = { info: '[Info]', success: '[OK]', error: '[Erreur]', warn: '[Attention]', heartbeat: '[En cours]', measure: '[Mesure]', autosave: '[Auto-save]', idb: '[IndexedDB]' };
+    const l = document.createElement('div'); l.className = 'log-line';
+    l.innerHTML = '<span class="log-time">' + time + '</span><span class="log-' + t + '">' + (tl[t] || '[Info]') + '</span> <span class="log-text">' + esc(m) + '</span>';
+    p.appendChild(l); p.scrollTop = p.scrollHeight;
+}
+
+function updateLimitsPanel() {
+    const now = Date.now();
+    if (now - counters.lastResetTime > 60000) { counters.videoRequestsThisMinute = 0; counters.lastResetTime = now; }
+    document.getElementById('limit-text-count').textContent = counters.textRequests;
+    document.getElementById('limit-image-count').textContent = counters.imagesGenerated;
+    document.getElementById('limit-video-count').textContent = Math.round(counters.videoSeconds);
+    document.getElementById('limit-video-rpm').textContent = counters.videoRequestsThisMinute;
+    updateMeasuredSpeedDisplay();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════════════════════════════
+function getApiKey() { try { return (localStorage.getItem('agnes_api_key') || '').trim(); } catch (e) { return ''; } }
+function saveApiKey() { const i = document.getElementById('api-key-input'); const k = i.value.trim(); if (!k) { localStorage.removeItem('agnes_api_key'); updateApiPanel(); showToast('Clé supprimée', 'warn'); return; } localStorage.setItem('agnes_api_key', k); updateApiPanel(); showToast('Clé API enregistrée ✓', 'success'); i.blur(); }
+function updateApiPanel() { const sl = document.getElementById('api-status-line'); const st = document.getElementById('api-status-text'); const i = document.getElementById('api-key-input'); const k = getApiKey(); if (k) { sl.classList.add('ok'); st.textContent = 'Clé API active · ' + k.slice(0, 8) + '…' + k.slice(-4); i.value = k; } else { sl.classList.remove('ok'); st.textContent = 'Aucune clé API enregistrée'; i.value = ''; } updateGenerateBtn(); }
+function updateGenerateBtn() {
+    const b = document.getElementById('generate-btn');
+    const hk = !!getApiKey(); const hi = document.getElementById('idea-input').value.trim().length > 5;
+    b.disabled = !hk || !hi || state.isRunning;
+    if (state.isRunning) b.textContent = 'Génération en cours…';
+    else if (!hk) b.textContent = 'Ajoutez votre clé API';
+    else if (!hi) b.textContent = 'Décrivez votre sujet';
+    else b.textContent = '🎬 Générer la séquence cinématique';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO-SAVE ROBUSTE
+// ══════════════════════════════════════════════════════════════════
+let autoSaveTimer = null;
+let autoSaveInFlight = false;
+
+function buildSnapshot() {
+    return {
+        id: AUTOSAVE_ID, version: 1, savedAt: Date.now(),
+        projectName: document.getElementById('project-name').value || 'Mon film cinématique',
+        idea: document.getElementById('idea-input').value || '',
+        selectedGenreId: state.selectedGenre.id,
+        selectedStyleId: state.selectedStyle.id,
+        shotType: document.getElementById('shot-type-select').value,
+        cameraMove: document.getElementById('camera-move-select').value,
+        lighting: document.getElementById('lighting-select').value,
+        grading: document.getElementById('grading-select').value,
+        language: document.getElementById('language-select').value,
+        narratorVoice: document.getElementById('narrator-select').value,
+        narrationStyle: document.getElementById('narration-style-select').value,
+        clipCount: parseInt(document.getElementById('clip-count-select').value) || 5,
+        numFrames: parseInt(document.getElementById('clip-duration-select').value) || 241,
+        aspect: document.getElementById('aspect-select').value,
+        quality: document.getElementById('quality-select').value,
+        scenario: state.scenario,
+        sceneFrames: state.sceneFrames.map(sf => ({
+            scene: sf.scene,
+            startAssetId: sf.startAssetId || null,
+            endAssetId: sf.endAssetId || null,
+            startUrl: sf.startAssetId ? null : sf.startUrl,
+            endUrl: sf.endAssetId ? null : sf.endUrl
+        })),
+        videos: state.videos.map(v => v ? { sceneIndex: v.sceneIndex, assetId: v.assetId || null, url: v.assetId ? null : v.url, narration: v.narration, sceneNumber: v.sceneNumber, actualDuration: v.actualDuration, prompt: v.prompt || null } : null)
+    };
+}
+
+async function performAutoSave(force = false) {
+    if (autoSaveInFlight) return;
+    autoSaveInFlight = true;
+    try {
+        const snap = buildSnapshot();
+        const hasContent = snap.idea.trim().length > 0 || snap.scenario || snap.sceneFrames.length > 0 || snap.videos.filter(Boolean).length > 0;
+        if (!hasContent && !force) { autoSaveInFlight = false; return; }
+        await idbPut('snapshots', snap);
+        state.lastSavedAt = snap.savedAt;
+        updateAutosaveStatus(); updateSessionButton(); updateStorageStats();
+    } catch (e) {
+        logConsole('Auto-save IDB échoué : ' + e.message, 'warn');
+        try {
+            const snap = buildSnapshot();
+            snap.sceneFrames = state.sceneFrames.map(sf => ({ scene: sf.scene, startUrl: sf.startUrl, endUrl: sf.endUrl }));
+            snap.videos = state.videos;
+            localStorage.setItem('cinematic_autosave_fallback', JSON.stringify(snap));
+        } catch (e2) {}
+    }
+    autoSaveInFlight = false;
+}
+
+function scheduleAutoSave() { if (autoSaveTimer) clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(() => performAutoSave(false), 1200); }
+
+async function loadAutoSavedSession() {
+    try {
+        const snap = await idbGet('snapshots', AUTOSAVE_ID);
+        if (snap && snap.savedAt) { if (Date.now() - snap.savedAt > AUTOSAVE_MAX_AGE_MS) { await idbDelete('snapshots', AUTOSAVE_ID); return null; } return snap; }
+    } catch (e) {}
+    try { const raw = localStorage.getItem('cinematic_autosave_fallback'); if (raw) { const s = JSON.parse(raw); if (s && s.savedAt) return s; } } catch (e) {}
+    return null;
+}
+
+async function clearAutoSavedSession() {
+    try { await idbDelete('snapshots', AUTOSAVE_ID); } catch (e) {}
+    try { localStorage.removeItem('cinematic_autosave_fallback'); } catch (e) {}
+    document.getElementById('autosave-banner').classList.remove('visible');
+    updateSessionButton(); updateAutosaveStatus();
+}
+
+function updateAutosaveStatus() {
+    const el = document.getElementById('autosave-status');
+    if (!el) return;
+    if (state.lastSavedAt) { const t = new Date(state.lastSavedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); el.textContent = '✓ ' + t; }
+    else el.textContent = '—';
+}
+function updateSessionButton() { const btn = document.getElementById('session-btn'); if (state.lastSavedAt) btn.classList.add('session-active'); else btn.classList.remove('session-active'); }
+
+async function restoreSession(snap) {
+    document.getElementById('project-name').value = snap.projectName || 'Mon film cinématique';
+    document.getElementById('idea-input').value = snap.idea || '';
+    document.getElementById('shot-type-select').value = snap.shotType || 'auto';
+    document.getElementById('camera-move-select').value = snap.cameraMove || 'auto';
+    document.getElementById('lighting-select').value = snap.lighting || 'auto';
+    document.getElementById('grading-select').value = snap.grading || 'auto';
+    document.getElementById('language-select').value = snap.language || 'fr';
+    document.getElementById('narrator-select').value = snap.narratorVoice || 'male-deep';
+    document.getElementById('narration-style-select').value = snap.narrationStyle || 'cinematic';
+    document.getElementById('clip-count-select').value = snap.clipCount || 5;
+    document.getElementById('clip-duration-select').value = snap.numFrames || 241;
+    document.getElementById('aspect-select').value = snap.aspect || 'portrait';
+    document.getElementById('quality-select').value = snap.quality || 'ultra';
+
+    state.idea = snap.idea || '';
+    state.shotType = snap.shotType || 'auto';
+    state.cameraMove = snap.cameraMove || 'auto';
+    state.lighting = snap.lighting || 'auto';
+    state.grading = snap.grading || 'auto';
+    state.language = snap.language || 'fr';
+    state.narratorVoice = snap.narratorVoice || 'male-deep';
+    state.narrationStyle = snap.narrationStyle || 'cinematic';
+    state.clipCount = snap.clipCount || 5;
+    state.numFrames = snap.numFrames || 241;
+    state.aspect = snap.aspect || 'portrait';
+    state.quality = snap.quality || 'ultra';
+    state.scenario = snap.scenario || null;
+    state.projectName = snap.projectName || 'Mon film cinématique';
+    state.lastSavedAt = snap.savedAt;
+
+    const g = GENRES.find(x => x.id === snap.selectedGenreId); if (g) state.selectedGenre = g;
+    const s = STYLES.find(x => x.id === snap.selectedStyleId); if (s) state.selectedStyle = s;
+
+    document.querySelectorAll('.genre-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedGenre.id));
+    document.querySelectorAll('.style-card').forEach(c => c.classList.toggle('selected', c.dataset.id === state.selectedStyle.id));
+
+    document.getElementById('generated-images').innerHTML = '';
+    state.sceneFrames = [];
+    if (snap.sceneFrames && snap.sceneFrames.length) {
+        for (let i = 0; i < snap.sceneFrames.length; i++) {
+            const sf = snap.sceneFrames[i];
+            let startUrl = sf.startUrl, endUrl = sf.endUrl;
+            if (sf.startAssetId) { const u = await getAssetObjectUrl(sf.startAssetId); if (u) startUrl = u; }
+            if (sf.endAssetId) { const u = await getAssetObjectUrl(sf.endAssetId); if (u) endUrl = u; }
+            state.sceneFrames.push({ scene: sf.scene, startAssetId: sf.startAssetId, endAssetId: sf.endAssetId, startUrl, endUrl });
+            if (startUrl) displayGeneratedImage(startUrl, 'Plan ' + (sf.scene?.scene_number || i + 1) + ' — Keyframe début', 'start-frame', i, 'start');
+            if (endUrl && endUrl !== startUrl) displayGeneratedImage(endUrl, 'Plan ' + (sf.scene?.scene_number || i + 1) + ' — Keyframe fin', 'end-frame', i, 'end');
+        }
+    }
+    document.getElementById('generated-videos').innerHTML = '';
+    state.videos = [];
+    if (snap.videos && snap.videos.length) {
+        for (let i = 0; i < snap.videos.length; i++) {
+            const v = snap.videos[i];
+            if (!v) { state.videos.push(null); continue; }
+            let url = v.url;
+            if (v.assetId) { const u = await getAssetObjectUrl(v.assetId); if (u) url = u; }
+            state.videos.push({ sceneIndex: v.sceneIndex, assetId: v.assetId, url, narration: v.narration, sceneNumber: v.sceneNumber, actualDuration: v.actualDuration, prompt: v.prompt || null });
+            if (url) replacePendingWithVideo(i, url, v.narration, v.sceneNumber, v.actualDuration);
+        }
+    }
+
+    if (state.scenario) { displayScript(state.scenario); document.getElementById('section-script').classList.remove('hidden'); }
+    if (state.sceneFrames.length > 0) document.getElementById('section-images').classList.remove('hidden');
+    if (state.videos.filter(v => v && v.url).length > 0) { document.getElementById('section-videos').classList.remove('hidden'); document.getElementById('section-player').classList.remove('hidden'); }
+
+    updateGenerateBtn(); updateLimitsPanel(); updateAutosaveStatus();
+    await updateStorageStats();
+}
+
+async function showSessionInfo() {
+    const snap = await loadAutoSavedSession();
+    if (!snap) { showToast('Aucune session sauvegardée', 'warn'); return; }
+    const dateStr = new Date(snap.savedAt).toLocaleString('fr-FR');
+    const imgCount = (snap.sceneFrames || []).length * 2;
+    const vidCount = (snap.videos || []).filter(v => v && (v.assetId || v.url)).length;
+    const msg = 'Session sauvegardée le ' + dateStr + '\n\nProjet : ' + (snap.projectName || 'sans nom') + '\nIdée : ' + (snap.idea ? snap.idea.slice(0, 60) + '...' : '(vide)') + '\nScript : ' + (snap.scenario ? 'oui' : 'non') + '\nKeyframes : ' + imgCount + '\nPlans : ' + vidCount + '\n\nOK pour restaurer.\nAnnuler → proposera d\'effacer.';
+    if (confirm(msg)) {
+        await restoreSession(snap);
+        document.getElementById('autosave-banner').classList.remove('visible');
+        showToast('Session restaurée ✓', 'success');
+    } else if (confirm('Effacer cette session ?')) { await clearAutoSavedSession(); showToast('Session effacée', 'warn'); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROJETS
+// ══════════════════════════════════════════════════════════════════
+async function saveProject() {
+    const name = document.getElementById('project-name').value.trim() || 'Sans nom';
+    const snap = buildSnapshot(); snap.name = name; snap.savedAt = Date.now();
+    try {
+        await idbPut('projects', snap);
+        showToast('Projet « ' + name + ' » sauvegardé ✓', 'success');
+        logConsole('Projet sauvegardé : ' + name, 'autosave');
+        await performAutoSave(true);
+    } catch (e) { showToast('Erreur : ' + e.message, 'error'); }
+}
+
+async function loadProject() {
+    let names = [];
+    try { const all = await idbGetAll('projects'); names = all.map(p => p.name); } catch (e) {}
+    if (!names.length) { showToast('Aucun projet sauvegardé', 'warn'); return; }
+    const list = names.map((n, i) => (i + 1) + '. ' + n).join('\n');
+    const choice = prompt('Quel projet charger ?\n\n' + list + '\n\nNuméro :');
+    if (!choice) return;
+    const idx = parseInt(choice) - 1;
+    if (idx < 0 || idx >= names.length) { showToast('Choix invalide', 'error'); return; }
+    try {
+        const p = await idbGet('projects', names[idx]);
+        if (!p) { showToast('Projet introuvable', 'error'); return; }
+        await restoreSession(p);
+        document.getElementById('autosave-banner').classList.remove('visible');
+        showToast('Projet « ' + names[idx] + ' » chargé ✓', 'success');
+    } catch (e) { showToast('Erreur : ' + e.message, 'error'); }
+}
+
+async function exportProject() {
+    try {
+        const snap = buildSnapshot();
+        const sceneFramesExport = [];
+        for (const sf of state.sceneFrames) {
+            const startB64 = sf.startAssetId ? await assetToB64(sf.startAssetId) : null;
+            const endB64 = sf.endAssetId ? await assetToB64(sf.endAssetId) : null;
+            sceneFramesExport.push({ scene: sf.scene, startB64, endB64, startUrl: sf.startUrl, endUrl: sf.endUrl });
+        }
+        const videosExport = [];
+        for (const v of state.videos) {
+            if (!v) { videosExport.push(null); continue; }
+            const b64 = v.assetId ? await assetToB64(v.assetId) : null;
+            videosExport.push({ ...v, b64, url: v.url });
+        }
+        const fullExport = { ...snap, sceneFrames: sceneFramesExport, videos: videosExport, exportedAt: Date.now(), appVersion: 'cinematic_v1' };
+        const blob = new Blob([JSON.stringify(fullExport)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = (snap.projectName || 'projet').replace(/[^a-z0-9]/gi, '_') + '.cinematic.json';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+        showToast('Projet exporté ✓', 'success');
+    } catch (e) { showToast('Erreur export : ' + e.message, 'error'); }
+}
+
+async function assetToB64(id) {
+    try {
+        const a = await idbGet('assets', id); if (!a || !a.blob) return null;
+        return await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => res(null); r.readAsDataURL(a.blob); });
+    } catch (e) { return null; }
+}
+async function b64ToBlob(b64) { try { const r = await fetch(b64); return await r.blob(); } catch (e) { return null; } }
+
+function importProject() {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        try {
+            const data = JSON.parse(await file.text());
+            if (!data || !data.scenario) { showToast('Fichier invalide', 'error'); return; }
+            if (!confirm('Importer le projet « ' + (data.projectName || 'sans nom') + ' » ? Le travail actuel sera remplacé.')) return;
+            const newSceneFrames = [];
+            if (data.sceneFrames) {
+                for (const sf of data.sceneFrames) {
+                    let startAssetId = null, endAssetId = null;
+                    if (sf.startB64) { const b = await b64ToBlob(sf.startB64); if (b) { startAssetId = 'asset_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); await idbPut('assets', { id: startAssetId, blob: b, type: 'image', createdAt: Date.now(), size: b.size }); } }
+                    if (sf.endB64) { const b = await b64ToBlob(sf.endB64); if (b) { endAssetId = 'asset_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); await idbPut('assets', { id: endAssetId, blob: b, type: 'image', createdAt: Date.now(), size: b.size }); } }
+                    newSceneFrames.push({ scene: sf.scene, startAssetId, endAssetId, startUrl: sf.startUrl, endUrl: sf.endUrl });
+                }
+            }
+            const newVideos = [];
+            if (data.videos) {
+                for (const v of data.videos) {
+                    if (!v) { newVideos.push(null); continue; }
+                    let assetId = null;
+                    if (v.b64) { const b = await b64ToBlob(v.b64); if (b) { assetId = 'asset_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); await idbPut('assets', { id: assetId, blob: b, type: 'video', createdAt: Date.now(), size: b.size }); } }
+                    newVideos.push({ sceneIndex: v.sceneIndex, assetId, url: v.url, narration: v.narration, sceneNumber: v.sceneNumber, actualDuration: v.actualDuration, prompt: v.prompt });
+                }
+            }
+            await restoreSession({ ...data, sceneFrames: newSceneFrames, videos: newVideos });
+            await performAutoSave(true);
+            showToast('Projet importé ✓', 'success');
+        } catch (err) { showToast('Erreur import : ' + err.message, 'error'); }
+    };
+    input.click();
+}
+
+async function newProject() {
+    if (!confirm('Créer un nouveau projet ? La session auto-sauvegardée sera conservée.\n\nContinuer ?')) return;
+    state.scenario = null; state.sceneFrames = []; state.videos = [];
+    document.getElementById('project-name').value = 'Mon film cinématique';
+    document.getElementById('idea-input').value = '';
+    document.getElementById('generated-images').innerHTML = '';
+    document.getElementById('generated-videos').innerHTML = '';
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('section-script').classList.add('hidden');
+    document.getElementById('section-images').classList.add('hidden');
+    document.getElementById('section-videos').classList.add('hidden');
+    document.getElementById('section-player').classList.add('hidden');
+    document.getElementById('autosave-banner').classList.remove('visible');
+    updateGenerateBtn(); await performAutoSave(true);
+    showToast('Nouveau projet', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TÉLÉCHARGEMENTS
+// ══════════════════════════════════════════════════════════════════
+async function downloadBlobUrl(url, filename) {
+    try { const res = await fetch(url); const blob = await res.blob(); const objUrl = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = objUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(objUrl), 3000); return true; }
+    catch (e) { try { window.open(url, '_blank'); } catch (e2) {} return false; }
+}
+function slug(s) { return String(s || 'f').replace(/[^a-z0-9\u0600-\u06FF]/gi, '_').slice(0, 60); }
+
+async function downloadAllImages() {
+    if (!state.sceneFrames.length) { showToast('Aucune keyframe', 'warn'); return; }
+    let count = 0;
+    for (let i = 0; i < state.sceneFrames.length; i++) {
+        const sf = state.sceneFrames[i]; const n = sf.scene?.scene_number || (i + 1);
+        if (sf.startUrl) { await downloadBlobUrl(sf.startUrl, 'plan-' + n + '-keyframe-debut.jpg'); await sleep(300); count++; }
+        if (sf.endUrl && sf.endUrl !== sf.startUrl) { await downloadBlobUrl(sf.endUrl, 'plan-' + n + '-keyframe-fin.jpg'); await sleep(300); count++; }
+    }
+    showToast(count + ' keyframe(s) téléchargée(s)', 'success', 2000);
+}
+
+async function downloadAllVideos() {
+    const ready = state.videos.filter(v => v && v.url);
+    if (!ready.length) { showToast('Aucun plan', 'warn'); return; }
+    for (const v of ready) { await downloadBlobUrl(v.url, 'plan-' + (v.sceneNumber || '?') + '.mp4'); await sleep(400); }
+    showToast(ready.length + ' plan(s) téléchargé(s)', 'success', 2000);
+}
+
+async function downloadEverything() {
+    showToast('Téléchargement complet…', 'success', 2500);
+    downloadNarration(); await sleep(500);
+    await downloadAllImages(); await sleep(500);
+    await downloadAllVideos();
+    showToast('Téléchargement terminé ✓', 'success', 2500);
+}
+
+function downloadNarration() {
+    if (!state.scenario) { showToast('Aucun script', 'warn'); return; }
+    const title = state.scenario.title || 'Sequence_Cinematique';
+    let c = '═══ ' + title + ' ═══\n\n';
+    c += 'Genre : ' + state.selectedGenre.name + '\n';
+    c += 'Style : ' + state.selectedStyle.name + '\n';
+    c += 'Format : ' + ASPECT_RATIOS[state.aspect].label + '\n';
+    c += 'Langue : ' + LANGUAGES[state.language].label + '\n\n';
+    if (state.scenario.scenes) {
+        state.scenario.scenes.forEach(s => {
+            c += 'PLAN ' + s.scene_number + ' — ' + (s.sequence_title || '') + '\n';
+            c += 'Description : ' + (s.description || '') + '\n';
+            c += '🎙️ ' + (s.narration || '(aucune narration)') + '\n\n';
+        });
+    }
+    const blob = new Blob([c], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = title.replace(/[^a-z0-9]/gi, '_') + '_narration.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Narration téléchargée ✓', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// JSON ROBUSTE
+// ══════════════════════════════════════════════════════════════════
+function extractJsonFromString(str) {
+    if (!str) return '';
+    let c = str.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+    const f = c.indexOf('{'); const l = c.lastIndexOf('}');
+    if (f === -1 || l === -1 || l <= f) return c;
+    c = c.substring(f, l + 1);
+    c = c.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
+    let out = '', inStr = false, esc = false;
+    for (let i = 0; i < c.length; i++) {
+        const ch = c[i];
+        if (esc) { out += ch; esc = false; continue; }
+        if (ch === '\\') { out += ch; esc = true; continue; }
+        if (ch === '"') { inStr = !inStr; out += ch; continue; }
+        if (inStr) { if (ch === '\n') { out += '\\n'; continue; } if (ch === '\r') continue; if (ch === '\t') { out += '\\t'; continue; } }
+        out += ch;
+    }
+    return out;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FETCH
+// ══════════════════════════════════════════════════════════════════
+async function fetchWithRetry(url, options = {}, maxRetries = 3, label = 'API') {
+    for (let a = 0; a <= maxRetries; a++) {
+        if (state.stopRequested) throw new Error('Arrêt');
+        try {
+            const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 60000);
+            const res = await fetch(url, { ...options, signal: ctrl.signal }); clearTimeout(t);
+            if ((res.status === 500 || res.status === 502 || res.status === 503 || res.status === 520) && a < maxRetries) { const w = Math.pow(2, a) * 3000 + Math.random() * 2000; logConsole(label + ' HTTP ' + res.status + ', retry ' + Math.round(w/1000) + 's…', 'warn'); await sleep(w); continue; }
+            if (res.status === 429 && a < maxRetries) { await sleep(65000); continue; }
+            return res;
+        } catch (e) {
+            if (e.message === 'Arrêt') throw e;
+            if (a < maxRetries) { const w = Math.pow(2, a) * 2000 + Math.random() * 1000; await sleep(w); }
+            else throw new Error(label + ' : ' + e.message);
+        }
+    }
+    throw new Error(label + ' échec');
+}
+
+async function callTextAPI(messages, options = {}) {
+    const now = Date.now();
+    if (now - state.lastTextRequestTime < 2000) await sleep(2000 - (now - state.lastTextRequestTime));
+    state.lastTextRequestTime = Date.now(); counters.textRequests++; updateLimitsPanel();
+    const body = { model: MODEL_TEXT, messages, temperature: options.temperature ?? 0.75, max_tokens: options.maxTokens ?? 8000 };
+    const res = await fetchWithRetry(API_BASE + '/chat/completions', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Texte');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json(); const c = d.choices?.[0]?.message?.content;
+    if (!c) throw new Error('Pas de contenu'); return c;
+}
+
+async function callImageAPI(prompt, size = '576x1024') {
+    counters.imagesGenerated++; updateLimitsPanel();
+    const body = { model: MODEL_IMAGE, prompt, size, extra_body: { response_format: 'url' } };
+    const res = await fetchWithRetry(API_BASE + '/images/generations', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Image');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json(); const u = d.data?.[0]?.url || d.data?.[0]?.b64_json;
+    if (!u) throw new Error('Pas d\'URL'); return u;
+}
+
+async function createVideoTaskOnly(item) {
+    const now = Date.now();
+    if (counters.videoRequestsThisMinute >= LIMITS.videoRpm) { const w = Math.ceil((60000 - (now - counters.lastResetTime)) / 1000); if (w > 0) { await sleep(w * 1000); counters.videoRequestsThisMinute = 0; counters.lastResetTime = Date.now(); } }
+    counters.videoRequestsThisMinute++; counters.lastVideoRequestTime = Date.now(); counters.videoSeconds += state.numFrames / 24; updateLimitsPanel();
+    const ar = ASPECT_RATIOS[state.aspect] || ASPECT_RATIOS.portrait;
+    const body = { model: MODEL_VIDEO, prompt: item.prompt, extra_body: { image: [item.startImage.url, item.endImage.url], mode: 'keyframes' }, num_frames: state.numFrames, frame_rate: 24, height: ar.videoHeight, width: ar.videoWidth };
+    const res = await fetchWithRetry(API_BASE + '/videos', { method: 'POST', headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, 3, 'Vidéo');
+    if (!res.ok) { const e = await res.text(); throw new Error('HTTP ' + res.status + ' ' + e.slice(0, 200)); }
+    const d = await res.json(); const vId = d.video_id;
+    if (!vId) throw new Error('Pas de video_id');
+    item.videoId = vId; item.startTime = Date.now();
+    return vId;
+}
+
+async function pollVideoForItem(item) {
+    const startTime = Date.now();
+    const wait = measuredSpeed.usedForEstimate !== null ? measuredSpeed.usedForEstimate : INITIAL_WAIT_SECONDS;
+    const card = document.getElementById('pending-video-' + item.index);
+    if (card) card.classList.add('measuring');
+    for (let r = Math.round(wait); r > 0; r--) {
+        if (state.stopRequested) throw new Error('Arrêt');
+        const e = Math.round((Date.now() - startTime) / 1000);
+        const p = Math.min(Math.round((e / wait) * 100), 95);
+        updatePendingVideoCard(item.index, 'Préparation…', p, e);
+        setStatus('Plan ' + (item.index + 1) + ' — attente ' + r + 's');
+        await sleep(1000);
+    }
+    let errs = 0, hb = Date.now();
+    for (let a = 0; a < 400; a++) {
+        if (state.stopRequested) throw new Error('Arrêt');
+        const url = POLL_BASE + '?video_id=' + encodeURIComponent(item.videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+        try {
+            const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + getApiKey() } });
+            if (res.status === 429) { await sleep(20000); continue; }
+            if (res.status === 404) { await sleep(POLL_INTERVAL_SECONDS * 1000); continue; }
+            if (!res.ok) { errs++; if (errs >= 15) { await sleep(30000); errs = 0; } await sleep(POLL_INTERVAL_SECONDS * 1000); continue; }
+            errs = 0;
+            const d = await res.json(); const status = d.status || 'unknown';
+            const apiP = d.progress || 0;
+            const e = Math.round((Date.now() - startTime) / 1000);
+            const timeP = Math.min(Math.round((e / wait) * 100), 95);
+            updatePendingVideoCard(item.index, 'Génération…', Math.max(apiP, timeP), e);
+            if (Date.now() - hb > 20000) { hb = Date.now(); logConsole('Plan ' + (item.index + 1) + ' — ' + apiP + '% — ' + e + 's', 'heartbeat'); }
+            if (status === 'completed' || status === 'succeeded' || status === 'done') {
+                const u = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+                if (!u) throw new Error('Pas d\'URL finale');
+                const actualDuration = Math.round((Date.now() - startTime) / 1000);
+                measuredSpeed.value = actualDuration; measuredSpeed.usedForEstimate = Math.round(actualDuration * SAFETY_MARGIN); measuredSpeed.sampleCount++;
+                saveMeasuredSpeed(); updateMeasuredSpeedDisplay();
+                item.actualDuration = actualDuration;
+                return { item, videoUrl: u, actualDuration };
+            }
+            if (status === 'failed' || status === 'error' || status === 'cancelled') throw new Error('Échec (' + status + ')');
+        } catch (e) {
+            if (e.message === 'Arrêt') throw e;
+            if (e.message.startsWith('Échec') || e.message === 'Pas d\'URL finale') throw e;
+            errs++; if (errs >= 15) { await sleep(20000); errs = 0; }
+        }
+        await sleep(POLL_INTERVAL_SECONDS * 1000);
+    }
+    throw new Error('Timeout');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE
+// ══════════════════════════════════════════════════════════════════
+async function runPipeline() {
+    if (state.isRunning) return;
+    const idea = document.getElementById('idea-input').value.trim();
+    if (idea.length < 5) { showToast('Sujet trop court', 'error'); return; }
+    if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
+
+    state.isRunning = true; state.stopRequested = false; state.idea = idea;
+    state.shotType = document.getElementById('shot-type-select').value;
+    state.cameraMove = document.getElementById('camera-move-select').value;
+    state.lighting = document.getElementById('lighting-select').value;
+    state.grading = document.getElementById('grading-select').value;
+    state.language = document.getElementById('language-select').value;
+    state.narratorVoice = document.getElementById('narrator-select').value;
+    state.narrationStyle = document.getElementById('narration-style-select').value;
+    state.clipCount = parseInt(document.getElementById('clip-count-select').value);
+    state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
+    state.aspect = document.getElementById('aspect-select').value;
+    state.quality = document.getElementById('quality-select').value;
+    state.sceneFrames = []; state.videos = [];
+
+    document.getElementById('stop-btn').classList.add('visible');
+    document.getElementById('generate-btn').disabled = true;
+    document.getElementById('console-panel').innerHTML = '';
+    document.getElementById('generated-images').innerHTML = '';
+    document.getElementById('generated-videos').innerHTML = '';
+    document.getElementById('images-badge').textContent = '0';
+    document.getElementById('videos-badge').textContent = '0';
+    document.getElementById('section-script').classList.add('hidden');
+    document.getElementById('section-images').classList.add('hidden');
+    document.getElementById('section-videos').classList.add('hidden');
+    document.getElementById('section-player').classList.add('hidden');
+    document.getElementById('autosave-banner').classList.remove('visible');
+
+    logConsole('🎬 Configuration : ' + state.clipCount + ' plans · ' + ASPECT_RATIOS[state.aspect].label, 'success');
+
+    await activateWakeLock();
+    setStatus('Initialisation…');
+    await performAutoSave(true);
+
+    try {
+        // SCRIPT
+        setStatus('L\'IA écrit le script…');
+        const langInfo = LANGUAGES[state.language];
+        const aspectInfo = ASPECT_RATIOS[state.aspect];
+        const shotLabels = { 'auto': 'variation libre', 'wide': 'plan large', 'medium': 'plan moyen', 'closeup': 'gros plan', 'extreme-closeup': 'très gros plan', 'over-shoulder': 'par-dessus l\'épaule', 'establishing': 'plan d\'ensemble', 'pov': 'vue subjective', 'aerial': 'plan aérien' };
+        const moveLabels = { 'auto': 'auto', 'static': 'fixe', 'dolly-in': 'dolly in', 'dolly-out': 'dolly out', 'tracking': 'tracking', 'crane-up': 'grue ascendante', 'crane-down': 'grue descendante', 'handheld': 'caméra à l\'épaule', 'steadicam': 'steadicam fluide', 'whip-pan': 'whip pan', 'zoom-in': 'zoom lent', 'drone-flyover': 'drone flyover' };
+        const lightLabels = { 'auto': 'auto', 'golden-hour': 'golden hour', 'blue-hour': 'blue hour', 'natural-daylight': 'lumière naturelle jour', 'overcast': 'couvert diffus', 'chiaroscuro': 'clair-obscur', 'neon-noir': 'néon noir', 'low-key': 'low key', 'high-key': 'high key', 'moonlight': 'clair de lune', 'fire-light': 'lumière de feu', 'candle-light': 'lumière de bougie' };
+        const gradingLabels = { 'auto': 'auto', 'teal-orange': 'teal & orange', 'desaturated': 'désaturé', 'sepia': 'sépia', 'bleach-bypass': 'bleach bypass', 'cool-tones': 'tons froids', 'warm-tones': 'tons chauds', 'high-contrast': 'contraste élevé', 'filmic': 'rendu filmique naturel' };
+
+        const scriptPrompt = `Tu es un réalisateur de cinéma primé. Tu prépares une séquence cinématographique hyper réaliste.
+
+SUJET : "${idea}"
+GENRE : ${state.selectedGenre.name} — ${state.selectedGenre.prompt}
+STYLE VISUEL : ${state.selectedStyle.name} — ${state.selectedStyle.prompt}
+
+PARAMÈTRES DE MISE EN SCÈNE :
+- Type de plan dominant : ${shotLabels[state.shotType]}
+- Mouvement caméra : ${moveLabels[state.cameraMove]}
+- Éclairage : ${lightLabels[state.lighting]}
+- Étalonnage couleur : ${gradingLabels[state.grading]}
+- Format : ${aspectInfo.label}
+- Nombre de plans : ${state.clipCount}
+- Durée par plan : ${state.numFrames / 24} secondes
+- Qualité : ${state.quality === 'ultra' ? 'ULTRA — photoréaliste cinéma' : 'standard'}
+
+${langInfo.promptInstruction}
+
+═══ EXIGENCES PHOTORÉALISTES ═══
+- Chaque plan doit être décrit avec une précision cinématographique : cadrage, focale, lumière, texture.
+- Rendu ULTRA photoréaliste : peaux naturelles, textures réalistes, éclairage physique.
+- AUCUN style illustration, dessin animé, vectoriel, flat design, peinture numérique stylisée.
+- Détails physiques : pores, sueur, poussière, reflets réels, ombres physiquement correctes.
+- Composition : règle des tiers, lignes directrices, profondeur.
+
+═══ RÈGLES JSON ═══
+1. Réponds UNIQUEMENT avec un objet JSON brut, SANS balises Markdown, SANS \`\`\`json.
+2. Commence par { et termine par }.
+3. N'utilise JAMAIS de retour à la ligne à l'intérieur des valeurs JSON.
+
+{
+  "title": "Titre de la séquence",
+  "logline": "Résumé en une phrase",
+  "subject": "Sujet",
+  "master_style_prompt": "English cinematic style anchor (camera, lens, lighting, color grading, film grain) — to be prepended to EVERY image prompt",
+  "characters": [
+    { "name": "Nom ou description", "identity_block": "English physical identity description (age, ethnicity, hair, features, clothing, distinctive marks) — to be repeated verbatim in every image prompt" }
+  ],
+  "scenes": [
+    {
+      "scene_number": 1,
+      "sequence_title": "Titre",
+      "description": "Description détaillée en français (cadrage, action, lumière, ambiance)",
+      "start_frame_prompt": "English prompt for the OPENING keyframe. MUST include master_style_prompt + verbatim character identity_block + photorealistic detail + camera position (shot type, angle, focal length feel) + lighting description. NO illustration style, PHOTOREALISTIC cinema only.",
+      "end_frame_prompt": "English prompt for the CLOSING keyframe (SAME scene, SAME characters, motion advanced, SAME lighting & framing). MUST include master_style_prompt + character identity_block.",
+      "narration": "Voix-off cinématographique (LANGUE CHOISIE, 1-2 phrases, ton épique ou contemplatif)",
+      "camera_movement": "Mouvement caméra spécifique (dolly in lent, tracking latéral, grue ascendante...)",
+      "shot_type": "Type de plan (wide shot, medium shot, close-up...)",
+      "lighting_notes": "Notes d'éclairage (golden hour backlit, low-key chiaroscuro, moonlight through window...)",
+      "sound_design": "Ambiance sonore suggérée"
+    }
+  ]
+}
+
+Vérification : "scenes" = EXACTEMENT ${state.clipCount} entrées. JSON valide uniquement.`;
+
+        const scriptRaw = await callTextAPI([
+            { role: 'system', content: 'Tu es un réalisateur de cinéma primé spécialisé dans le rendu photoréaliste. Tu réponds UNIQUEMENT avec un objet JSON brut, SANS balises Markdown, SANS ```json. N\'utilise JAMAIS de retour à la ligne dans les valeurs JSON.' },
+            { role: 'user', content: scriptPrompt }
+        ], { temperature: 0.75, maxTokens: 8000 });
+
+        let scenario;
+        try { scenario = JSON.parse(extractJsonFromString(scriptRaw)); }
+        catch (e) { logConsole('Erreur JSON : ' + e.message, 'warn'); logConsole('Extrait : ' + scriptRaw.slice(0, 300), 'warn'); throw new Error('JSON invalide'); }
+
+        if (!scenario.scenes || scenario.scenes.length === 0) throw new Error('Aucune scène');
+        if (scenario.scenes.length > state.clipCount) scenario.scenes = scenario.scenes.slice(0, state.clipCount);
+        if (!scenario.characters) scenario.characters = [];
+        if (!scenario.master_style_prompt) scenario.master_style_prompt = state.selectedStyle.prompt;
+
+        state.scenario = scenario;
+        logConsole('Script : « ' + scenario.title + ' »', 'success');
+        displayScript(scenario);
+        await performAutoSave(true);
+
+        // IMAGES
+        logConsole('ÉTAPE 2/3 — Keyframes photoréalistes', 'success');
+        setStatus('Génération des keyframes…');
+        const ar = ASPECT_RATIOS[state.aspect];
+        const imgSize = ar.width + 'x' + ar.height;
+        const masterAnchor = 'PHOTOREALISTIC CINEMATIC SHOT. ' + scenario.master_style_prompt + '. ';
+        const charBlock = scenario.characters.length > 0 ? ' CHARACTERS: ' + scenario.characters.map(c => c.name + ' — ' + c.identity_block).join(' || ') + '. ' : ' ';
+        const photoAnchor = ' Ultra photorealistic rendering, cinematic quality, natural textures, real-world materials, physical lighting, no illustration, no cartoon, no CGI look, no digital painting, no stylization. ';
+
+        for (let i = 0; i < scenario.scenes.length; i++) {
+            if (state.stopRequested) break;
+            const scene = scenario.scenes[i];
+            logConsole('Plan ' + scene.scene_number + ' — keyframes début + fin', 'info');
+
+            setStatus('Plan ' + (i + 1) + ' — keyframe début');
+            const startPrompt = masterAnchor + charBlock + photoAnchor + (scene.start_frame_prompt || scene.description) + '. ' + state.selectedStyle.prompt + '. Cinematic composition, rule of thirds, natural lighting, high quality, no text, no watermark.';
+            let startUrl, startAssetId = null;
+            try { startUrl = await callImageAPI(startPrompt, imgSize); startAssetId = await storeAssetFromUrl(startUrl, 'image', 'plan-' + scene.scene_number + '-start'); }
+            catch (e) { logConsole('Erreur keyframe début : ' + e.message, 'error'); throw new Error('Échec keyframe début plan ' + scene.scene_number); }
+            await sleep(1500);
+
+            setStatus('Plan ' + (i + 1) + ' — keyframe fin');
+            const endPrompt = masterAnchor + charBlock + photoAnchor + (scene.end_frame_prompt || scene.description) + '. ' + state.selectedStyle.prompt + '. SAME scene, SAME characters, motion advanced, closing keyframe, cinematic composition, high quality, no text.';
+            let endUrl, endAssetId = null;
+            try { endUrl = await callImageAPI(endPrompt, imgSize); endAssetId = await storeAssetFromUrl(endUrl, 'image', 'plan-' + scene.scene_number + '-end'); }
+            catch (e) { logConsole('Erreur keyframe fin : ' + e.message + ' — fallback', 'warn'); endUrl = startUrl; endAssetId = startAssetId; }
+
+            state.sceneFrames.push({ scene, startAssetId, endAssetId, startUrl, endUrl });
+            displayGeneratedImage(startUrl, 'Plan ' + scene.scene_number + ' — Début', 'start-frame', i, 'start');
+            if (endUrl !== startUrl) displayGeneratedImage(endUrl, 'Plan ' + scene.scene_number + ' — Fin', 'end-frame', i, 'end');
+            await performAutoSave(true);
+            await sleep(1200);
+        }
+
+        if (state.sceneFrames.length === 0) throw new Error('Aucune scène générée');
+
+        // VIDÉOS
+        logConsole('ÉTAPE 3/3 — Plans cinématographiques', 'success');
+        for (let i = 0; i < state.sceneFrames.length; i++) createPendingVideoCard(i, state.sceneFrames.length);
+        document.getElementById('section-videos').classList.remove('hidden');
+        document.getElementById('section-videos').classList.add('open');
+
+        const pollingPromises = [];
+        for (let i = 0; i < state.sceneFrames.length; i++) {
+            if (state.stopRequested) break;
+            const sf = state.sceneFrames[i];
+            const scene = sf.scene;
+            const cameraMove = scene.camera_movement || (state.cameraMove !== 'auto' ? moveLabels[state.cameraMove] : 'slow cinematic dolly');
+            const shotType = scene.shot_type || shotLabels[state.shotType];
+            const lightingNotes = scene.lighting_notes || lightLabels[state.lighting];
+
+            const videoPrompt = [
+                'PHOTOREALISTIC CINEMATIC SHOT. ONE SINGLE UNBROKEN TAKE. NO CUTS.',
+                'Camera movement: ' + cameraMove + '.',
+                'Shot type: ' + shotType + '.',
+                'Lighting: ' + lightingNotes + '.',
+                'Color grading: ' + gradingLabels[state.grading] + '.',
+                'Style: ' + scenario.master_style_prompt + '.',
+                'Photorealistic realism, film grain, physical light, real textures, natural motion, cinematic depth of field.',
+                'No illustration, no cartoon, no CGI look, no text, no watermarks, no scary elements.'
+            ].join(' ');
+
+            const item = { index: i, scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
+            updatePendingVideoCard(i, 'Création de la tâche…', 0, 0);
+
+            try {
+                await createVideoTaskOnly(item);
+                updatePendingVideoCard(i, 'Plan en file…', 0, 0);
+                pollingPromises.push(
+                    pollVideoForItem(item).then(async result => {
+                        const { item: it, videoUrl, actualDuration } = result;
+                        const assetId = await storeAssetFromUrl(videoUrl, 'video', 'plan-' + (it.scene.scene_number || it.index + 1));
+                        state.videos[it.index] = { sceneIndex: it.index, assetId, url: videoUrl, narration: it.scene.narration || null, sceneNumber: it.scene.scene_number || it.index + 1, actualDuration, prompt: videoPrompt };
+                        logConsole('✅ Plan ' + (it.index + 1) + ' prêt en ' + actualDuration + 's', 'success');
+                        replacePendingWithVideo(it.index, videoUrl, it.scene.narration, it.index + 1, actualDuration);
+                        playNotificationSound();
+                        showToast('Plan ' + (it.index + 1) + ' prêt !', 'success', 3000);
+                        await performAutoSave(true);
+                        return result;
+                    }).catch(e => { logConsole('Erreur plan ' + (item.index + 1) + ' : ' + e.message, 'error'); markPendingFailed(item.index, e.message); return null; })
+                );
+            } catch (e) { logConsole('Échec plan ' + (i + 1) + ' : ' + e.message, 'error'); markPendingFailed(i, e.message); }
+
+            if (i < state.sceneFrames.length - 1 && !state.stopRequested) {
+                for (let r = 62; r > 0; r--) { if (state.stopRequested) break; setStatus('Prochain plan dans ' + r + 's'); await sleep(1000); }
+            }
+        }
+
+        setStatus('Attente des plans…');
+        await Promise.allSettled(pollingPromises);
+
+        const ready = state.videos.filter(v => v && v.url);
+        logConsole('Plans prêts : ' + ready.length + '/' + state.sceneFrames.length, 'success');
+        if (ready.length > 0) document.getElementById('section-player').classList.remove('hidden');
+
+        await performAutoSave(true);
+        setStatus('✦ Séquence terminée ✦');
+        await sleep(3000); setStatus(null);
+        showToast(ready.length + ' plan(s) généré(s)', 'success');
+
+    } catch (e) {
+        logConsole('ERREUR : ' + e.message, 'error');
+        setStatus('Erreur : ' + e.message.slice(0, 50));
+        await sleep(4000); setStatus(null);
+        showToast('Erreur : ' + e.message.slice(0, 60), 'error');
+    }
+
+    state.isRunning = false; state.stopRequested = false;
+    document.getElementById('stop-btn').classList.remove('visible');
+    updateGenerateBtn();
+    await deactivateWakeLock();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AFFICHAGE
+// ══════════════════════════════════════════════════════════════════
+function displayScript(scenario) {
+    const s = document.getElementById('section-script'); const d = document.getElementById('script-display');
+    s.classList.remove('hidden'); s.classList.add('open');
+    let h = '<h3>🎬 ' + esc(scenario.title || 'Séquence') + '</h3>';
+    if (scenario.logline) h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline) + '</p>';
+    if (scenario.characters && scenario.characters.length > 0) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Personnages : ' + scenario.characters.map(c => esc(c.name)).join(', ') + '</div>';
+    if (scenario.scenes) scenario.scenes.forEach(sc => {
+        h += '<div class="scene-item"><span class="scene-num">Plan ' + sc.scene_number + '</span>';
+        if (sc.sequence_title) h += ' — ' + esc(sc.sequence_title) + '<br>';
+        h += '<span style="font-size:0.75rem;">' + esc(sc.description) + '</span>';
+        if (sc.narration) h += '<div style="margin-top:0.3rem;font-style:italic;color:var(--accent);">🎙️ « ' + esc(sc.narration) + ' »</div>';
+        h += '</div>';
+    });
+    d.innerHTML = h;
+    s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function displayGeneratedImage(url, label, frameClass, sceneIdx, which) {
+    const s = document.getElementById('section-images'); const g = document.getElementById('generated-images');
+    s.classList.remove('hidden');
+    const existing = document.getElementById('gen-image-' + sceneIdx + '-' + which);
+    if (existing) existing.remove();
+    const c = document.createElement('div');
+    const ar = ASPECT_RATIOS[state.aspect];
+    c.className = 'gen-image-card ' + (ar.cssClass || '') + (frameClass ? ' ' + frameClass : '');
+    c.id = 'gen-image-' + sceneIdx + '-' + which;
+    c.innerHTML = '<img src="' + url + '" alt="" loading="lazy">' +
+        '<div class="gen-label">' + esc(label) + '</div>' +
+        '<div class="gen-actions-bar">' +
+            '<button class="img-dl-btn">💾 DL</button>' +
+            '<button class="img-regen-btn">🔁</button>' +
+            '<button class="img-copy-btn">📋</button>' +
+        '</div>';
+    g.appendChild(c);
+    document.getElementById('images-badge').textContent = g.children.length;
+    c.querySelector('.img-dl-btn').addEventListener('click', () => downloadBlobUrl(url, 'plan-' + sceneIdx + '-' + which + '.jpg'));
+    c.querySelector('.img-regen-btn').addEventListener('click', () => regenerateImage(sceneIdx, which));
+    c.querySelector('.img-copy-btn').addEventListener('click', async () => {
+        if (state.scenario && state.sceneFrames[sceneIdx]) {
+            const scene = state.sceneFrames[sceneIdx].scene;
+            const prompt = buildImagePrompt(scene, which);
+            const ok = await copyToClipboard(prompt);
+            showToast(ok ? 'Prompt copié' : 'URL copiée', 'success', 1200);
+        }
+    });
+}
+
+function createPendingVideoCard(index, total) {
+    const g = document.getElementById('generated-videos');
+    const existing = document.getElementById('pending-video-' + index);
+    if (existing) existing.remove();
+    const c = document.createElement('div');
+    const ar = ASPECT_RATIOS[state.aspect];
+    c.className = 'pending-video-card ' + (ar.cssClass || '');
+    c.id = 'pending-video-' + index;
+    c.innerHTML = '<div class="pending-spinner"></div><div class="pending-label">Plan ' + (index + 1) + ' / ' + total + '</div><div class="pending-progress-text" id="pending-progress-' + index + '">En attente…</div><div class="pending-eta" id="pending-eta-' + index + '"></div><div class="pending-progress-bar"><div class="pending-progress-fill" id="pending-fill-' + index + '"></div></div>';
+    g.appendChild(c);
+}
+
+function updatePendingVideoCard(index, label, progress, elapsed) {
+    const p = document.getElementById('pending-progress-' + index);
+    const e = document.getElementById('pending-eta-' + index);
+    const f = document.getElementById('pending-fill-' + index);
+    if (p) { let t = label; if (progress > 0) t += ' ' + progress + '%'; if (elapsed > 0) t += ' · ' + elapsed + 's'; p.textContent = t; }
+    if (e && elapsed > 0) { const w = measuredSpeed.usedForEstimate !== null ? measuredSpeed.usedForEstimate : INITIAL_WAIT_SECONDS; const r = Math.max(0, w - elapsed); e.textContent = r > 0 ? '≈ ' + formatTime(r) + ' restantes' : 'Bientôt…'; }
+    if (f && progress > 0) f.style.width = progress + '%';
+}
+
+function replacePendingWithVideo(index, videoUrl, narration, sceneNumber, actualDuration) {
+    const p = document.getElementById('pending-video-' + index);
+    const old = document.getElementById('video-card-' + index);
+    if (old) old.remove();
+    const c = document.createElement('div');
+    const ar = ASPECT_RATIOS[state.aspect];
+    c.className = 'gen-video-card newly-added ' + (ar.cssClass || '');
+    c.id = 'video-card-' + index;
+    c.innerHTML = '<video src="' + videoUrl + '" controls playsinline preload="metadata"></video>' +
+        '<div class="gen-label">🎬 Plan ' + sceneNumber + '</div>' +
+        (actualDuration ? '<div class="gen-timing">⚡ ' + actualDuration + 's</div>' : '') +
+        (narration ? '<div class="gen-narration">🎙️ ' + esc(narration.slice(0, 130)) + (narration.length > 130 ? '…' : '') + '</div>' : '') +
+        '<div class="gen-actions">' +
+            (narration ? '<button class="narration-play-btn" data-index="' + index + '">▶ Écouter</button>' : '') +
+            '<button class="video-edit-btn" data-index="' + index + '">✏️ Modifier</button>' +
+            '<button class="video-dl-btn" data-index="' + index + '">💾 DL</button>' +
+            '<button class="video-copy-btn" data-index="' + index + '">📋</button>' +
+            '<button class="video-regen-btn" data-index="' + index + '">🔁 Régén</button>' +
+            '<button class="video-del-btn danger" data-index="' + index + '">🗑️ Suppr</button>' +
+        '</div>';
+    if (p) p.parentNode.replaceChild(c, p);
+    else document.getElementById('generated-videos').appendChild(c);
+    setTimeout(() => c.classList.remove('newly-added'), 3000);
+    document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
+
+    const pb = c.querySelector('.narration-play-btn');
+    if (pb) pb.addEventListener('click', () => {
+        const v = state.videos[index]; if (!v || !v.narration) return;
+        if (pb.classList.contains('playing')) { stopSpeech(); pb.classList.remove('playing'); pb.textContent = '▶ Écouter'; }
+        else { document.querySelectorAll('.narration-play-btn.playing').forEach(b => { b.classList.remove('playing'); b.textContent = '▶ Écouter'; }); pb.classList.add('playing'); pb.textContent = '⏸ Arrêter'; speakText(v.narration).then(() => { pb.classList.remove('playing'); pb.textContent = '▶ Écouter'; }); }
+    });
+    const eb = c.querySelector('.video-edit-btn'); if (eb) eb.addEventListener('click', () => openEditModal(index));
+    const db = c.querySelector('.video-dl-btn'); if (db) db.addEventListener('click', () => { const v = state.videos[index]; if (v && v.url) downloadBlobUrl(v.url, 'plan-' + (v.sceneNumber || index + 1) + '.mp4'); });
+    const cb = c.querySelector('.video-copy-btn'); if (cb) cb.addEventListener('click', async () => { const v = state.videos[index]; if (v && v.prompt) { const ok = await copyToClipboard(v.prompt); showToast(ok ? 'Prompt copié' : '—', 'success', 1200); } });
+    const rb = c.querySelector('.video-regen-btn'); if (rb) rb.addEventListener('click', () => regenerateVideo(index));
+    const xb = c.querySelector('.video-del-btn'); if (xb) xb.addEventListener('click', () => deleteVideo(index));
+}
+
+function markPendingFailed(index, msg) {
+    const p = document.getElementById('pending-video-' + index); if (!p) return;
+    p.innerHTML = '<div style="color:var(--error);font-size:2rem;">✕</div><div class="pending-label" style="color:var(--error);">Échec</div><div class="pending-progress-text">' + esc(msg.slice(0, 80)) + '</div>';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GESTION DES PLANS
+// ══════════════════════════════════════════════════════════════════
+function buildImagePrompt(scene, which) {
+    const scenario = state.scenario; if (!scenario) return '';
+    const masterAnchor = 'PHOTOREALISTIC CINEMATIC SHOT. ' + scenario.master_style_prompt + '. ';
+    const charBlock = scenario.characters && scenario.characters.length > 0 ? ' CHARACTERS: ' + scenario.characters.map(c => c.name + ' — ' + c.identity_block).join(' || ') + '. ' : ' ';
+    const photoAnchor = ' Ultra photorealistic rendering, cinematic quality, natural textures, real-world materials, physical lighting, no illustration, no cartoon, no CGI look. ';
+    const base = which === 'start' ? (scene.start_frame_prompt || scene.description) : (scene.end_frame_prompt || scene.description);
+    return masterAnchor + charBlock + photoAnchor + base + '. ' + state.selectedStyle.prompt + '. No text, no watermark.';
+}
+
+async function copyToClipboard(text) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); return true; }
+        const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true;
+    } catch (e) { return false; }
+}
+
+async function regenerateImage(sceneIdx, which) {
+    if (state.isRunning) { showToast('Attends', 'warn'); return; }
+    const sf = state.sceneFrames[sceneIdx]; if (!sf) return;
+    if (!getApiKey()) { showToast('Clé API manquante', 'error'); return; }
+    state.isRunning = true; updateGenerateBtn();
+    showToast('Régénération keyframe…', 'success', 1500);
+    const ar = ASPECT_RATIOS[state.aspect];
+    try {
+        const prompt = buildImagePrompt(sf.scene, which);
+        const url = await callImageAPI(prompt, ar.width + 'x' + ar.height);
+        const assetId = await storeAssetFromUrl(url, 'image', 'plan-' + sf.scene.scene_number + '-' + which);
+        if (which === 'start') { sf.startUrl = url; sf.startAssetId = assetId; } else { sf.endUrl = url; sf.endAssetId = assetId; }
+        displayGeneratedImage(url, 'Plan ' + sf.scene.scene_number + ' — ' + (which === 'start' ? 'Début' : 'Fin'), which === 'start' ? 'start-frame' : 'end-frame', sceneIdx, which);
+        await performAutoSave(true);
+        showToast('Keyframe régénérée ✓', 'success');
+    } catch (e) { showToast('Erreur : ' + e.message.slice(0, 50), 'error'); }
+    state.isRunning = false; updateGenerateBtn();
+}
+
+async function regenerateVideo(sceneIdx) {
+    if (state.isRunning) { showToast('Attends', 'warn'); return; }
+    const sf = state.sceneFrames[sceneIdx]; if (!sf) return;
+    if (!getApiKey()) { showToast('Clé API manquante', 'error'); return; }
+    state.isRunning = true; updateGenerateBtn();
+    showToast('Régénération du plan…', 'success', 1500);
+    const scene = sf.scene;
+    const oldPrompt = state.videos[sceneIdx]?.prompt;
+    const videoPrompt = oldPrompt || buildVideoPrompt(scene, sceneIdx);
+    const item = { index: sceneIdx, scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
+    const oldCard = document.getElementById('video-card-' + sceneIdx); if (oldCard) oldCard.remove();
+    const emptyCard = document.getElementById('video-empty-' + sceneIdx); if (emptyCard) emptyCard.remove();
+    createPendingVideoCard(sceneIdx, state.sceneFrames.length);
+    try {
+        await createVideoTaskOnly(item);
+        const result = await pollVideoForItem(item);
+        const assetId = await storeAssetFromUrl(result.videoUrl, 'video', 'plan-' + (scene.scene_number || sceneIdx + 1));
+        const old = state.videos[sceneIdx];
+        if (old && old.assetId) { try { await idbDelete('assets', old.assetId); } catch (e) {} }
+        state.videos[sceneIdx] = { sceneIndex: sceneIdx, assetId, url: result.videoUrl, narration: scene.narration, sceneNumber: scene.scene_number || sceneIdx + 1, actualDuration: result.actualDuration, prompt: videoPrompt };
+        replacePendingWithVideo(sceneIdx, result.videoUrl, scene.narration, scene.scene_number || sceneIdx + 1, result.actualDuration);
+        await performAutoSave(true);
+        showToast('Plan régénéré ✓', 'success');
+    } catch (e) { logConsole('Erreur : ' + e.message, 'error'); markPendingFailed(sceneIdx, e.message); showToast('Erreur : ' + e.message.slice(0, 50), 'error'); }
+    state.isRunning = false; updateGenerateBtn();
+}
+
+function buildVideoPrompt(scene, sceneIndex) {
+    const scenario = state.scenario; if (!scenario) return '';
+    const cameraMove = scene.camera_movement || 'slow cinematic dolly';
+    const shotType = scene.shot_type || 'medium shot';
+    const lightingNotes = scene.lighting_notes || 'natural lighting';
+    return [
+        'PHOTOREALISTIC CINEMATIC SHOT. ONE SINGLE UNBROKEN TAKE. NO CUTS.',
+        'Camera movement: ' + cameraMove + '.',
+        'Shot type: ' + shotType + '.',
+        'Lighting: ' + lightingNotes + '.',
+        'Style: ' + scenario.master_style_prompt + '.',
+        'Photorealistic realism, film grain, physical light, real textures, natural motion, cinematic depth of field.',
+        'No illustration, no cartoon, no CGI look, no text, no watermarks.'
+    ].join(' ');
+}
+
+async function deleteVideo(sceneIdx) {
+    if (!confirm('Supprimer ce plan ?\n\nLes keyframes et le script restent intacts. Tu pourras le régénérer plus tard.')) return;
+    const v = state.videos[sceneIdx];
+    if (v && v.assetId) { try { await idbDelete('assets', v.assetId); } catch (e) {} }
+    state.videos[sceneIdx] = null;
+    const card = document.getElementById('video-card-' + sceneIdx); if (card) card.remove();
+    const pending = document.getElementById('pending-video-' + sceneIdx); if (pending) pending.remove();
+    document.getElementById('videos-badge').textContent = document.getElementById('generated-videos').querySelectorAll('.gen-video-card').length;
+    createEmptyVideoCard(sceneIdx);
+    await performAutoSave(true);
+    showToast('Plan supprimé', 'warn');
+}
+
+function createEmptyVideoCard(index) {
+    const g = document.getElementById('generated-videos');
+    const existing = document.getElementById('video-empty-' + index);
+    if (existing) existing.remove();
+    const scene = state.sceneFrames[index] ? state.sceneFrames[index].scene : null;
+    const c = document.createElement('div');
+    const ar = ASPECT_RATIOS[state.aspect];
+    c.className = 'pending-video-card ' + (ar.cssClass || '');
+    c.id = 'video-empty-' + index;
+    c.innerHTML = '<div style="font-size:2.5rem;color:var(--ink-faint);">📭</div>' +
+        '<div class="pending-label">Plan ' + (index + 1) + ' supprimé</div>' +
+        '<div class="pending-progress-text">' + (scene ? esc(scene.sequence_title || '') : '') + '</div>' +
+        '<button type="button" class="btn-secondary" style="margin-top:0.7rem;" id="recreate-btn-' + index + '">🔁 Régénérer ce plan</button>';
+    g.appendChild(c);
+    c.querySelector('#recreate-btn-' + index).addEventListener('click', async () => { c.remove(); await regenerateVideo(index); });
+    document.getElementById('videos-badge').textContent = g.querySelectorAll('.gen-video-card').length;
+}
+
+function openEditModal(index) {
+    const sf = state.sceneFrames[index]; if (!sf) return;
+    const v = state.videos[index];
+    const scene = sf.scene;
+    state.editingVideoIndex = index;
+    document.getElementById('modal-title').textContent = 'Modifier le plan ' + (scene.scene_number || index + 1);
+    document.getElementById('modal-narration').value = (v && v.narration) || scene.narration || '';
+    document.getElementById('modal-prompt').value = (v && v.prompt) || buildVideoPrompt(scene, index);
+    document.getElementById('modal-description').value = scene.description || '';
+    document.getElementById('edit-modal').classList.add('visible');
+}
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('visible'); state.editingVideoIndex = null; }
+
+async function saveEditModal(regenerate) {
+    const idx = state.editingVideoIndex; if (idx === null) return;
+    const newNarration = document.getElementById('modal-narration').value.trim();
+    const newPrompt = document.getElementById('modal-prompt').value.trim();
+    const newDescription = document.getElementById('modal-description').value.trim();
+    const sf = state.sceneFrames[idx]; if (!sf) { closeEditModal(); return; }
+    const scene = sf.scene;
+    if (state.scenario && state.scenario.scenes) {
+        const s = state.scenario.scenes.find(x => x.scene_number === scene.scene_number);
+        if (s) { s.narration = newNarration; s.description = newDescription; }
+    }
+    scene.narration = newNarration; scene.description = newDescription;
+    if (state.videos[idx]) { state.videos[idx].narration = newNarration; state.videos[idx].prompt = newPrompt; }
+    const card = document.getElementById('video-card-' + idx);
+    if (card) {
+        const nEl = card.querySelector('.gen-narration');
+        if (nEl) nEl.textContent = '🎙️ ' + newNarration.slice(0, 130);
+    }
+    await performAutoSave(true);
+    closeEditModal();
+    showToast('Modifications enregistrées ✓', 'success');
+    if (regenerate) { await sleep(300); await regenerateWithCustomPrompt(idx, newPrompt); }
+}
+
+async function regenerateWithCustomPrompt(sceneIdx, customPrompt) {
+    if (state.isRunning) { showToast('Attends', 'warn'); return; }
+    const sf = state.sceneFrames[sceneIdx]; if (!sf) return;
+    if (!getApiKey()) { showToast('Clé API manquante', 'error'); return; }
+    state.isRunning = true; updateGenerateBtn();
+    showToast('Régénération avec nouveau prompt…', 'success', 1500);
+    const scene = sf.scene;
+    const item = { index: sceneIdx, scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: customPrompt, videoId: null, startTime: null, actualDuration: null };
+    const oldCard = document.getElementById('video-card-' + sceneIdx) || document.getElementById('video-empty-' + sceneIdx); if (oldCard) oldCard.remove();
+    createPendingVideoCard(sceneIdx, state.sceneFrames.length);
+    try {
+        await createVideoTaskOnly(item);
+        const result = await pollVideoForItem(item);
+        const assetId = await storeAssetFromUrl(result.videoUrl, 'video', 'plan-' + (scene.scene_number || sceneIdx + 1));
+        const old = state.videos[sceneIdx];
+        if (old && old.assetId) { try { await idbDelete('assets', old.assetId); } catch (e) {} }
+        state.videos[sceneIdx] = { sceneIndex: sceneIdx, assetId, url: result.videoUrl, narration: scene.narration, sceneNumber: scene.scene_number || sceneIdx + 1, actualDuration: result.actualDuration, prompt: customPrompt };
+        replacePendingWithVideo(sceneIdx, result.videoUrl, scene.narration, scene.scene_number || sceneIdx + 1, result.actualDuration);
+        await performAutoSave(true);
+        showToast('Plan régénéré ✓', 'success');
+    } catch (e) { markPendingFailed(sceneIdx, e.message); showToast('Erreur : ' + e.message.slice(0, 50), 'error'); }
+    state.isRunning = false; updateGenerateBtn();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LECTURE
+// ══════════════════════════════════════════════════════════════════
+function playAllVideos() {
+    const rv = state.videos.filter(v => v && v.url); if (!rv.length) return;
+    state.isPlayingSequence = true; state.currentSceneIndex = 0;
+    document.getElementById('play-all-btn').textContent = '⏸ Projection…';
+    document.getElementById('play-all-btn').classList.add('playing');
+    document.getElementById('section-player').classList.add('open');
+    playVideoAt(0);
+}
+function playVideoAt(index) {
+    while (index < state.videos.length && (!state.videos[index] || !state.videos[index].url)) index++;
+    if (index >= state.videos.length || !state.isPlayingSequence) {
+        state.isPlayingSequence = false;
+        document.getElementById('play-all-btn').textContent = '▶ Projeter';
+        document.getElementById('play-all-btn').classList.remove('playing'); return;
+    }
+    const v = document.getElementById('player-video'); const d = state.videos[index];
+    v.src = d.url; v.currentTime = 0; v.play().catch(() => {});
+    document.getElementById('player-info').textContent = 'Plan ' + (index + 1) + ' / ' + state.videos.length;
+    document.getElementById('player-progress').style.width = ((index + 1) / state.videos.length * 100) + '%';
+    if (d.narration) setTimeout(() => speakText(d.narration), 500);
+    v.onended = () => { if (state.isPlayingSequence) setTimeout(() => playVideoAt(index + 1), 600); };
+}
+function stopAllVideos() {
+    state.isPlayingSequence = false;
+    const v = document.getElementById('player-video'); v.pause(); v.currentTime = 0;
+    stopSpeech();
+    document.getElementById('play-all-btn').textContent = '▶ Projeter';
+    document.getElementById('play-all-btn').classList.remove('playing');
+    document.querySelectorAll('.narration-play-btn.playing').forEach(b => { b.classList.remove('playing'); b.textContent = '▶ Écouter'; });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TTS
+// ══════════════════════════════════════════════════════════════════
+let speechSynth = null;
+function initSpeech() { if ('speechSynthesis' in window) { speechSynth = window.speechSynthesis; speechSynth.getVoices(); if (speechSynth.onvoiceschanged !== undefined) speechSynth.onvoiceschanged = () => { speechSynth.getVoices(); }; } }
+function findVoice(lc, nc) {
+    if (!speechSynth) return null;
+    const vs = speechSynth.getVoices(); if (!vs.length) return null;
+    const lt = [lc.ttsLang, ...lc.ttsFallbacks];
+    for (const l of lt) {
+        const m = vs.filter(v => v.lang && v.lang.toLowerCase().startsWith(l.toLowerCase().split('-')[0]));
+        if (m.length) { const p = m.find(v => nc.patterns.test(v.name)); if (p) return p; return m[0]; }
+    }
+    return null;
+}
+function speakText(text) {
+    return new Promise((resolve) => {
+        if (!speechSynth || !text) { resolve(); return; }
+        speechSynth.cancel();
+        setTimeout(() => {
+            const lc = LANGUAGES[state.language]; const nc = NARRATORS[state.narratorVoice];
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = lc.ttsLang; u.pitch = nc.pitch; u.rate = nc.rate; u.volume = nc.volume;
+            const v = findVoice(lc, nc); if (v) { u.voice = v; u.lang = v.lang; }
+            u.onend = resolve; u.onerror = resolve;
+            speechSynth.speak(u);
+        }, 150);
+    });
+}
+function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
+function testVoice() {
+    const lt = LANGUAGES[state.language]; const nt = NARRATORS[state.narratorVoice];
+    const t = {
+        'fr': 'Dans une ville où la nuit ne finit jamais, un homme marche seul à la recherche de la vérité.',
+        'en': 'In a city where the night never ends, a man walks alone searching for the truth.',
+        'ar': 'في مدينة لا تنتهي فيها الليل، يمشي رجل وحيدًا بحثًا عن الحقيقة.',
+        'ar-dz': 'في مدينة ما كتشبع فيها الليل، راجل واحد يمشي وحدو وهو يحوس على الحقيقة.'
+    }[state.language] || 'Test narration.';
+    logConsole('Test voix : ' + nt.label, 'info');
+    speakText(t);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(async function init() {
+    initSpeech();
+    loadMeasuredSpeed();
+    try { await openDB(); logConsole('IndexedDB prêt', 'idb'); }
+    catch (e) { logConsole('IndexedDB indisponible', 'warn'); }
+    await updateStorageStats();
+
+    const gg = document.getElementById('genre-grid');
+    GENRES.forEach((g, i) => {
+        const c = document.createElement('div');
+        c.className = 'genre-card' + (i === 0 ? ' selected' : '');
+        c.dataset.id = g.id;
+        c.innerHTML = '<span class="genre-emoji">' + g.emoji + '</span><span class="genre-name">' + g.name + '</span><span class="genre-desc">' + g.desc + '</span>';
+        c.addEventListener('click', () => {
+            document.querySelectorAll('.genre-card').forEach(x => x.classList.remove('selected'));
+            c.classList.add('selected'); state.selectedGenre = g;
+            document.getElementById('genre-description').textContent = g.desc + ' — ' + g.prompt.slice(0, 100) + '…';
+            scheduleAutoSave();
+        });
+        gg.appendChild(c);
+    });
+
+    const sg = document.getElementById('style-grid');
+    STYLES.forEach((s, i) => {
+        const c = document.createElement('div');
+        c.className = 'style-card' + (i === 0 ? ' selected' : '') + (s.flagship ? ' flagship' : '');
+        c.dataset.id = s.id;
+        c.innerHTML = '<span class="style-emoji">' + s.emoji + '</span><span class="style-name">' + s.name + '</span>';
+        c.addEventListener('click', () => {
+            document.querySelectorAll('.style-card').forEach(x => x.classList.remove('selected'));
+            c.classList.add('selected'); state.selectedStyle = s;
+            scheduleAutoSave();
+        });
+        sg.appendChild(c);
+    });
+
+    document.getElementById('api-save-btn').addEventListener('click', saveApiKey);
+    document.getElementById('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
+    document.getElementById('generate-btn').addEventListener('click', runPipeline);
+    document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; setStatus('Arrêt…'); });
+    document.getElementById('idea-input').addEventListener('input', () => { updateGenerateBtn(); scheduleAutoSave(); });
+    document.querySelectorAll('[data-toggle]').forEach(h => h.addEventListener('click', () => document.getElementById(h.dataset.toggle).classList.toggle('open')));
+    document.getElementById('play-all-btn').addEventListener('click', () => { if (state.isPlayingSequence) stopAllVideos(); else playAllVideos(); });
+    document.getElementById('stop-all-btn').addEventListener('click', stopAllVideos);
+    document.getElementById('test-voice-btn').addEventListener('click', testVoice);
+    document.getElementById('download-narration-btn').addEventListener('click', downloadNarration);
+    document.getElementById('download-all-images-btn').addEventListener('click', downloadAllImages);
+    document.getElementById('download-all-videos-btn').addEventListener('click', downloadAllVideos);
+    document.getElementById('download-everything-btn').addEventListener('click', downloadEverything);
+    document.getElementById('save-project-btn').addEventListener('click', saveProject);
+    document.getElementById('load-project-btn').addEventListener('click', loadProject);
+    document.getElementById('export-project-btn').addEventListener('click', exportProject);
+    document.getElementById('import-project-btn').addEventListener('click', importProject);
+    document.getElementById('new-project-btn').addEventListener('click', newProject);
+    document.getElementById('session-btn').addEventListener('click', showSessionInfo);
+    document.getElementById('dismiss-autosave-btn').addEventListener('click', () => document.getElementById('autosave-banner').classList.remove('visible'));
+    document.getElementById('save-as-project-btn').addEventListener('click', saveProject);
+    document.getElementById('clear-autosave-btn').addEventListener('click', async () => { if (confirm('Effacer la session ?')) { await clearAutoSavedSession(); showToast('Session effacée', 'warn'); } });
+
+    document.getElementById('modal-cancel-btn').addEventListener('click', closeEditModal);
+    document.getElementById('modal-save-btn').addEventListener('click', () => saveEditModal(false));
+    document.getElementById('modal-save-regen-btn').addEventListener('click', () => saveEditModal(true));
+    document.getElementById('edit-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('edit-modal')) closeEditModal(); });
+
+    ['clip-count-select', 'clip-duration-select', 'aspect-select', 'project-name', 'shot-type-select', 'camera-move-select', 'lighting-select', 'grading-select', 'language-select', 'narrator-select', 'narration-style-select', 'quality-select'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.addEventListener('change', scheduleAutoSave); el.addEventListener('input', scheduleAutoSave); }
+    });
+
+    window.addEventListener('beforeunload', () => { performAutoSave(true); });
+    setInterval(() => { if (!state.isRunning) performAutoSave(false); }, 30000);
+
+    updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
+    const sk = getApiKey(); if (sk) document.getElementById('api-key-input').value = sk;
+
+    logConsole('Cinematic Studio prêt', 'info');
+    logConsole('🎬 ' + GENRES.length + ' genres · ' + STYLES.length + ' styles · rendu hyper réaliste', 'success');
+
+    const snap = await loadAutoSavedSession();
+    if (snap) {
+        const ageMin = Math.round((Date.now() - snap.savedAt) / 60000);
+        const ageStr = ageMin < 1 ? 'il y a quelques secondes' : ageMin < 60 ? 'il y a ' + ageMin + ' min' : ageMin < 1440 ? 'il y a ' + Math.round(ageMin / 60) + ' h' : 'il y a ' + Math.round(ageMin / 1440) + ' j';
+        logConsole('Session détectée (' + ageStr + ')', 'autosave');
+        await restoreSession(snap);
+        const banner = document.getElementById('autosave-banner');
+        const info = document.getElementById('autosave-info');
+        const stats = document.getElementById('autosave-stats');
+        const dateStr = new Date(snap.savedAt).toLocaleString('fr-FR');
+        const imgCount = (snap.sceneFrames || []).length * 2;
+        const vidCount = (snap.videos || []).filter(v => v && (v.assetId || v.url)).length;
+        info.textContent = 'Sauvegardée ' + ageStr + ' (' + dateStr + ') — Tu peux reprendre ton travail exactement où tu l\'as laissé.';
+        stats.innerHTML = '📊 <strong>' + esc(snap.projectName || 'sans nom') + '</strong> · Script : ' + (snap.scenario ? '✓' : '—') + ' · Keyframes : ' + imgCount + ' · Plans : ' + vidCount;
+        banner.classList.add('visible');
+        showToast('Session restaurée automatiquement ✓', 'success', 4000);
+    } else {
+        logConsole('Aucune session antérieure', 'info');
+        updateAutosaveStatus();
+    }
+    updateSessionButton();
+    await updateStorageStats();
+})();
+</script>
+
+</body>
+</html>
