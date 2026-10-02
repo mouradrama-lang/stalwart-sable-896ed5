@@ -165,6 +165,8 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
 #noSleepCanvas,#noSleepVideo{position:fixed;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1}
 .expert-panel{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:.8rem;margin-bottom:.6rem}
 .expert-panel .ep-title{font-size:.65rem;text-transform:uppercase;color:var(--purple);font-weight:700;margin-bottom:.5rem;letter-spacing:.08em}
+.save-indicator{position:fixed;top:1rem;right:1rem;background:var(--success);color:#fff;padding:.4rem .8rem;border-radius:8px;font-size:.7rem;font-weight:700;opacity:0;transition:opacity .3s;z-index:1000}
+.save-indicator.visible{opacity:1}
 </style>
 </head>
 <body>
@@ -173,6 +175,8 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
     <h1>MarxTok Generator 2.0</h1>
     <p class="subtitle">AI Visual Storyboard Generator for Educational TikTok</p>
 </header>
+
+<div class="save-indicator" id="save-indicator">💾 Sauvegardé</div>
 
 <!-- ═══ API KEY ═══ -->
 <div class="panel">
@@ -194,9 +198,16 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
     </div>
 </div>
 
+<!-- ═══ SAUVEGARDES ═══ -->
+<div class="panel" id="saves-panel">
+    <h2>💾 Sauvegardes <span class="badge soft" id="saves-count">0</span></h2>
+    <div id="saves-list"><div style="font-size:.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucune sauvegarde</div></div>
+    <button type="button" class="btn btn-outline btn-sm" id="save-current-btn" style="margin-top:.6rem;" disabled>💾 Sauvegarder ce projet</button>
+</div>
+
 <!-- ═══ CONCEPT ═══ -->
 <div class="panel">
-    <h2>📖 Concept marxiste <span class="badge">1 par vidéo</span></h2>
+    <h2> Concept marxiste <span class="badge">1 par vidéo</span></h2>
     <div class="field">
         <select id="concept-select">
             <option value="">— Choisir —</option>
@@ -264,8 +275,8 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
     <div class="field" style="margin-top:.6rem;">
         <label>Mode visuel</label>
         <div class="mode-grid" id="visual-mode-grid">
-            <div class="mode-card selected" data-mode="realiste"><div class="m-name">📷 Réaliste</div></div>
-            <div class="mode-card" data-mode="documentaire"><div class="m-name">📹 Documentaire</div></div>
+            <div class="mode-card selected" data-mode="realiste"><div class="m-name"> Réaliste</div></div>
+            <div class="mode-card" data-mode="documentaire"><div class="m-name"> Documentaire</div></div>
             <div class="mode-card" data-mode="conceptuel"><div class="m-name">🧠 Conceptuel</div></div>
             <div class="mode-card" data-mode="symbolique"><div class="m-name">🔮 Symbolique</div></div>
             <div class="mode-card" data-mode="mixte"><div class="m-name">🎭 Mixte</div></div>
@@ -285,12 +296,12 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
 
 <!-- ═══ PARAMÈTRES ═══ -->
 <div class="panel">
-    <h2>⚙️ Paramètres de production</h2>
+    <h2>️ Paramètres de production</h2>
     <div class="grid-2">
-        <div class="field"><label>Langue</label><select id="lang-select"><option value="darija">🇩🇿 Darija</option><option value="arabe-standard">🇸🇦 Arabe standard</option><option value="francais" selected>🇫🇷 Français</option></select></div>
+        <div class="field"><label>Langue</label><select id="lang-select"><option value="darija">🇩🇿 Darija</option><option value="arabe-standard">🇦 Arabe standard</option><option value="francais" selected>🇫🇷 Français</option></select></div>
         <div class="field"><label>Durée totale</label><select id="duration-select"><option value="30">30s</option><option value="45" selected>45s</option><option value="60">60s</option></select></div>
         <div class="field"><label>Nombre de scènes</label><select id="scenes-select"><option value="5">5</option><option value="6" selected>6</option><option value="8">8</option><option value="10">10</option></select></div>
-        <div class="field"><label>Durée par scène</label><select id="scene-duration-select"><option value="121">5s (121 frames)</option><option value="241" selected>10s (241 frames)</option><option value="361">15s (361 frames)</option></select></div>
+        <div class="field"><label>Durée par scène</label><select id="scene-duration-select"><option value="120">5s (120 frames)</option><option value="240" selected>10s (240 frames)</option><option value="360">15s (360 frames)</option></select></div>
     </div>
     <div class="toggle-row"><div><div class="tl">Sans personnages humains</div><div class="th">Objets, paysages, symboles</div></div><label class="switch"><input type="checkbox" id="no-humans-toggle"><span class="slider"></span></label></div>
     <div class="toggle-row"><div><div class="tl">Symboles visuels principaux</div><div class="th">Métaphores visuelles</div></div><label class="switch"><input type="checkbox" id="symbols-toggle"><span class="slider"></span></label></div>
@@ -335,7 +346,7 @@ h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;ba
 <!-- ═══ CONSOLE ═══ -->
 <div class="console" id="console-panel"><div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">Prêt.</span></div></div>
 
-<!-- ═══ RÉSULTATS ═══ -->
+<!-- ═══ RÉSULTATS ══ -->
 <div id="results-container"></div>
 
 <div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
@@ -351,14 +362,15 @@ const API_BASE='https://apihub.agnes-ai.com/v1';
 const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
 const MODEL_TEXT='agnes-2.5-flash';
 const MODEL_IMAGE='agnes-image-2.5-flash';
-const MODEL_VIDEO='agnes-video-v2.0'; // Utilise la version stable éprouvée
+const MODEL_VIDEO='agnes-video-v2.0';
 const INITIAL_WAIT=105;
 const POLL_INTERVAL=5;
 const SAFETY=1.10;
+const SAVE_KEY='marxtok_saves_v2';
 
 // ══════════════════════════════════════════════════════════════════
 // DIRECTION ARTISTIQUE — 10 STYLES
-// ══════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════
 const ART_STYLES=[
 {id:'social-realism',emoji:'🏭',name:'Réalisme social cinématographique',
 prompt:'Documentary-inspired cinematic realism. Realistic environments. Natural human behavior. Observational camera. Muted industrial colors. Natural and practical lighting. Authentic clothing. Realistic architecture. Subtle film grain. No exaggerated cinematic effects. No caricature. No propaganda aesthetics.',
@@ -522,7 +534,7 @@ const VISUAL_SYMBOLS={
 
 // ══════════════════════════════════════════════════════════════════
 // PROGRESSION VISUELLE PAR CONCEPT
-// ══════════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════
 const VISUAL_PROGRESSIONS={
 'Lutte des classes':['Deux positions sociales','Le travail','Production et contrôle','Intérêts économiques différents','Conflit social collectif','Vision globale du système'],
 'Plus-value':['Le travail productif','La valeur créée','Le salaire','La différence (surplus)','L\'appropriation','Le système global'],
@@ -589,7 +601,7 @@ concept:'',customConcept:'',
 artStyle:ART_STYLES[0],
 visualMode:'realiste',
 clarity:70,complexity:50,
-lang:'francais',duration:45,scenes:6,sceneDuration:241,
+lang:'francais',duration:45,scenes:6,sceneDuration:240,
 noHumans:false,symbols:false,generateVideos:true,expertMode:false,
 continuity:'soft',refFrame:false,refChar:true,refEnv:false,
 results:null,images:[],videos:[],characters:[],
@@ -597,7 +609,7 @@ narrativeMemory:[],visualProgression:[],
 counters:{text:0,images:0,videoSeconds:0,videoRpm:0,lastReset:Date.now()},
 measuredSpeed:{value:null,usedForEstimate:null},
 lastTextRequest:0,isPlayingSequence:false,
-styleLock:null
+styleLock:null,currentSaveId:null
 };
 
 // ══════════════════════════════════════════════════════════════════
@@ -616,6 +628,7 @@ function saveMeasuredSpeed(){try{localStorage.setItem('marxtok_speed',JSON.strin
 function copyToClipboard(txt){if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>toast('Copié !','success')).catch(()=>fallbackCopy(txt));}else fallbackCopy(txt);}
 function fallbackCopy(txt){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copié !','success');}catch(e){toast('Échec copie','error');}document.body.removeChild(ta);}
 function downloadTxt(name,content){const blob=new Blob([content],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);}
+function showSaveIndicator(){const ind=document.getElementById('save-indicator');ind.classList.add('visible');setTimeout(()=>ind.classList.remove('visible'),2000);}
 
 function updateCounters(){
     const elText=document.getElementById('limit-text');
@@ -628,6 +641,160 @@ function updateCounters(){
     if(elVid)elVid.textContent=Math.round(state.counters.videoSeconds);
     if(elRpm)elRpm.textContent=state.counters.videoRpm;
     if(elSpeed)elSpeed.textContent=state.measuredSpeed.value===null?'en attente':Math.round(state.measuredSpeed.value)+'s';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SYSTÈME DE SAUVEGARDE
+// ══════════════════════════════════════════════════════════════════
+function getSaves(){
+    try{
+        const data=localStorage.getItem(SAVE_KEY);
+        return data?JSON.parse(data):[];
+    }catch(e){return [];}
+}
+
+function saveProject(){
+    if(!state.results)return;
+    const saves=getSaves();
+    const saveData={
+        id:state.currentSaveId||uid(),
+        timestamp:Date.now(),
+        concept:state.concept,
+        customConcept:state.customConcept,
+        artStyle:state.artStyle,
+        visualMode:state.visualMode,
+        clarity:state.clarity,
+        complexity:state.complexity,
+        lang:state.lang,
+        duration:state.duration,
+        scenes:state.scenes,
+        sceneDuration:state.sceneDuration,
+        noHumans:state.noHumans,
+        symbols:state.symbols,
+        generateVideos:state.generateVideos,
+        expertMode:state.expertMode,
+        continuity:state.continuity,
+        refFrame:state.refFrame,
+        refChar:state.refChar,
+        refEnv:state.refEnv,
+        results:state.results,
+        images:state.images,
+        videos:state.videos,
+        styleLock:state.styleLock
+    };
+    const idx=saves.findIndex(s=>s.id===saveData.id);
+    if(idx>=0)saves[idx]=saveData;
+    else saves.push(saveData);
+    localStorage.setItem(SAVE_KEY,JSON.stringify(saves));
+    state.currentSaveId=saveData.id;
+    renderSavesList();
+    showSaveIndicator();
+    log('Projet sauvegardé','success');
+}
+
+function loadProject(saveId){
+    const saves=getSaves();
+    const save=saves.find(s=>s.id===saveId);
+    if(!save){toast('Sauvegarde introuvable','error');return;}
+    state.currentSaveId=save.id;
+    state.concept=save.concept;
+    state.customConcept=save.customConcept;
+    state.artStyle=save.artStyle;
+    state.visualMode=save.visualMode;
+    state.clarity=save.clarity;
+    state.complexity=save.complexity;
+    state.lang=save.lang;
+    state.duration=save.duration;
+    state.scenes=save.scenes;
+    state.sceneDuration=save.sceneDuration;
+    state.noHumans=save.noHumans;
+    state.symbols=save.symbols;
+    state.generateVideos=save.generateVideos;
+    state.expertMode=save.expertMode;
+    state.continuity=save.continuity;
+    state.refFrame=save.refFrame;
+    state.refChar=save.refChar;
+    state.refEnv=save.refEnv;
+    state.results=save.results;
+    state.images=save.images||[];
+    state.videos=save.videos||[];
+    state.styleLock=save.styleLock;
+    // Restaurer l'UI
+    document.getElementById('concept-select').value=state.concept;
+    document.getElementById('lang-select').value=state.lang;
+    document.getElementById('duration-select').value=state.duration;
+    document.getElementById('scenes-select').value=state.scenes;
+    document.getElementById('scene-duration-select').value=state.sceneDuration;
+    document.getElementById('no-humans-toggle').checked=state.noHumans;
+    document.getElementById('symbols-toggle').checked=state.symbols;
+    document.getElementById('videos-toggle').checked=state.generateVideos;
+    document.getElementById('expert-toggle').checked=state.expertMode;
+    document.getElementById('continuity-select').value=state.continuity;
+    document.getElementById('ref-frame-toggle').checked=state.refFrame;
+    document.getElementById('ref-char-toggle').checked=state.refChar;
+    document.getElementById('ref-env-toggle').checked=state.refEnv;
+    document.getElementById('clarity-slider').value=state.clarity;
+    document.getElementById('complexity-slider').value=state.complexity;
+    document.getElementById('clarity-value').textContent=state.clarity<33?'Basse':state.clarity<66?'Moyenne':'Haute';
+    document.getElementById('complexity-value').textContent=state.complexity<33?'Simple':state.complexity<66?'Équilibrée':'Complexe';
+    // Restaurer style
+    const styleCard=document.querySelector('.art-style-card');
+    if(styleCard&&state.artStyle){
+        document.querySelectorAll('.art-style-card').forEach(c=>c.classList.remove('selected'));
+        document.querySelectorAll('.art-style-card').forEach(c=>{if(c.querySelector('.as-name').textContent===state.artStyle.name)c.classList.add('selected');});
+    }
+    // Restaurer mode visuel
+    document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));
+    const modeCard=document.querySelector('.mode-card[data-mode="'+state.visualMode+'"]');
+    if(modeCard)modeCard.classList.add('selected');
+    // Afficher les résultats
+    if(state.results){
+        document.getElementById('results-container').innerHTML='';
+        renderResults(state.results,{images:state.images,videos:state.videos,progression:state.visualProgression||[]});
+    }
+    document.getElementById('save-current-btn').disabled=false;
+    toast('Projet restauré','success');
+    log('Projet chargé : '+state.concept,'success');
+}
+
+function deleteSave(saveId){
+    if(!confirm('Supprimer cette sauvegarde ?'))return;
+    let saves=getSaves();
+    saves=saves.filter(s=>s.id!==saveId);
+    localStorage.setItem(SAVE_KEY,JSON.stringify(saves));
+    if(state.currentSaveId===saveId)state.currentSaveId=null;
+    renderSavesList();
+    toast('Sauvegarde supprimée','warn');
+}
+
+function renderSavesList(){
+    const saves=getSaves();
+    const list=document.getElementById('saves-list');
+    const count=document.getElementById('saves-count');
+    count.textContent=saves.length;
+    if(saves.length===0){
+        list.innerHTML='<div style="font-size:.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucune sauvegarde</div>';
+        return;
+    }
+    list.innerHTML='';
+    saves.sort((a,b)=>b.timestamp-a.timestamp).forEach(save=>{
+        const div=document.createElement('div');
+        div.style.cssText='background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem;margin-bottom:.4rem;cursor:pointer;transition:border-color .2s';
+        div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">'+
+            '<div style="min-width:0;flex:1;">'+
+            '<div style="font-size:.82rem;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(save.concept)+'</div>'+
+            '<div style="font-size:.65rem;color:var(--ink-dim);margin-top:.15rem">'+new Date(save.timestamp).toLocaleString('fr-FR')+' · '+(save.videos?save.videos.filter(v=>v&&v.url).length:0)+' vidéos</div>'+
+            '</div>'+
+            '<div style="display:flex;gap:.3rem;">'+
+            '<button class="btn btn-info btn-xs" data-load="'+save.id+'">📂 Charger</button>'+
+            '<button class="btn btn-outline btn-xs" data-del="'+save.id+'">🗑</button>'+
+            '</div></div>';
+        div.addEventListener('click',e=>{
+            if(e.target.dataset.load)loadProject(e.target.dataset.load);
+            if(e.target.dataset.del){e.stopPropagation();deleteSave(e.target.dataset.del);}
+        });
+        list.appendChild(div);
+    });
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -674,19 +841,22 @@ const now=Date.now();
 if(state.counters.videoRpm>=1){const wait=Math.ceil((60000-(now-state.counters.lastReset))/1000);if(wait>0){log('RPM vidéo — attente '+wait+'s','warn');await sleep(wait*1000);state.counters.videoRpm=0;state.counters.lastReset=Date.now();}}
 state.counters.videoRpm++;state.counters.videoSeconds+=seconds;updateCounters();
 
-// Format éprouvé et stable pour l'API Agnès
+// CORRECTION: num_frames doit être un multiple de 8
 const numFrames = Math.round(seconds * 24);
+// S'assurer que c'est un multiple de 8
+const adjustedFrames = Math.floor(numFrames / 8) * 8;
+
 const body={
     model:MODEL_VIDEO,
     prompt:prompt,
     extra_body:{image:[startUrl,endUrl],mode:'keyframes'},
-    num_frames:numFrames,
+    num_frames:adjustedFrames,
     frame_rate:24,
     height:1024,
     width:576
 };
 
-log('Création tâche vidéo → '+MODEL_VIDEO,'info');
+log('Création tâche vidéo → '+MODEL_VIDEO+' ('+adjustedFrames+' frames)','info');
 const res=await fetchWithRetry(API_BASE+'/videos',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},body:JSON.stringify(body)},3,'Vidéo');
 if(!res.ok){const err=await res.text();throw new Error('Vidéo HTTP '+res.status+' — '+err.slice(0,200));}
 const d=await res.json();const vid=d.video_id;if(!vid)throw new Error('Pas de video_id');return vid;
@@ -713,7 +883,7 @@ const vUrl=d.url||(d.metadata&&d.metadata.url)||(d.output&&d.output.url);
 if(!vUrl)throw new Error('URL manquante');
 const dur=Math.round((Date.now()-start)/1000);
 state.measuredSpeed.value=dur;state.measuredSpeed.usedForEstimate=Math.round(dur*SAFETY);saveMeasuredSpeed();updateCounters();
-log('⚡ Scène '+(sceneIndex+1)+' générée en '+dur+'s','measure');
+log(' Scène '+(sceneIndex+1)+' générée en '+dur+'s','measure');
 return {url:vUrl,duration:dur};
 }
 if(st==='failed'||st==='error'||st==='cancelled')throw new Error('Échec ('+st+')');
@@ -934,6 +1104,7 @@ state.refFrame=document.getElementById('ref-frame-toggle').checked;
 state.refChar=document.getElementById('ref-char-toggle').checked;
 state.refEnv=document.getElementById('ref-env-toggle').checked;
 state.images=[];state.videos=[];state.characters=[];state.narrativeMemory=[];state.visualProgression=[];
+state.currentSaveId=null; // Nouvelle génération = nouveau projet
 
 // Appliquer le preset visuel
 const preset=CONCEPT_STYLE_PRESETS[concept];
@@ -946,6 +1117,7 @@ document.getElementById('stop-btn').style.display='block';
 document.getElementById('generate-btn').disabled=true;
 document.getElementById('console-panel').innerHTML='';
 document.getElementById('results-container').innerHTML='';
+document.getElementById('save-current-btn').disabled=true;
 
 log('═══════════════════════════════','info');
 log('Concept : « '+concept+' »','info');
@@ -1046,6 +1218,7 @@ renderResults(data,{images:state.images,videos:state.videos,progression:state.vi
 setStatus('✦ Storyboard terminé ✦');
 await sleep(2500);setStatus(null);
 toast(ready+' clips générés !','success');
+document.getElementById('save-current-btn').disabled=false;
 
 }catch(e){
 log('ERREUR : '+e.message,'error');
@@ -1068,7 +1241,7 @@ const c=document.getElementById('results-container');
 let html='';
 
 // Titre
-html+='<div class="result-section open"><div class="result-header" data-toggle><span class="result-title">🎯 Titre & Hook</span><span class="chevron">▼</span></div><div class="result-body"><div class="result-content">';
+html+='<div class="result-section open"><div class="result-header" data-toggle><span class="result-title"> Titre & Hook</span><span class="chevron">▼</span></div><div class="result-body"><div class="result-content">';
 html+='<div style="font-size:1.1rem;font-weight:800;color:var(--accent);margin-bottom:.3rem;">'+esc(data.titre||state.concept)+'</div>';
 if(data.hook)html+='<div style="font-size:.85rem;color:var(--warn);font-style:italic;">« '+esc(data.hook)+' »</div>';
 if(data.cta)html+='<div style="font-size:.75rem;color:var(--info);margin-top:.3rem;">💬 '+esc(data.cta)+'</div>';
@@ -1135,7 +1308,7 @@ html+='</div></div></div>';
 html+='<div class="result-section" id="player-section"><div class="result-header" data-toggle><span class="result-title">🎬 Lecture séquentielle</span><span class="chevron">▼</span></div><div class="result-body"><div class="result-content"><div class="player-container"><video id="player-video" controls playsinline></video></div><div class="player-controls"><button type="button" id="play-all-btn">▶ Lire tout</button><button type="button" id="stop-all-btn">⏹ Arrêter</button></div><div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div><div style="font-size:.72rem;color:var(--ink-dim);margin-top:.4rem;text-align:center;" id="player-info">—</div></div></div></div>';
 
 // Exports
-html+='<div class="export-bar"><button type="button" id="exp-txt">📄 TXT</button><button type="button" id="exp-json">📋 JSON</button><button type="button" id="exp-prompts">📋 Tous les prompts</button></div>';
+html+='<div class="export-bar"><button type="button" id="exp-txt"> TXT</button><button type="button" id="exp-json">📋 JSON</button><button type="button" id="exp-prompts"> Tous les prompts</button></div>';
 
 c.innerHTML=html;
 
@@ -1297,8 +1470,12 @@ document.getElementById('api-key-input').addEventListener('keydown',e=>{if(e.key
 document.getElementById('generate-btn').addEventListener('click',generateStoryboard);
 document.getElementById('stop-btn').addEventListener('click',()=>{state.stopRequested=true;log('Arrêt demandé','warn');setStatus('Arrêt…');});
 
+// Sauvegarde
+document.getElementById('save-current-btn').addEventListener('click',saveProject);
+
 updateApiStatus();
 updateCounters();
+renderSavesList();
 log('MarxTok Generator 2.0 prêt — 10 styles, 36 concepts, storyboard complet.','success');
 })();
 
