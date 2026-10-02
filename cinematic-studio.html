@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Cinematic Studio — Générateur Vidéo Hyper Réaliste</title>
+<title>Cinematic Studio v2 — Hyper réaliste + Character Library</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -75,7 +75,6 @@
     textarea, input[type="text"] { width: 100%; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); font-family: inherit; font-size: 0.9rem; resize: vertical; }
     textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--accent); }
     textarea { min-height: 100px; line-height: 1.5; }
-    textarea.darija, textarea.rtl { direction: rtl; text-align: right; }
 
     .control-row { margin-bottom: 0.9rem; }
     .control-label { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
@@ -99,6 +98,7 @@
     .btn-secondary { padding: 0.6rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: inherit; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
     .btn-secondary.danger { border-color: var(--error); color: var(--error); }
     .btn-secondary.gold { border-color: var(--gold); color: var(--gold); }
+    .btn-secondary.info { border-color: var(--info); color: var(--info); }
 
     .console-panel { background: #050510; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1rem; max-height: 300px; overflow-y: auto; font-family: ui-monospace, monospace; font-size: 0.72rem; line-height: 1.6; }
     .console-panel .log-line { padding: 0.15rem 0; }
@@ -117,12 +117,15 @@
     .scenario-display h3 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--accent); }
     .scenario-display .scene-item { padding: 0.65rem 0.85rem; border-left: 3px solid var(--info); margin-bottom: 0.45rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.8rem; }
     .scenario-display .scene-item .scene-num { font-weight: 700; color: var(--info); margin-right: 0.3rem; }
+    .character-bible-block { padding: 0.7rem 0.9rem; border-left: 3px solid var(--gold); margin-bottom: 0.5rem; background: var(--panel); border-radius: 0 6px 6px 0; font-size: 0.76rem; font-family: ui-monospace, monospace; }
 
     .generated-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.55rem; margin-bottom: 1rem; }
     .gen-image-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); animation: fadeIn 0.4s; }
     .gen-image-card img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
     .gen-image-card.cinema img { aspect-ratio: 16/9; }
     .gen-image-card.anamorphic img { aspect-ratio: 21/9; }
+    .gen-image-card.classic img { aspect-ratio: 4/3; }
+    .gen-image-card.square img { aspect-ratio: 1/1; }
     .gen-image-card .gen-label { padding: 0.35rem 0.5rem; font-size: 0.65rem; color: var(--ink-dim); text-align: center; }
     .gen-image-card.start-frame { border-color: var(--info); }
     .gen-image-card.end-frame { border-color: var(--warn); }
@@ -135,6 +138,8 @@
     .gen-video-card video { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; background: #000; }
     .gen-video-card.cinema video { aspect-ratio: 16/9; }
     .gen-video-card.anamorphic video { aspect-ratio: 21/9; }
+    .gen-video-card.classic video { aspect-ratio: 4/3; }
+    .gen-video-card.square video { aspect-ratio: 1/1; }
     .gen-video-card .gen-label { padding: 0.45rem 0.55rem; font-size: 0.68rem; color: var(--ink); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-weight: 600; }
     .gen-video-card .gen-narration { padding: 0.4rem 0.6rem; font-size: 0.68rem; color: var(--accent); font-style: italic; background: var(--panel); border-top: 1px solid var(--border); }
     .gen-video-card .gen-actions { display: flex; gap: 0.35rem; padding: 0.45rem; background: var(--panel); border-top: 1px solid var(--border); flex-wrap: wrap; }
@@ -144,6 +149,8 @@
     .gen-video-card .gen-timing { padding: 0.35rem 0.5rem; font-size: 0.65rem; color: var(--warn); text-align: center; background: var(--panel); border-top: 1px solid var(--border); font-family: ui-monospace, monospace; }
 
     .pending-video-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); padding: 1rem 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 320px; text-align: center; }
+    .pending-video-card.cinema { min-height: 220px; }
+    .pending-video-card.anamorphic { min-height: 180px; }
     .pending-video-card .pending-spinner { width: 42px; height: 42px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
     .pending-video-card .pending-label { font-size: 0.85rem; color: var(--ink); font-weight: 700; margin-bottom: 0.5rem; }
     .pending-video-card .pending-progress-text { font-size: 0.72rem; color: var(--ink-dim); font-family: ui-monospace, monospace; margin-bottom: 0.6rem; }
@@ -183,8 +190,8 @@
 <body>
 
 <header>
-    <h1>Cinematic Studio</h1>
-    <p class="subtitle">Générateur vidéo hyper réaliste · Rendu cinématographique · Sauvegarde robuste</p>
+    <h1>Cinematic Studio v2</h1>
+    <p class="subtitle">Rendu hyper réaliste · Character Library · Contrôle des dialogues</p>
 </header>
 
 <div class="project-bar">
@@ -243,7 +250,7 @@
         <span class="chevron">▼</span>
     </div>
     <div class="section-body"><div class="section-content">
-        <textarea id="idea-input" placeholder="Décrivez la scène ou la séquence (ex: un détective solitaire traverse une ville sous la pluie à la recherche d'un indice, un astronaute découvre une structure alien sur une planète gelée, un cavalier traverse le désert au coucher du soleil...)"></textarea>
+        <textarea id="idea-input" placeholder="Décrivez la scène ou la séquence (ex: un détective solitaire traverse une ville sous la pluie à la recherche d'un indice...)"></textarea>
     </div></div>
 </div>
 
@@ -331,12 +338,12 @@
 
 <div class="section open" id="section-narration">
     <div class="section-header" data-toggle="section-narration">
-        <span class="section-title">🎙️ Voix &amp; Langue</span>
+        <span class="section-title">🎙️ Voix, Langue &amp; Dialogue</span>
         <span class="chevron">▼</span>
     </div>
     <div class="section-body"><div class="section-content">
         <div class="control-row">
-            <label class="control-label">🌐 Langue de la narration (optionnelle)</label>
+            <label class="control-label">🌐 Langue (narration + dialogues)</label>
             <select id="language-select">
                 <option value="fr" selected>🇫🇷 Français</option>
                 <option value="en">🇬🇧 Anglais</option>
@@ -361,8 +368,48 @@
                 <option value="none">🔇 Aucune narration (scène muette)</option>
             </select>
         </div>
+        <div class="control-row">
+            <label class="control-label">🗣️ Politique de dialogue <span class="badge new" style="display:inline-block;margin-left:0.3rem;padding:0.1rem 0.4rem;background:#8a4cf7;color:#fff;border-radius:8px;font-size:0.55rem;font-weight:700;">NOUVEAU</span></label>
+            <select id="dialogue-policy-select">
+                <option value="none" selected>🔇 Aucun dialogue (scène silencieuse, voix-off seule)</option>
+                <option value="narration-only">🎙️ Narration uniquement, personnages muets</option>
+                <option value="chosen-language">🌍 Dialogue dans la langue choisie uniquement</option>
+                <option value="free">⚠️ Dialogue libre (risque de langues mélangées)</option>
+            </select>
+            <div class="control-hint">Recommandé : « Aucun dialogue » pour un rendu cinématographique pur, ou « langue choisie uniquement » si tu veux faire parler tes personnages.</div>
+        </div>
         <button type="button" id="test-voice-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">🔊 Tester la voix</button>
         <button type="button" id="download-narration-btn" style="width:100%;padding:0.7rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:0.8rem;font-weight:600;cursor:pointer;margin-top:0.4rem;">💾 Télécharger la narration (.txt)</button>
+    </div></div>
+</div>
+
+<div class="section open" id="section-characters">
+    <div class="section-header" data-toggle="section-characters">
+        <span class="section-title">👤 Character Bible Library <span class="badge new">NOUVEAU</span></span>
+        <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+        <div style="font-size:0.72rem;color:var(--ink-dim);margin-bottom:0.6rem;">
+            Sauvegarde un personnage une seule fois et réutilise-le dans tous tes projets futurs pour garantir la cohérence.
+        </div>
+        <div class="control-row">
+            <label class="control-label">📚 Charger un personnage sauvegardé</label>
+            <select id="character-library-select">
+                <option value="">— Aucun —</option>
+            </select>
+            <button type="button" id="load-character-btn" class="btn-secondary info" style="width:100%;margin-top:0.4rem;">📥 Charger ce personnage dans le projet</button>
+        </div>
+        <div class="control-row">
+            <label class="control-label">✏️ Character Bible personnalisée (optionnel)</label>
+            <textarea id="custom-character-bible" placeholder="Colle ici une description détaillée de ton personnage. Elle sera injectée mot pour mot dans chaque prompt d'image et de vidéo. Ex:&#10;&#10;Name: Detective Marc&#10;Age: 45&#10;Appearance: weathered caucasian male, salt-and-pepper hair combed back, deep wrinkles on forehead, sharp grey eyes, 3-day stubble&#10;Build: 1m78, lean, slightly hunched posture&#10;Clothing: long beige trench coat slightly damp, dark navy suit underneath, white shirt with loosened tie, brown leather shoes worn out&#10;Distinctive marks: small scar on left cheek, smoking occasionally&#10;&#10;En anglais pour un rendu optimal." style="min-height:180px;font-family:ui-monospace,monospace;font-size:0.72rem;"></textarea>
+            <div class="control-hint">Si tu remplis ce champ, il sera utilisé à la place de la character bible générée automatiquement par l'IA.</div>
+        </div>
+        <div class="control-row">
+            <label class="control-label">💾 Sauvegarder la character bible actuelle</label>
+            <input type="text" id="save-character-name-input" placeholder="Nom du personnage (ex: Detective Marc)">
+            <button type="button" id="save-character-btn" class="btn-secondary gold" style="width:100%;margin-top:0.4rem;">💾 Sauvegarder dans la bibliothèque</button>
+        </div>
+        <button type="button" id="delete-character-btn" class="btn-secondary danger" style="width:100%;">🗑️ Supprimer le personnage sélectionné</button>
     </div></div>
 </div>
 
@@ -470,7 +517,6 @@
         <div class="modal-row">
             <label>Prompt vidéo (avancé)</label>
             <textarea id="modal-prompt" style="min-height:130px;font-family:ui-monospace,monospace;font-size:0.75rem;"></textarea>
-            <div class="control-hint">Modifier ce prompt change le mouvement caméra, l'éclairage et le rendu visuel.</div>
         </div>
         <div class="modal-row">
             <label>Description de la scène</label>
@@ -504,10 +550,11 @@ const POLL_INTERVAL_SECONDS = 5;
 const SAFETY_MARGIN = 1.10;
 const LIMITS = { textRpm: 30, imagesPerDay: 4000, videoSecondsPerDay: 500, videoRpm: 1 };
 
-const DB_NAME = 'cinematic_studio_db_v1';
+const DB_NAME = 'cinematic_studio_db_v2';
 const DB_VERSION = 1;
 const AUTOSAVE_ID = 'autosave_current';
 const AUTOSAVE_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+const CHAR_LIB_KEY = 'cinematic_characters_v1';
 
 let counters = { textRequests: 0, imagesGenerated: 0, videoSeconds: 0, videoRequestsThisMinute: 0, lastVideoRequestTime: 0, lastResetTime: Date.now() };
 let measuredSpeed = { value: null, usedForEstimate: null, sampleCount: 0 };
@@ -515,6 +562,23 @@ let measuredSpeed = { value: null, usedForEstimate: null, sampleCount: 0 };
 function loadMeasuredSpeed() { try { const r = localStorage.getItem('cinematic_measured_speed'); if (r) measuredSpeed = JSON.parse(r); } catch (e) {} }
 function saveMeasuredSpeed() { try { localStorage.setItem('cinematic_measured_speed', JSON.stringify(measuredSpeed)); } catch (e) {} }
 function updateMeasuredSpeedDisplay() { const el = document.getElementById('limit-measured-speed'); if (!el) return; el.textContent = measuredSpeed.value === null ? 'en attente' : Math.round(measuredSpeed.value) + 's réel / ' + Math.round(measuredSpeed.usedForEstimate) + 's estimé'; }
+
+// ══════════════════════════════════════════════════════════════════
+// CHARACTER LIBRARY
+// ══════════════════════════════════════════════════════════════════
+function getCharacterLibrary() { try { const r = localStorage.getItem(CHAR_LIB_KEY); return r ? JSON.parse(r) : {}; } catch (e) { return {}; } }
+function saveCharacterLibrary(lib) { try { localStorage.setItem(CHAR_LIB_KEY, JSON.stringify(lib)); } catch (e) {} }
+function addCharacterToLibrary(name, bible) { const lib = getCharacterLibrary(); lib[name] = { name, bible, savedAt: Date.now() }; saveCharacterLibrary(lib); renderCharacterLibrary(); }
+function removeCharacterFromLibrary(name) { const lib = getCharacterLibrary(); delete lib[name]; saveCharacterLibrary(lib); renderCharacterLibrary(); }
+function renderCharacterLibrary() {
+    const sel = document.getElementById('character-library-select');
+    if (!sel) return;
+    const lib = getCharacterLibrary();
+    const names = Object.keys(lib).sort();
+    let html = '<option value="">— Aucun —</option>';
+    names.forEach(n => { html += '<option value="' + esc(n) + '">' + esc(n) + '</option>'; });
+    sel.innerHTML = html;
+}
 
 // ══════════════════════════════════════════════════════════════════
 // INDEXEDDB
@@ -549,15 +613,9 @@ async function storeAssetFromUrl(remoteUrl, type, label) {
         await idbPut('assets', { id, blob, type, label, createdAt: Date.now(), size: blob.size });
         logConsole('Asset stocké : ' + id + ' (' + Math.round(blob.size / 1024) + ' Ko)', 'idb');
         return id;
-    } catch (e) {
-        logConsole('Échec stockage asset : ' + e.message, 'warn');
-        return null;
-    }
+    } catch (e) { logConsole('Échec stockage asset : ' + e.message, 'warn'); return null; }
 }
-async function getAssetObjectUrl(id) {
-    if (!id) return null;
-    try { const a = await idbGet('assets', id); if (!a || !a.blob) return null; return URL.createObjectURL(a.blob); } catch (e) { return null; }
-}
+async function getAssetObjectUrl(id) { if (!id) return null; try { const a = await idbGet('assets', id); if (!a || !a.blob) return null; return URL.createObjectURL(a.blob); } catch (e) { return null; } }
 async function updateStorageStats() {
     try {
         const all = await idbGetAll('assets');
@@ -568,75 +626,39 @@ async function updateStorageStats() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GENRES CINÉMATOGRAPHIQUES
+// GENRES
 // ══════════════════════════════════════════════════════════════════
 const GENRES = [
-    { id: 'neo-noir', name: 'Néo-noir', emoji: '🕵️', desc: 'Enquête sombre, pluie, néons',
-      prompt: 'Crée une séquence néo-noir : ville nocturne sous la pluie, détective solitaire, néons reflétés dans les flaques, tension morale, monologue intérieur possible.',
-      visual: 'neo-noir cinematic, rain-soaked streets, neon reflections, high contrast shadows' },
-    { id: 'scifi', name: 'Science-fiction', emoji: '🚀', desc: 'Futur, espace, IA',
-      prompt: 'Crée une séquence de science-fiction cinématographique : univers futuriste cohérent, technologie avancée, questionnement philosophique, mise en scène grandiose.',
-      visual: 'epic science-fiction cinematography, sleek futuristic design, volumetric light, epic scale' },
-    { id: 'thriller', name: 'Thriller', emoji: '🔪', desc: 'Suspense et tension',
-      prompt: 'Crée une séquence de thriller : montée de tension progressive, menace implicite, cadres serrés, mouvements de caméra perturbants.',
-      visual: 'tense thriller cinematography, cold color grade, tight framing, unsettling composition' },
-    { id: 'horror', name: 'Horreur', emoji: '👁️', desc: 'Angoisse et terreur',
-      prompt: 'Crée une séquence d\'horreur cinématographique : ambiance oppressante, sons étranges, ombres mouvantes, tension croissante sans jumpscare brutal.',
-      visual: 'atmospheric horror cinematography, deep shadows, cold desaturated palette, unsettling stillness' },
-    { id: 'western', name: 'Western', emoji: '🤠', desc: 'Désert, duel, solitude',
-      prompt: 'Crée une séquence western : paysages désertiques, silence tendu, duel, cadrages larges, regards qui pèsent.',
-      visual: 'classic western cinematography, wide vistas, harsh sunlight, dusty atmosphere, Monument Valley' },
-    { id: 'drama', name: 'Drame', emoji: '🎭', desc: 'Émotion, relations humaines',
-      prompt: 'Crée une séquence dramatique : moments intimes, émotions à fleur de peau, silences lourds de sens, cadres rapprochés sur les visages.',
-      visual: 'intimate drama cinematography, naturalistic lighting, warm tones, close framing on expressions' },
-    { id: 'epic-fantasy', name: 'Fantasy épique', emoji: '🐉', desc: 'Mondes, batailles, quêtes',
-      prompt: 'Crée une séquence de fantasy épique : paysages grandioses, créatures mythiques, quête héroïque, mise en scène spectaculaire.',
-      visual: 'epic fantasy cinematography, sweeping landscapes, dramatic scale, rich textures' },
-    { id: 'war', name: 'Guerre', emoji: '💥', desc: 'Combat, sacrifice',
-      prompt: 'Crée une séquence de film de guerre : camaraderie, peur, sacrifice, sons des combats, boue et sueur.',
-      visual: 'war film cinematography, desaturated palette, handheld camera, dust and smoke, natural light' },
-    { id: 'historical', name: 'Historique', emoji: '🏛️', desc: 'Époques révolues',
-      prompt: 'Crée une séquence historique : reconstitution minutieuse, costumes d\'époque, décors fidèles, enjeux politiques.',
-      visual: 'historical film cinematography, period-accurate design, warm torchlight, rich costumes' },
-    { id: 'documentary', name: 'Docufiction', emoji: '📖', desc: 'Réalisme documentaire',
-      prompt: 'Crée une séquence docufiction : narration informative, plans larges contemplatifs, sentiment d\'authenticité et d\'observation.',
-      visual: 'documentary cinematography, natural lighting, wide contemplative shots, candid moments' },
-    { id: 'romance', name: 'Romance', emoji: '💕', desc: 'Amour, gestes, silences',
-      prompt: 'Crée une séquence romantique : rencontre, tension amoureuse, gestes retenus, lumière douce et chaude.',
-      visual: 'romantic cinematography, warm golden hour, soft focus, intimate framing' },
-    { id: 'cyberpunk', name: 'Cyberpunk', emoji: '🌃', desc: 'Néon, futur dystopique',
-      prompt: 'Crée une séquence cyberpunk : ville futuriste, néons, pluie, haute technologie et basse vie, ambiance Blade Runner.',
-      visual: 'cyberpunk cinematography, neon pink and cyan, rain-soaked streets, futuristic cityscape' }
+    { id: 'neo-noir', name: 'Néo-noir', emoji: '🕵️', desc: 'Enquête sombre, pluie, néons', prompt: 'Crée une séquence néo-noir : ville nocturne sous la pluie, détective solitaire, néons reflétés dans les flaques, tension morale.', visual: 'neo-noir cinematic, rain-soaked streets, neon reflections' },
+    { id: 'scifi', name: 'Science-fiction', emoji: '🚀', desc: 'Futur, espace, IA', prompt: 'Crée une séquence de science-fiction : univers futuriste cohérent, technologie avancée, mise en scène grandiose.', visual: 'epic science-fiction cinematography, volumetric light, epic scale' },
+    { id: 'thriller', name: 'Thriller', emoji: '🔪', desc: 'Suspense et tension', prompt: 'Crée une séquence de thriller : montée de tension progressive, menace implicite, mouvements de caméra perturbants.', visual: 'tense thriller cinematography, cold color grade, tight framing' },
+    { id: 'horror', name: 'Horreur', emoji: '👁️', desc: 'Angoisse et terreur', prompt: 'Crée une séquence d\'horreur : ambiance oppressante, sons étranges, ombres mouvantes, tension croissante.', visual: 'atmospheric horror cinematography, deep shadows, cold desaturated palette' },
+    { id: 'western', name: 'Western', emoji: '🤠', desc: 'Désert, duel, solitude', prompt: 'Crée une séquence western : paysages désertiques, silence tendu, duel, cadrages larges.', visual: 'classic western cinematography, wide vistas, harsh sunlight' },
+    { id: 'drama', name: 'Drame', emoji: '🎭', desc: 'Émotion, relations humaines', prompt: 'Crée une séquence dramatique : moments intimes, émotions à fleur de peau, cadres rapprochés.', visual: 'intimate drama cinematography, naturalistic lighting, warm tones' },
+    { id: 'epic-fantasy', name: 'Fantasy épique', emoji: '🐉', desc: 'Mondes, batailles, quêtes', prompt: 'Crée une séquence de fantasy épique : paysages grandioses, créatures mythiques, quête héroïque.', visual: 'epic fantasy cinematography, sweeping landscapes, dramatic scale' },
+    { id: 'war', name: 'Guerre', emoji: '💥', desc: 'Combat, sacrifice', prompt: 'Crée une séquence de film de guerre : camaraderie, peur, sacrifice, boue et sueur.', visual: 'war film cinematography, desaturated palette, dust and smoke' },
+    { id: 'historical', name: 'Historique', emoji: '🏛️', desc: 'Époques révolues', prompt: 'Crée une séquence historique : reconstitution minutieuse, costumes d\'époque, décors fidèles.', visual: 'historical film cinematography, period-accurate design' },
+    { id: 'documentary', name: 'Docufiction', emoji: '📖', desc: 'Réalisme documentaire', prompt: 'Crée une séquence docufiction : narration informative, plans larges contemplatifs.', visual: 'documentary cinematography, natural lighting' },
+    { id: 'romance', name: 'Romance', emoji: '💕', desc: 'Amour, gestes, silences', prompt: 'Crée une séquence romantique : rencontre, tension amoureuse, gestes retenus, lumière douce.', visual: 'romantic cinematography, warm golden hour, soft focus' },
+    { id: 'cyberpunk', name: 'Cyberpunk', emoji: '🌃', desc: 'Néon, futur dystopique', prompt: 'Crée une séquence cyberpunk : ville futuriste, néons, pluie, ambiance Blade Runner.', visual: 'cyberpunk cinematography, neon pink and cyan' }
 ];
 
 // ══════════════════════════════════════════════════════════════════
-// STYLES HYPER RÉALISTES / CINÉMATOGRAPHIQUES
+// STYLES HYPER RÉALISTES
 // ══════════════════════════════════════════════════════════════════
 const STYLES = [
-    { id: 'arri-alexa', name: 'ARRI Alexa 65', emoji: '🎥', flagship: true,
-      prompt: 'Shot on ARRI Alexa 65, cinema-grade dynamic range, natural color science, sharp but filmic rendering, subtle grain, professional high-end production look, hyper-realistic detail' },
-    { id: 'red-8k', name: 'RED Monstro 8K', emoji: '🔴', flagship: true,
-      prompt: 'Shot on RED Monstro 8K VV, ultra-sharp hyper-realistic image, wide latitude, precise skin tones, professional cinema quality, subtle highlight roll-off' },
-    { id: 'k65-imax', name: 'IMAX 15/70', emoji: '🎞️', flagship: true,
-      prompt: 'Shot on IMAX 15/70mm film, massive scale, striking clarity, deep rich blacks, wide aspect ratio, epic cinematic look, subtle film grain, photorealistic depth' },
-    { id: 'kodak-35', name: 'Kodak 35mm', emoji: '📽️', flagship: true,
-      prompt: 'Shot on Kodak Vision3 35mm film, organic film grain, soft highlight roll-off, natural skin tones, warm analog feel, cinematic grain structure' },
-    { id: 'anamorphic-scope', name: 'Anamorphique 2.39:1', emoji: '🎬', flagship: true,
-      prompt: 'Anamorphic widescreen, 2.39:1 aspect ratio, characteristic lens flares, oval bokeh, subtle distortion at edges, cinematic scope look, photorealistic' },
-    { id: 'deakins', name: 'Style Roger Deakins', emoji: '🌅', flagship: true,
-      prompt: 'Cinematography in the style of Roger Deakins, naturalistic lighting, deep shadows, painterly compositions, subtle colors, Blade Runner 2049 / 1917 mood, hyper-realistic detail' },
-    { id: 'lubezki', name: 'Style Emmanuel Lubezki', emoji: '🌿', flagship: true,
-      prompt: 'Cinematography in the style of Emmanuel Lubezki, natural magic-hour light, handheld fluid camera, long takes, poetic realism, hyper-realistic, Tree of Life / Birdman mood' },
-    { id: 'storaro', name: 'Style Vittorio Storaro', emoji: '🎨', flagship: true,
-      prompt: 'Cinematography in the style of Vittorio Storaro, rich saturated color, dramatic chiaroscuro, theatrical lighting, hyper-realistic detail, Apocalypse Now / Last Emperor mood' },
-    { id: 'doyle', name: 'Style Christopher Doyle', emoji: '🌃', flagship: true,
-      prompt: 'Cinematography in the style of Christopher Doyle, moody neon, saturated colors, expressive blur, Hong Kong cinema mood, hyper-realistic detail' },
-    { id: 'hyperreal-clean', name: 'Hyperréaliste clean', emoji: '✨', flagship: true,
-      prompt: 'Ultra photorealistic rendering, 8K resolution, natural daylight, no stylization, no illustration feel, sharp physical accuracy, documentary precision' },
-    { id: 'chiaroscuro', name: 'Chiaroscuro classique', emoji: '🎭',
-      prompt: 'Classical chiaroscuro lighting, deep blacks and stark highlights, baroque influence, photorealistic oil-painting-like quality, dramatic shadows' },
-    { id: 'desaturated-real', name: 'Désaturé réaliste', emoji: '⬜',
-      prompt: 'Desaturated realistic palette, muted colors, photorealistic rendering, serious dramatic tone, subtle color grading' }
+    { id: 'arri-alexa', name: 'ARRI Alexa 65', emoji: '🎥', flagship: true, prompt: 'Shot on ARRI Alexa 65, cinema-grade dynamic range, natural color science, sharp but filmic rendering, subtle grain, professional high-end production look, hyper-realistic detail' },
+    { id: 'red-8k', name: 'RED Monstro 8K', emoji: '🔴', flagship: true, prompt: 'Shot on RED Monstro 8K VV, ultra-sharp hyper-realistic image, wide latitude, precise skin tones, professional cinema quality' },
+    { id: 'k65-imax', name: 'IMAX 15/70', emoji: '🎞️', flagship: true, prompt: 'Shot on IMAX 15/70mm film, massive scale, striking clarity, deep rich blacks, epic cinematic look, subtle film grain' },
+    { id: 'kodak-35', name: 'Kodak 35mm', emoji: '📽️', flagship: true, prompt: 'Shot on Kodak Vision3 35mm film, organic film grain, soft highlight roll-off, natural skin tones, warm analog feel' },
+    { id: 'anamorphic-scope', name: 'Anamorphique 2.39:1', emoji: '🎬', flagship: true, prompt: 'Anamorphic widescreen, 2.39:1 aspect ratio, characteristic lens flares, oval bokeh, cinematic scope look, photorealistic' },
+    { id: 'deakins', name: 'Style Roger Deakins', emoji: '🌅', flagship: true, prompt: 'Cinematography in the style of Roger Deakins, naturalistic lighting, deep shadows, painterly compositions, subtle colors, Blade Runner 2049 mood, hyper-realistic detail' },
+    { id: 'lubezki', name: 'Style Emmanuel Lubezki', emoji: '🌿', flagship: true, prompt: 'Cinematography in the style of Emmanuel Lubezki, natural magic-hour light, handheld fluid camera, long takes, poetic realism, hyper-realistic' },
+    { id: 'storaro', name: 'Style Vittorio Storaro', emoji: '🎨', flagship: true, prompt: 'Cinematography in the style of Vittorio Storaro, rich saturated color, dramatic chiaroscuro, theatrical lighting, hyper-realistic detail' },
+    { id: 'doyle', name: 'Style Christopher Doyle', emoji: '🌃', flagship: true, prompt: 'Cinematography in the style of Christopher Doyle, moody neon, saturated colors, expressive blur, Hong Kong cinema mood' },
+    { id: 'hyperreal-clean', name: 'Hyperréaliste clean', emoji: '✨', flagship: true, prompt: 'Ultra photorealistic rendering, 8K resolution, natural daylight, no stylization, sharp physical accuracy, documentary precision' },
+    { id: 'chiaroscuro', name: 'Chiaroscuro classique', emoji: '🎭', prompt: 'Classical chiaroscuro lighting, deep blacks and stark highlights, baroque influence, photorealistic oil-painting-like quality' },
+    { id: 'desaturated-real', name: 'Désaturé réaliste', emoji: '⬜', prompt: 'Desaturated realistic palette, muted colors, photorealistic rendering, serious dramatic tone' }
 ];
 
 const NARRATORS = {
@@ -647,7 +669,7 @@ const NARRATORS = {
 };
 
 const LANGUAGES = {
-    'fr': { label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'], promptInstruction: 'IMPORTANT : Écris la narration en français cinématographique, avec un ton adapté au genre.' },
+    'fr': { label: 'Français', ttsLang: 'fr-FR', ttsFallbacks: ['fr-CA', 'fr-BE'], promptInstruction: 'IMPORTANT : Écris la narration en français cinématographique, ton adapté au genre.' },
     'en': { label: 'Anglais', ttsLang: 'en-US', ttsFallbacks: ['en-GB', 'en-AU', 'en'], promptInstruction: 'IMPORTANT : Écris la narration en anglais cinématographique.' },
     'ar': { label: 'Arabe classique', ttsLang: 'ar-SA', ttsFallbacks: ['ar-EG', 'ar-AE', 'ar'], promptInstruction: 'IMPORTANT : Écris la narration en arabe classique littéraire.' },
     'ar-dz': { label: 'Daridja algérienne', ttsLang: 'ar-DZ', ttsFallbacks: ['ar-SA', 'ar-EG', 'ar'], promptInstruction: 'IMPORTANT : Écris la narration en daridja algérienne cultivée.' }
@@ -666,9 +688,9 @@ const state = {
     selectedGenre: GENRES[0], selectedStyle: STYLES[0],
     shotType: 'auto', cameraMove: 'auto', lighting: 'auto', grading: 'auto',
     language: 'fr', narratorVoice: 'male-deep', narrationStyle: 'cinematic',
+    dialoguePolicy: 'none', customCharacterBible: '',
     clipCount: 5, numFrames: 241, aspect: 'portrait', quality: 'ultra',
-    scenario: null,
-    sceneFrames: [], videos: [],
+    scenario: null, sceneFrames: [], videos: [],
     currentSceneIndex: 0, isPlayingSequence: false, lastTextRequestTime: 0,
     projectName: 'Mon film cinématique', lastSavedAt: null,
     editingVideoIndex: null
@@ -743,14 +765,14 @@ function updateGenerateBtn() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// AUTO-SAVE ROBUSTE
+// AUTO-SAVE
 // ══════════════════════════════════════════════════════════════════
 let autoSaveTimer = null;
 let autoSaveInFlight = false;
 
 function buildSnapshot() {
     return {
-        id: AUTOSAVE_ID, version: 1, savedAt: Date.now(),
+        id: AUTOSAVE_ID, version: 2, savedAt: Date.now(),
         projectName: document.getElementById('project-name').value || 'Mon film cinématique',
         idea: document.getElementById('idea-input').value || '',
         selectedGenreId: state.selectedGenre.id,
@@ -762,6 +784,8 @@ function buildSnapshot() {
         language: document.getElementById('language-select').value,
         narratorVoice: document.getElementById('narrator-select').value,
         narrationStyle: document.getElementById('narration-style-select').value,
+        dialoguePolicy: document.getElementById('dialogue-policy-select').value,
+        customCharacterBible: document.getElementById('custom-character-bible').value,
         clipCount: parseInt(document.getElementById('clip-count-select').value) || 5,
         numFrames: parseInt(document.getElementById('clip-duration-select').value) || 241,
         aspect: document.getElementById('aspect-select').value,
@@ -836,6 +860,8 @@ async function restoreSession(snap) {
     document.getElementById('language-select').value = snap.language || 'fr';
     document.getElementById('narrator-select').value = snap.narratorVoice || 'male-deep';
     document.getElementById('narration-style-select').value = snap.narrationStyle || 'cinematic';
+    document.getElementById('dialogue-policy-select').value = snap.dialoguePolicy || 'none';
+    document.getElementById('custom-character-bible').value = snap.customCharacterBible || '';
     document.getElementById('clip-count-select').value = snap.clipCount || 5;
     document.getElementById('clip-duration-select').value = snap.numFrames || 241;
     document.getElementById('aspect-select').value = snap.aspect || 'portrait';
@@ -849,6 +875,8 @@ async function restoreSession(snap) {
     state.language = snap.language || 'fr';
     state.narratorVoice = snap.narratorVoice || 'male-deep';
     state.narrationStyle = snap.narrationStyle || 'cinematic';
+    state.dialoguePolicy = snap.dialoguePolicy || 'none';
+    state.customCharacterBible = snap.customCharacterBible || '';
     state.clipCount = snap.clipCount || 5;
     state.numFrames = snap.numFrames || 241;
     state.aspect = snap.aspect || 'portrait';
@@ -917,12 +945,8 @@ async function showSessionInfo() {
 async function saveProject() {
     const name = document.getElementById('project-name').value.trim() || 'Sans nom';
     const snap = buildSnapshot(); snap.name = name; snap.savedAt = Date.now();
-    try {
-        await idbPut('projects', snap);
-        showToast('Projet « ' + name + ' » sauvegardé ✓', 'success');
-        logConsole('Projet sauvegardé : ' + name, 'autosave');
-        await performAutoSave(true);
-    } catch (e) { showToast('Erreur : ' + e.message, 'error'); }
+    try { await idbPut('projects', snap); showToast('Projet « ' + name + ' » sauvegardé ✓', 'success'); logConsole('Projet sauvegardé : ' + name, 'autosave'); await performAutoSave(true); }
+    catch (e) { showToast('Erreur : ' + e.message, 'error'); }
 }
 
 async function loadProject() {
@@ -958,7 +982,7 @@ async function exportProject() {
             const b64 = v.assetId ? await assetToB64(v.assetId) : null;
             videosExport.push({ ...v, b64, url: v.url });
         }
-        const fullExport = { ...snap, sceneFrames: sceneFramesExport, videos: videosExport, exportedAt: Date.now(), appVersion: 'cinematic_v1' };
+        const fullExport = { ...snap, sceneFrames: sceneFramesExport, videos: videosExport, exportedAt: Date.now(), appVersion: 'cinematic_v2' };
         const blob = new Blob([JSON.stringify(fullExport)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -970,10 +994,7 @@ async function exportProject() {
 }
 
 async function assetToB64(id) {
-    try {
-        const a = await idbGet('assets', id); if (!a || !a.blob) return null;
-        return await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => res(null); r.readAsDataURL(a.blob); });
-    } catch (e) { return null; }
+    try { const a = await idbGet('assets', id); if (!a || !a.blob) return null; return await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => res(null); r.readAsDataURL(a.blob); }); } catch (e) { return null; }
 }
 async function b64ToBlob(b64) { try { const r = await fetch(b64); return await r.blob(); } catch (e) { return null; } }
 
@@ -1036,7 +1057,6 @@ async function downloadBlobUrl(url, filename) {
     try { const res = await fetch(url); const blob = await res.blob(); const objUrl = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = objUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(objUrl), 3000); return true; }
     catch (e) { try { window.open(url, '_blank'); } catch (e2) {} return false; }
 }
-function slug(s) { return String(s || 'f').replace(/[^a-z0-9\u0600-\u06FF]/gi, '_').slice(0, 60); }
 
 async function downloadAllImages() {
     if (!state.sceneFrames.length) { showToast('Aucune keyframe', 'warn'); return; }
@@ -1084,6 +1104,14 @@ function downloadNarration() {
     a.href = url; a.download = title.replace(/[^a-z0-9]/gi, '_') + '_narration.txt';
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     showToast('Narration téléchargée ✓', 'success');
+}
+
+async function copyToClipboard(text) {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); return true; }
+        const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true;
+    } catch (e) { return false; }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1229,6 +1257,8 @@ async function runPipeline() {
     state.language = document.getElementById('language-select').value;
     state.narratorVoice = document.getElementById('narrator-select').value;
     state.narrationStyle = document.getElementById('narration-style-select').value;
+    state.dialoguePolicy = document.getElementById('dialogue-policy-select').value;
+    state.customCharacterBible = document.getElementById('custom-character-bible').value.trim();
     state.clipCount = parseInt(document.getElementById('clip-count-select').value);
     state.numFrames = parseInt(document.getElementById('clip-duration-select').value);
     state.aspect = document.getElementById('aspect-select').value;
@@ -1249,13 +1279,15 @@ async function runPipeline() {
     document.getElementById('autosave-banner').classList.remove('visible');
 
     logConsole('🎬 Configuration : ' + state.clipCount + ' plans · ' + ASPECT_RATIOS[state.aspect].label, 'success');
+    logConsole('Dialogue policy : ' + state.dialoguePolicy, 'info');
+    if (state.customCharacterBible) logConsole('Character Bible personnalisée fournie (' + state.customCharacterBible.length + ' caractères)', 'info');
 
     await activateWakeLock();
     setStatus('Initialisation…');
     await performAutoSave(true);
 
     try {
-        // SCRIPT
+        // ═══ SCRIPT ═══
         setStatus('L\'IA écrit le script…');
         const langInfo = LANGUAGES[state.language];
         const aspectInfo = ASPECT_RATIOS[state.aspect];
@@ -1263,6 +1295,16 @@ async function runPipeline() {
         const moveLabels = { 'auto': 'auto', 'static': 'fixe', 'dolly-in': 'dolly in', 'dolly-out': 'dolly out', 'tracking': 'tracking', 'crane-up': 'grue ascendante', 'crane-down': 'grue descendante', 'handheld': 'caméra à l\'épaule', 'steadicam': 'steadicam fluide', 'whip-pan': 'whip pan', 'zoom-in': 'zoom lent', 'drone-flyover': 'drone flyover' };
         const lightLabels = { 'auto': 'auto', 'golden-hour': 'golden hour', 'blue-hour': 'blue hour', 'natural-daylight': 'lumière naturelle jour', 'overcast': 'couvert diffus', 'chiaroscuro': 'clair-obscur', 'neon-noir': 'néon noir', 'low-key': 'low key', 'high-key': 'high key', 'moonlight': 'clair de lune', 'fire-light': 'lumière de feu', 'candle-light': 'lumière de bougie' };
         const gradingLabels = { 'auto': 'auto', 'teal-orange': 'teal & orange', 'desaturated': 'désaturé', 'sepia': 'sépia', 'bleach-bypass': 'bleach bypass', 'cool-tones': 'tons froids', 'warm-tones': 'tons chauds', 'high-contrast': 'contraste élevé', 'filmic': 'rendu filmique naturel' };
+
+        const dialoguePolicyLabels = {
+            'none': 'AUCUN dialogue dans les scènes. Les personnages restent MUETS. Seule la voix-off du narrateur peut exister. Aucun mot prononcé à l\'écran.',
+            'narration-only': 'Narration voix-off uniquement. Les personnages à l\'écran ne parlent JAMAIS. Aucun dialogue visible.',
+            'chosen-language': 'Autorise des dialogues TRÈS courts (max 6 mots) UNIQUEMENT en ' + langInfo.label + '. Aucun autre langue tolérée. Les dialogues doivent être cohérents et naturels.',
+            'free': 'Dialogue libre (déconseillé, risque de langues mélangées).'
+        };
+        const dialogueRule = dialoguePolicyLabels[state.dialoguePolicy] || dialoguePolicyLabels['none'];
+
+        const customBibleBlock = state.customCharacterBible ? '\n\n═══ CHARACTER BIBLE IMPOSÉE (utilise-la TELLE QUELLE, copiée mot pour mot dans chaque image_prompt et chaque prompt vidéo) ═══\n' + state.customCharacterBible + '\n═══ FIN CHARACTER BIBLE ═══\n' : '';
 
         const scriptPrompt = `Tu es un réalisateur de cinéma primé. Tu prépares une séquence cinématographique hyper réaliste.
 
@@ -1282,6 +1324,13 @@ PARAMÈTRES DE MISE EN SCÈNE :
 
 ${langInfo.promptInstruction}
 
+═══ RÈGLE ABSOLUE SUR LES DIALOGUES ═══
+${dialogueRule}
+
+═══ RÈGLE ABSOLUE SUR LA LANGUE ═══
+Toute la narration et tout dialogue autorisé doivent être UNIQUEMENT en ${langInfo.label}.
+INTERDICTION ABSOLUE de mélanger les langues (pas d'anglais, pas de japonais, aucune autre langue que ${langInfo.label}).
+${customBibleBlock}
 ═══ EXIGENCES PHOTORÉALISTES ═══
 - Chaque plan doit être décrit avec une précision cinématographique : cadrage, focale, lumière, texture.
 - Rendu ULTRA photoréaliste : peaux naturelles, textures réalistes, éclairage physique.
@@ -1298,22 +1347,22 @@ ${langInfo.promptInstruction}
   "title": "Titre de la séquence",
   "logline": "Résumé en une phrase",
   "subject": "Sujet",
-  "master_style_prompt": "English cinematic style anchor (camera, lens, lighting, color grading, film grain) — to be prepended to EVERY image prompt",
+  "master_style_prompt": "English cinematic style anchor (camera, lens, lighting, color grading, film grain) — to be prepended to EVERY image prompt and EVERY video prompt",
   "characters": [
-    { "name": "Nom ou description", "identity_block": "English physical identity description (age, ethnicity, hair, features, clothing, distinctive marks) — to be repeated verbatim in every image prompt" }
+    { "name": "Nom", "identity_block": "${state.customCharacterBible ? 'USE THE IMPOSED CHARACTER BIBLE ABOVE, copy it verbatim' : 'English physical identity description (age, ethnicity, hair, features, clothing, distinctive marks) — to be repeated verbatim in every image prompt AND every video prompt'}" }
   ],
   "scenes": [
     {
       "scene_number": 1,
       "sequence_title": "Titre",
       "description": "Description détaillée en français (cadrage, action, lumière, ambiance)",
-      "start_frame_prompt": "English prompt for the OPENING keyframe. MUST include master_style_prompt + verbatim character identity_block + photorealistic detail + camera position (shot type, angle, focal length feel) + lighting description. NO illustration style, PHOTOREALISTIC cinema only.",
-      "end_frame_prompt": "English prompt for the CLOSING keyframe (SAME scene, SAME characters, motion advanced, SAME lighting & framing). MUST include master_style_prompt + character identity_block.",
-      "narration": "Voix-off cinématographique (LANGUE CHOISIE, 1-2 phrases, ton épique ou contemplatif)",
-      "camera_movement": "Mouvement caméra spécifique (dolly in lent, tracking latéral, grue ascendante...)",
-      "shot_type": "Type de plan (wide shot, medium shot, close-up...)",
-      "lighting_notes": "Notes d'éclairage (golden hour backlit, low-key chiaroscuro, moonlight through window...)",
-      "sound_design": "Ambiance sonore suggérée"
+      "start_frame_prompt": "English prompt for the OPENING keyframe. MUST include master_style_prompt + verbatim character identity_block + photorealistic detail + camera position + lighting. NO illustration style.",
+      "end_frame_prompt": "English prompt for the CLOSING keyframe (SAME scene, SAME characters, motion advanced). MUST include master_style_prompt + character identity_block.",
+      "narration": "Voix-off (${langInfo.label} UNIQUEMENT, 1-2 phrases)",
+      "camera_movement": "Mouvement caméra spécifique",
+      "shot_type": "Type de plan",
+      "lighting_notes": "Notes d'éclairage",
+      "sound_design": "Ambiance sonore"
     }
   ]
 }
@@ -1321,7 +1370,7 @@ ${langInfo.promptInstruction}
 Vérification : "scenes" = EXACTEMENT ${state.clipCount} entrées. JSON valide uniquement.`;
 
         const scriptRaw = await callTextAPI([
-            { role: 'system', content: 'Tu es un réalisateur de cinéma primé spécialisé dans le rendu photoréaliste. Tu réponds UNIQUEMENT avec un objet JSON brut, SANS balises Markdown, SANS ```json. N\'utilise JAMAIS de retour à la ligne dans les valeurs JSON.' },
+            { role: 'system', content: 'Tu es un réalisateur de cinéma primé spécialisé dans le rendu photoréaliste. Tu réponds UNIQUEMENT avec un objet JSON brut, SANS balises Markdown, SANS ```json. N\'utilise JAMAIS de retour à la ligne dans les valeurs JSON. Toute la narration et les dialogues doivent être dans une seule langue.' },
             { role: 'user', content: scriptPrompt }
         ], { temperature: 0.75, maxTokens: 8000 });
 
@@ -1339,7 +1388,7 @@ Vérification : "scenes" = EXACTEMENT ${state.clipCount} entrées. JSON valide u
         displayScript(scenario);
         await performAutoSave(true);
 
-        // IMAGES
+        // ═══ IMAGES ═══
         logConsole('ÉTAPE 2/3 — Keyframes photoréalistes', 'success');
         setStatus('Génération des keyframes…');
         const ar = ASPECT_RATIOS[state.aspect];
@@ -1375,11 +1424,20 @@ Vérification : "scenes" = EXACTEMENT ${state.clipCount} entrées. JSON valide u
 
         if (state.sceneFrames.length === 0) throw new Error('Aucune scène générée');
 
-        // VIDÉOS
+        // ═══ VIDÉOS ═══
         logConsole('ÉTAPE 3/3 — Plans cinématographiques', 'success');
         for (let i = 0; i < state.sceneFrames.length; i++) createPendingVideoCard(i, state.sceneFrames.length);
         document.getElementById('section-videos').classList.remove('hidden');
         document.getElementById('section-videos').classList.add('open');
+
+        const dialogueClause = state.dialoguePolicy === 'none' ? 'NO dialogue. Characters are completely SILENT. No spoken words, no lip movement suggesting speech. '
+            : state.dialoguePolicy === 'narration-only' ? 'NO on-screen dialogue. Characters are silent. Voice-over only may exist in post-production. '
+            : state.dialoguePolicy === 'chosen-language' ? 'IF dialogue occurs, it MUST be exclusively in ' + LANGUAGES[state.language].label + '. Absolutely no other language. '
+            : 'Dialogue allowed (language may vary). ';
+
+        const characterBibleVideo = scenario.characters && scenario.characters.length > 0
+            ? ' SAME CHARACTERS AS PREVIOUS SHOTS, EXACT SAME APPEARANCE, SAME COSTUME, SAME FACE, NO CHANGE: ' + scenario.characters.map(c => c.name + ' — ' + c.identity_block).join(' || ') + '. '
+            : ' ';
 
         const pollingPromises = [];
         for (let i = 0; i < state.sceneFrames.length; i++) {
@@ -1392,13 +1450,16 @@ Vérification : "scenes" = EXACTEMENT ${state.clipCount} entrées. JSON valide u
 
             const videoPrompt = [
                 'PHOTOREALISTIC CINEMATIC SHOT. ONE SINGLE UNBROKEN TAKE. NO CUTS.',
+                'STRICT CHARACTER CONTINUITY WITH THE PREVIOUS AND NEXT SHOTS.',
+                characterBibleVideo,
                 'Camera movement: ' + cameraMove + '.',
                 'Shot type: ' + shotType + '.',
                 'Lighting: ' + lightingNotes + '.',
                 'Color grading: ' + gradingLabels[state.grading] + '.',
-                'Style: ' + scenario.master_style_prompt + '.',
+                'Master style: ' + scenario.master_style_prompt + '.',
+                dialogueClause,
                 'Photorealistic realism, film grain, physical light, real textures, natural motion, cinematic depth of field.',
-                'No illustration, no cartoon, no CGI look, no text, no watermarks, no scary elements.'
+                'No illustration, no cartoon, no CGI look, no text, no watermarks.'
             ].join(' ');
 
             const item = { index: i, scene, startImage: { url: sf.startUrl }, endImage: { url: sf.endUrl }, prompt: videoPrompt, videoId: null, startTime: null, actualDuration: null };
@@ -1460,7 +1521,11 @@ function displayScript(scenario) {
     s.classList.remove('hidden'); s.classList.add('open');
     let h = '<h3>🎬 ' + esc(scenario.title || 'Séquence') + '</h3>';
     if (scenario.logline) h += '<p style="font-size:0.8rem;color:var(--ink-dim);margin-bottom:0.8rem;">' + esc(scenario.logline) + '</p>';
-    if (scenario.characters && scenario.characters.length > 0) h += '<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:0.6rem;">Personnages : ' + scenario.characters.map(c => esc(c.name)).join(', ') + '</div>';
+    if (scenario.characters && scenario.characters.length > 0) {
+        h += '<div style="margin-bottom:0.8rem;"><strong style="font-size:0.72rem;color:var(--gold);text-transform:uppercase;">👤 Character Bible</strong>';
+        scenario.characters.forEach(c => { h += '<div class="character-bible-block"><strong style="color:var(--gold);">' + esc(c.name) + '</strong><br>' + esc(c.identity_block) + '</div>'; });
+        h += '</div>';
+    }
     if (scenario.scenes) scenario.scenes.forEach(sc => {
         h += '<div class="scene-item"><span class="scene-num">Plan ' + sc.scene_number + '</span>';
         if (sc.sequence_title) h += ' — ' + esc(sc.sequence_title) + '<br>';
@@ -1578,14 +1643,6 @@ function buildImagePrompt(scene, which) {
     return masterAnchor + charBlock + photoAnchor + base + '. ' + state.selectedStyle.prompt + '. No text, no watermark.';
 }
 
-async function copyToClipboard(text) {
-    try {
-        if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); return true; }
-        const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true;
-    } catch (e) { return false; }
-}
-
 async function regenerateImage(sceneIdx, which) {
     if (state.isRunning) { showToast('Attends', 'warn'); return; }
     const sf = state.sceneFrames[sceneIdx]; if (!sf) return;
@@ -1603,6 +1660,32 @@ async function regenerateImage(sceneIdx, which) {
         showToast('Keyframe régénérée ✓', 'success');
     } catch (e) { showToast('Erreur : ' + e.message.slice(0, 50), 'error'); }
     state.isRunning = false; updateGenerateBtn();
+}
+
+function buildVideoPrompt(scene, sceneIndex) {
+    const scenario = state.scenario; if (!scenario) return '';
+    const cameraMove = scene.camera_movement || 'slow cinematic dolly';
+    const shotType = scene.shot_type || 'medium shot';
+    const lightingNotes = scene.lighting_notes || 'natural lighting';
+    const dialogueClause = state.dialoguePolicy === 'none' ? 'NO dialogue. Characters are completely SILENT. '
+        : state.dialoguePolicy === 'narration-only' ? 'NO on-screen dialogue. Characters are silent. '
+        : state.dialoguePolicy === 'chosen-language' ? 'Dialogue ONLY in ' + LANGUAGES[state.language].label + '. '
+        : 'Dialogue allowed. ';
+    const characterBibleVideo = scenario.characters && scenario.characters.length > 0
+        ? ' SAME CHARACTERS AS PREVIOUS SHOTS, EXACT SAME APPEARANCE, SAME COSTUME, SAME FACE: ' + scenario.characters.map(c => c.name + ' — ' + c.identity_block).join(' || ') + '. '
+        : ' ';
+    return [
+        'PHOTOREALISTIC CINEMATIC SHOT. ONE SINGLE UNBROKEN TAKE. NO CUTS.',
+        'STRICT CHARACTER CONTINUITY WITH THE PREVIOUS AND NEXT SHOTS.',
+        characterBibleVideo,
+        'Camera movement: ' + cameraMove + '.',
+        'Shot type: ' + shotType + '.',
+        'Lighting: ' + lightingNotes + '.',
+        'Master style: ' + scenario.master_style_prompt + '.',
+        dialogueClause,
+        'Photorealistic realism, film grain, physical light, real textures, natural motion, cinematic depth of field.',
+        'No illustration, no cartoon, no CGI look, no text, no watermarks.'
+    ].join(' ');
 }
 
 async function regenerateVideo(sceneIdx) {
@@ -1630,22 +1713,6 @@ async function regenerateVideo(sceneIdx) {
         showToast('Plan régénéré ✓', 'success');
     } catch (e) { logConsole('Erreur : ' + e.message, 'error'); markPendingFailed(sceneIdx, e.message); showToast('Erreur : ' + e.message.slice(0, 50), 'error'); }
     state.isRunning = false; updateGenerateBtn();
-}
-
-function buildVideoPrompt(scene, sceneIndex) {
-    const scenario = state.scenario; if (!scenario) return '';
-    const cameraMove = scene.camera_movement || 'slow cinematic dolly';
-    const shotType = scene.shot_type || 'medium shot';
-    const lightingNotes = scene.lighting_notes || 'natural lighting';
-    return [
-        'PHOTOREALISTIC CINEMATIC SHOT. ONE SINGLE UNBROKEN TAKE. NO CUTS.',
-        'Camera movement: ' + cameraMove + '.',
-        'Shot type: ' + shotType + '.',
-        'Lighting: ' + lightingNotes + '.',
-        'Style: ' + scenario.master_style_prompt + '.',
-        'Photorealistic realism, film grain, physical light, real textures, natural motion, cinematic depth of field.',
-        'No illustration, no cartoon, no CGI look, no text, no watermarks.'
-    ].join(' ');
 }
 
 async function deleteVideo(sceneIdx) {
@@ -1706,10 +1773,7 @@ async function saveEditModal(regenerate) {
     scene.narration = newNarration; scene.description = newDescription;
     if (state.videos[idx]) { state.videos[idx].narration = newNarration; state.videos[idx].prompt = newPrompt; }
     const card = document.getElementById('video-card-' + idx);
-    if (card) {
-        const nEl = card.querySelector('.gen-narration');
-        if (nEl) nEl.textContent = '🎙️ ' + newNarration.slice(0, 130);
-    }
+    if (card) { const nEl = card.querySelector('.gen-narration'); if (nEl) nEl.textContent = '🎙️ ' + newNarration.slice(0, 130); }
     await performAutoSave(true);
     closeEditModal();
     showToast('Modifications enregistrées ✓', 'success');
@@ -1812,7 +1876,7 @@ function testVoice() {
         'ar': 'في مدينة لا تنتهي فيها الليل، يمشي رجل وحيدًا بحثًا عن الحقيقة.',
         'ar-dz': 'في مدينة ما كتشبع فيها الليل، راجل واحد يمشي وحدو وهو يحوس على الحقيقة.'
     }[state.language] || 'Test narration.';
-    logConsole('Test voix : ' + nt.label, 'info');
+    logConsole('Test voix : ' + nt.label + ' · ' + lt.label, 'info');
     speakText(t);
 }
 
@@ -1878,12 +1942,41 @@ function testVoice() {
     document.getElementById('save-as-project-btn').addEventListener('click', saveProject);
     document.getElementById('clear-autosave-btn').addEventListener('click', async () => { if (confirm('Effacer la session ?')) { await clearAutoSavedSession(); showToast('Session effacée', 'warn'); } });
 
+    // Character Library
+    renderCharacterLibrary();
+    document.getElementById('save-character-btn').addEventListener('click', () => {
+        const name = document.getElementById('save-character-name-input').value.trim();
+        if (!name) { showToast('Nomme ton personnage d\'abord', 'warn'); return; }
+        const bible = document.getElementById('custom-character-bible').value.trim();
+        if (!bible) { showToast('Remplis la character bible d\'abord', 'warn'); return; }
+        addCharacterToLibrary(name, bible);
+        showToast('Personnage « ' + name + ' » sauvegardé ✓', 'success');
+        document.getElementById('save-character-name-input').value = '';
+    });
+    document.getElementById('load-character-btn').addEventListener('click', () => {
+        const sel = document.getElementById('character-library-select').value;
+        if (!sel) { showToast('Sélectionne un personnage', 'warn'); return; }
+        const lib = getCharacterLibrary();
+        if (lib[sel]) {
+            document.getElementById('custom-character-bible').value = lib[sel].bible;
+            showToast('Personnage « ' + sel + ' » chargé ✓', 'success');
+            scheduleAutoSave();
+        }
+    });
+    document.getElementById('delete-character-btn').addEventListener('click', () => {
+        const sel = document.getElementById('character-library-select').value;
+        if (!sel) { showToast('Sélectionne un personnage', 'warn'); return; }
+        if (!confirm('Supprimer « ' + sel + ' » de la bibliothèque ?')) return;
+        removeCharacterFromLibrary(sel);
+        showToast('Personnage supprimé', 'warn');
+    });
+
     document.getElementById('modal-cancel-btn').addEventListener('click', closeEditModal);
     document.getElementById('modal-save-btn').addEventListener('click', () => saveEditModal(false));
     document.getElementById('modal-save-regen-btn').addEventListener('click', () => saveEditModal(true));
     document.getElementById('edit-modal').addEventListener('click', (e) => { if (e.target === document.getElementById('edit-modal')) closeEditModal(); });
 
-    ['clip-count-select', 'clip-duration-select', 'aspect-select', 'project-name', 'shot-type-select', 'camera-move-select', 'lighting-select', 'grading-select', 'language-select', 'narrator-select', 'narration-style-select', 'quality-select'].forEach(id => {
+    ['clip-count-select', 'clip-duration-select', 'aspect-select', 'project-name', 'shot-type-select', 'camera-move-select', 'lighting-select', 'grading-select', 'language-select', 'narrator-select', 'narration-style-select', 'dialogue-policy-select', 'quality-select', 'custom-character-bible'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.addEventListener('change', scheduleAutoSave); el.addEventListener('input', scheduleAutoSave); }
     });
@@ -1894,8 +1987,8 @@ function testVoice() {
     updateApiPanel(); updateLimitsPanel(); updateGenerateBtn();
     const sk = getApiKey(); if (sk) document.getElementById('api-key-input').value = sk;
 
-    logConsole('Cinematic Studio prêt', 'info');
-    logConsole('🎬 ' + GENRES.length + ' genres · ' + STYLES.length + ' styles · rendu hyper réaliste', 'success');
+    logConsole('Cinematic Studio v2 prêt', 'info');
+    logConsole('🎬 ' + GENRES.length + ' genres · ' + STYLES.length + ' styles · Character Library activée', 'success');
 
     const snap = await loadAutoSavedSession();
     if (snap) {
