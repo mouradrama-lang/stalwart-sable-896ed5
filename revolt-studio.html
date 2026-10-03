@@ -3,126 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>REVOLT//STUDIO — Cyberpunk Révolté</title>
+<title>REVOLT//STUDIO v2.0 — Production</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#050508;--panel:#0a0a12;--panel2:#101020;--border:#1a1a2e;--pink:#ff2d95;--cyan:#00e5ff;--ink:#eaeaf0;--dim:#8a8a9a;--faint:#404058;--ok:#00d47e;--err:#ff3355;--warn:#ffaa00}
 body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem 1rem 6rem;font-size:15px;line-height:1.5;max-width:800px;margin:0 auto}
-h1{font-size:1.5rem;font-weight:900;letter-spacing:.05em;margin-bottom:.2rem;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
-.sub{font-size:.7rem;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:1.2rem}
+h1{font-size:1.4rem;font-weight:900;letter-spacing:.05em;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
+.sub{font-size:.68rem;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:1rem}
 .toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel2);color:var(--ink);padding:.8rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:600;box-shadow:0 8px 40px rgba(0,0,0,.8);border:1px solid var(--border);z-index:9999;opacity:0;transition:.3s;max-width:90vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.ok{border-color:var(--ok)}
-.toast.err{border-color:var(--err)}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:.8rem;overflow:hidden}
-.ph{padding:.9rem 1.1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.toast.ok{border-color:var(--ok)}.toast.err{border-color:var(--err)}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:.7rem;overflow:hidden}
+.ph{padding:.85rem 1.05rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
 .ph:active{background:var(--panel2)}
-.pt{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);font-weight:800;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
-.pt .n{background:var(--pink);color:#fff;padding:.1rem .45rem;border-radius:8px;font-size:.65rem;letter-spacing:0}
+.pt{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);font-weight:800;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.pt .n{background:var(--pink);color:#fff;padding:.1rem .45rem;border-radius:8px;font-size:.62rem;letter-spacing:0}
 .ph .ch{color:var(--faint);font-size:.7rem;transition:.2s}
 .panel.open .ch{transform:rotate(180deg)}
 .pb{max-height:0;overflow:hidden;transition:max-height .4s}
-.panel.open .pb{max-height:30000px}
-.pc{padding:0 1.1rem 1.1rem}
-label{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:.35rem;font-weight:700;margin-top:.7rem}
+.panel.open .pb{max-height:40000px}
+.pc{padding:0 1.05rem 1.05rem}
+label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:.35rem;font-weight:700;margin-top:.65rem}
 label:first-child{margin-top:0}
-input,textarea,select{width:100%;padding:.75rem .9rem;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.9rem}
-textarea{min-height:80px;resize:vertical;line-height:1.5}
+input,textarea,select{width:100%;padding:.7rem .85rem;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.88rem}
+textarea{min-height:70px;resize:vertical;line-height:1.5}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
-.hint{font-size:.65rem;color:var(--faint);margin-top:.3rem;font-style:italic}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem;margin-top:.5rem}
-.card{padding:.7rem;border-radius:6px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;text-align:center;transition:.15s}
+.hint{font-size:.63rem;color:var(--faint);margin-top:.3rem;font-style:italic}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.45rem;margin-top:.5rem}
+.card{padding:.65rem;border-radius:6px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;text-align:center;transition:.15s}
 .card:hover{border-color:var(--cyan)}
 .card.sel{background:linear-gradient(135deg,var(--pink),var(--cyan));border-color:var(--pink);color:#fff}
-.card .ic{font-size:1.4rem;display:block;margin-bottom:.25rem}
-.card .nm{font-size:.72rem;font-weight:700}
-.card .dc{font-size:.6rem;color:var(--dim);margin-top:.15rem}
+.card .ic{font-size:1.3rem;display:block;margin-bottom:.2rem}
+.card .nm{font-size:.68rem;font-weight:700}
+.card .dc{font-size:.58rem;color:var(--dim);margin-top:.1rem}
 .card.sel .dc{color:rgba(255,255,255,.85)}
-.btn{width:100%;padding:1rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--pink),#7a00ff);color:#fff;font-size:.95rem;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem}
+.btn{width:100%;padding:.9rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--pink),#7a00ff);color:#fff;font-size:.88rem;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.6rem}
 .btn:disabled{opacity:.3;cursor:not-allowed}
 .btn.cyan{background:linear-gradient(135deg,var(--cyan),#0088ff)}
-.btn.small{padding:.6rem .9rem;font-size:.72rem;width:auto;margin-bottom:0;letter-spacing:.05em}
+.btn.small{padding:.55rem .8rem;font-size:.68rem;width:auto;margin-bottom:0;letter-spacing:.05em}
 .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--ink)}
 .btn.ok{background:linear-gradient(135deg,#00d47e,#008850)}
 .btn.err{background:transparent;border:1px solid var(--err);color:var(--err)}
 .btn.warn{background:linear-gradient(135deg,#ffaa00,#cc6600)}
-.btn-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem}
-.api{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.8rem}
+.btn-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
+.api{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.7rem}
 .api.ok{border-color:var(--ok)}
-.console{background:#000;border:1px solid var(--border);border-radius:8px;padding:.7rem;margin-bottom:.8rem;max-height:220px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:.7rem;line-height:1.6}
-.cl{padding:.1rem 0}
+.console{background:#000;border:1px solid var(--border);border-radius:8px;padding:.65rem;margin-bottom:.6rem;max-height:200px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:.68rem;line-height:1.55}
+.cl{padding:.08rem 0}
 .ct{color:var(--faint);margin-right:.4rem}
 .ci{color:var(--cyan)}.co{color:var(--ok)}.ce{color:var(--err)}.cw{color:var(--warn)}
-.slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.7rem;position:relative}
+.slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.6rem}
 .slot.locked{border-color:var(--faint);opacity:.4}
 .slot.active{border-color:var(--pink);box-shadow:0 0 20px rgba(255,45,149,.3)}
 .slot.done{border-color:var(--ok)}
-.slot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
-.slot-title{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
-.slot-num{font-size:.65rem;background:var(--pink);color:#fff;padding:.15rem .5rem;border-radius:10px}
-.slot-body{font-size:.78rem;color:var(--dim);margin-bottom:.6rem;line-height:1.4}
-.slot-img{width:100%;border-radius:6px;margin-bottom:.5rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block}
-.slot-img-placeholder{width:100%;aspect-ratio:9/16;border-radius:6px;background:var(--bg);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.72rem;margin-bottom:.5rem}
-.slot-video{width:100%;border-radius:6px;margin-bottom:.5rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block;background:#000}
-.slot-status{font-size:.65rem;color:var(--faint);font-family:ui-monospace,monospace;margin-bottom:.5rem}
-.bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-bottom:.5rem}
+.slot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem}
+.slot-title{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
+.slot-num{font-size:.62rem;background:var(--pink);color:#fff;padding:.15rem .5rem;border-radius:10px}
+.slot-body{font-size:.75rem;color:var(--dim);margin-bottom:.5rem;line-height:1.4}
+.slot-img{width:100%;border-radius:6px;margin-bottom:.45rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block}
+.slot-img-ph{width:100%;aspect-ratio:9/16;border-radius:6px;background:var(--bg);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.68rem;margin-bottom:.45rem;flex-direction:column;gap:.5rem;text-align:center;padding:1rem}
+.slot-video{width:100%;border-radius:6px;margin-bottom:.45rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block;background:#000}
+.slot-status{font-size:.62rem;color:var(--faint);font-family:ui-monospace,monospace;margin-bottom:.45rem}
+.bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-bottom:.4rem}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .3s;width:0%}
-.video-slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.7rem}
+.video-slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.6rem}
 .video-slot.done{border-color:var(--ok)}
 .video-slot.processing{border-color:var(--warn);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.video-progress{font-size:.7rem;color:var(--dim);font-family:ui-monospace,monospace;margin-top:.4rem}
-.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.4rem}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+.vopts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.4rem 0}
+.vopts select{padding:.5rem .6rem;font-size:.75rem}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.35rem}
 @keyframes spin{to{transform:rotate(360deg)}}
-.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:.7rem 1rem;font-size:.78rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:.3s;z-index:100}
+.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:.65rem 1rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:.3s;z-index:100}
 .status-bar.show{transform:translateY(0)}
 .autosave-dot{position:fixed;top:1rem;right:1rem;width:8px;height:8px;border-radius:50%;background:var(--ok);opacity:0;transition:opacity .3s;z-index:9999;box-shadow:0 0 12px var(--ok)}
 .autosave-dot.show{opacity:1}
-.footer-note{text-align:center;font-size:.65rem;color:var(--faint);margin-top:2rem;padding-bottom:1rem;letter-spacing:.1em;text-transform:uppercase}
+.audio-row{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}
+.audio-row .btn{flex:1;min-width:90px;margin-bottom:0}
+.preview-video{width:100%;border-radius:8px;background:#000;aspect-ratio:9/16;max-height:70vh;object-fit:contain;margin-bottom:.5rem}
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:1rem;text-align:center;color:var(--dim);font-size:.75rem;cursor:pointer;transition:.2s}
+.upload-zone:hover{border-color:var(--cyan)}
+.footer-note{text-align:center;font-size:.62rem;color:var(--faint);margin-top:1.5rem;padding-bottom:1rem;letter-spacing:.1em;text-transform:uppercase}
 </style>
 </head>
 <body>
 
 <h1>Revolt//Studio</h1>
-<div class="sub">Cyberpunk · Révolté · v1.4</div>
+<div class="sub">v2.0 · Production · Cyberpunk Révolté</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
 <div class="api" id="api-box">
   <label style="margin-top:0">Clé API Agnès</label>
   <input type="password" id="api-key" placeholder="sk-..." autocomplete="off">
-  <button class="btn cyan small" id="api-save" style="margin-top:.5rem;width:100%">ENREGISTRER</button>
-  <div style="font-size:.68rem;color:var(--dim);margin-top:.5rem" id="api-status">Non configurée</div>
+  <button class="btn cyan small" id="api-save" style="margin-top:.45rem;width:100%">ENREGISTRER</button>
+  <div style="font-size:.65rem;color:var(--dim);margin-top:.45rem" id="api-status">Non configurée</div>
 </div>
 
+<!-- 1. CONCEPT -->
 <div class="panel open" id="p-concept">
   <div class="ph" data-t="p-concept">
     <div class="pt"><span class="n">1</span> Concept révolté</div>
     <span class="ch">▼</span>
   </div>
   <div class="pb"><div class="pc">
-    <div class="hint">Choisis un concept. Le script est pré-écrit. Tu peux le modifier ensuite.</div>
+    <div class="hint">Choisis un concept. Le script et les cadrages sont pré-écrits.</div>
     <div class="grid" id="concepts"></div>
-    <label>Script voix-off (modifiable)</label>
-    <textarea id="vo-text" style="min-height:140px;font-size:.85rem"></textarea>
-    <label>Phrase de chute (texte final à l'écran)</label>
-    <input type="text" id="vo-punch" placeholder="Ce qui est gratuit, c'est toi le produit.">
+    <label>Script voix-off</label>
+    <textarea id="vo-text" style="min-height:120px;font-size:.82rem"></textarea>
+    <label>Phrase de chute</label>
+    <input type="text" id="vo-punch" placeholder="Respirer n'est plus un droit.">
   </div></div>
 </div>
 
+<!-- 2. CHARACTER -->
 <div class="panel" id="p-char">
   <div class="ph" data-t="p-char">
     <div class="pt"><span class="n">2</span> Character DNA</div>
     <span class="ch">▼</span>
   </div>
   <div class="pb"><div class="pc">
-    <label>Nom du personnage</label>
+    <label>Nom</label>
     <input type="text" id="c-name" value="KAI">
     <label>Âge</label>
     <input type="text" id="c-age" value="28">
     <label>Sexe / ethnie / morphologie</label>
     <input type="text" id="c-eth" value="male, mixed East-Asian and Black, lean athletic build">
     <label>Visage</label>
-    <textarea id="c-face" style="min-height:60px">angular sharp face, dark brown almond-shaped eyes, high cheekbones, straight narrow nose, thin lips</textarea>
+    <textarea id="c-face" style="min-height:50px">angular sharp face, dark brown almond-shaped eyes, high cheekbones, straight narrow nose, thin lips</textarea>
     <label>Cheveux</label>
     <input type="text" id="c-hair" value="short shaved black hair with slight dark stubble on top">
     <label>Marques</label>
@@ -140,53 +148,124 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
   </div></div>
 </div>
 
+<!-- 3. IMAGES -->
 <div class="panel open" id="p-gen">
   <div class="ph" data-t="p-gen">
     <div class="pt"><span class="n">3</span> Génération images</div>
     <span class="ch">▼</span>
   </div>
   <div class="pb"><div class="pc">
-    <div class="hint">Les 3 plans se génèrent UN PAR UN. Tu valides avant de passer au suivant.</div>
+    <div class="hint">3 plans séquentiels. Tu valides chaque plan avant de passer au suivant.</div>
     <div id="slots"></div>
   </div></div>
 </div>
 
+<!-- 4. VIDEOS -->
 <div class="panel open" id="p-video">
   <div class="ph" data-t="p-video">
-    <div class="pt"><span class="n">4</span> Génération vidéo <span class="n" style="background:var(--warn);color:#000">NOUVEAU</span></div>
+    <div class="pt"><span class="n">4</span> Génération vidéo</div>
     <span class="ch">▼</span>
   </div>
   <div class="pb"><div class="pc">
-    <div class="hint">Une fois les 3 images générées, transforme-les en plans vidéo animés (5 secondes chacun).</div>
-    <label>Durée par vidéo</label>
-    <select id="v-duration">
-      <option value="121">5 secondes</option>
-      <option value="169" selected>7 secondes</option>
-      <option value="241">10 secondes</option>
-    </select>
-    <label>Mouvement caméra (appliqué à toutes les vidéos)</label>
-    <select id="v-motion">
-      <option value="Slow cinematic dolly in, subtle camera push forward, character breathing naturally">Dolly in — poussée avant</option>
-      <option value="Slow cinematic dolly out, camera pulls back slightly revealing the scene">Dolly out — recul</option>
-      <option value="Very slow tracking shot moving laterally to the right">Tracking latéral droit</option>
-      <option value="Very slow tracking shot moving laterally to the left">Tracking latéral gauche</option>
-      <option value="Subtle handheld camera with micro-movements, breathing character">Caméra épaule subtile</option>
-      <option value="Almost static shot, only subtle wind and neon flicker in the scene">Presque statique</option>
-      <option value="Slow zoom in on the character's face, cinematic intensity">Zoom lent sur le visage</option>
-    </select>
+    <div class="hint">Chaque vidéo a son propre mouvement et sa propre durée. Les vidéos s'enchaînent image N → image N+1.</div>
     <div id="video-slots"></div>
+    <button class="btn warn" id="batch-videos" style="margin-top:.6rem">⚡ GÉNÉRER LES 3 VIDÉOS D'AFFILÉE</button>
   </div></div>
 </div>
 
-<div class="panel" id="p-export">
-  <div class="ph" data-t="p-export">
-    <div class="pt"><span class="n">5</span> Export</div>
+<!-- 5. VOIX-OFF -->
+<div class="panel" id="p-voice">
+  <div class="ph" data-t="p-voice">
+    <div class="pt"><span class="n">5</span> Voix-off (TTS)</div>
     <span class="ch">▼</span>
   </div>
   <div class="pb"><div class="pc">
+    <div class="hint">Génère la voix-off avec la synthèse vocale du navigateur. Écoute puis exporte en audio.</div>
+    <label>Voix</label>
+    <select id="tts-voice"><option value="">Chargement…</option></select>
+    <label>Vitesse</label>
+    <select id="tts-rate">
+      <option value="0.75">Lente (0.75x)</option>
+      <option value="0.85" selected>Posée (0.85x)</option>
+      <option value="1">Normale (1x)</option>
+      <option value="1.15">Rapide (1.15x)</option>
+    </select>
+    <label>Hauteur</label>
+    <select id="tts-pitch">
+      <option value="0.6">Très grave</option>
+      <option value="0.75" selected>Grave</option>
+      <option value="0.9">Médium</option>
+      <option value="1.1">Aiguë</option>
+    </select>
+    <div class="audio-row">
+      <button class="btn small cyan" id="tts-play">▶ ÉCOUTER</button>
+      <button class="btn small ghost" id="tts-stop">⏹ STOP</button>
+      <button class="btn small ok" id="tts-record">● ENREGISTRER</button>
+    </div>
+    <div id="tts-status" class="hint"></div>
+  </div></div>
+</div>
+
+<!-- 6. MUSIQUE -->
+<div class="panel" id="p-music">
+  <div class="ph" data-t="p-music">
+    <div class="pt"><span class="n">6</span> Drone musical</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <div class="hint">Génère une nappe synthwave sombre. Jouée en boucle pendant toute la séquence.</div>
+    <label>Style</label>
+    <select id="mus-style">
+      <option value="dark">Sombre profond (recommandé)</option>
+      <option value="tense">Tendu anxiogène</option>
+      <option value="industrial">Industriel métallique</option>
+      <option value="ambient">Ambient flottant</option>
+    </select>
+    <label>Volume</label>
+    <select id="mus-vol">
+      <option value="0.05">Très faible</option>
+      <option value="0.1" selected>Faible</option>
+      <option value="0.2">Moyen</option>
+      <option value="0.35">Fort</option>
+    </select>
+    <div class="audio-row">
+      <button class="btn small cyan" id="mus-play">▶ JOUER</button>
+      <button class="btn small ghost" id="mus-stop">⏹ STOP</button>
+      <button class="btn small ok" id="mus-record">● ENREGISTRER 30S</button>
+    </div>
+    <div id="mus-status" class="hint"></div>
+  </div></div>
+</div>
+
+<!-- 7. PREVIEW -->
+<div class="panel" id="p-preview">
+  <div class="ph" data-t="p-preview">
+    <div class="pt"><span class="n">7</span> Prévisualisation séquence</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <div class="hint">Lit les 3 vidéos à la suite avec la voix-off.</div>
+    <video class="preview-video" id="prev-video" playsinline></video>
+    <div class="btn-row">
+      <button class="btn small ok" id="prev-play" style="flex:1">▶ JOUER SÉQUENCE</button>
+      <button class="btn small ghost" id="prev-stop" style="flex:1">⏹ STOP</button>
+    </div>
+    <div class="hint" id="prev-info" style="text-align:center;margin-top:.4rem"></div>
+  </div></div>
+</div>
+
+<!-- 8. EXPORT -->
+<div class="panel" id="p-export">
+  <div class="ph" data-t="p-export">
+    <div class="pt"><span class="n">8</span> Export</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <button class="btn cyan" id="dl-zip">📦 TOUT EXPORTER EN .ZIP</button>
     <button class="btn ghost" id="dl-all">TÉLÉCHARGER LES IMAGES</button>
     <button class="btn ghost" id="dl-videos">TÉLÉCHARGER LES VIDÉOS</button>
-    <button class="btn ghost" id="dl-script">TÉLÉCHARGER LE SCRIPT TEXTE</button>
+    <button class="btn ghost" id="dl-srt">TÉLÉCHARGER LES SOUS-TITRES (.srt)</button>
+    <button class="btn ghost" id="dl-script">TÉLÉCHARGER LE SCRIPT (.txt)</button>
     <button class="btn ghost" id="copy-punch">COPIER LA CHUTE</button>
     <button class="btn err" id="reset-all">EFFACER TOUT</button>
   </div></div>
@@ -204,7 +283,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
 
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">Revolt//Studio · v1.4 · Vidéo + Images</div>
+<div class="footer-note">Revolt//Studio v2.0 · Images · Vidéos · Audio · Export complet</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -219,11 +298,8 @@ const VID_W = 576, VID_H = 1024;
 const MAX_PROMPT = 1800;
 const INITIAL_WAIT = 105;
 const POLL_INTERVAL = 5;
-const STORAGE_KEY = 'revolt_studio_v1_4';
+const STORAGE_KEY = 'revolt_studio_v2_0';
 
-// ═══════════════════════════════════════════════════════════════
-// STYLE BASE
-// ═══════════════════════════════════════════════════════════════
 const STYLE_BASE =
 'Ultra photorealistic cinematic photography. Analog 35mm film, Kodak Vision3 500T, pronounced grain, bloom around light sources, high contrast. ' +
 'Futuristic Asian megacity alley at night. Wet asphalt, deep puddles with reflections, steam from manholes, tangled cables overhead, vertical neon signs in Chinese and Korean characters on every facade. ' +
@@ -234,64 +310,89 @@ const CHARACTER_FACE_RULE =
 'CRITICAL: The SAME character appears in every shot. EXACT SAME face, hair, scars, implants, clothing in every single image. Never alter the character. ';
 
 // ═══════════════════════════════════════════════════════════════
-// 8 CONCEPTS
+// 10 CONCEPTS
 // ═══════════════════════════════════════════════════════════════
 const CONCEPTS = [
   { id: 'surveillance', icon: '👁️', name: 'Surveillance', desc: 'La ville te regarde',
     voice: "En 2030, chaque caméra de cette ville te connaît par ton nom. Ton visage est une donnée. Ton regard, une preuve. Ta démarche, une signature. On te dit que c'est pour ta sécurité. Mais demande-toi une chose : si c'était vraiment pour toi, pourquoi c'est gratuit ?",
     punch: "Ce qui est gratuit, c'est toi le produit.",
-    p1: "SHOT TYPE: EXTREME WIDE ESTABLISHING SHOT. The camera is 40 meters away from the character. The character is TINY in the frame, almost invisible, standing at the far end of an EMPTY alley. A single surveillance camera on a pole dominates the top-left of the frame. No close-up, no face detail. COLOR: cold cyan and pale pink, the base cyberpunk palette.",
-    p2: "SHOT TYPE: MEDIUM CLOSE-UP from the CHEST UP. The camera is 1 meter from the character. His face fills the LEFT HALF of the frame. He is looking UP and to the LEFT toward an off-screen surveillance camera above. Half of his face is lit by HARD PINK neon, the other half is in DEEP BLUE SHADOW. COLOR: hard pink on the left side, deep blue on the right.",
-    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE EYES ONLY. The camera is 10 centimeters from the character's face. Only his EYES and eyelashes fill the ENTIRE frame. No mouth, no nose, no hair visible. In each pupil, a tiny cyan reflection of a camera lens. No movement. COLOR: cyan reflections in dark pupils, pink neon rim on the skin." },
+    p1: "SHOT TYPE: EXTREME WIDE ESTABLISHING SHOT. Camera 40 meters away. The character is TINY in the frame, at the far end of an EMPTY alley. A single surveillance camera on a pole dominates top-left. No close-up. COLOR: cold cyan and pale pink.",
+    p2: "SHOT TYPE: MEDIUM CLOSE-UP from CHEST UP. His face fills the LEFT HALF. He looks UP and LEFT toward an off-screen camera. Half face lit by HARD PINK neon, other half DEEP BLUE SHADOW. COLOR: hard pink left, deep blue right.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE EYES ONLY. Only his EYES and eyelashes fill the ENTIRE frame. Tiny cyan reflection of a camera lens in each pupil. No movement. COLOR: cyan in dark pupils, pink neon rim." },
 
   { id: 'work', icon: '💼', name: 'Travail inutile', desc: 'Ils te paient pour te taire',
     voice: "En 2030, ton travail ne sert à rien. Pas parce que tu es mauvais. Parce qu'une machine le fait mieux. Mais on te garde quand même. Pour ton loyer. Pour ta consommation. Pour ton obéissance. On n'a plus besoin de toi. On a juste besoin que tu ne réfléchisses pas trop.",
     punch: "Ils ne te paient pas pour travailler. Ils te paient pour te taire.",
-    p1: "SHOT TYPE: EXTREME WIDE SHOT. Camera is 20 meters away. The alley is COMPLETELY EMPTY, no character visible at all. Cold white light spills from an open doorway at the far end of the street. Only the corridor of neon signs and wet asphalt. NO human figure. COLOR: cold white light mixed with pink neon on the walls.",
-    p2: "SHOT TYPE: MEDIUM SHOT from the WAIST UP, viewed from the character's LEFT PROFILE. He is leaning with his BACK against a shuttered storefront, eyes looking DOWN at his own empty hands. Exhausted slumped posture, shoulders low. Neon lights behind him. COLOR: pink rim light on the back and hair, shadow on the face.",
-    p3: "SHOT TYPE: EXTREME CLOSE-UP ON THE HANDS ONLY. Both open palms face up, framed tightly filling the ENTIRE image. No face, no head, no background. Lit by hard pink and cyan side light. Skin pores and dust visible on the palms. NO rings, NO objects. COLOR: harsh pink on one side of each palm, cyan on the other side." },
+    p1: "SHOT TYPE: EXTREME WIDE SHOT. Camera 20 meters away. The alley is COMPLETELY EMPTY. Cold white light from an open doorway at the far end. NO human figure. COLOR: cold white and pink neon on walls.",
+    p2: "SHOT TYPE: MEDIUM SHOT from WAIST UP, LEFT PROFILE. He leans BACK against a shuttered storefront, eyes DOWN at his empty hands. Exhausted posture. COLOR: pink rim light on back, shadow on face.",
+    p3: "SHOT TYPE: EXTREME CLOSE-UP ON THE HANDS ONLY. Both open palms face up, filling the ENTIRE image. NO face, NO background. Skin pores and dust visible. NO rings, NO objects. COLOR: harsh pink on one side, cyan on the other." },
 
   { id: 'data', icon: '📡', name: 'Données volées', desc: 'Tu es la matière première',
     voice: "En 2030, ta vie est à vendre. Tes photos. Tes messages. Tes opinions. Tes habitudes. Tes peurs. Chaque clic est une monnaie. Chaque hésitation est un profit. Tu n'es pas un utilisateur. Tu es une matière première. Et tu la donnes gratuitement.",
     punch: "Tu travailles pour eux. Gratuitement. Tous les jours.",
-    p1: "SHOT TYPE: LOW WIDE SHOT AT GROUND LEVEL. The camera is at ankle height, looking at the ground and the legs of passersby. ONLY blurred anonymous legs and shoes fill the frame. No faces, no upper bodies. Dense crowd, ALL OUT OF FOCUS. Wet asphalt with neon reflections. COLOR: pink and cyan reflected in puddles, dark silhouettes of legs.",
-    p2: "SHOT TYPE: MEDIUM SHOT from the waist up. The character stands PERFECTLY STILL in the middle of the moving crowd. The crowd around him is COMPLETELY MOTION-BLURRED. He is the ONLY SHARP element. He stares straight forward, unblinking. COLOR: hard pink neon side-light on the face, cyan on the jacket shoulder.",
-    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE RIGHT EYE ONLY. The eye fills the ENTIRE frame. Only the iris, pupil, eyelashes, and surrounding skin visible. Inside the iris, a scrolling stream of tiny glowing pink and cyan data characters flows vertically. No movement of the eye, dead stare. COLOR: cyan and pink data glow inside the iris." },
+    p1: "SHOT TYPE: LOW WIDE SHOT AT GROUND LEVEL. Camera at ankle height. ONLY blurred anonymous LEGS and SHOES fill the frame. No faces, no upper bodies. Wet asphalt with neon reflections. COLOR: pink and cyan in puddles.",
+    p2: "SHOT TYPE: MEDIUM SHOT from waist up. The character stands PERFECTLY STILL in the moving crowd. Crowd around him is MOTION-BLURRED. He is the ONLY SHARP element. Stares forward. COLOR: hard pink side-light.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE RIGHT EYE ONLY. The eye fills the ENTIRE frame. Inside the iris, a scrolling stream of tiny glowing pink and cyan data characters flows vertically. Dead stare. COLOR: cyan and pink data inside iris." },
 
   { id: 'ai', icon: '🤖', name: 'IA qui décide', desc: 'Le chiffre qui te condamne',
     voice: "En 2030, une machine décide qui aura un prêt. Qui aura un logement. Qui aura un travail. Qui aura le droit d'exister. Elle ne te connaît pas. Elle ne te juge pas. Elle calcule. Et si ton score tombe trop bas, tu disparais des radars. Pas de procès. Pas d'appel. Juste un chiffre qui te condamne.",
     punch: "L'IA n'est pas neutre. Elle est écrite par ceux qui te possèdent.",
-    p1: "SHOT TYPE: EXTREME WIDE SHOT from 30 meters. COMPLETELY EMPTY alley, no character. A giant glowing holographic screen floats above the street, displaying abstract RED horizontal bars and blurred numbers. The screen DOMINATES the upper half of the frame. COLOR: dominant RED from the hologram, subtle cyan on the walls.",
-    p2: "SHOT TYPE: MEDIUM SHOT from BEHIND THE CHARACTER. We see only his BACK and the back of his head. He is looking UP at an off-screen hologram above. His back and shoulders are lit by COLD CYAN light from above. Shoulders tense. NO face visible. COLOR: cold cyan from above, deep blue shadows on the back.",
-    p3: "SHOT TYPE: EXTREME CLOSE-UP OF THE FACE FROM THE FRONT. Only the character's face fills the entire frame. He is lit ONLY by HARSH RED light from an off-screen source on the RIGHT. The LEFT half of the face is in COMPLETE BLACK SHADOW. Eyes fixed forward, no expression. COLOR: hard RED on the right half, pure black on the left half. NO PINK, NO CYAN." },
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 30 meters. COMPLETELY EMPTY alley. ABSOLUTELY NO PEOPLE, NO CROWD, NO SILHOUETTES. Only wet asphalt, closed shops, and a giant glowing holographic screen floating above, displaying abstract RED bars and blurred numbers. COLOR: dominant RED from hologram.",
+    p2: "SHOT TYPE: MEDIUM SHOT from BEHIND THE CHARACTER. We see only his BACK and the back of his head, 2 meters away. He wears ONLY the worn BLACK TECHNICAL JACKET with high collar — NO armor, NO tactical vest, NO shoulder pads, NO metallic parts. He looks UP at an off-screen hologram. COLOR: cold cyan from above, deep blue shadows.",
+    p3: "SHOT TYPE: EXTREME CLOSE-UP OF THE FACE FROM THE FRONT. Only the character's face fills the entire frame. Lit ONLY by HARSH RED light from the RIGHT. LEFT half is COMPLETE BLACK SHADOW. Eyes fixed forward. COLOR: hard RED right, pure black left. NO PINK, NO CYAN." },
 
   { id: 'city', icon: '🌆', name: 'Ville qui te vide', desc: 'Personne ne t\'attend',
     voice: "En 2030, la ville est pleine. Et toi, tu es seul. Dix millions de personnes autour de toi. Zéro qui connaît ton prénom. On a construit des tours toujours plus hautes. Des écrans toujours plus grands. Des foules toujours plus denses. Pour que tu oublies une chose simple : personne ne t'attend nulle part.",
     punch: "Ils t'ont donné le monde. Ils t'ont pris ta place.",
-    p1: "SHOT TYPE: EXTREME WIDE SHOT from 50 meters. The alley recedes into HEAVY FOG. Buildings stretch HIGH ABOVE the frame, out of view. THOUSANDS of tiny blurred silhouettes walk in both directions. NO identifiable face anywhere. Monumental, crushing scale. COLOR: pale pink and cyan diffused by the fog, no sharp lights.",
-    p2: "SHOT TYPE: MEDIUM WIDE SHOT from the waist up. The character stands ALONE and perfectly STILL in the middle of the moving crowd. ALL silhouettes around him are MOTION-BLURRED and FACELESS. He is the only sharp human figure. Empty space around him. COLOR: pink rim light on the shoulders, cyan cold light on the chest.",
-    p3: "SHOT TYPE: WIDE SHOT FROM BEHIND. We see the character's SILHOUETTE from the back, SMALL in the frame. He walks AWAY from the camera into the neon fog. The crowd around him has COMPLETELY VANISHED. Empty street ahead. No other human visible. COLOR: pink and cyan neon fading into the fog, character in silhouette." },
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 50 meters. The alley recedes into HEAVY FOG. Buildings stretch HIGH ABOVE. THOUSANDS of tiny blurred silhouettes walk in both directions. NO identifiable face. Monumental scale. COLOR: pale pink and cyan diffused by fog.",
+    p2: "SHOT TYPE: MEDIUM WIDE SHOT from waist up. The character stands ALONE and STILL in the middle of the moving crowd. ALL silhouettes around him are MOTION-BLURRED and FACELESS. He is the only sharp figure. COLOR: pink rim light on shoulders, cyan on chest.",
+    p3: "SHOT TYPE: WIDE SHOT FROM BEHIND. We see his SILHOUETTE from the back, SMALL in the frame. He walks AWAY into the neon fog. The crowd has COMPLETELY VANISHED. Empty street ahead. COLOR: pink and cyan neon fading into fog." },
 
   { id: 'body', icon: '🦾', name: 'Corps augmenté', desc: 'Tu es un abonnement',
     voice: "En 2030, on peut remplacer tes yeux. Tes oreilles. Ton cœur. Ta peau. Tout sauf ce qui te rend humain. On te vend des upgrades. Des versions améliorées de toi-même. Mais personne ne te demande si l'original te suffisait. On ne te demande jamais si tu voulais changer. On te demande juste si tu peux payer.",
     punch: "Tu n'es plus une personne. Tu es un abonnement.",
-    p1: "SHOT TYPE: WIDE SHOT from 15 meters. EMPTY alley, no character. On the LEFT side, a lit medical clinic storefront emits COLD WHITE light onto the wet pavement. A red cross sign glows above the door. NO human figure. COLOR: cold clinical white light from the storefront, cyan neon around.",
-    p2: "SHOT TYPE: MEDIUM CLOSE-UP from the SHOULDERS UP, viewed from the LEFT SIDE PROFILE. The character's head and neck fill the frame. The silver data port implant BEHIND THE RIGHT EAR is the focal point. Cyan LED pulsing. His face is turned AWAY from camera. COLOR: cold cyan glow from the implant, pink neon rim on the hair.",
-    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE IMPLANT ONLY. Only the DATA PORT BEHIND THE EAR fills the entire frame. Rain droplets on the metal surface. The cyan LED glows brightly in the dark. Skin pores, stubble, and hairline visible around the implant. NO face, NO eye visible. COLOR: bright cyan LED glow in dark, deep black background." },
+    p1: "SHOT TYPE: WIDE SHOT from 15 meters. EMPTY alley. On the LEFT, a lit medical clinic storefront emits COLD WHITE light onto wet pavement. A red cross sign glows. NO human figure. COLOR: cold white from storefront, cyan neon around.",
+    p2: "SHOT TYPE: MEDIUM CLOSE-UP from SHOULDERS UP, LEFT SIDE PROFILE. The silver data port implant BEHIND THE RIGHT EAR is the focal point. Cyan LED pulsing. Face turned AWAY. COLOR: cold cyan glow from implant, pink neon rim on hair.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE IMPLANT ONLY. Only the DATA PORT BEHIND THE EAR fills the ENTIRE frame. Rain droplets on metal. Cyan LED glows in the dark. Skin pores and hairline around it. NO face, NO eye. COLOR: bright cyan LED in dark." },
 
-  { id: 'words', icon: '🚫', name: 'Contrôle des mots', desc: 'Quand on t\'enlève les mots',
-    voice: "En 2030, certains mots sont interdits. Pas parce qu'ils sont faux. Parce qu'ils sont dangereux. Dangereux pour qui ? Pour ceux qui décident. Pour ceux qui possèdent. Pour ceux qui mentent. On te dit que c'est pour ton bien. Mais rappelle-toi : ce n'est jamais toi qui décides ce qui est bien.",
-    punch: "Quand on t'enlève les mots, on t'enlève tout.",
-    p1: "SHOT TYPE: WIDE SHOT from 15 meters. EMPTY alley, no character. Above, ONE giant vertical neon sign is COMPLETELY BLACKED OUT with gray static noise. It stands as a visual anomaly among the other lit signs. No character visible. COLOR: gray static where the sign should glow, pink and cyan on all other signs.",
-    p2: "SHOT TYPE: MEDIUM SHOT from the waist up. The character looks UP and slightly LEFT at the blacked-out sign (off-frame). His mouth is CLOSED TIGHT, jaw tense, eyebrows slightly lowered. Cold white light on the face from above. COLOR: cold white light on the face, cyan ambient from surroundings.",
-    p3: "SHOT TYPE: EXTREME CLOSE-UP ON THE MOUTH ONLY. Only the character's LIPS and MOUTH fill the ENTIRE frame. Lips pressed tightly closed. Harsh pink neon light from the LEFT side, blue shadow from the RIGHT. No expression, no movement. COLOR: pink on the left half, deep blue on the right half." },
+  { id: 'air', icon: '💨', name: 'L\'air', desc: 'Tu paies pour respirer',
+    voice: "En 2030, l'air est devenu une marchandise. Tu paies pour respirer. Les riches ont des filtres dans leurs tours. Les autres ont des masques qui tiennent trois jours. On t'a dit que c'était pour ton bien. Que la planète est malade. Mais personne ne te dit qui l'a rendue malade.",
+    punch: "Respirer n'est plus un droit. C'est un abonnement.",
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 25 meters. The alley is filled with THICK YELLOW-GRAY HAZE obscuring everything beyond 15 meters. Dozens of blurred silhouettes wear white and grey FILTER MASKS. A vertical neon sign on the LEFT glows a sickly YELLOW warning color. Character TINY at the far end. COLOR: sickly yellow and gray haze dominating.",
+    p2: "SHOT TYPE: MEDIUM CLOSE-UP from CHEST UP. The character stands still facing slightly RIGHT. A dark grey industrial FILTER MASK is pulled DOWN around his NECK, not covering his mouth. His nose and mouth are EXPOSED, faint breath vapor visible. Harsh YELLOW-GRAY light on his face from above. COLOR: sickly yellow upper face, pink neon rim on hair.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP OF THE MOUTH AND FILTER MASK ONLY. Only the lower half of the face fills the frame: nose, mouth, chin, and the FILTER MASK hanging around the neck. CONDENSATION droplets on the plastic surface. LIPS slightly parted, faint breath vapor. NO eyes, NO forehead. COLOR: harsh YELLOW-GRAY from above, deep shadow under jaw." },
+
+  { id: 'silence', icon: '🤫', name: 'Silence imposé', desc: 'On t\'a coupé la voix',
+    voice: "En 2030, parler est devenu un risque. Chaque mot est analysé. Chaque opinion, notée. Chaque silence, suspect. On t'a appris à ne plus rien dire. À sourire. À hocher la tête. À faire semblant. Et le pire, c'est que tu as fini par aimer ça.",
+    punch: "Ils ne t'ont pas fait taire. Ils t'ont appris à aimer le silence.",
+    p1: "SHOT TYPE: WIDE SHOT from 20 meters. EMPTY alley. On the RIGHT, a massive PUBLIC SPEAKER attached to a wall, covered in DUCT TAPE with a big X of black tape sealing it shut. NO human figure. COLOR: pale pink and cyan, the speaker in shadow.",
+    p2: "SHOT TYPE: MEDIUM CLOSE-UP from CHEST UP. The character's LEFT HAND is PRESSED FLAT over his OWN MOUTH, fingers spread. His EYES are visible above, staring forward, expressionless. Harsh cyan light from the right. COLOR: cold cyan on right side, pink on left edge.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE MOUTH COVERED BY THE HAND. The hand and mouth fill the ENTIRE frame. Fingers slightly spread so we see the lips pressed tightly closed behind them. Skin pores, fingerprints, slight sweat. NO eyes, NO background. COLOR: harsh pink on one side, cyan on the other." },
 
   { id: 'revolt', icon: '🔥', name: 'Révolte', desc: 'Ils ont peur de ton réveil',
     voice: "En 2030, ils te diront que tu ne peux rien faire. Que le système est trop grand. Que les puissants sont trop forts. Que ta voix n'a pas de poids. Ils te le diront encore. Et encore. Et encore. Pas parce que c'est vrai. Parce que c'est leur seule arme qui leur reste : te faire croire que tu n'en as pas.",
     punch: "Ils n'ont pas peur de ta colère. Ils ont peur de ton réveil.",
-    p1: "SHOT TYPE: EXTREME WIDE SHOT from 35 meters. The alley is EMPTY of the main character. At the FAR END of the street, a DISTANT MASS of dark silhouettes is gathering, small in the frame. The entire alley is bathed in DEEP SATURATED RED NEON. No pink, no cyan. Wet street reflects RED only.",
-    p2: "SHOT TYPE: MEDIUM SHOT from the waist up. The character stands STILL facing forward. Both FISTS VISIBLY CLENCHED at his sides, knuckles white. His face is fully lit by HARD RED neon from the front. Jaw set, unflinching gaze. NO pink, NO cyan anywhere in the image. ONLY RED and deep black shadows.",
-    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP. The character's face fills the ENTIRE frame edge to edge. NOTHING ELSE VISIBLE — no street, no crowd, no background, only his skin, eyes, and the darkness around him. The background is PURE BLACK behind his face. He stares DIRECTLY INTO THE CAMERA LENS. Deep RED light reflects in both eyes. Rain droplets on the skin. NO crowd visible at all." }
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 35 meters. EMPTY of the main character. FAR END of the street, a DISTANT MASS of dark silhouettes gathers, small in the frame. Entire alley bathed in DEEP SATURATED RED NEON. No pink, no cyan. Wet street reflects RED only.",
+    p2: "SHOT TYPE: MEDIUM SHOT from waist up. The character stands STILL facing forward. Both FISTS VISIBLY CLENCHED at his sides, knuckles white. Face fully lit by HARD RED neon from the front. Jaw set. NO pink, NO cyan. ONLY RED and deep black.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP. The character's face fills the ENTIRE frame edge to edge. NOTHING ELSE VISIBLE — pure BLACK background. He stares DIRECTLY INTO THE CAMERA LENS. Deep RED light in both eyes. Rain droplets on skin. NO crowd visible." },
+
+  { id: 'solitude', icon: '🚶', name: 'Solitude urbaine', desc: 'Noyé dans la foule',
+    voice: "En 2030, tu n'es pas seul parce que personne ne veut de toi. Tu es seul parce que tout le monde est seul. On a construit une ville où dix millions de personnes marchent côte à côte sans jamais se regarder. On a appelé ça la modernité. On aurait pu appeler ça autrement.",
+    punch: "Ils n'ont pas isolé les gens. Ils ont isolé chacun de nous.",
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 40 meters. The alley is PACKED with hundreds of blurry silhouettes walking in both directions. NO single face identifiable. Monumental, oppressive crowd. Character invisible in the mass. COLOR: pink and cyan neon diffused through the crowd.",
+    p2: "SHOT TYPE: MEDIUM CLOSE-UP from CHEST UP. The character stands STILL as the CROWD RUSHES AROUND HIM, all bodies out of focus, only he sharp. He stares forward, empty gaze. COLOR: pink neon side-light, cyan rim on hair.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP OF THE LEFT EAR AND PROFILE. Only the side of his face, ear, and part of the neck fill the frame. Through the blurred background behind him, indistinct silhouettes pass by, out of focus. NO eye contact possible. COLOR: cool blue shadow on skin, pink rim on the ear edge." }
+];
+
+const MOTIONS = [
+  { id: 'static', label: 'Presque statique', prompt: 'Almost static shot, only subtle wind, neon flicker, and steam drift in the scene' },
+  { id: 'dolly-in', label: 'Dolly in (avance)', prompt: 'Slow cinematic dolly in, subtle camera push forward, character breathing naturally' },
+  { id: 'dolly-out', label: 'Dolly out (recul)', prompt: 'Slow cinematic dolly out, camera pulls back slightly revealing the scene' },
+  { id: 'track-right', label: 'Tracking droit', prompt: 'Very slow tracking shot moving laterally to the right' },
+  { id: 'track-left', label: 'Tracking gauche', prompt: 'Very slow tracking shot moving laterally to the left' },
+  { id: 'handheld', label: 'Caméra épaule', prompt: 'Subtle handheld camera with micro-movements, breathing character' },
+  { id: 'zoom-in', label: 'Zoom lent visage', prompt: 'Slow zoom in on the character face, cinematic intensity, one direction only, no return' },
+  { id: 'crane-up', label: 'Grue ascendante', prompt: 'Slow crane rising upward vertically, revealing the full scene' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -306,12 +407,15 @@ const state = {
     { idx: 2, key: 'p3', title: 'Chute', desc: 'Très gros plan — détail intense', img: null, status: 'idle', prompt: '' }
   ],
   videos: [
-    { idx: 0, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0 },
-    { idx: 1, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0 },
-    { idx: 2, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0 }
+    { idx: 0, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0, motion: 'static', duration: 169, progressText: '' },
+    { idx: 1, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0, motion: 'dolly-in', duration: 169, progressText: '' },
+    { idx: 2, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0, motion: 'zoom-in', duration: 169, progressText: '' }
   ],
   isBusy: false,
-  restored: false
+  restored: false,
+  ttsVoice: null,
+  mediaRecorder: null,
+  audioCtx: null
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -403,7 +507,7 @@ function buildIdentityBlock() {
   const bottom = $('c-bottom').value.trim();
   const shoes = $('c-shoes').value.trim();
   const acc = $('c-acc').value.trim();
-  return `CHARACTER — ${name}: ${age} years old, ${eth}, ${face}, ${hair}. Marks: ${mark}. Implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Accessory: ${acc}. This is the SAME character in every shot — never alter.`;
+  return `CHARACTER — ${name}: ${age} years old, ${eth}, ${face}, ${hair}. Marks: ${mark}. Implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Accessory: ${acc}. SAME character every shot — never alter.`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -428,7 +532,7 @@ function saveState() {
         shoes: $('c-shoes').value, acc: $('c-acc').value
       },
       slots: state.slots.map(s => ({ img: s.img, status: s.status, prompt: s.prompt })),
-      videos: state.videos.map(v => ({ url: v.url, status: v.status, videoId: v.videoId })),
+      videos: state.videos.map(v => ({ url: v.url, status: v.url ? 'done' : 'idle', videoId: v.videoId, motion: v.motion, duration: v.duration })),
       savedAt: Date.now()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -458,6 +562,8 @@ function loadState() {
         state.videos[i].url = v.url || null;
         state.videos[i].status = v.url ? 'done' : 'idle';
         state.videos[i].videoId = v.videoId || null;
+        if (v.motion) state.videos[i].motion = v.motion;
+        if (v.duration) state.videos[i].duration = v.duration;
       }
     });
     const t = new Date(d.savedAt).toLocaleTimeString('fr-FR');
@@ -495,7 +601,7 @@ function renderConcepts() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// IMAGE PROMPT BUILDER
+// PROMPTS
 // ═══════════════════════════════════════════════════════════════
 function buildPrompt(slot) {
   const c = state.concept;
@@ -507,33 +613,31 @@ function buildPrompt(slot) {
   p += sceneDesc + ' ';
   p += '════ REPEAT ════ ';
   p += sceneDesc + ' ';
-  p += '════ THIS IS THE ONLY SCENE, FOLLOW IT STRICTLY ════ ';
+  p += '════ FOLLOW STRICTLY ════ ';
   p += sceneDesc + ' ';
   p += STYLE_BASE + ' ';
   p += CHARACTER_FACE_RULE + ' ';
   p += charBlock + ' ';
-  p += 'Vertical 9:16 cinematic composition. ';
-  p += 'No text, no watermark, no logo. ';
+  p += 'Vertical 9:16 cinematic composition. No text, no watermark, no logo. ';
 
   if (p.length > MAX_PROMPT) p = p.slice(0, MAX_PROMPT);
   return p;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// VIDEO PROMPT BUILDER
-// ═══════════════════════════════════════════════════════════════
 function buildVideoPrompt(idx) {
   const c = state.concept;
-  const motion = $('v-motion').value;
+  const v = state.videos[idx];
+  const motionObj = MOTIONS.find(m => m.id === v.motion) || MOTIONS[0];
   const sceneKey = 'p' + (idx + 1);
   const sceneDesc = c[sceneKey] || '';
 
   let p = 'Cinematic cyberpunk shot. Photorealistic, film grain, no CGI. ';
-  p += 'MOTION: ' + motion + '. ';
+  p += 'MOTION: ' + motionObj.prompt + '. ';
+  p += 'ONE SINGLE DIRECTION LOCK: camera moves continuously in ONE direction only, NO return, NO back-and-forth. ';
   p += 'SCENE: ' + sceneDesc + ' ';
   p += 'STRICT: maintain exact character appearance, clothing, environment, lighting, and color palette from the keyframe image. ';
-  p += 'No text overlays, no watermarks, no cuts, no scene changes. ';
-  p += 'Natural fluid motion only. No morphing faces. No changing clothing.';
+  p += 'SUBTLE ANIMATION: blinking eyes slowly, breathing chest movement, rain droplets falling, neon lights flickering, steam drifting. ';
+  p += 'No text overlays, no watermarks, no cuts, no scene changes. No morphing faces. No changing clothing.';
 
   if (p.length > MAX_PROMPT) p = p.slice(0, MAX_PROMPT);
   return p;
@@ -571,7 +675,6 @@ async function callImageAPI(prompt) {
   if (!state.apiKey) throw new Error('Clé API manquante');
   const sizes = [`${IMG_W}x${IMG_H}`, '1024x1792', '1024x1024', '768x1024', '512x512'];
   let lastErr = null;
-
   for (const size of sizes) {
     const variants = [
       { model: MODEL_IMAGE, prompt, size, response_format: 'url' },
@@ -606,10 +709,7 @@ async function createVideoTask(startUrl, endUrl, prompt, numFrames) {
   const body = {
     model: MODEL_VIDEO,
     prompt: prompt,
-    extra_body: {
-      image: [startUrl, endUrl],
-      mode: 'keyframes'
-    },
+    extra_body: { image: [startUrl, endUrl], mode: 'keyframes' },
     num_frames: numFrames,
     frame_rate: 24,
     height: VID_H,
@@ -628,36 +728,27 @@ async function createVideoTask(startUrl, endUrl, prompt, numFrames) {
   return id;
 }
 
-async function pollVideo(videoId, onProgress, checkAbort) {
+async function pollVideo(videoId, onProgress) {
   const start = Date.now();
-  let initialWait = INITIAL_WAIT;
-
-  // Wait initiale (l'API a besoin de temps avant de répondre)
-  for (let r = Math.round(initialWait); r > 0; r--) {
-    if (checkAbort && checkAbort()) throw new Error('Arrêt');
+  for (let r = Math.round(INITIAL_WAIT); r > 0; r--) {
     const e = Math.round((Date.now() - start) / 1000);
-    const p = Math.min(Math.round((e / initialWait) * 95), 90);
-    onProgress('Préparation…', p, e, '≈ ' + formatTime(r) + ' avant polling');
+    const p = Math.min(Math.round((e / INITIAL_WAIT) * 90), 85);
+    onProgress('Préparation…', p, e);
     await sleep(1000);
   }
-
-  // Polling
   for (let a = 0; a < 400; a++) {
-    if (checkAbort && checkAbort()) throw new Error('Arrêt');
     const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
     try {
       const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + state.apiKey } });
       if (res.status === 429) { await sleep(20000); continue; }
       if (res.status === 404) { await sleep(POLL_INTERVAL * 1000); continue; }
       if (!res.ok) { await sleep(POLL_INTERVAL * 1000); continue; }
-
       const d = await res.json();
       const status = (d.status || '').toLowerCase();
       const apiProgress = d.progress || 0;
       const elapsed = Math.round((Date.now() - start) / 1000);
-      const timeProgress = Math.min(Math.round((elapsed / initialWait) * 95), 92);
+      const timeProgress = Math.min(Math.round((elapsed / INITIAL_WAIT) * 90), 92);
       const p = Math.max(apiProgress, timeProgress);
-
       if (status === 'completed' || status === 'succeeded' || status === 'done') {
         const u = d.metadata?.url || d.url || d.output?.url || d.data?.url;
         if (!u) throw new Error('Pas d\'URL vidéo');
@@ -666,14 +757,13 @@ async function pollVideo(videoId, onProgress, checkAbort) {
       if (status === 'failed' || status === 'error' || status === 'cancelled') {
         throw new Error('Échec API : ' + (d.error || status));
       }
-      onProgress('Génération…', p, elapsed, '');
+      onProgress('Génération…', p, elapsed);
     } catch (e) {
       if (e.message.startsWith('Échec')) throw e;
-      // Erreur réseau, on retente
     }
     await sleep(POLL_INTERVAL * 1000);
   }
-  throw new Error('Timeout vidéo (>20 min)');
+  throw new Error('Timeout vidéo');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -698,7 +788,7 @@ function renderSlots() {
     html += `<div class="slot-body">${esc(slot.desc)}</div>`;
 
     if (slot.img) html += `<img class="slot-img" src="${slot.img}" alt="Plan ${i+1}">`;
-    else html += `<div class="slot-img-placeholder">Plan ${i+1} — non généré</div>`;
+    else html += `<div class="slot-img-ph">Plan ${i+1} — non généré</div>`;
 
     html += `<div class="slot-status">${slot.status === 'idle' ? '○ en attente' : slot.status === 'gen' ? '◐ génération…' : slot.status === 'done' ? '● terminé' : '✕ erreur'}</div>`;
     html += `<div class="bar"><div class="bar-fill" style="width:${slot.status === 'gen' ? 60 : slot.status === 'done' ? 100 : 0}%"></div></div>`;
@@ -732,8 +822,10 @@ function renderVideos() {
   const allImagesReady = state.slots.every(s => s.status === 'done');
   if (!allImagesReady) {
     c.innerHTML = `<div class="hint" style="text-align:center;padding:1rem;">Génère les 3 images d'abord pour activer la vidéo.</div>`;
+    $('batch-videos').disabled = true;
     return;
   }
+  $('batch-videos').disabled = false;
 
   state.videos.forEach((v, i) => {
     const el = document.createElement('div');
@@ -743,16 +835,33 @@ function renderVideos() {
 
     if (v.url) {
       html += `<video class="slot-video" src="${v.url}" controls playsinline preload="metadata"></video>`;
+    } else if (v.status === 'gen') {
+      html += `<div class="slot-img-ph"><div class="spinner" style="width:40px;height:40px;border-width:3px;margin-bottom:.8rem;"></div><div style="color:var(--warn);font-weight:700;">Génération…</div></div>`;
+    } else {
+      html += `<div class="slot-img-ph">Vidéo ${i+1} — à générer</div>`;
+    }
+
+    // Menu mouvement + durée
+    html += `<div class="vopts">`;
+    html += `<select data-vmotion="${i}" ${v.status === 'gen' ? 'disabled' : ''}>`;
+    MOTIONS.forEach(m => { html += `<option value="${m.id}" ${v.motion === m.id ? 'selected' : ''}>${esc(m.label)}</option>`; });
+    html += `</select>`;
+    html += `<select data-vduration="${i}" ${v.status === 'gen' ? 'disabled' : ''}>`;
+    html += `<option value="121" ${v.duration === 121 ? 'selected' : ''}>5 sec</option>`;
+    html += `<option value="169" ${v.duration === 169 ? 'selected' : ''}>7 sec</option>`;
+    html += `<option value="241" ${v.duration === 241 ? 'selected' : ''}>10 sec</option>`;
+    html += `</select>`;
+    html += `</div>`;
+
+    if (v.status === 'gen') {
+      html += `<div class="slot-status" id="vp-${i}">${v.progressText || ''}</div>`;
+      html += `<div class="bar"><div class="bar-fill" id="vbar-${i}" style="width:${v.progress || 0}%"></div></div>`;
+    } else if (v.url) {
       html += `<div class="btn-row">`;
       html += `<button class="btn small ghost" data-vdl="${i}" style="flex:1">💾 TÉLÉCHARGER</button>`;
-      html += `<button class="btn small err" data-vdel="${i}" style="flex:1">↻ RÉGÉNÉRER</button>`;
+      html += `<button class="btn small err" data-vregen="${i}" style="flex:1">↻ RÉGÉNÉRER</button>`;
       html += `</div>`;
-    } else if (v.status === 'gen') {
-      html += `<div class="slot-img-placeholder" style="aspect-ratio:9/16;display:flex;flex-direction:column;justify-content:center;align-items:center;"><div class="spinner" style="width:40px;height:40px;border-width:3px;margin-bottom:1rem;"></div><div style="color:var(--warn);font-weight:700;">Génération en cours…</div></div>`;
-      html += `<div class="video-progress" id="vp-${i}">${v.progressText || ''}</div>`;
-      html += `<div class="bar"><div class="bar-fill" id="vbar-${i}" style="width:${v.progress || 0}%"></div></div>`;
     } else {
-      html += `<div class="slot-img-placeholder">Vidéo ${i+1} — à générer</div>`;
       html += `<button class="btn small warn" data-vgen="${i}" style="width:100%" ${state.isBusy || !state.apiKey ? 'disabled' : ''}>🎬 GÉNÉRER VIDÉO ${i+1}</button>`;
     }
 
@@ -760,16 +869,27 @@ function renderVideos() {
     c.appendChild(el);
   });
 
-  c.querySelectorAll('[data-vgen]').forEach(b => b.addEventListener('click', () => generateVideo(+b.dataset.vgen)));
+  c.querySelectorAll('[data-vgen]').forEach(b => b.addEventListener('click', () => generateVideo(+b.dataset.vgen, false)));
+  c.querySelectorAll('[data-vregen]').forEach(b => b.addEventListener('click', () => {
+    const i = +b.dataset.vregen;
+    state.videos[i].url = null;
+    state.videos[i].status = 'idle';
+    state.videos[i].videoId = null;
+    state.videos[i].progress = 0;
+    renderVideos();
+    saveState();
+    generateVideo(i, false);
+  }));
   c.querySelectorAll('[data-vdl]').forEach(b => b.addEventListener('click', () => {
     const v = state.videos[+b.dataset.vdl];
-    if (v.url) downloadImage(v.url, 'revolt_' + state.concept.id + '_video' + (+b.dataset.vdl + 1) + '.mp4');
+    if (v.url) downloadFile(v.url, 'revolt_' + state.concept.id + '_video' + (+b.dataset.vdl + 1) + '.mp4');
   }));
-  c.querySelectorAll('[data-vdel]').forEach(b => b.addEventListener('click', () => {
-    const i = +b.dataset.vdel;
-    if (!confirm('Régénérer cette vidéo ?')) return;
-    state.videos[i] = { idx: i, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0 };
-    renderVideos();
+  c.querySelectorAll('[data-vmotion]').forEach(s => s.addEventListener('change', () => {
+    state.videos[+s.dataset.vmotion].motion = s.value;
+    saveState();
+  }));
+  c.querySelectorAll('[data-vduration]').forEach(s => s.addEventListener('change', () => {
+    state.videos[+s.dataset.vduration].duration = parseInt(s.value);
     saveState();
   }));
 }
@@ -780,32 +900,24 @@ function renderVideos() {
 async function generateSlot(i) {
   if (state.isBusy) return;
   if (!state.apiKey) { toast('Ajoute ta clé API', 'err'); return; }
-
   state.isBusy = true;
   const slot = state.slots[i];
-  slot.status = 'gen';
-  slot.img = null;
+  slot.status = 'gen'; slot.img = null;
   renderSlots();
-
   const prompt = buildPrompt(slot);
   slot.prompt = prompt;
-
-  log('▶ Image plan ' + (i+1) + ' — ' + slot.title, 'i');
-  log('  Prompt : ' + prompt.length + ' car.', 'i');
+  log('▶ Image ' + (i+1) + ' — ' + slot.title + ' (' + prompt.length + ' car.)', 'i');
   setStatus('Génération image ' + (i+1) + '…');
-
   try {
     const url = await callImageAPI(prompt);
-    slot.img = url;
-    slot.status = 'done';
-    log('✅ Image plan ' + (i+1) + ' OK', 'o');
+    slot.img = url; slot.status = 'done';
+    log('✅ Image ' + (i+1) + ' OK', 'o');
     toast('Plan ' + (i+1) + ' prêt', 'ok');
   } catch (e) {
     slot.status = 'idle';
     log('❌ Image ' + (i+1) + ' : ' + e.message, 'e');
-    toast('Erreur : ' + e.message.slice(0, 60), 'err', 4000);
+    toast('Erreur', 'err');
   }
-
   state.isBusy = false;
   setStatus(null);
   renderSlots();
@@ -816,8 +928,7 @@ async function generateSlot(i) {
 async function regenerateSlot(i) {
   state.slots[i].status = 'idle';
   state.slots[i].img = null;
-  // Invalider la vidéo correspondante
-  state.videos[i] = { idx: i, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0 };
+  state.videos[i] = { idx: i, url: null, status: 'idle', videoId: null, progress: 0, elapsed: 0, motion: state.videos[i].motion, duration: state.videos[i].duration, progressText: '' };
   renderSlots();
   renderVideos();
   saveState();
@@ -834,28 +945,24 @@ function validateSlot(i) {
     const slots = document.querySelectorAll('.slot');
     if (slots[i+1]) slots[i+1].scrollIntoView({ behavior: 'smooth', block: 'center' });
   } else {
-    toast('Séquence images complète ✓ — Passer aux vidéos', 'ok', 3000);
-    renderVideos();
+    toast('Images complètes ✓ Passe aux vidéos', 'ok', 3000);
     const pv = $('p-video');
-    if (pv) pv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (pv) { pv.classList.add('open'); pv.scrollIntoView({ behavior: 'smooth' }); }
+    renderVideos();
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
 // VIDEO GENERATION
 // ═══════════════════════════════════════════════════════════════
-async function generateVideo(i) {
-  if (state.isBusy) return;
+async function generateVideo(i, silent = false) {
+  if (state.isBusy && !silent) return;
   if (!state.apiKey) { toast('Ajoute ta clé API', 'err'); return; }
 
   const startImg = state.slots[i]?.img;
-  // Pour l'image de fin : on utilise l'image suivante si elle existe, sinon la même
   const endImg = state.slots[i+1]?.img || startImg;
+  if (!startImg) { toast('Image plan ' + (i+1) + ' manquante', 'err'); return; }
 
-  if (!startImg) { toast('Génère d\'abord l\'image du plan ' + (i+1), 'err'); return; }
-  if (!endImg) { toast('Image de fin manquante', 'err'); return; }
-
-  state.isBusy = true;
   const v = state.videos[i];
   v.status = 'gen';
   v.url = null;
@@ -864,52 +971,281 @@ async function generateVideo(i) {
   v.progressText = 'Création de la tâche…';
   renderVideos();
 
-  const numFrames = parseInt($('v-duration').value) || 169;
   const prompt = buildVideoPrompt(i);
-
-  log('▶ Vidéo plan ' + (i+1) + ' — création tâche', 'i');
-  log('  Durée : ' + (numFrames / 24).toFixed(1) + 's · prompt : ' + prompt.length + ' car.', 'i');
-  setStatus('Création vidéo ' + (i+1) + '…');
+  log('▶ Vidéo ' + (i+1) + ' — ' + (v.duration / 24).toFixed(1) + 's · ' + v.motion, 'i');
+  if (!silent) setStatus('Création vidéo ' + (i+1) + '…');
 
   try {
-    const videoId = await createVideoTask(startImg, endImg, prompt, numFrames);
+    const videoId = await createVideoTask(startImg, endImg, prompt, v.duration);
     v.videoId = videoId;
-    log('  Task créée : ' + videoId, 'i');
+    log('  Task : ' + videoId, 'i');
     saveState();
 
-    const finalUrl = await pollVideo(videoId, (label, p, e, eta) => {
+    const finalUrl = await pollVideo(videoId, (label, p, e) => {
       v.progress = p;
       v.elapsed = e;
-      v.progressText = label + ' ' + p + '% · ' + e + 's' + (eta ? ' · ' + eta : '');
+      v.progressText = label + ' ' + p + '% · ' + e + 's';
       const el = $('vp-' + i);
       if (el) el.textContent = v.progressText;
       const bar = $('vbar-' + i);
       if (bar) bar.style.width = p + '%';
-      setStatus('Vidéo ' + (i+1) + ' — ' + p + '%');
-    }, () => false);
+      if (!silent) setStatus('Vidéo ' + (i+1) + ' — ' + p + '%');
+    });
 
     v.url = finalUrl;
     v.status = 'done';
     v.progress = 100;
-    log('✅ Vidéo plan ' + (i+1) + ' OK', 'o');
-    toast('Vidéo ' + (i+1) + ' prête ✓', 'ok', 3000);
+    log('✅ Vidéo ' + (i+1) + ' OK', 'o');
+    if (!silent) toast('Vidéo ' + (i+1) + ' prête ✓', 'ok', 3000);
+    return true;
   } catch (e) {
     v.status = 'idle';
     v.url = null;
     log('❌ Vidéo ' + (i+1) + ' : ' + e.message, 'e');
-    toast('Erreur vidéo : ' + e.message.slice(0, 60), 'err', 5000);
+    if (!silent) toast('Erreur vidéo', 'err');
+    return false;
+  } finally {
+    renderVideos();
+    saveState();
+    if (!silent) setStatus(null);
   }
+}
 
+async function batchVideos() {
+  if (state.isBusy) { toast('Déjà en cours', 'warn'); return; }
+  if (!state.apiKey) { toast('Ajoute ta clé API', 'err'); return; }
+  if (!state.slots.every(s => s.status === 'done')) { toast('Génère les 3 images d\'abord', 'err'); return; }
+  if (!confirm('Générer les 3 vidéos d\'affilée ? (~15-20 minutes)')) return;
+
+  state.isBusy = true;
+  log('⚡ Batch : génération des 3 vidéos', 'o');
+  for (let i = 0; i < 3; i++) {
+    if (state.videos[i].url && state.videos[i].url.startsWith('http')) {
+      log('Vidéo ' + (i+1) + ' déjà prête, on saute', 'i');
+      continue;
+    }
+    setStatus('Batch : vidéo ' + (i+1) + ' / 3');
+    await generateVideo(i, true);
+    if (i < 2) { log('Pause 60s avant la suivante…', 'i'); await sleep(62000); }
+  }
   state.isBusy = false;
   setStatus(null);
-  renderVideos();
-  saveState();
+  log('⚡ Batch terminé', 'o');
+  toast('Batch terminé', 'ok', 4000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════════════════════
+function loadVoices() {
+  if (!('speechSynthesis' in window)) {
+    $('tts-voice').innerHTML = '<option>Aucune voix disponible</option>';
+    return;
+  }
+  const voices = speechSynthesis.getVoices();
+  const sel = $('tts-voice');
+  sel.innerHTML = '';
+  const frVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('fr'));
+  const otherVoices = voices.filter(v => !v.lang || !v.lang.toLowerCase().startsWith('fr'));
+  if (frVoices.length === 0) {
+    sel.innerHTML = '<option value="">Aucune voix FR — utilise la voix par défaut</option>';
+  } else {
+    frVoices.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.name;
+      opt.textContent = '🇫🇷 ' + v.name;
+      sel.appendChild(opt);
+    });
+  }
+  state.ttsVoice = frVoices[0] || null;
+}
+
+function speakText(text) {
+  return new Promise(resolve => {
+    if (!('speechSynthesis' in window)) { resolve(); return; }
+    speechSynthesis.cancel();
+    setTimeout(() => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = parseFloat($('tts-rate').value) || 0.85;
+      u.pitch = parseFloat($('tts-pitch').value) || 0.75;
+      u.volume = 1;
+      const name = $('tts-voice').value;
+      if (name) {
+        const v = speechSynthesis.getVoices().find(x => x.name === name);
+        if (v) { u.voice = v; u.lang = v.lang; }
+      }
+      u.onend = resolve;
+      u.onerror = resolve;
+      speechSynthesis.speak(u);
+    }, 150);
+  });
+}
+
+function stopSpeech() { if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+
+function ttsPlay() {
+  const txt = $('vo-text').value.trim();
+  if (!txt) { toast('Écris un script d\'abord', 'err'); return; }
+  $('tts-status').textContent = 'Lecture…';
+  speakText(txt).then(() => { $('tts-status').textContent = ''; });
+}
+
+function ttsStop() {
+  stopSpeech();
+  $('tts-status').textContent = 'Arrêté';
+  setTimeout(() => $('tts-status').textContent = '', 1500);
+}
+
+function ttsRecord() {
+  const txt = $('vo-text').value.trim();
+  if (!txt) { toast('Écris un script d\'abord', 'err'); return; }
+  toast('Enregistrement audio non supporté par le navigateur — utilise ÉCOUTER + enregistre ton écran', 'warn', 5000);
+  $('tts-status').textContent = 'Pour exporter : utilise un enregistreur d\'écran système';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DRONE MUSICAL (Web Audio)
+// ═══════════════════════════════════════════════════════════════
+let droneNodes = null;
+let droneRecorder = null;
+
+function startDrone() {
+  stopDrone();
+  try {
+    const ctx = state.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    state.audioCtx = ctx;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const style = $('mus-style').value;
+    const vol = parseFloat($('mus-vol').value) || 0.1;
+
+    const master = ctx.createGain();
+    master.gain.value = vol;
+    master.connect(ctx.destination);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = style === 'industrial' ? 800 : style === 'tense' ? 600 : 400;
+    filter.Q.value = 2;
+    filter.connect(master);
+
+    const freqs = style === 'tense' ? [55, 82.5, 110] : style === 'ambient' ? [73.4, 146.8] : [55, 65.4, 82.5];
+    const oscs = [];
+    freqs.forEach((f, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = i === 0 ? 'sawtooth' : 'sine';
+      osc.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.value = 0.3 / freqs.length;
+      osc.connect(g);
+      g.connect(filter);
+      osc.start();
+      oscs.push(osc);
+    });
+
+    // LFO pour respiration
+    const lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = style === 'tense' ? 3 : 0.15;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = style === 'tense' ? 15 : 40;
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+    lfo.start();
+    oscs.push(lfo);
+
+    droneNodes = { ctx, master, filter, oscs, lfo };
+    $('mus-status').textContent = '▶ Drone en cours · ' + style;
+  } catch (e) {
+    log('Erreur drone : ' + e.message, 'e');
+    $('mus-status').textContent = 'Erreur audio';
+  }
+}
+
+function stopDrone() {
+  if (!droneNodes) return;
+  try {
+    droneNodes.oscs.forEach(o => { try { o.stop(); } catch (e) {} });
+    droneNodes.master.disconnect();
+    droneNodes = null;
+    $('mus-status').textContent = '⏹ Arrêté';
+  } catch (e) {}
+}
+
+async function recordDrone() {
+  startDrone();
+  if (!droneNodes) return;
+  try {
+    const dest = droneNodes.ctx.createMediaStreamDestination();
+    droneNodes.master.connect(dest);
+    const mr = new MediaRecorder(dest.stream);
+    const chunks = [];
+    mr.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    mr.onstop = () => {
+      const blob = new Blob(chunks, { type: 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'revolt_drone_' + Date.now() + '.webm';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+      $('mus-status').textContent = '✓ Drone exporté';
+    };
+    mr.start();
+    $('mus-status').textContent = '● Enregistrement 30 secondes…';
+    setTimeout(() => { mr.stop(); stopDrone(); }, 30000);
+  } catch (e) {
+    log('Erreur enregistrement : ' + e.message, 'e');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PREVIEW
+// ═══════════════════════════════════════════════════════════════
+let prevIndex = 0;
+let prevPlaying = false;
+
+function playPreview() {
+  const ready = state.videos.filter(v => v.url);
+  if (ready.length === 0) { toast('Aucune vidéo à jouer', 'err'); return; }
+  prevPlaying = true;
+  prevIndex = 0;
+  playNextPreview();
+  startDrone();
+}
+
+function playNextPreview() {
+  if (!prevPlaying) return;
+  const ready = state.videos.filter(v => v.url);
+  if (prevIndex >= ready.length) {
+    stopPreview();
+    return;
+  }
+  const v = ready[prevIndex];
+  const vid = $('prev-video');
+  vid.src = v.url;
+  vid.play().catch(() => {});
+  $('prev-info').textContent = 'Plan ' + (v.idx + 1) + ' / 3';
+  vid.onended = () => {
+    if (prevPlaying) {
+      prevIndex++;
+      setTimeout(playNextPreview, 300);
+    }
+  };
+}
+
+function stopPreview() {
+  prevPlaying = false;
+  $('prev-video').pause();
+  $('prev-video').currentTime = 0;
+  stopDrone();
+  $('prev-info').textContent = 'Arrêté';
 }
 
 // ═══════════════════════════════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════════════════════════════
-async function downloadImage(url, filename) {
+async function downloadFile(url, filename) {
   try {
     const res = await fetch(url);
     const blob = await res.blob();
@@ -918,14 +1254,18 @@ async function downloadImage(url, filename) {
     a.href = obj; a.download = filename;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(obj), 3000);
-  } catch (e) { window.open(url, '_blank'); }
+    return blob;
+  } catch (e) {
+    window.open(url, '_blank');
+    return null;
+  }
 }
 
 async function downloadAllImages() {
   const ready = state.slots.filter(s => s.img);
   if (!ready.length) { toast('Aucune image', 'err'); return; }
   for (let i = 0; i < ready.length; i++) {
-    await downloadImage(ready[i].img, `revolt_${state.concept.id}_plan${ready[i].idx+1}.png`);
+    await downloadFile(ready[i].img, `revolt_${state.concept.id}_plan${ready[i].idx+1}.png`);
     await sleep(400);
   }
   toast('Images téléchargées', 'ok');
@@ -933,12 +1273,49 @@ async function downloadAllImages() {
 
 async function downloadAllVideos() {
   const ready = state.videos.filter(v => v.url);
-  if (!ready.length) { toast('Aucune vidéo générée', 'err'); return; }
-  for (let i = 0; i < ready.length; i++) {
-    await downloadImage(ready[i].url, `revolt_${state.concept.id}_video${ready[i].idx+1}.mp4`);
+  if (!ready.length) { toast('Aucune vidéo', 'err'); return; }
+  for (const v of ready) {
+    await downloadFile(v.url, `revolt_${state.concept.id}_video${v.idx+1}.mp4`);
     await sleep(600);
   }
   toast('Vidéos téléchargées', 'ok');
+}
+
+function generateSRT() {
+  let srt = '';
+  let t = 0;
+  const durations = state.videos.map(v => (v.duration || 169) / 24);
+  state.slots.forEach((s, i) => {
+    const start = t;
+    const dur = durations[i] || 7;
+    const end = t + dur;
+    srt += (i + 1) + '\n';
+    srt += formatSRTTime(start) + ' --> ' + formatSRTTime(end) + '\n';
+    const concept = state.concept;
+    const line = (s.idx === 0 ? concept.voice.slice(0, 80) : s.idx === 2 ? concept.punch : concept.voice.slice(80, 160)) || '';
+    srt += line + '\n\n';
+    t = end;
+  });
+  return srt;
+}
+
+function formatSRTTime(s) {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = Math.floor(s % 60);
+  const ms = Math.floor((s % 1) * 1000);
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0') + ',' + String(ms).padStart(3, '0');
+}
+
+function downloadSRT() {
+  const srt = generateSRT();
+  const blob = new Blob([srt], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'revolt_' + state.concept.id + '_sous-titres.srt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Sous-titres téléchargés', 'ok');
 }
 
 function downloadScript() {
@@ -950,7 +1327,16 @@ function downloadScript() {
   txt += 'THÈME : ' + c.desc + '\n\n';
   txt += '── VOIX-OFF ──\n' + $('vo-text').value + '\n\n';
   txt += '── CHUTE ──\n' + $('vo-punch').value + '\n\n';
-  txt += '── HASHTAGS ──\n#cyberpunk #2030 #révolte #' + c.id + ' #dystopie\n';
+  txt += '── PLANS ──\n';
+  state.slots.forEach((s, i) => {
+    txt += (i+1) + '. ' + s.title + ' — ' + s.desc + '\n';
+  });
+  txt += '\n── MOUVEMENTS VIDÉO ──\n';
+  state.videos.forEach(v => {
+    const m = MOTIONS.find(x => x.id === v.motion);
+    txt += 'Vidéo ' + (v.idx+1) + ' : ' + (m ? m.label : '') + ' · ' + (v.duration/24).toFixed(1) + 's\n';
+  });
+  txt += '\n── HASHTAGS ──\n#cyberpunk #2030 #révolte #' + c.id + ' #dystopie\n';
   const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -958,6 +1344,52 @@ function downloadScript() {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
   toast('Script téléchargé', 'ok');
+}
+
+async function downloadZip() {
+  if (typeof JSZip === 'undefined') { toast('JSZip non chargé', 'err'); return; }
+  const zip = new JSZip();
+  const folder = zip.folder('revolt_' + state.concept.id);
+  toast('Construction du ZIP…', 'ok', 3000);
+
+  // Images
+  for (const s of state.slots) {
+    if (s.img) {
+      try {
+        const res = await fetch(s.img);
+        const blob = await res.blob();
+        folder.file('plan' + (s.idx+1) + '.png', blob);
+      } catch (e) {}
+    }
+  }
+  // Vidéos
+  for (const v of state.videos) {
+    if (v.url) {
+      try {
+        const res = await fetch(v.url);
+        const blob = await res.blob();
+        folder.file('video' + (v.idx+1) + '.mp4', blob);
+      } catch (e) {}
+    }
+  }
+  // Script
+  const c = state.concept;
+  let txt = 'REVOLT STUDIO — ' + c.name + '\n\n';
+  txt += 'VOIX-OFF :\n' + $('vo-text').value + '\n\n';
+  txt += 'CHUTE :\n' + $('vo-punch').value + '\n';
+  folder.file('script.txt', txt);
+  // SRT
+  folder.file('sous-titres.srt', generateSRT());
+  // README
+  folder.file('README.txt', 'Revolt//Studio v2.0\nConcept : ' + c.name + '\nGénéré le ' + new Date().toLocaleString('fr-FR') + '\n\nContenu :\n- plan1.png, plan2.png, plan3.png (keyframes)\n- video1.mp4, video2.mp4, video3.mp4 (si générées)\n- script.txt (voix-off et chute)\n- sous-titres.srt\n');
+
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'revolt_' + c.id + '_' + Date.now() + '.zip';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('ZIP téléchargé ✓', 'ok', 4000);
 }
 
 async function copyPunch() {
@@ -968,7 +1400,7 @@ async function copyPunch() {
 function resetAll() {
   if (!confirm('Effacer toutes les images, vidéos et repartir de zéro ?')) return;
   state.slots.forEach(s => { s.img = null; s.status = 'idle'; s.prompt = ''; });
-  state.videos.forEach(v => { v.url = null; v.status = 'idle'; v.videoId = null; v.progress = 0; });
+  state.videos.forEach((v, i) => { v.url = null; v.status = 'idle'; v.videoId = null; v.progress = 0; v.motion = MOTIONS[i].id; v.duration = 169; });
   clearState();
   renderSlots();
   renderVideos();
@@ -998,12 +1430,32 @@ function init() {
   renderVideos();
 
   $('api-save').addEventListener('click', saveKey);
+  $('batch-videos').addEventListener('click', batchVideos);
   $('dl-all').addEventListener('click', downloadAllImages);
   $('dl-videos').addEventListener('click', downloadAllVideos);
+  $('dl-zip').addEventListener('click', downloadZip);
+  $('dl-srt').addEventListener('click', downloadSRT);
   $('dl-script').addEventListener('click', downloadScript);
   $('copy-punch').addEventListener('click', copyPunch);
   $('reset-all').addEventListener('click', resetAll);
 
+  // TTS
+  loadVoices();
+  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = loadVoices;
+  $('tts-play').addEventListener('click', ttsPlay);
+  $('tts-stop').addEventListener('click', ttsStop);
+  $('tts-record').addEventListener('click', ttsRecord);
+
+  // Drone
+  $('mus-play').addEventListener('click', startDrone);
+  $('mus-stop').addEventListener('click', stopDrone);
+  $('mus-record').addEventListener('click', recordDrone);
+
+  // Preview
+  $('prev-play').addEventListener('click', playPreview);
+  $('prev-stop').addEventListener('click', stopPreview);
+
+  // Autosave
   ['vo-text','vo-punch','c-name','c-age','c-eth','c-face','c-hair','c-mark','c-implant','c-top','c-bottom','c-shoes','c-acc'].forEach(id => {
     const el = $(id);
     if (el) { el.addEventListener('input', scheduleAutosave); el.addEventListener('change', scheduleAutosave); }
@@ -1013,13 +1465,9 @@ function init() {
   window.addEventListener('beforeunload', saveState);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
 
-  log('REVOLT//STUDIO v1.4 prêt', 'o');
-  if (state.restored) {
-    log('Session restaurée.', 'o');
-  } else {
-    log('Images + Vidéo activées.', 'i');
-    log('Choisis un concept et lance le plan 1.', 'i');
-  }
+  log('REVOLT//STUDIO v2.0 prêt', 'o');
+  log('10 concepts · Vidéo par plan · TTS · Drone · ZIP', 'i');
+  if (state.restored) log('Session restaurée.', 'o');
 }
 
 init();
