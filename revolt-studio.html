@@ -77,10 +77,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
 <body>
 
 <h1>Revolt//Studio</h1>
-<div class="sub">Cyberpunk · Révolté · TikTok 30-40s</div>
+<div class="sub">Cyberpunk · Révolté · v1.2</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
-<!-- API -->
 <div class="api" id="api-box">
   <label style="margin-top:0">Clé API Agnès</label>
   <input type="password" id="api-key" placeholder="sk-..." autocomplete="off">
@@ -88,7 +87,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
   <div style="font-size:.68rem;color:var(--dim);margin-top:.5rem" id="api-status">Non configurée</div>
 </div>
 
-<!-- 1. CONCEPT -->
 <div class="panel open" id="p-concept">
   <div class="ph" data-t="p-concept">
     <div class="pt"><span class="n">1</span> Concept révolté</div>
@@ -104,7 +102,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
   </div></div>
 </div>
 
-<!-- 2. CHARACTER DNA -->
 <div class="panel" id="p-char">
   <div class="ph" data-t="p-char">
     <div class="pt"><span class="n">2</span> Character DNA</div>
@@ -137,7 +134,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
   </div></div>
 </div>
 
-<!-- 3. GÉNÉRATION -->
 <div class="panel open" id="p-gen">
   <div class="ph" data-t="p-gen">
     <div class="pt"><span class="n">3</span> Génération séquentielle</div>
@@ -149,7 +145,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
   </div></div>
 </div>
 
-<!-- 4. EXPORT -->
 <div class="panel" id="p-export">
   <div class="ph" data-t="p-export">
     <div class="pt"><span class="n">4</span> Export</div>
@@ -163,7 +158,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
   </div></div>
 </div>
 
-<!-- CONSOLE -->
 <div class="panel" id="p-log">
   <div class="ph" data-t="p-log">
     <div class="pt"><span class="n">·</span> Console</div>
@@ -176,7 +170,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
 
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">Revolt//Studio · v1.1 · Autosave</div>
+<div class="footer-note">Revolt//Studio · v1.2 · Plans distincts + Autosave</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -186,10 +180,10 @@ const API_BASE = 'https://apihub.agnes-ai.com/v1';
 const MODEL_IMAGE = 'agnes-image-2.5-flash';
 const IMG_W = 1024, IMG_H = 1792;
 const MAX_PROMPT = 1700;
-const STORAGE_KEY = 'revolt_studio_v1_1';
+const STORAGE_KEY = 'revolt_studio_v1_2';
 
 // ═══════════════════════════════════════════════════════════════
-// STYLE LOCK — INCHANGEABLE, SANS CODE HEX
+// STYLE LOCK
 // ═══════════════════════════════════════════════════════════════
 const STYLE_LOCK = 
 'REVOLT STUDIO CYBERPUNK STYLE — MANDATORY AND IMMUTABLE. ' +
@@ -212,57 +206,64 @@ const CHARACTER_FACE_RULE =
 'NEVER alter the character appearance between shots. ';
 
 // ═══════════════════════════════════════════════════════════════
-// 8 CONCEPTS
+// 8 CONCEPTS — CADRAGES DIFFÉRENCIÉS
 // ═══════════════════════════════════════════════════════════════
 const CONCEPTS = [
   { id: 'surveillance', icon: '👁️', name: 'Surveillance', desc: 'La ville te regarde',
     voice: "En 2030, chaque caméra de cette ville te connaît par ton nom. Ton visage est une donnée. Ton regard, une preuve. Ta démarche, une signature. On te dit que c'est pour ta sécurité. Mais demande-toi une chose : si c'était vraiment pour toi, pourquoi c'est gratuit ?",
     punch: "Ce qui est gratuit, c'est toi le produit.",
-    p1: "wide establishing shot of a narrow rain-soaked neon alley, empty, surveillance camera on a pole visible top-left, pink and cyan neon reflections in puddles",
-    p2: "medium close-up of the character standing in the alley, looking up slightly toward the surveillance camera, hard pink neon light on half of the face, blue shadow on the other half",
-    p3: "extreme close-up of the character's face, eyes reflecting a small neon surveillance camera light, expression cold and watchful, cyan and pink reflections on the skin" },
+    p1: "EXTREME WIDE SHOT from 40 meters away. The alley is completely EMPTY, no visible character. A single surveillance camera on a pole dominates the top-left corner. Wet asphalt covered in pink and cyan reflections. No human figure.",
+    p2: "MEDIUM SHOT of the character from the waist up, standing still in the alley, looking UP and to the LEFT toward an off-screen surveillance camera. Half of his face lit by hard pink neon, the other half in deep blue shadow. Hands at his sides.",
+    p3: "EXTREME CLOSE-UP on the character's EYES ONLY, filling the entire frame. Tiny cyan reflection of a camera lens visible in each pupil. No smile, no movement." },
+
   { id: 'work', icon: '💼', name: 'Travail inutile', desc: 'Ils te paient pour te taire',
     voice: "En 2030, ton travail ne sert à rien. Pas parce que tu es mauvais. Parce qu'une machine le fait mieux. Mais on te garde quand même. Pour ton loyer. Pour ta consommation. Pour ton obéissance. On n'a plus besoin de toi. On a juste besoin que tu ne réfléchisses pas trop.",
     punch: "Ils ne te paient pas pour travailler. Ils te paient pour te taire.",
-    p1: "wide establishing shot of the neon alley at night, empty, an open doorway at the end emitting cold white light, no one visible",
-    p2: "medium shot of the character standing still against a shuttered storefront, hands empty at his sides, eyes looking down, exhausted posture, neon lights on his back",
-    p3: "close-up of the character's hands, empty, still, lit by harsh pink and cyan neon from the sides, no movement" },
+    p1: "WIDE SHOT of the neon alley from 15 meters, EMPTY street, cold white light spilling from an open doorway at the far end. No character visible. Only the corridor of neon and wet ground.",
+    p2: "MEDIUM SHOT of the character from the waist up, leaning with his BACK against a shuttered storefront, eyes looking DOWN at his empty hands, exhausted slumped posture, neon lights from behind.",
+    p3: "EXTREME CLOSE-UP of the character's HANDS ONLY. Two empty open palms facing up, framed by the frame edges. Lit by harsh pink and cyan side light. No movement, no rings, no objects." },
+
   { id: 'data', icon: '📡', name: 'Données volées', desc: 'Tu es la matière première',
     voice: "En 2030, ta vie est à vendre. Tes photos. Tes messages. Tes opinions. Tes habitudes. Tes peurs. Chaque clic est une monnaie. Chaque hésitation est un profit. Tu n'es pas un utilisateur. Tu es une matière première. Et tu la donnes gratuitement.",
     punch: "Tu travailles pour eux. Gratuitement. Tous les jours.",
-    p1: "wide shot of the neon alley, dozens of anonymous blurred silhouettes walking in both directions, all lit only by pink and cyan signs",
-    p2: "medium shot of the character standing still in the middle of the moving crowd, motion blur around him, sharp on him, hard pink neon on the face",
-    p3: "extreme close-up of the character's eye, the iris reflecting a scrolling stream of glowing pink and cyan data characters" },
+    p1: "WIDE SHOT of the neon alley at ground level, ONLY blurred anonymous legs and torsos walking in both directions, faces out of frame. Dense crowd, all out of focus, pink and cyan neon above.",
+    p2: "MEDIUM SHOT of the character standing perfectly STILL in the middle of the moving crowd. He is SHARP, everyone around him is a MOTION BLUR. Hard pink neon side-light on his face. He stares forward, unblinking.",
+    p3: "EXTREME CLOSE-UP of the character's RIGHT EYE, filling the entire frame. Inside the iris, a scrolling stream of tiny glowing pink and cyan data characters flows vertically. No movement of the eye, dead stare." },
+
   { id: 'ai', icon: '🤖', name: 'IA qui décide', desc: 'Le chiffre qui te condamne',
     voice: "En 2030, une machine décide qui aura un prêt. Qui aura un logement. Qui aura un travail. Qui aura le droit d'exister. Elle ne te connaît pas. Elle ne te juge pas. Elle calcule. Et si ton score tombe trop bas, tu disparais des radars. Pas de procès. Pas d'appel. Juste un chiffre qui te condamne.",
     punch: "L'IA n'est pas neutre. Elle est écrite par ceux qui te possèdent.",
-    p1: "wide shot of the neon alley, an enormous glowing holographic screen floating above the street displaying abstract red bars and numbers, no readable text",
-    p2: "medium shot of the character looking up at the hologram, face lit by cold cyan light from the screen, hard shadow underneath",
-    p3: "close-up of the character's face, only lit by red light from an off-screen screen, deep black shadows, eyes fixed forward, no expression" },
+    p1: "EXTREME WIDE SHOT from 30 meters, EMPTY alley. A giant glowing holographic screen floats above the street, displaying abstract red horizontal bars and blurred numbers, no readable text. No character visible.",
+    p2: "MEDIUM SHOT of the character from behind, seen from the BACK, head tilted UP looking at an off-screen hologram. His back is lit by cold cyan glow from above. Shoulders tense. No face visible.",
+    p3: "EXTREME CLOSE-UP of the character's FACE from the front, filling the frame. Only lit by harsh RED light from an off-screen source on the right. Left half of the face in complete black shadow. Eyes fixed forward, no expression, jaw clenched." },
+
   { id: 'city', icon: '🌆', name: 'Ville qui te vide', desc: 'Personne ne t\'attend',
     voice: "En 2030, la ville est pleine. Et toi, tu es seul. Dix millions de personnes autour de toi. Zéro qui connaît ton prénom. On a construit des tours toujours plus hautes. Des écrans toujours plus grands. Des foules toujours plus denses. Pour que tu oublies une chose simple : personne ne t'attend nulle part.",
     punch: "Ils t'ont donné le monde. Ils t'ont pris ta place.",
-    p1: "extreme wide establishing shot of the neon alley, thousands of blurred anonymous silhouettes walking, buildings stretching into fog above, sense of being crushed by the city",
-    p2: "medium wide shot of the character standing alone in the middle of the moving crowd, all faces blurred around him, only he is sharp, hard pink light on him",
-    p3: "wide shot of the character's silhouette from behind, walking away into the neon fog, the crowd thinning, no one looking at him" },
+    p1: "EXTREME WIDE SHOT from 50 meters, the alley recedes into heavy fog, buildings stretching high above the frame, thousands of tiny blurred silhouettes walking, no identifiable face, monumental and crushing scale.",
+    p2: "MEDIUM SHOT of the character from the waist up, standing alone and still in the middle of the moving crowd. All silhouettes around him are motion-blurred and faceless. He is perfectly sharp. Pink neon rim light on his shoulders.",
+    p3: "WIDE SHOT of the character's silhouette from BEHIND, small in the frame, walking away from camera into the neon fog. The crowd around him has completely vanished. Empty street ahead. Only neon reflections remain." },
+
   { id: 'body', icon: '🦾', name: 'Corps augmenté', desc: 'Tu es un abonnement',
     voice: "En 2030, on peut remplacer tes yeux. Tes oreilles. Ton cœur. Ta peau. Tout sauf ce qui te rend humain. On te vend des upgrades. Des versions améliorées de toi-même. Mais personne ne te demande si l'original te suffisait. On ne te demande jamais si tu voulais changer. On te demande juste si tu peux payer.",
     punch: "Tu n'es plus une personne. Tu es un abonnement.",
-    p1: "wide shot of the neon alley with a lit medical clinic storefront in the background, red cross sign, cold light spilling onto the wet pavement",
-    p2: "medium close-up of the character, the cyan data port implant behind the right ear clearly visible with a pulsing LED, cold side light, dark shadows",
-    p3: "extreme close-up of the character's face in profile showing the data port implant and the LED, rain drops on the skin, only cyan and pink light" },
+    p1: "WIDE SHOT of the neon alley from 20 meters, EMPTY street, a lit medical clinic storefront on the left side emits a cold white glow onto the wet pavement. Red cross sign above the door. No character visible.",
+    p2: "MEDIUM CLOSE-UP of the character from the SHOULDERS UP, viewed from the LEFT SIDE PROFILE. The silver data port implant behind the right ear is the focal point, cyan LED pulsing. Cold side light on the neck and jaw. Face partly turned away.",
+    p3: "EXTREME CLOSE-UP on the DATA PORT IMPLANT behind the ear only. Rain droplets on the metal surface. The cyan LED glows brightly in the dark. Skin pores and stubble visible around the implant. No face visible, only the implant." },
+
   { id: 'words', icon: '🚫', name: 'Contrôle des mots', desc: 'Quand on t\'enlève les mots',
     voice: "En 2030, certains mots sont interdits. Pas parce qu'ils sont faux. Parce qu'ils sont dangereux. Dangereux pour qui ? Pour ceux qui décident. Pour ceux qui possèdent. Pour ceux qui mentent. On te dit que c'est pour ton bien. Mais rappelle-toi : ce n'est jamais toi qui décides ce qui est bien.",
     punch: "Quand on t'enlève les mots, on t'enlève tout.",
-    p1: "wide shot of the neon alley, one giant vertical sign above the street is completely blacked out with static, standing out among lit signs",
-    p2: "medium close-up of the character looking up at the blacked-out sign, mouth slightly closed, jaw tense, cold side light",
-    p3: "extreme close-up of the character's mouth, closed tight, lit by hard neon, no expression, no movement" },
+    p1: "WIDE SHOT of the neon alley from 15 meters, EMPTY street. Above, one giant vertical neon sign is COMPLETELY BLACKED OUT with gray static noise, standing out as an anomaly among the other lit signs. No character visible.",
+    p2: "MEDIUM SHOT of the character from the waist up, looking UP and slightly LEFT at the blacked-out sign off-frame. Mouth CLOSED tight, jaw tense, eyebrows slightly lowered. Cold white light on the face from above.",
+    p3: "EXTREME CLOSE-UP of the character's MOUTH ONLY, lips pressed tightly closed, filling the entire frame. Harsh pink neon light from the left side, blue shadow from the right. No expression, no movement." },
+
   { id: 'revolt', icon: '🔥', name: 'Révolte', desc: 'Ils ont peur de ton réveil',
     voice: "En 2030, ils te diront que tu ne peux rien faire. Que le système est trop grand. Que les puissants sont trop forts. Que ta voix n'a pas de poids. Ils te le diront encore. Et encore. Et encore. Pas parce que c'est vrai. Parce que c'est leur seule arme qui leur reste : te faire croire que tu n'en as pas.",
     punch: "Ils n'ont pas peur de ta colère. Ils ont peur de ton réveil.",
-    p1: "wide shot of the neon alley, dominated by deep red light, a distant mass of blurred silhouettes gathering at the end of the street",
-    p2: "medium shot of the character standing still, fists clenched at his sides, face fully lit by hard red neon, unflinching",
-    p3: "extreme close-up of the character's face, eyes open, staring directly at the camera, only red light, no movement, no smile" }
+    p1: "EXTREME WIDE SHOT from 35 meters, the alley is dominated by deep RED light. At the far end, a distant mass of blurred dark silhouettes gathers. Wet street reflects red neon. No identifiable character, only the crowd and the red glow.",
+    p2: "MEDIUM SHOT of the character from the waist up, standing still facing forward. Both FISTS VISIBLY CLENCHED at his sides, knuckles white. Face fully lit by hard red neon from the front. Jaw set, unflinching.",
+    p3: "EXTREME CLOSE-UP of the character's face, eyes and upper cheeks only, filling the entire frame. He stares DIRECTLY INTO THE CAMERA LENS. No smile, no movement. Deep red light reflects in both eyes. Rain on the skin." }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -272,9 +273,9 @@ const state = {
   concept: CONCEPTS[0],
   apiKey: '',
   slots: [
-    { idx: 0, key: 'p1', title: 'Establishing', desc: 'Rue déserte néon. La ville te montre son visage.', img: null, status: 'idle', prompt: '' },
-    { idx: 1, key: 'p2', title: 'Personnage', desc: 'Le personnage réagit. Regard, posture.', img: null, status: 'idle', prompt: '' },
-    { idx: 2, key: 'p3', title: 'Chute', desc: 'Gros plan, révélation, silence.', img: null, status: 'idle', prompt: '' }
+    { idx: 0, key: 'p1', title: 'Establishing', desc: 'Plan large — décor dominant', img: null, status: 'idle', prompt: '' },
+    { idx: 1, key: 'p2', title: 'Personnage', desc: 'Plan moyen — posture, regard', img: null, status: 'idle', prompt: '' },
+    { idx: 2, key: 'p3', title: 'Chute', desc: 'Très gros plan — détail intense', img: null, status: 'idle', prompt: '' }
   ],
   isBusy: false,
   restored: false
@@ -368,7 +369,6 @@ function buildIdentityBlock() {
 // AUTOSAVE
 // ═══════════════════════════════════════════════════════════════
 let autosaveTimer = null;
-
 function scheduleAutosave() {
   if (autosaveTimer) clearTimeout(autosaveTimer);
   autosaveTimer = setTimeout(saveState, 800);
@@ -391,7 +391,7 @@ function saveState() {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     flashAutosave();
-  } catch (e) { /* quota plein, on ignore */ }
+  } catch (e) {}
 }
 
 function loadState() {
@@ -417,9 +417,7 @@ function loadState() {
   } catch (e) { return false; }
 }
 
-function clearState() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-}
+function clearState() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
 
 // ═══════════════════════════════════════════════════════════════
 // CONCEPT RENDER
@@ -446,24 +444,30 @@ function renderConcepts() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROMPT BUILDER
+// PROMPT BUILDER — CADRAGE EN PREMIER, RÉPÉTÉ
 // ═══════════════════════════════════════════════════════════════
 function buildPrompt(slot) {
   const c = state.concept;
   const sceneDesc = c[slot.key] || '';
   const charBlock = buildIdentityBlock();
-  let p = STYLE_LOCK + ' ';
+
+  // Le cadrage est placé AVANT le style, et répété 2 fois pour forcer l'IA à le lire
+  let p = '';
+  p += 'FRAMING AND COMPOSITION — THIS IS THE MOST IMPORTANT INSTRUCTION: ' + sceneDesc + '. ';
+  p += 'REPEAT: ' + sceneDesc + '. ';
+  p += 'FOLLOW THIS FRAMING EXACTLY. DO NOT use a different shot type. ';
+  p += STYLE_LOCK + ' ';
   p += CHARACTER_FACE_RULE + ' ';
   p += charBlock + ' ';
-  p += 'SCENE: ' + sceneDesc + '. ';
   p += 'Vertical 9:16 cinematic composition. ';
   p += 'No text, no watermark, no logo. ';
+
   if (p.length > MAX_PROMPT) p = p.slice(0, MAX_PROMPT);
   return p;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// FETCH RETRY
+// FETCH
 // ═══════════════════════════════════════════════════════════════
 async function fetchRetry(url, opts, maxRetry, label) {
   for (let i = 0; i <= maxRetry; i++) {
@@ -475,13 +479,11 @@ async function fetchRetry(url, opts, maxRetry, label) {
       if ((res.status === 500 || res.status === 502 || res.status === 503) && i < maxRetry) {
         const w = Math.pow(2, i) * 3000;
         log(label + ' HTTP ' + res.status + ' — retry ' + Math.round(w/1000) + 's', 'w');
-        await sleep(w);
-        continue;
+        await sleep(w); continue;
       }
       if (res.status === 429 && i < maxRetry) {
         log(label + ' rate limited — attente 15s', 'w');
-        await sleep(15000);
-        continue;
+        await sleep(15000); continue;
       }
       return res;
     } catch (e) {
@@ -489,12 +491,9 @@ async function fetchRetry(url, opts, maxRetry, label) {
       else throw new Error(label + ' : ' + e.message);
     }
   }
-  throw new Error(label + ' échec après ' + maxRetry + ' essais');
+  throw new Error(label + ' échec');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// IMAGE API
-// ═══════════════════════════════════════════════════════════════
 async function callImageAPI(prompt) {
   if (!state.apiKey) throw new Error('Clé API manquante');
   const sizes = [`${IMG_W}x${IMG_H}`, '1024x1792', '1024x1024', '768x1024', '512x512'];
@@ -508,11 +507,9 @@ async function callImageAPI(prompt) {
     ];
     for (const body of variants) {
       try {
-        const res = await fetchRetry(
-          API_BASE + '/images/generations',
+        const res = await fetchRetry(API_BASE + '/images/generations',
           { method: 'POST', headers: { 'Authorization': 'Bearer ' + state.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify(body) },
-          1, 'Image'
-        );
+          1, 'Image');
         if (res.ok) {
           const d = await res.json();
           const url = d.data?.[0]?.url || d.data?.[0]?.b64_json;
@@ -555,11 +552,9 @@ function renderSlots() {
     html += `<div class="slot-status">${slot.status === 'idle' ? '○ en attente' : slot.status === 'gen' ? '◐ génération…' : slot.status === 'done' ? '● terminé' : '✕ erreur'}</div>`;
     html += `<div class="bar"><div class="bar-fill" style="width:${slot.status === 'gen' ? 60 : slot.status === 'done' ? 100 : 0}%"></div></div>`;
 
-    if (locked) {
-      html += `<div class="hint">Termine le plan ${i} d'abord.</div>`;
-    } else if (!slot.img) {
-      html += `<button class="btn small" data-gen="${i}" style="width:100%" ${state.isBusy || !state.apiKey ? 'disabled' : ''}>GÉNÉRER PLAN ${i+1}</button>`;
-    } else {
+    if (locked) html += `<div class="hint">Termine le plan ${i} d'abord.</div>`;
+    else if (!slot.img) html += `<button class="btn small" data-gen="${i}" style="width:100%" ${state.isBusy || !state.apiKey ? 'disabled' : ''}>GÉNÉRER PLAN ${i+1}</button>`;
+    else {
       html += `<div class="btn-row">`;
       html += `<button class="btn small ok" data-next="${i}" style="flex:1">${i < 2 ? '✓ VALIDER & PLAN ' + (i+2) : '✓ VALIDER'}</button>`;
       html += `<button class="btn small ghost" data-regen="${i}" style="flex:1">↻ REGÉNÉRER</button>`;
@@ -592,7 +587,7 @@ async function generateSlot(i) {
   slot.prompt = prompt;
 
   log('▶ Plan ' + (i+1) + ' — ' + slot.title, 'i');
-  log('  Prompt : ' + prompt.length + ' caractères', 'i');
+  log('  Prompt : ' + prompt.length + ' car.', 'i');
   setStatus('Génération plan ' + (i+1) + '…');
 
   try {
@@ -718,24 +713,21 @@ function init() {
   $('copy-punch').addEventListener('click', copyPunch);
   $('reset-all').addEventListener('click', resetAll);
 
-  // Autosave sur chaque champ
   ['vo-text','vo-punch','c-name','c-age','c-eth','c-face','c-hair','c-mark','c-implant','c-top','c-bottom','c-shoes','c-acc'].forEach(id => {
     const el = $(id);
     if (el) { el.addEventListener('input', scheduleAutosave); el.addEventListener('change', scheduleAutosave); }
   });
 
-  // Autosave de secours toutes les 5s
   setInterval(() => { if (!state.isBusy) saveState(); }, 5000);
-
-  // Save avant fermeture
   window.addEventListener('beforeunload', saveState);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
 
-  log('REVOLT//STUDIO v1.1 prêt', 'o');
+  log('REVOLT//STUDIO v1.2 prêt', 'o');
   if (state.restored) {
     log('Travail précédent restauré automatiquement.', 'o');
   } else {
     log('Style verrouillé : Cyberpunk Révolté', 'i');
+    log('Cadrages différenciés activés.', 'i');
     log('Sélectionne un concept et lance le plan 1.', 'i');
   }
 }
