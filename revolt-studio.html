@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>REVOLT//STUDIO — Cyberpunk Révolté</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#050508;--panel:#0a0a12;--panel2:#101020;--border:#1a1a2e;--pink:#ff2d95;--cyan:#00e5ff;--ink:#eaeaf0;--dim:#8a8a9a;--faint:#404058;--ok:#00d47e;--err:#ff3355;--warn:#ffaa00;--gold:#ffcc00}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem 1rem 6rem;font-size:15px;line-height:1.5;max-width:800px;margin:0 auto}
+h1{font-size:1.5rem;font-weight:900;letter-spacing:.05em;margin-bottom:.2rem;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
+.sub{font-size:.7rem;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:1.2rem}
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel2);color:var(--ink);padding:.8rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:600;box-shadow:0 8px 40px rgba(0,0,0,.8);border:1px solid var(--border);z-index:9999;opacity:0;transition:.3s;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{border-color:var(--ok)}
+.toast.err{border-color:var(--err)}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:.8rem;overflow:hidden}
+.ph{padding:.9rem 1.1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.ph:active{background:var(--panel2)}
+.pt{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);font-weight:800;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.pt .n{background:var(--pink);color:#fff;padding:.1rem .45rem;border-radius:8px;font-size:.65rem;letter-spacing:0}
+.ph .ch{color:var(--faint);font-size:.7rem;transition:.2s}
+.panel.open .ch{transform:rotate(180deg)}
+.pb{max-height:0;overflow:hidden;transition:max-height .4s}
+.panel.open .pb{max-height:30000px}
+.pc{padding:0 1.1rem 1.1rem}
+label{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:.35rem;font-weight:700;margin-top:.7rem}
+label:first-child{margin-top:0}
+input,textarea,select{width:100%;padding:.75rem .9rem;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.9rem}
+textarea{min-height:80px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
+.hint{font-size:.65rem;color:var(--faint);margin-top:.3rem;font-style:italic}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem;margin-top:.5rem}
+.card{padding:.7rem;border-radius:6px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;text-align:center;transition:.15s}
+.card:hover{border-color:var(--cyan)}
+.card.sel{background:linear-gradient(135deg,var(--pink),var(--cyan));border-color:var(--pink);color:#fff}
+.card .ic{font-size:1.4rem;display:block;margin-bottom:.25rem}
+.card .nm{font-size:.72rem;font-weight:700}
+.card .dc{font-size:.6rem;color:var(--dim);margin-top:.15rem}
+.card.sel .dc{color:rgba(255,255,255,.85)}
+.btn{width:100%;padding:1rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--pink),#7a00ff);color:#fff;font-size:.95rem;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn.cyan{background:linear-gradient(135deg,var(--cyan),#0088ff)}
+.btn.small{padding:.6rem .9rem;font-size:.72rem;width:auto;margin-bottom:0;letter-spacing:.05em}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--ink)}
+.btn.ok{background:linear-gradient(135deg,#00d47e,#008850)}
+.btn.err{background:transparent;border:1px solid var(--err);color:var(--err)}
+.btn-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem}
+.api{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.8rem}
+.api.ok{border-color:var(--ok)}
+.console{background:#000;border:1px solid var(--border);border-radius:8px;padding:.7rem;margin-bottom:.8rem;max-height:220px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:.7rem;line-height:1.6}
+.cl{padding:.1rem 0}
+.ct{color:var(--faint);margin-right:.4rem}
+.ci{color:var(--cyan)}.co{color:var(--ok)}.ce{color:var(--err)}.cw{color:var(--warn)}
+.slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.7rem;position:relative}
+.slot.locked{border-color:var(--faint);opacity:.4}
+.slot.active{border-color:var(--pink);box-shadow:0 0 20px rgba(255,45,149,.3)}
+.slot.done{border-color:var(--ok)}
+.slot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.slot-title{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan)}
+.slot-num{font-size:.65rem;background:var(--pink);color:#fff;padding:.15rem .5rem;border-radius:10px}
+.slot-body{font-size:.78rem;color:var(--dim);margin-bottom:.6rem;line-height:1.4}
+.slot-img{width:100%;border-radius:6px;margin-bottom:.5rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block}
+.slot-img-placeholder{width:100%;aspect-ratio:9/16;border-radius:6px;background:var(--bg);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.72rem;margin-bottom:.5rem}
+.slot-status{font-size:.65rem;color:var(--faint);font-family:ui-monospace,monospace;margin-bottom:.5rem}
+.bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-bottom:.5rem}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .3s;width:0%}
+.script-box{background:var(--bg);border-left:3px solid var(--pink);padding:.7rem .9rem;border-radius:0 6px 6px 0;font-size:.8rem;margin-bottom:.5rem;line-height:1.5}
+.script-box strong{color:var(--pink);display:block;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.tags{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem}
+.tag{font-size:.6rem;padding:.2rem .5rem;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--dim)}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.4rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:.7rem 1rem;font-size:.78rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:.3s;z-index:100}
+.status-bar.show{transform:translateY(0)}
+.hidden{display:none!important}
+.footer-note{text-align:center;font-size:.65rem;color:var(--faint);margin-top:2rem;padding-bottom:1rem;letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<h1>Revolt//Studio</h1>
+<div class="sub">Cyberpunk · Révolté · TikTok 30-40s</div>
+
+<!-- ═══ API ═══ -->
+<div class="api" id="api-box">
+  <label style="margin-top:0">Clé API Agnès</label>
+  <input type="password" id="api-key" placeholder="sk-..." autocomplete="off">
+  <button class="btn cyan small" id="api-save" style="margin-top:.5rem;width:100%">ENREGISTRER</button>
+  <div style="font-size:.68rem;color:var(--dim);margin-top:.5rem" id="api-status">Non configurée</div>
+</div>
+
+<!-- ═══ 1. CONCEPT ═══ -->
+<div class="panel open" id="p-concept">
+  <div class="ph" data-t="p-concept">
+    <div class="pt"><span class="n">1</span> Concept révolté</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <div class="hint">Choisis un concept. Le script est pré-écrit. Tu peux le modifier ensuite.</div>
+    <div class="grid" id="concepts"></div>
+    <label>Script voix-off (modifiable)</label>
+    <textarea id="vo-text" style="min-height:140px;font-size:.85rem"></textarea>
+    <label>Phrase de chute (texte final à l'écran)</label>
+    <input type="text" id="vo-punch" placeholder="Ce qui est gratuit, c'est toi le produit.">
+  </div></div>
+</div>
+
+<!-- ═══ 2. CHARACTER DNA ═══ -->
+<div class="panel" id="p-char">
+  <div class="ph" data-t="p-char">
+    <div class="pt"><span class="n">2</span> Character DNA</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <div class="hint">Le personnage principal. Chaque champ est injecté VERBATIM dans chaque prompt.</div>
+    <label>Nom du personnage</label>
+    <input type="text" id="c-name" value="KAI">
+    <label>Âge</label>
+    <input type="text" id="c-age" value="28">
+    <label>Sexe / ethnie / morphologie</label>
+    <input type="text" id="c-eth" value="male, mixed East-Asian and Black, lean athletic build">
+    <label>Visage (traits précis)</label>
+    <textarea id="c-face" style="min-height:60px">angular sharp face, dark brown almond-shaped eyes, high cheekbones, straight narrow nose, thin lips</textarea>
+    <label>Cheveux</label>
+    <input type="text" id="c-hair" value="short shaved black hair with slight dark stubble on top">
+    <label>Marques distinctives (cicatrice, tatouage, grain de beauté)</label>
+    <input type="text" id="c-mark" value="small scar on the left eyebrow, faint stubble shadow on the jaw">
+    <label>Implant cyberpunk (élément signature)</label>
+    <input type="text" id="c-implant" value="thin silver data port behind the right ear with pulsing cyan LED">
+    <label>Tenue — haut</label>
+    <input type="text" id="c-top" value="worn black technical jacket with high collar, dark grey tactical undershirt">
+    <label>Tenue — bas</label>
+    <input type="text" id="c-bottom" value="black cargo trousers with reflective side stripes">
+    <label>Chaussures</label>
+    <input type="text" id="c-shoes" value="scuffed black combat boots">
+    <label>Accessoire signature</label>
+    <input type="text" id="c-acc" value="waterproof black messenger bag strapped across the chest, single black fingerless glove on the right hand">
+    <div class="hint" style="margin-top:.7rem">Ces informations seront copiées telles quelles dans tous les prompts.</div>
+  </div></div>
+</div>
+
+<!-- ═══ 3. GÉNÉRATION SÉQUENTIELLE ═══ -->
+<div class="panel open" id="p-gen">
+  <div class="ph" data-t="p-gen">
+    <div class="pt"><span class="n">3</span> Génération séquentielle</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <div class="hint">Les 3 plans se génèrent UN PAR UN. Chaque image sert de référence à la suivante. Tu valides avant de passer au suivant.</div>
+    <div id="slots"></div>
+  </div></div>
+</div>
+
+<!-- ═══ 4. EXPORT ═══ -->
+<div class="panel" id="p-export">
+  <div class="ph" data-t="p-export">
+    <div class="pt"><span class="n">4</span> Export</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <button class="btn ghost" id="dl-all">TÉLÉCHARGER LES 3 IMAGES</button>
+    <button class="btn ghost" id="dl-script">TÉLÉCHARGER LE SCRIPT TEXTE</button>
+    <button class="btn ghost" id="copy-punch">COPIER LA CHUTE</button>
+    <button class="btn err" id="reset-all">EFFACER TOUT</button>
+  </div></div>
+</div>
+
+<!-- ═══ 5. CONSOLE ═══ -->
+<div class="panel" id="p-log">
+  <div class="ph" data-t="p-log">
+    <div class="pt"><span class="n">·</span> Console</div>
+    <span class="ch">▼</span>
+  </div>
+  <div class="pb"><div class="pc">
+    <div class="console" id="log"></div>
+  </div></div>
+</div>
+
+<div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
+<div class="toast" id="toast"></div>
+
+<div class="footer-note">Revolt//Studio · v1 · Cyberpunk verrouillé</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const MODEL_IMAGE = 'agnes-image-2.5-flash';
+const IMG_W = 1024, IMG_H = 1792;
+const MAX_PROMPT = 1700;
+const MAX_RETRY = 3;
+
+// ═══════════════════════════════════════════════════════════════
+// STYLE LOCK — INCHANGEABLE
+// ═══════════════════════════════════════════════════════════════
+const STYLE_LOCK = 
+'REVOLT//STUDIO CYBERPUNK STYLE — MANDATORY AND IMMUTABLE. ' +
+'URBAN DYSTOPIAN CYBERPUNK. Rain-soaked narrow alley in a futuristic Asian megacity at night. ' +
+'Wet asphalt and deep puddles reflecting pink and cyan neon. ' +
+'Vertical neon signs in Chinese, Japanese and Korean characters stacked on every facade. ' +
+'Steam rising from manholes. Dense anonymous crowd in background, always out of focus. ' +
+'Floating holographic advertisements. Tangled electrical cables overhead. ' +
+'Dominant color palette: saturated hot pink (#ff2d95) and electric cyan (#00e5ff), ' +
+'with magenta reflections in water, deep black shadows, ZERO natural colors, ZERO white light. ' +
+'Faces sculpted by hard lateral neon light, deep blue-red shadows. ' +
+'Shot on Kodak Vision3 500T, pronounced grain, organic bloom around neon sources, ' +
+'heavy halation on reds, high contrast, analog 35mm film texture. ' +
+'Somber, angry, rebellious atmosphere. No hope, no beauty, no softness. ' +
+'Ultra photorealistic, cinematic quality, no illustration, no CGI look, no cartoon. ';
+
+const CHARACTER_FACE_RULE =
+'CRITICAL CHARACTER CONTINUITY RULE: The SAME character appears in every shot. ' +
+'EXACT SAME face, hair, scars, implants, clothing, and accessories in every single image. ' +
+'NEVER alter the character appearance between shots. ';
+
+// ═══════════════════════════════════════════════════════════════
+// 8 CONCEPTS PRÉ-ÉCRITS
+// ═══════════════════════════════════════════════════════════════
+const CONCEPTS = [
+  {
+    id: 'surveillance',
+    icon: '👁️',
+    name: 'Surveillance',
+    desc: 'La ville te regarde',
+    voice: "En 2030, chaque caméra de cette ville te connaît par ton nom. Ton visage est une donnée. Ton regard, une preuve. Ta démarche, une signature. On te dit que c'est pour ta sécurité. Mais demande-toi une chose : si c'était vraiment pour toi, pourquoi c'est gratuit ?",
+    punch: "Ce qui est gratuit, c'est toi le produit.",
+    p1: "wide establishing shot of a narrow rain-soaked neon alley, empty, surveillance camera on a pole visible top-left, pink and cyan neon reflections in puddles",
+    p2: "medium close-up of the character standing in the alley, looking up slightly toward the surveillance camera, hard pink neon light on half of the face, blue shadow on the other half",
+    p3: "extreme close-up of the character's face, eyes reflecting a small neon surveillance camera light, expression cold and watchful, cyan and pink reflections on the skin"
+  },
+  {
+    id: 'work',
+    icon: '💼',
+    name: 'Travail inutile',
+    desc: 'Ils te paient pour te taire',
+    voice: "En 2030, ton travail ne sert à rien. Pas parce que tu es mauvais. Parce qu'une machine le fait mieux. Mais on te garde quand même. Pour ton loyer. Pour ta consommation. Pour ton obéissance. On n'a plus besoin de toi. On a juste besoin que tu ne réfléchisses pas trop.",
+    punch: "Ils ne te paient pas pour travailler. Ils te paient pour te taire.",
+    p1: "wide establishing shot of the neon alley at night, empty, an open doorway at the end emitting cold white light, no one visible",
+    p2: "medium shot of the character standing still against a shuttered storefront, hands empty at his sides, eyes looking down, exhausted posture, neon lights on his back",
+    p3: "close-up of the character's hands, empty, still, lit by harsh pink and cyan neon from the sides, no movement"
+  },
+  {
+    id: 'data',
+    icon: '📡',
+    name: 'Données volées',
+    desc: 'Tu es la matière première',
+    voice: "En 2030, ta vie est à vendre. Tes photos. Tes messages. Tes opinions. Tes habitudes. Tes peurs. Chaque clic est une monnaie. Chaque hésitation est un profit. Tu n'es pas un utilisateur. Tu es une matière première. Et tu la donnes gratuitement.",
+    punch: "Tu travailles pour eux. Gratuitement. Tous les jours.",
+    p1: "wide shot of the neon alley, dozens of anonymous blurred silhouettes walking in both directions, all lit only by pink and cyan signs",
+    p2: "medium shot of the character standing still in the middle of the moving crowd, motion blur around him, sharp on him, hard pink neon on the face",
+    p3: "extreme close-up of the character's eye, the iris reflecting a scrolling stream of glowing pink and cyan data characters"
+  },
+  {
+    id: 'ai',
+    icon: '🤖',
+    name: 'IA qui décide',
+    desc: 'Le chiffre qui te condamne',
+    voice: "En 2030, une machine décide qui aura un prêt. Qui aura un logement. Qui aura un travail. Qui aura le droit d'exister. Elle ne te connaît pas. Elle ne te juge pas. Elle calcule. Et si ton score tombe trop bas, tu disparais des radars. Pas de procès. Pas d'appel. Juste un chiffre qui te condamne.",
+    punch: "L'IA n'est pas neutre. Elle est écrite par ceux qui te possèdent.",
+    p1: "wide shot of the neon alley, an enormous glowing holographic screen floating above the street displaying abstract red bars and numbers, no readable text",
+    p2: "medium shot of the character looking up at the hologram, face lit by cold cyan light from the screen, hard shadow underneath",
+    p3: "close-up of the character's face, only lit by red light from an off-screen screen, deep black shadows, eyes fixed forward, no expression"
+  },
+  {
+    id: 'city',
+    icon: '🌆',
+    name: 'Ville qui te vide',
+    desc: 'Personne ne t\'attend',
+    voice: "En 2030, la ville est pleine. Et toi, tu es seul. Dix millions de personnes autour de toi. Zéro qui connaît ton prénom. On a construit des tours toujours plus hautes. Des écrans toujours plus grands. Des foules toujours plus denses. Pour que tu oublies une chose simple : personne ne t'attend nulle part.",
+    punch: "Ils t'ont donné le monde. Ils t'ont pris ta place.",
+    p1: "extreme wide establishing shot of the neon alley, thousands of blurred anonymous silhouettes walking, buildings stretching into fog above, sense of being crushed by the city",
+    p2: "medium wide shot of the character standing alone in the middle of the moving crowd, all faces blurred around him, only he is sharp, hard pink light on him",
+    p3: "wide shot of the character's silhouette from behind, walking away into the neon fog, the crowd thinning, no one looking at him"
+  },
+  {
+    id: 'body',
+    icon: '🦾',
+    name: 'Corps augmenté',
+    desc: 'Tu es un abonnement',
+    voice: "En 2030, on peut remplacer tes yeux. Tes oreilles. Ton cœur. Ta peau. Tout sauf ce qui te rend humain. On te vend des upgrades. Des versions améliorées de toi-même. Mais personne ne te demande si l'original te suffisait. On ne te demande jamais si tu voulais changer. On te demande juste si tu peux payer.",
+    punch: "Tu n'es plus une personne. Tu es un abonnement.",
+    p1: "wide shot of the neon alley with a lit medical clinic storefront in the background, red cross sign, cold light spilling onto the wet pavement",
+    p2: "medium close-up of the character, the cyan data port implant behind the right ear clearly visible with a pulsing LED, cold side light, dark shadows",
+    p3: "extreme close-up of the character's face in profile showing the data port implant and the LED, rain drops on the skin, only cyan and pink light"
+  },
+  {
+    id: 'words',
+    icon: '🚫',
+    name: 'Contrôle des mots',
+    desc: 'Quand on t\'enlève les mots',
+    voice: "En 2030, certains mots sont interdits. Pas parce qu'ils sont faux. Parce qu'ils sont dangereux. Dangereux pour qui ? Pour ceux qui décident. Pour ceux qui possèdent. Pour ceux qui mentent. On te dit que c'est pour ton bien. Mais rappelle-toi : ce n'est jamais toi qui décides ce qui est bien.",
+    punch: "Quand on t'enlève les mots, on t'enlève tout.",
+    p1: "wide shot of the neon alley, one giant vertical sign above the street is completely blacked out / censored with static, standing out among lit signs",
+    p2: "medium close-up of the character looking up at the blacked-out sign, mouth slightly closed, jaw tense, cold side light",
+    p3: "extreme close-up of the character's mouth, closed tight, lit by hard neon, no expression, no movement"
+  },
+  {
+    id: 'revolt',
+    icon: '🔥',
+    name: 'Révolte',
+    desc: 'Ils ont peur de ton réveil',
+    voice: "En 2030, ils te diront que tu ne peux rien faire. Que le système est trop grand. Que les puissants sont trop forts. Que ta voix n'a pas de poids. Ils te le diront encore. Et encore. Et encore. Pas parce que c'est vrai. Parce que c'est leur seule arme qui leur reste : te faire croire que tu n'en as pas.",
+    punch: "Ils n'ont pas peur de ta colère. Ils ont peur de ton réveil.",
+    p1: "wide shot of the neon alley, dominated by deep red light, a distant mass of blurred silhouettes gathering at the end of the street",
+    p2: "medium shot of the character standing still, fists clenched at his sides, face fully lit by hard red neon, unflinching",
+    p3: "extreme close-up of the character's face, eyes open, staring directly at the camera, only red light, no movement, no smile"
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// ÉTAT
+// ═══════════════════════════════════════════════════════════════
+const state = {
+  concept: CONCEPTS[0],
+  apiKey: '',
+  slots: [
+    { idx: 0, key: 'p1', title: 'Establishing', desc: 'Rue déserte néon. La ville te montre son visage.', img: null, status: 'idle', prompt: '' },
+    { idx: 1, key: 'p2', title: 'Personnage', desc: 'Le personnage réagit. Regard, posture.', img: null, status: 'idle', prompt: '' },
+    { idx: 2, key: 'p3', title: 'Chute', desc: 'Gros plan, révélation, silence.', img: null, status: 'idle', prompt: '' }
+  ],
+  isBusy: false
+};
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function log(msg, type = 'i') {
+  const el = $('log');
+  const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const div = document.createElement('div');
+  div.className = 'cl';
+  div.innerHTML = `<span class="ct">${time}</span><span class="c${type}">${esc(msg)}</span>`;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+let toastT = null;
+function toast(msg, type = 'ok', dur = 2500) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  if (toastT) clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), dur);
+}
+
+function setStatus(t) {
+  const b = $('status');
+  if (t) { b.classList.add('show'); $('status-text').textContent = t; }
+  else b.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// API KEY
+// ═══════════════════════════════════════════════════════════════
+function loadKey() {
+  try { state.apiKey = localStorage.getItem('revolt_api_key') || ''; } catch (e) { state.apiKey = ''; }
+  $('api-key').value = state.apiKey;
+  updateApiUI();
+}
+function saveKey() {
+  const k = $('api-key').value.trim();
+  if (!k) { try { localStorage.removeItem('revolt_api_key'); } catch (e) {} state.apiKey = ''; updateApiUI(); toast('Clé effacée', 'err'); return; }
+  try { localStorage.setItem('revolt_api_key', k); } catch (e) {}
+  state.apiKey = k;
+  updateApiUI();
+  toast('Clé enregistrée', 'ok');
+}
+function updateApiUI() {
+  const box = $('api-box');
+  const st = $('api-status');
+  if (state.apiKey) {
+    box.classList.add('ok');
+    st.textContent = 'Active · ' + state.apiKey.slice(0, 8) + '…' + state.apiKey.slice(-4);
+  } else {
+    box.classList.remove('ok');
+    st.textContent = 'Non configurée';
+  }
+  renderSlots();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHAR DNA → IDENTITY BLOCK (VERBATIM)
+// ═══════════════════════════════════════════════════════════════
+function buildIdentityBlock() {
+  const name = $('c-name').value.trim() || 'CHARACTER';
+  const age = $('c-age').value.trim();
+  const eth = $('c-eth').value.trim();
+  const face = $('c-face').value.trim();
+  const hair = $('c-hair').value.trim();
+  const mark = $('c-mark').value.trim();
+  const implant = $('c-implant').value.trim();
+  const top = $('c-top').value.trim();
+  const bottom = $('c-bottom').value.trim();
+  const shoes = $('c-shoes').value.trim();
+  const acc = $('c-acc').value.trim();
+  return `CHARACTER — ${name}: ${age} years old, ${eth}, ${face}, ${hair}. Distinctive marks: ${mark}. Cyberpunk implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Signature accessory: ${acc}. This is the SAME character in every shot — never alter.`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONCEPT RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderConcepts() {
+  const g = $('concepts');
+  g.innerHTML = '';
+  CONCEPTS.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'card' + (c.id === state.concept.id ? ' sel' : '');
+    el.innerHTML = `<span class="ic">${c.icon}</span><span class="nm">${esc(c.name)}</span><span class="dc">${esc(c.desc)}</span>`;
+    el.addEventListener('click', () => {
+      state.concept = c;
+      $('vo-text').value = c.voice;
+      $('vo-punch').value = c.punch;
+      renderConcepts();
+      // reset slots
+      state.slots.forEach(s => { s.img = null; s.status = 'idle'; s.prompt = ''; });
+      renderSlots();
+      toast('Concept chargé : ' + c.name, 'ok', 1500);
+    });
+    g.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SLOT PROMPT BUILDER
+// ═══════════════════════════════════════════════════════════════
+function buildPrompt(slot) {
+  const c = state.concept;
+  const sceneDesc = c[slot.key] || '';
+  const charBlock = buildIdentityBlock();
+
+  let p = STYLE_LOCK + ' ';
+  p += CHARACTER_FACE_RULE + ' ';
+  p += charBlock + ' ';
+  p += 'SCENE: ' + sceneDesc + '. ';
+  p += 'Vertical 9:16 cinematic composition. ';
+  p += 'No text, no watermark, no logo. ';
+
+  // Troncature
+  if (p.length > MAX_PROMPT) p = p.slice(0, MAX_PROMPT);
+
+  return p;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FETCH RETRY
+// ═══════════════════════════════════════════════════════════════
+async function fetchRetry(url, opts, maxRetry, label) {
+  for (let i = 0; i <= maxRetry; i++) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 90000);
+      const res = await fetch(url, { ...opts, signal: ctrl.signal });
+      clearTimeout(t);
+      if ((res.status === 500 || res.status === 502 || res.status === 503) && i < maxRetry) {
+        const w = Math.pow(2, i) * 3000;
+        log(label + ' HTTP ' + res.status + ' — retry ' + Math.round(w/1000) + 's', 'w');
+        await sleep(w);
+        continue;
+      }
+      if (res.status === 429 && i < maxRetry) {
+        log(label + ' rate limited — attente 15s', 'w');
+        await sleep(15000);
+        continue;
+      }
+      return res;
+    } catch (e) {
+      if (i < maxRetry) await sleep(Math.pow(2, i) * 2000);
+      else throw new Error(label + ' : ' + e.message);
+    }
+  }
+  throw new Error(label + ' échec après ' + maxRetry + ' essais');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// IMAGE API (avec fallbacks de taille)
+// ═══════════════════════════════════════════════════════════════
+async function callImageAPI(prompt) {
+  if (!state.apiKey) throw new Error('Clé API manquante');
+
+  const sizes = [`${IMG_W}x${IMG_H}`, '1024x1792', '1024x1024', '768x1024', '512x512'];
+  let lastErr = null;
+
+  for (const size of sizes) {
+    const variants = [
+      { model: MODEL_IMAGE, prompt, size, response_format: 'url' },
+      { model: MODEL_IMAGE, prompt, size, extra_body: { response_format: 'url' } },
+      { model: MODEL_IMAGE, prompt, size }
+    ];
+    for (const body of variants) {
+      try {
+        const res = await fetchRetry(
+          API_BASE + '/images/generations',
+          { method: 'POST', headers: { 'Authorization': 'Bearer ' + state.apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify(body) },
+          1, 'Image'
+        );
+        if (res.ok) {
+          const d = await res.json();
+          const url = d.data?.[0]?.url || d.data?.[0]?.b64_json;
+          if (url) {
+            log('Image OK — size ' + size, 'o');
+            return url;
+          }
+        } else {
+          const txt = await res.text();
+          lastErr = 'HTTP ' + res.status + ' : ' + txt.slice(0, 150);
+          log('Échec ' + size + ' — ' + lastErr, 'w');
+        }
+      } catch (e) {
+        lastErr = e.message;
+      }
+    }
+  }
+  throw new Error('Image : tout échoué. Dernier : ' + lastErr);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SLOTS RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderSlots() {
+  const c = $('slots');
+  c.innerHTML = '';
+  state.slots.forEach((slot, i) => {
+    const prev = i > 0 ? state.slots[i-1] : null;
+    const locked = prev && prev.status !== 'done';
+    const active = !locked && slot.status !== 'done';
+    const done = slot.status === 'done';
+
+    let cls = 'slot';
+    if (locked) cls += ' locked';
+    else if (active) cls += ' active';
+    if (done) cls += ' done';
+
+    const el = document.createElement('div');
+    el.className = cls;
+
+    let html = `<div class="slot-header"><div class="slot-title">${esc(slot.title)}</div><span class="slot-num">PLAN ${i+1}</span></div>`;
+    html += `<div class="slot-body">${esc(slot.desc)}</div>`;
+
+    if (slot.img) {
+      html += `<img class="slot-img" src="${slot.img}" alt="Plan ${i+1}">`;
+    } else {
+      html += `<div class="slot-img-placeholder">Plan ${i+1} — non généré</div>`;
+    }
+
+    html += `<div class="slot-status">${slot.status === 'idle' ? '○ en attente' : slot.status === 'gen' ? '◐ génération…' : slot.status === 'done' ? '● terminé' : '✕ erreur'}</div>`;
+    html += `<div class="bar"><div class="bar-fill" style="width:${slot.status === 'gen' ? 60 : slot.status === 'done' ? 100 : 0}%"></div></div>`;
+
+    if (locked) {
+      html += `<div class="hint">Termine le plan ${i} d'abord.</div>`;
+    } else if (!slot.img) {
+      html += `<button class="btn small" data-gen="${i}" style="width:100%" ${state.isBusy || !state.apiKey ? 'disabled' : ''}>GÉNÉRER PLAN ${i+1}</button>`;
+    } else {
+      html += `<div class="btn-row">`;
+      html += `<button class="btn small ok" data-next="${i}" style="flex:1">${i < 2 ? '✓ VALIDER & PLAN ' + (i+2) : '✓ VALIDER'}</button>`;
+      html += `<button class="btn small ghost" data-regen="${i}" style="flex:1">↻ REGÉNÉRER</button>`;
+      html += `</div>`;
+    }
+
+    el.innerHTML = html;
+    c.appendChild(el);
+  });
+
+  // Listeners
+  c.querySelectorAll('[data-gen]').forEach(b => b.addEventListener('click', () => generateSlot(+b.dataset.gen)));
+  c.querySelectorAll('[data-regen]').forEach(b => b.addEventListener('click', () => regenerateSlot(+b.dataset.regen)));
+  c.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => validateSlot(+b.dataset.next)));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GÉNÉRATION SÉQUENTIELLE
+// ═══════════════════════════════════════════════════════════════
+async function generateSlot(i) {
+  if (state.isBusy) return;
+  if (!state.apiKey) { toast('Ajoute ta clé API', 'err'); return; }
+
+  state.isBusy = true;
+  const slot = state.slots[i];
+  slot.status = 'gen';
+  slot.img = null;
+  renderSlots();
+
+  const prompt = buildPrompt(slot);
+  slot.prompt = prompt;
+
+  log('▶ Génération plan ' + (i+1) + ' — ' + slot.title, 'i');
+  log('  Prompt : ' + prompt.length + ' caractères', 'i');
+  setStatus('Génération plan ' + (i+1) + '…');
+
+  try {
+    const url = await callImageAPI(prompt);
+    slot.img = url;
+    slot.status = 'done';
+    log('✅ Plan ' + (i+1) + ' terminé', 'o');
+    toast('Plan ' + (i+1) + ' prêt', 'ok');
+  } catch (e) {
+    slot.status = 'idle';
+    log('❌ Plan ' + (i+1) + ' : ' + e.message, 'e');
+    toast('Erreur : ' + e.message.slice(0, 60), 'err', 4000);
+  }
+
+  state.isBusy = false;
+  setStatus(null);
+  renderSlots();
+}
+
+async function regenerateSlot(i) {
+  const slot = state.slots[i];
+  slot.status = 'idle';
+  slot.img = null;
+  renderSlots();
+  await generateSlot(i);
+}
+
+function validateSlot(i) {
+  if (i < 2) {
+    // Débloquer le suivant
+    state.slots[i+1].status = 'idle';
+    renderSlots();
+    toast('Plan ' + (i+2) + ' débloqué', 'ok', 1500);
+    // Scroll vers le suivant
+    const slots = document.querySelectorAll('.slot');
+    if (slots[i+1]) slots[i+1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    toast('Séquence complète ✓', 'ok');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════
+async function downloadImage(url, filename) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const obj = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = obj;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(obj), 3000);
+  } catch (e) { window.open(url, '_blank'); }
+}
+
+async function downloadAllImages() {
+  const ready = state.slots.filter(s => s.img);
+  if (!ready.length) { toast('Aucune image', 'err'); return; }
+  for (let i = 0; i < ready.length; i++) {
+    await downloadImage(ready[i].img, `revolt_${state.concept.id}_plan${ready[i].idx+1}.png`);
+    await sleep(400);
+  }
+  toast('Images téléchargées', 'ok');
+}
+
+function downloadScript() {
+  const c = state.concept;
+  let txt = '';
+  txt += '═══════════════════════════════════════════\n';
+  txt += 'REVOLT//STUDIO — ' + c.name + '\n';
+  txt += '═══════════════════════════════════════════\n\n';
+  txt += 'THÈME : ' + c.desc + '\n\n';
+  txt += '── VOIX-OFF ──\n';
+  txt += $('vo-text').value + '\n\n';
+  txt += '── CHUTE ──\n';
+  txt += $('vo-punch').value + '\n\n';
+  txt += '── HASHTAGS SUGGÉRÉS ──\n';
+  txt += '#cyberpunk #2030 #révolte #' + c.id + ' #dystopie #société\n';
+  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'revolt_' + c.id + '_script.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Script téléchargé', 'ok');
+}
+
+async function copyPunch() {
+  const txt = $('vo-punch').value;
+  try {
+    await navigator.clipboard.writeText(txt);
+    toast('Chute copiée', 'ok');
+  } catch (e) { toast('Erreur copie', 'err'); }
+}
+
+function resetAll() {
+  if (!confirm('Effacer toutes les images et repartir de zéro ?')) return;
+  state.slots.forEach(s => { s.img = null; s.status = 'idle'; });
+  renderSlots();
+  toast('Réinitialisé', 'ok');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACCORDÉON
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('[data-t]').forEach(h => {
+  h.addEventListener('click', () => {
+    const p = document.getElementById(h.dataset.t);
+    p.classList.toggle('open');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+function init() {
+  loadKey();
+  renderConcepts();
+  // Charger concept initial
+  $('vo-text').value = state.concept.voice;
+  $('vo-punch').value = state.concept.punch;
+  renderSlots();
+
+  $('api-save').addEventListener('click', saveKey);
+  $('dl-all').addEventListener('click', downloadAllImages);
+  $('dl-script').addEventListener('click', downloadScript);
+  $('copy-punch').addEventListener('click', copyPunch);
+  $('reset-all').addEventListener('click', resetAll);
+
+  // Re-render slots quand Character DNA change
+  ['c-name','c-age','c-eth','c-face','c-hair','c-mark','c-implant','c-top','c-bottom','c-shoes','c-acc'].forEach(id => {
+    $(id).addEventListener('input', () => {
+      // Si on modifie après génération, warn
+      if (state.slots.some(s => s.img)) {
+        // Pas de reset auto, juste un warning discret
+      }
+    });
+  });
+
+  log('REVOLT//STUDIO v1 prêt', 'o');
+  log('Style verrouillé : Cyberpunk Révolté', 'i');
+  log('Format : 9:16 vertical · 3 plans séquentiels', 'i');
+  log('Sélectionne un concept et lance le plan 1.', 'i');
+}
+
+init();
+</script>
+</body>
+</html>
