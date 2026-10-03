@@ -77,7 +77,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
 <body>
 
 <h1>Revolt//Studio</h1>
-<div class="sub">Cyberpunk · Révolté · v1.2</div>
+<div class="sub">Cyberpunk · Révolté · v1.3</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
 <div class="api" id="api-box">
@@ -170,7 +170,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
 
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">Revolt//Studio · v1.2 · Plans distincts + Autosave</div>
+<div class="footer-note">Revolt//Studio · v1.3 · Cadrage massif + Couleur par scène</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -179,91 +179,80 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pink)}
 const API_BASE = 'https://apihub.agnes-ai.com/v1';
 const MODEL_IMAGE = 'agnes-image-2.5-flash';
 const IMG_W = 1024, IMG_H = 1792;
-const MAX_PROMPT = 1700;
-const STORAGE_KEY = 'revolt_studio_v1_2';
+const MAX_PROMPT = 1800;
+const STORAGE_KEY = 'revolt_studio_v1_3';
 
 // ═══════════════════════════════════════════════════════════════
-// STYLE LOCK
+// STYLE BASE — COURT, SANS COULEUR IMPOSÉE
 // ═══════════════════════════════════════════════════════════════
-const STYLE_LOCK = 
-'REVOLT STUDIO CYBERPUNK STYLE — MANDATORY AND IMMUTABLE. ' +
-'URBAN DYSTOPIAN CYBERPUNK. Rain-soaked narrow alley in a futuristic Asian megacity at night. ' +
-'Wet asphalt and deep puddles reflecting hot pink and electric cyan neon. ' +
-'Vertical neon signs in Chinese, Japanese and Korean characters stacked on every facade. ' +
-'Steam rising from manholes. Dense anonymous crowd in background, always out of focus. ' +
-'Floating holographic advertisements. Tangled electrical cables overhead. ' +
-'Dominant color palette: saturated hot pink and electric cyan, ' +
-'with magenta reflections in water, deep black shadows, no natural colors, no white light. ' +
-'Faces sculpted by hard lateral neon light, deep blue-red shadows. ' +
-'Shot on Kodak Vision3 500T, pronounced grain, organic bloom around neon sources, ' +
-'heavy halation on reds, high contrast, analog 35mm film texture. ' +
-'Somber, angry, rebellious atmosphere. No hope, no beauty, no softness. ' +
-'Ultra photorealistic, cinematic quality, no illustration, no CGI look, no cartoon. ';
+const STYLE_BASE =
+'Ultra photorealistic cinematic photography. Analog 35mm film, Kodak Vision3 500T, pronounced grain, bloom around light sources, high contrast. ' +
+'Futuristic Asian megacity alley at night. Wet asphalt, deep puddles with reflections, steam from manholes, tangled cables overhead, vertical neon signs in Chinese and Korean characters on every facade. ' +
+'Dense anonymous crowd in the background, always out of focus. ' +
+'Somber, angry, rebellious atmosphere. No illustration, no CGI look, no cartoon. ';
 
 const CHARACTER_FACE_RULE =
-'CRITICAL CHARACTER CONTINUITY RULE: The SAME character appears in every shot. ' +
-'EXACT SAME face, hair, scars, implants, clothing, and accessories in every single image. ' +
-'NEVER alter the character appearance between shots. ';
+'CRITICAL: The SAME character appears in every shot. EXACT SAME face, hair, scars, implants, clothing in every single image. Never alter the character. ';
 
 // ═══════════════════════════════════════════════════════════════
-// 8 CONCEPTS — CADRAGES DIFFÉRENCIÉS
+// 8 CONCEPTS — CADRAGE MASSIF + COULEUR PROPRE
 // ═══════════════════════════════════════════════════════════════
 const CONCEPTS = [
   { id: 'surveillance', icon: '👁️', name: 'Surveillance', desc: 'La ville te regarde',
     voice: "En 2030, chaque caméra de cette ville te connaît par ton nom. Ton visage est une donnée. Ton regard, une preuve. Ta démarche, une signature. On te dit que c'est pour ta sécurité. Mais demande-toi une chose : si c'était vraiment pour toi, pourquoi c'est gratuit ?",
     punch: "Ce qui est gratuit, c'est toi le produit.",
-    p1: "EXTREME WIDE SHOT from 40 meters away. The alley is completely EMPTY, no visible character. A single surveillance camera on a pole dominates the top-left corner. Wet asphalt covered in pink and cyan reflections. No human figure.",
-    p2: "MEDIUM SHOT of the character from the waist up, standing still in the alley, looking UP and to the LEFT toward an off-screen surveillance camera. Half of his face lit by hard pink neon, the other half in deep blue shadow. Hands at his sides.",
-    p3: "EXTREME CLOSE-UP on the character's EYES ONLY, filling the entire frame. Tiny cyan reflection of a camera lens visible in each pupil. No smile, no movement." },
+    p1: "SHOT TYPE: EXTREME WIDE ESTABLISHING SHOT. The camera is 40 meters away from the character. The character is TINY in the frame, almost invisible, standing at the far end of an EMPTY alley. A single surveillance camera on a pole dominates the top-left of the frame. No close-up, no face detail. COLOR: cold cyan and pale pink, the base cyberpunk palette.",
+    p2: "SHOT TYPE: MEDIUM CLOSE-UP from the CHEST UP. The camera is 1 meter from the character. His face fills the LEFT HALF of the frame. He is looking UP and to the LEFT toward an off-screen surveillance camera above. Half of his face is lit by HARD PINK neon, the other half is in DEEP BLUE SHADOW. COLOR: hard pink on the left side, deep blue on the right.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE EYES ONLY. The camera is 10 centimeters from the character's face. Only his EYES and eyelashes fill the ENTIRE frame. No mouth, no nose, no hair visible. In each pupil, a tiny cyan reflection of a camera lens. No movement. COLOR: cyan reflections in dark pupils, pink neon rim on the skin." },
 
   { id: 'work', icon: '💼', name: 'Travail inutile', desc: 'Ils te paient pour te taire',
     voice: "En 2030, ton travail ne sert à rien. Pas parce que tu es mauvais. Parce qu'une machine le fait mieux. Mais on te garde quand même. Pour ton loyer. Pour ta consommation. Pour ton obéissance. On n'a plus besoin de toi. On a juste besoin que tu ne réfléchisses pas trop.",
     punch: "Ils ne te paient pas pour travailler. Ils te paient pour te taire.",
-    p1: "WIDE SHOT of the neon alley from 15 meters, EMPTY street, cold white light spilling from an open doorway at the far end. No character visible. Only the corridor of neon and wet ground.",
-    p2: "MEDIUM SHOT of the character from the waist up, leaning with his BACK against a shuttered storefront, eyes looking DOWN at his empty hands, exhausted slumped posture, neon lights from behind.",
-    p3: "EXTREME CLOSE-UP of the character's HANDS ONLY. Two empty open palms facing up, framed by the frame edges. Lit by harsh pink and cyan side light. No movement, no rings, no objects." },
+    p1: "SHOT TYPE: EXTREME WIDE SHOT. Camera is 20 meters away. The alley is COMPLETELY EMPTY, no character visible at all. Cold white light spills from an open doorway at the far end of the street. Only the corridor of neon signs and wet asphalt. NO human figure. COLOR: cold white light mixed with pink neon on the walls.",
+    p2: "SHOT TYPE: MEDIUM SHOT from the WAIST UP, viewed from the character's LEFT PROFILE. He is leaning with his BACK against a shuttered storefront, eyes looking DOWN at his own empty hands. Exhausted slumped posture, shoulders low. Neon lights behind him. COLOR: pink rim light on the back and hair, shadow on the face.",
+    p3: "SHOT TYPE: EXTREME CLOSE-UP ON THE HANDS ONLY. Both open palms face up, framed tightly filling the ENTIRE image. No face, no head, no background. Lit by hard pink and cyan side light. Skin pores and dust visible on the palms. NO rings, NO objects. COLOR: harsh pink on one side of each palm, cyan on the other side." },
 
   { id: 'data', icon: '📡', name: 'Données volées', desc: 'Tu es la matière première',
     voice: "En 2030, ta vie est à vendre. Tes photos. Tes messages. Tes opinions. Tes habitudes. Tes peurs. Chaque clic est une monnaie. Chaque hésitation est un profit. Tu n'es pas un utilisateur. Tu es une matière première. Et tu la donnes gratuitement.",
     punch: "Tu travailles pour eux. Gratuitement. Tous les jours.",
-    p1: "WIDE SHOT of the neon alley at ground level, ONLY blurred anonymous legs and torsos walking in both directions, faces out of frame. Dense crowd, all out of focus, pink and cyan neon above.",
-    p2: "MEDIUM SHOT of the character standing perfectly STILL in the middle of the moving crowd. He is SHARP, everyone around him is a MOTION BLUR. Hard pink neon side-light on his face. He stares forward, unblinking.",
-    p3: "EXTREME CLOSE-UP of the character's RIGHT EYE, filling the entire frame. Inside the iris, a scrolling stream of tiny glowing pink and cyan data characters flows vertically. No movement of the eye, dead stare." },
+    p1: "SHOT TYPE: LOW WIDE SHOT AT GROUND LEVEL. The camera is at ankle height, looking at the ground and the legs of passersby. ONLY blurred anonymous legs and shoes fill the frame. No faces, no upper bodies. Dense crowd, ALL OUT OF FOCUS. Wet asphalt with neon reflections. COLOR: pink and cyan reflected in puddles, dark silhouettes of legs.",
+    p2: "SHOT TYPE: MEDIUM SHOT from the waist up. The character stands PERFECTLY STILL in the middle of the moving crowd. The crowd around him is COMPLETELY MOTION-BLURRED. He is the ONLY SHARP element. He stares straight forward, unblinking. COLOR: hard pink neon side-light on the face, cyan on the jacket shoulder.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE RIGHT EYE ONLY. The eye fills the ENTIRE frame. Only the iris, pupil, eyelashes, and surrounding skin visible. Inside the iris, a scrolling stream of tiny glowing pink and cyan data characters flows vertically. No movement of the eye, dead stare. COLOR: cyan and pink data glow inside the iris." },
 
   { id: 'ai', icon: '🤖', name: 'IA qui décide', desc: 'Le chiffre qui te condamne',
     voice: "En 2030, une machine décide qui aura un prêt. Qui aura un logement. Qui aura un travail. Qui aura le droit d'exister. Elle ne te connaît pas. Elle ne te juge pas. Elle calcule. Et si ton score tombe trop bas, tu disparais des radars. Pas de procès. Pas d'appel. Juste un chiffre qui te condamne.",
     punch: "L'IA n'est pas neutre. Elle est écrite par ceux qui te possèdent.",
-    p1: "EXTREME WIDE SHOT from 30 meters, EMPTY alley. A giant glowing holographic screen floats above the street, displaying abstract red horizontal bars and blurred numbers, no readable text. No character visible.",
-    p2: "MEDIUM SHOT of the character from behind, seen from the BACK, head tilted UP looking at an off-screen hologram. His back is lit by cold cyan glow from above. Shoulders tense. No face visible.",
-    p3: "EXTREME CLOSE-UP of the character's FACE from the front, filling the frame. Only lit by harsh RED light from an off-screen source on the right. Left half of the face in complete black shadow. Eyes fixed forward, no expression, jaw clenched." },
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 30 meters. COMPLETELY EMPTY alley, no character. A giant glowing holographic screen floats above the street, displaying abstract RED horizontal bars and blurred numbers. The screen DOMINATES the upper half of the frame. COLOR: dominant RED from the hologram, subtle cyan on the walls.",
+    p2: "SHOT TYPE: MEDIUM SHOT from BEHIND THE CHARACTER. We see only his BACK and the back of his head. He is looking UP at an off-screen hologram above. His back and shoulders are lit by COLD CYAN light from above. Shoulders tense. NO face visible. COLOR: cold cyan from above, deep blue shadows on the back.",
+    p3: "SHOT TYPE: EXTREME CLOSE-UP OF THE FACE FROM THE FRONT. Only the character's face fills the entire frame. He is lit ONLY by HARSH RED light from an off-screen source on the RIGHT. The LEFT half of the face is in COMPLETE BLACK SHADOW. Eyes fixed forward, no expression. COLOR: hard RED on the right half, pure black on the left half. NO PINK, NO CYAN." },
 
   { id: 'city', icon: '🌆', name: 'Ville qui te vide', desc: 'Personne ne t\'attend',
     voice: "En 2030, la ville est pleine. Et toi, tu es seul. Dix millions de personnes autour de toi. Zéro qui connaît ton prénom. On a construit des tours toujours plus hautes. Des écrans toujours plus grands. Des foules toujours plus denses. Pour que tu oublies une chose simple : personne ne t'attend nulle part.",
     punch: "Ils t'ont donné le monde. Ils t'ont pris ta place.",
-    p1: "EXTREME WIDE SHOT from 50 meters, the alley recedes into heavy fog, buildings stretching high above the frame, thousands of tiny blurred silhouettes walking, no identifiable face, monumental and crushing scale.",
-    p2: "MEDIUM SHOT of the character from the waist up, standing alone and still in the middle of the moving crowd. All silhouettes around him are motion-blurred and faceless. He is perfectly sharp. Pink neon rim light on his shoulders.",
-    p3: "WIDE SHOT of the character's silhouette from BEHIND, small in the frame, walking away from camera into the neon fog. The crowd around him has completely vanished. Empty street ahead. Only neon reflections remain." },
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 50 meters. The alley recedes into HEAVY FOG. Buildings stretch HIGH ABOVE the frame, out of view. THOUSANDS of tiny blurred silhouettes walk in both directions. NO identifiable face anywhere. Monumental, crushing scale. COLOR: pale pink and cyan diffused by the fog, no sharp lights.",
+    p2: "SHOT TYPE: MEDIUM WIDE SHOT from the waist up. The character stands ALONE and perfectly STILL in the middle of the moving crowd. ALL silhouettes around him are MOTION-BLURRED and FACELESS. He is the only sharp human figure. Empty space around him. COLOR: pink rim light on the shoulders, cyan cold light on the chest.",
+    p3: "SHOT TYPE: WIDE SHOT FROM BEHIND. We see the character's SILHOUETTE from the back, SMALL in the frame. He walks AWAY from the camera into the neon fog. The crowd around him has COMPLETELY VANISHED. Empty street ahead. No other human visible. COLOR: pink and cyan neon fading into the fog, character in silhouette." },
 
   { id: 'body', icon: '🦾', name: 'Corps augmenté', desc: 'Tu es un abonnement',
     voice: "En 2030, on peut remplacer tes yeux. Tes oreilles. Ton cœur. Ta peau. Tout sauf ce qui te rend humain. On te vend des upgrades. Des versions améliorées de toi-même. Mais personne ne te demande si l'original te suffisait. On ne te demande jamais si tu voulais changer. On te demande juste si tu peux payer.",
     punch: "Tu n'es plus une personne. Tu es un abonnement.",
-    p1: "WIDE SHOT of the neon alley from 20 meters, EMPTY street, a lit medical clinic storefront on the left side emits a cold white glow onto the wet pavement. Red cross sign above the door. No character visible.",
-    p2: "MEDIUM CLOSE-UP of the character from the SHOULDERS UP, viewed from the LEFT SIDE PROFILE. The silver data port implant behind the right ear is the focal point, cyan LED pulsing. Cold side light on the neck and jaw. Face partly turned away.",
-    p3: "EXTREME CLOSE-UP on the DATA PORT IMPLANT behind the ear only. Rain droplets on the metal surface. The cyan LED glows brightly in the dark. Skin pores and stubble visible around the implant. No face visible, only the implant." },
+    p1: "SHOT TYPE: WIDE SHOT from 15 meters. EMPTY alley, no character. On the LEFT side, a lit medical clinic storefront emits COLD WHITE light onto the wet pavement. A red cross sign glows above the door. NO human figure. COLOR: cold clinical white light from the storefront, cyan neon around.",
+    p2: "SHOT TYPE: MEDIUM CLOSE-UP from the SHOULDERS UP, viewed from the LEFT SIDE PROFILE. The character's head and neck fill the frame. The silver data port implant BEHIND THE RIGHT EAR is the focal point. Cyan LED pulsing. His face is turned AWAY from camera. COLOR: cold cyan glow from the implant, pink neon rim on the hair.",
+    p3: "SHOT TYPE: EXTREME MACRO CLOSE-UP ON THE IMPLANT ONLY. Only the DATA PORT BEHIND THE EAR fills the entire frame. Rain droplets on the metal surface. The cyan LED glows brightly in the dark. Skin pores, stubble, and hairline visible around the implant. NO face, NO eye visible. COLOR: bright cyan LED glow in dark, deep black background." },
 
   { id: 'words', icon: '🚫', name: 'Contrôle des mots', desc: 'Quand on t\'enlève les mots',
     voice: "En 2030, certains mots sont interdits. Pas parce qu'ils sont faux. Parce qu'ils sont dangereux. Dangereux pour qui ? Pour ceux qui décident. Pour ceux qui possèdent. Pour ceux qui mentent. On te dit que c'est pour ton bien. Mais rappelle-toi : ce n'est jamais toi qui décides ce qui est bien.",
     punch: "Quand on t'enlève les mots, on t'enlève tout.",
-    p1: "WIDE SHOT of the neon alley from 15 meters, EMPTY street. Above, one giant vertical neon sign is COMPLETELY BLACKED OUT with gray static noise, standing out as an anomaly among the other lit signs. No character visible.",
-    p2: "MEDIUM SHOT of the character from the waist up, looking UP and slightly LEFT at the blacked-out sign off-frame. Mouth CLOSED tight, jaw tense, eyebrows slightly lowered. Cold white light on the face from above.",
-    p3: "EXTREME CLOSE-UP of the character's MOUTH ONLY, lips pressed tightly closed, filling the entire frame. Harsh pink neon light from the left side, blue shadow from the right. No expression, no movement." },
+    p1: "SHOT TYPE: WIDE SHOT from 15 meters. EMPTY alley, no character. Above, ONE giant vertical neon sign is COMPLETELY BLACKED OUT with gray static noise. It stands as a visual anomaly among the other lit signs. No character visible. COLOR: gray static where the sign should glow, pink and cyan on all other signs.",
+    p2: "SHOT TYPE: MEDIUM SHOT from the waist up. The character looks UP and slightly LEFT at the blacked-out sign (off-frame). His mouth is CLOSED TIGHT, jaw tense, eyebrows slightly lowered. Cold white light on the face from above. COLOR: cold white light on the face, cyan ambient from surroundings.",
+    p3: "SHOT TYPE: EXTREME CLOSE-UP ON THE MOUTH ONLY. Only the character's LIPS and MOUTH fill the ENTIRE frame. Lips pressed tightly closed. Harsh pink neon light from the LEFT side, blue shadow from the RIGHT. No expression, no movement. COLOR: pink on the left half, deep blue on the right half." },
 
   { id: 'revolt', icon: '🔥', name: 'Révolte', desc: 'Ils ont peur de ton réveil',
     voice: "En 2030, ils te diront que tu ne peux rien faire. Que le système est trop grand. Que les puissants sont trop forts. Que ta voix n'a pas de poids. Ils te le diront encore. Et encore. Et encore. Pas parce que c'est vrai. Parce que c'est leur seule arme qui leur reste : te faire croire que tu n'en as pas.",
     punch: "Ils n'ont pas peur de ta colère. Ils ont peur de ton réveil.",
-    p1: "EXTREME WIDE SHOT from 35 meters, the alley is dominated by deep RED light. At the far end, a distant mass of blurred dark silhouettes gathers. Wet street reflects red neon. No identifiable character, only the crowd and the red glow.",
-    p2: "MEDIUM SHOT of the character from the waist up, standing still facing forward. Both FISTS VISIBLY CLENCHED at his sides, knuckles white. Face fully lit by hard red neon from the front. Jaw set, unflinching.",
-    p3: "EXTREME CLOSE-UP of the character's face, eyes and upper cheeks only, filling the entire frame. He stares DIRECTLY INTO THE CAMERA LENS. No smile, no movement. Deep red light reflects in both eyes. Rain on the skin." }
+    p1: "SHOT TYPE: EXTREME WIDE SHOT from 35 meters. The alley is EMPTY of the main character. At the FAR END of the street, a DISTANT MASS of dark silhouettes is gathering, small in the frame. The entire alley is BATHEd in DEEP SATURATED RED NEON. No pink, no cyan. Wet street reflects RED only. NO character in foreground, only the distant crowd and red glow.",
+    p2: "SHOT TYPE: MEDIUM SHOT from the waist up. The character stands STILL facing forward. Both FISTS VISIBLY CLENCHED at his sides, knuckles white. His face is fully lit by HARD RED neon from the front. Jaw set, unflinching gaze. NO pink, NO cyan anywhere in the image. ONLY RED and deep black shadows.",
+    p3: "SHOT TYPE: EXTREME CLOSE-UP OF THE FACE, EYES AND UPPER CHEEKS ONLY. The character's face fills the ENTIRE frame. He stares DIRECTLY INTO THE CAMERA LENS. No smile, no movement. Deep RED light reflects in both eyes. Rain droplets on the skin. NO pink, NO cyan. ONLY RED, black, and skin tones under red light." }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -362,7 +351,7 @@ function buildIdentityBlock() {
   const bottom = $('c-bottom').value.trim();
   const shoes = $('c-shoes').value.trim();
   const acc = $('c-acc').value.trim();
-  return `CHARACTER — ${name}: ${age} years old, ${eth}, ${face}, ${hair}. Distinctive marks: ${mark}. Cyberpunk implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Signature accessory: ${acc}. This is the SAME character in every shot — never alter.`;
+  return `CHARACTER — ${name}: ${age} years old, ${eth}, ${face}, ${hair}. Marks: ${mark}. Implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Accessory: ${acc}. This is the SAME character in every shot — never alter.`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -444,19 +433,23 @@ function renderConcepts() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROMPT BUILDER — CADRAGE EN PREMIER, RÉPÉTÉ
+// PROMPT BUILDER — CADRAGE ×3 EN PREMIER
 // ═══════════════════════════════════════════════════════════════
 function buildPrompt(slot) {
   const c = state.concept;
   const sceneDesc = c[slot.key] || '';
   const charBlock = buildIdentityBlock();
 
-  // Le cadrage est placé AVANT le style, et répété 2 fois pour forcer l'IA à le lire
+  // Le cadrage et la couleur sont RÉPÉTÉS 3 fois avant le style
   let p = '';
-  p += 'FRAMING AND COMPOSITION — THIS IS THE MOST IMPORTANT INSTRUCTION: ' + sceneDesc + '. ';
-  p += 'REPEAT: ' + sceneDesc + '. ';
-  p += 'FOLLOW THIS FRAMING EXACTLY. DO NOT use a different shot type. ';
-  p += STYLE_LOCK + ' ';
+  p += '════ MOST IMPORTANT INSTRUCTION — READ CAREFULLY ════ ';
+  p += sceneDesc + ' ';
+  p += '════ REPEAT THE EXACT SAME INSTRUCTION ════ ';
+  p += sceneDesc + ' ';
+  p += '════ THIS IS THE ONLY SCENE TO DEPICT, FOLLOW IT STRICTLY ════ ';
+  p += sceneDesc + ' ';
+  p += '════ IGNORE ANY OTHER FRAMING OR COLOR SUGGESTION ════ ';
+  p += STYLE_BASE + ' ';
   p += CHARACTER_FACE_RULE + ' ';
   p += charBlock + ' ';
   p += 'Vertical 9:16 cinematic composition. ';
@@ -722,13 +715,12 @@ function init() {
   window.addEventListener('beforeunload', saveState);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
 
-  log('REVOLT//STUDIO v1.2 prêt', 'o');
+  log('REVOLT//STUDIO v1.3 prêt', 'o');
   if (state.restored) {
-    log('Travail précédent restauré automatiquement.', 'o');
+    log('Session restaurée.', 'o');
   } else {
-    log('Style verrouillé : Cyberpunk Révolté', 'i');
-    log('Cadrages différenciés activés.', 'i');
-    log('Sélectionne un concept et lance le plan 1.', 'i');
+    log('Style verrouillé, couleur par scène.', 'i');
+    log('Sélectionne Révolte et lance le plan 1.', 'i');
   }
 }
 
