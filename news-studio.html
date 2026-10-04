@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEWS//STUDIO v2.0</title>
+<title>NEWS//STUDIO v2.1</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#030408;--panel:#070a12;--panel2:#0c1018;--border:#161e2e;--cyan:#00d4ff;--amber:#ffb400;--red:#ff3344;--ink:#eaeaf0;--dim:#8a8a9a;--faint:#404058;--ok:#00d47e;--err:#ff3355}
 body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem 1rem 6rem;font-size:15px;line-height:1.5;max-width:800px;margin:0 auto}
-h1{font-size:1.4rem;font-weight:900;letter-spacing:.05em;background:linear-gradient(90deg,var(--cyan),var(--amber),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
+h1{font-size:1.4rem;font-weight:900;letter-spacing:.05em;background:linear-gradient(90deg,var(--cyan),var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
 .sub{font-size:.68rem;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:1rem}
 .toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel2);color:var(--ink);padding:.8rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:600;box-shadow:0 8px 40px rgba(0,0,0,.8);border:1px solid var(--border);z-index:9999;opacity:0;transition:.3s;max-width:90vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -77,11 +77,6 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
 .vopts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.4rem 0}
 .vopts select{padding:.5rem .6rem;font-size:.75rem}
-.effects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.45rem;margin-top:.5rem}
-.eff-card{padding:.55rem;border-radius:6px;border:1px solid var(--border);background:var(--panel);cursor:pointer;text-align:center}
-.eff-card.sel{background:linear-gradient(135deg,#8a4cf7,#5a2ec7);color:#fff;border-color:#8a4cf7}
-.eff-card .e-ic{font-size:1.2rem;display:block;margin-bottom:.15rem}
-.eff-card .e-nm{font-size:.65rem;font-weight:700}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.35rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 .status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:.65rem 1rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:.3s;z-index:100}
@@ -98,7 +93,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <body>
 
 <h1>News//Studio</h1>
-<div class="sub">v2.0 · Upload + Effets broadcast</div>
+<div class="sub">v2.1 · Nord-Africain · Anti-hallucination</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
 <div class="api" id="api-box">
@@ -111,11 +106,11 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <div class="panel open" id="p-concept">
   <div class="ph" data-t="p-concept"><div class="pt"><span class="n">1</span> Dépêche 2030</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Choisis une dépêche. Script et cadrages pré-écrits.</div>
+    <div class="hint">Choisis une dépêche.</div>
     <div class="grid" id="concepts"></div>
     <label>Script voix-off journaliste</label>
     <textarea id="vo-text" style="min-height:110px;font-size:.82rem"></textarea>
-    <label>Titre choc (bandeau bas d'écran)</label>
+    <label>Titre choc</label>
     <input type="text" id="vo-punch">
   </div></div>
 </div>
@@ -149,7 +144,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <div class="panel open" id="p-gen">
   <div class="ph" data-t="p-gen"><div class="pt"><span class="n">3</span> Génération images</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Pour chaque plan : génère avec l'IA OU importe ta propre image (base64 direct).</div>
+    <div class="hint">Pour chaque plan : génère avec l'IA OU importe ta propre image.</div>
     <div id="slots"></div>
   </div></div>
 </div>
@@ -157,7 +152,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <div class="panel open" id="p-video">
   <div class="ph" data-t="p-video"><div class="pt"><span class="n">4</span> Génération vidéo + Effets</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Chaque vidéo a son propre effet broadcast, mouvement et durée.</div>
+    <div class="hint">Chaque vidéo a son propre effet, mouvement et durée.</div>
     <div id="video-slots"></div>
     <button class="btn warn" id="batch-videos" style="margin-top:.6rem">⚡ GÉNÉRER LES 3 VIDÉOS</button>
   </div></div>
@@ -232,7 +227,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">News//Studio v2.0 · Upload · 8 effets broadcast · Base64 direct</div>
+<div class="footer-note">News//Studio v2.1 · Nord-Africain · Anti-hallucination</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -247,93 +242,100 @@ const VID_W = 576, VID_H = 1024;
 const MAX_PROMPT = 1800;
 const INITIAL_WAIT = 105;
 const POLL_INTERVAL = 5;
-const STORAGE_KEY = 'news_studio_v2_0';
+const STORAGE_KEY = 'news_studio_v2_1';
 
+// ═══════════════════════════════════════════════════════════════
+// STYLE — NORD-AFRICAIN + CYAN/AMBER
+// ═══════════════════════════════════════════════════════════════
 const STYLE_BASE =
 'Ultra photorealistic cinematic broadcast imagery. Analog 35mm film texture with digital broadcast overlays. ' +
-'Futuristic Asian megacity at night, seen through the lens of an official state television broadcast. ' +
-'Wet asphalt with neon reflections, vertical neon signs, holographic public screens floating at street level. ' +
-'Massive scrolling LED tickers on every wall. Holographic channel logos suspended mid-air, glowing cyan and amber. ' +
-'Dominant color palette: corporate cyan and warning amber-yellow, with deep blue-black shadows, ' +
-'PURE RED used ONLY for breaking news alerts. Cold clinical corporate lighting. ' +
-'Oppressive, controlled, official atmosphere. No illustration, no CGI, no cartoon. No smiles, no warmth. ';
+'Futuristic North African / Mediterranean international megacity at night, seen through the lens of an official state television broadcast. ' +
+'Wet asphalt with neon reflections, vertical neon signs with LATIN and ARABIC script ONLY, holographic public screens floating at street level. ' +
+'ABSOLUTELY NO East Asian characters, NO Chinese, NO Japanese, NO Korean text, NO Asian city aesthetic. ' +
+'Massive scrolling LED tickers on every wall displaying headlines in LATIN alphabet or ARABIC script only. ' +
+'Holographic channel logos suspended mid-air, glowing cold institutional cyan. ' +
+'Dominant color palette: institutional cold cyan, pale warning amber-yellow, bone-white highlights, deep slate-blue shadows. ' +
+'ABSOLUTELY NO dominant RED. Red is used ONLY as a tiny emergency alert accent, NEVER as ambient decoration. ' +
+'Cold clinical corporate lighting, oppressively controlled atmosphere. ' +
+'No illustration, no CGI, no cartoon. No smiles, no warmth. ';
 
 const CHARACTER_FACE_RULE =
-'CRITICAL: The SAME female journalist appears in every shot. EXACT SAME face, hair, clothing, implant every image. Never alter her. ';
+'CRITICAL ETHNICITY LOCK (MANDATORY, NON-NEGOTIABLE): The journalist is NORTH AFRICAN ALGERIAN / MAGHREBI. Olive skin, dark brown almond eyes, dark hair, North African facial bone structure. She is ABSOLUTELY NOT East Asian. NOT Chinese. NOT Japanese. NOT Korean. NOT Vietnamese. NOT Filipino. Her ethnicity MUST NEVER change between shots. ' +
+'CRITICAL IDENTITY LOCK: The SAME female journalist appears in every shot. EXACT SAME face, hair, clothing, implant every image. Never alter her. ';
 
 // ═══════════════════════════════════════════════════════════════
-// 8 EFFETS BROADCAST UTILES
+// 9 EFFETS BROADCAST
 // ═══════════════════════════════════════════════════════════════
 const EFFECTS = [
-{ id:'broadcast-fixed', icon:'🎙️', name:'Broadcast fixe', desc:'Caméra posée, journaliste parle face caméra', prompt:'Almost static broadcast shot, fixed camera, only subtle breathing, blinking eyes, tiny head movement, neon flicker in background.' },
-{ id:'glitch', icon:'📺', name:'Glitch broadcast', desc:'Micro-coupures numériques', prompt:'Subtle digital glitch effect on the broadcast, occasional RGB split, scan lines flickering, brief horizontal distortion like a bad satellite feed.' },
-{ id:'breaking', icon:'⚡', name:'Breaking news', desc:'Flash rouge, alerte', prompt:'Red breaking-news alert pulse in the scene, pulsing red glow hitting the subject face, emergency broadcast overlay feel.' },
-{ id:'zoom-studio', icon:'🔍', name:'Zoom studio', desc:'Zoom lent sur le visage', prompt:'Slow continuous zoom in on the subject face, one direction only, no return, cinematic tension building.' },
-{ id:'dolly-in', icon:'🎬', name:'Dolly in', desc:'Avancée cinéma', prompt:'Slow cinematic dolly in, camera pushing forward, subject breathing, natural fluid motion.' },
-{ id:'dolly-out', icon:'🎥', name:'Dolly out', desc:'Recul révélation', prompt:'Slow cinematic dolly out, camera pulls back revealing the context, tension release.' },
-{ id:'track-right', icon:'➡️', name:'Tracking droit', desc:'Balayage latéral', prompt:'Very slow tracking shot moving laterally to the right, cinematic panorama.' },
-{ id:'handheld-live', icon:'📹', name:'Caméra épaule (live)', desc:'Live reportage', prompt:'Subtle handheld camera with micro-movements, like a live broadcast on location, breathing frame, documentary feel.' }
+{ id:'broadcast-fixed', icon:'🎙️', name:'Broadcast fixe', desc:'Caméra posée, ZÉRO ajout', prompt:'Almost completely static broadcast shot, fixed locked-off camera, MINIMAL animation: only subtle breathing, blinking eyes if a person is present, slight neon flicker in background. NO camera movement at all. NO new elements introduced. The scene must remain IDENTICAL to the input image.' },
+{ id:'empty-lock', icon:'🔒', name:'Plan vide verrouillé', desc:'Aucun humain — pour décors vides', prompt:'Completely STATIC shot. NO camera movement. NO new characters. NO new figures appearing. NO people added. The image must stay EXACTLY as it is, only subtle atmospheric motion: rain falling, steam drifting slowly, neon flickering, hologram pulsing. If the scene is empty, it MUST stay empty. No humans visible, ever.' },
+{ id:'glitch', icon:'📺', name:'Glitch broadcast', desc:'Micro-coupures numériques', prompt:'Subtle digital glitch effect on the broadcast, occasional RGB split, scan lines flickering, brief horizontal distortion like a bad satellite feed. No new elements added.' },
+{ id:'breaking', icon:'⚡', name:'Breaking news', desc:'Flash amber alerte', prompt:'Amber breaking-news alert pulse in the scene, pulsing amber glow hitting the subject face, emergency broadcast overlay feel. NO dominant red, only amber warning light.' },
+{ id:'zoom-studio', icon:'🔍', name:'Zoom studio', desc:'Zoom lent sur le visage', prompt:'Slow continuous zoom in on the subject face, one direction only, no return, cinematic tension building. No new elements added.' },
+{ id:'dolly-in', icon:'🎬', name:'Dolly in', desc:'Avancée cinéma', prompt:'Slow cinematic dolly in, camera pushing forward, subject breathing, natural fluid motion. No new elements added.' },
+{ id:'track-right', icon:'➡️', name:'Tracking droit', desc:'Balayage latéral', prompt:'Very slow tracking shot moving laterally to the right, cinematic panorama. No new elements added.' },
+{ id:'handheld-live', icon:'📹', name:'Caméra épaule (live)', desc:'Live reportage', prompt:'Subtle handheld camera with micro-movements, like a live broadcast on location, breathing frame, documentary feel. No new elements added.' }
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// 8 DÉPÊCHES
+// 8 DÉPÊCHES — Palette cyan/amber (sauf resistance = rouge)
 // ═══════════════════════════════════════════════════════════════
 const CONCEPTS = [
 { id:'canicule', icon:'🔥', name:'Canicule', desc:'47°C — 340 morts',
   voice:"Le thermomètre de la capitale affiche 47 degrés Celsius à 14 heures. Les autorités sanitaires confirment 340 décès liés à la chaleur depuis ce matin. Le ministère remercie les citoyens pour leur patience.",
   punch:"47°C — 340 morts — merci pour votre patience.",
-  p1:"WIDE BROADCAST SHOT. Massive HOLOGRAPHIC PUBLIC SCREEN floating above a wet cyberpunk street, displaying an official RED breaking news banner with abstract warning symbols. NO readable text. Street EMPTY of main character. Heat haze visible. COLOR: dominant RED alert on the screen, cyan and amber neon on the walls below.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. She stands still facing the camera, broadcast microphone up near her face. Neutral expression. Holographic press badge glows on her blazer chest. Behind her, out of focus, the glowing RED warning screen. COLOR: cold cyan rim light on shoulders, amber reflection on face from the screen behind.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE BROADCAST MICROPHONE. Only the microphone fills the frame edge to edge, the journalist's hand visible behind it. Small holographic channel logo floats above the mic head, glowing cyan. Rain droplets on the matte-black surface. NO face visible. COLOR: cyan hologram glow, amber rim on the hand, deep black background." },
+  p1:"WIDE BROADCAST SHOT. Massive HOLOGRAPHIC PUBLIC SCREEN floating above a wet North African futuristic street, displaying an official AMBER warning banner with abstract alert symbols in LATIN and ARABIC script only. NO East Asian characters. Street EMPTY of main character. Heat haze visible. COLOR: dominant AMBER alert on the screen, cold cyan and pale amber neon on the walls below.",
+  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman, olive skin, dark almond eyes, dark hair. She stands still facing the camera, broadcast microphone up near her face. Neutral expression. Holographic press badge glows cyan on her blazer chest. Behind her, out of focus, the glowing AMBER warning screen. COLOR: cold cyan rim light on shoulders, pale amber reflection on face. NO dominant red.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE BROADCAST MICROPHONE. Only the microphone fills the frame edge to edge, the journalist's olive-skinned hand visible behind it. Small holographic channel logo floats above the mic head, glowing cyan. Rain droplets on the matte-black surface. NO face visible. COLOR: cyan hologram glow, pale amber rim on the hand, deep black background." },
 
 { id:'emploi', icon:'💼', name:'Automatisation', desc:'12M emplois supprimés',
   voice:"Le ministère du Travail annonce un record historique. Douze millions d'emplois ont été automatisés ce trimestre. La productivité nationale a augmenté de quatre cents pour cent.",
   punch:"12 millions d'emplois supprimés — record historique.",
-  p1:"WIDE BROADCAST SHOT. Wet street with a huge floor-to-ceiling LED billboard on the right showing an abstract GRAPH rising sharply, glowing amber and cyan. NO readable text. A few blurred anonymous silhouettes walk past, out of focus. NO main character. COLOR: amber data glow dominating, cyan neon reflections in puddles.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. She stands still, mic in her right hand near her chin. Neutral expression. Press badge glows on her chest. Behind her, out of focus, the glowing amber billboard. COLOR: warm amber rim light on the side of her face, cyan shadow on the other side.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE HOLOGRAPHIC PRESS BADGE STILL PINNED ON HER BLAZER. She is wearing it — we see the fabric, the pin clip, the edge of her collar. NO floating logo. The badge glows cyan with an abstract channel logo. Rain droplets on the blazer. NO face. COLOR: cyan hologram glow, black fabric shadow around." },
+  p1:"WIDE BROADCAST SHOT. Wet North African street with a huge LED billboard showing an abstract GRAPH rising sharply, glowing amber and cyan. NO readable text, NO East Asian characters. A few blurred anonymous silhouettes walk past, out of focus. NO main character. COLOR: amber data glow dominating, cold cyan neon reflections in puddles.",
+  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman, olive skin. She stands still, mic in her right hand near her chin. Neutral expression. Press badge glows cyan on her chest. Behind her, out of focus, the glowing amber billboard. COLOR: pale amber rim light on her face, cold cyan shadow.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE HOLOGRAPHIC PRESS BADGE STILL PINNED ON HER BLAZER. She is wearing it — we see the navy fabric, the pin clip, the collar edge. The badge glows cold cyan. Rain droplets on the blazer. NO face. COLOR: cyan hologram glow, dark navy fabric shadow around." },
 
 { id:'silence', icon:'🤫', name:'Réforme du silence', desc:'10 000 arrestations',
-  voice:"La réforme du silence entre en vigueur à minuit. Dix mille arrestations ont déjà été effectuées cette semaine pour propos non conformes. Les citoyens sont invités à signaler toute parole suspecte via l'application officielle.",
+  voice:"La réforme du silence entre en vigueur à minuit. Dix mille arrestations ont déjà été effectuées cette semaine pour propos non conformes. Les citoyens sont invités à signaler toute parole suspecte.",
   punch:"10 000 arrestations pour propos non conformes.",
-  p1:"WIDE BROADCAST SHOT. Wet street where every citizen wears a plain grey IDENTIFICATION ARM BAND glowing amber on their left wrist. Blurred anonymous silhouettes walk slowly, all out of focus, heads bowed. NO main character. COLOR: sickly amber warning glow on every wrist, cold cyan neon on walls.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. She stands still, mic in right hand. She wears a matching grey IDENTIFICATION ARM BAND glowing amber on her left wrist. Neutral expression. COLOR: hard cyan on one side of her face, amber from the wrist band on the lower part.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S LIPS ONLY. Only her mouth fills the frame edge to edge: lips, chin, part of jawline. Lips pressed tightly closed. Skin texture, natural pores. NO eyes, NO background. COLOR: harsh cold cyan from left, amber shadow from right." },
+  p1:"WIDE BROADCAST SHOT. Wet North African street where every citizen wears a plain grey IDENTIFICATION ARM BAND glowing pale amber on their left wrist. Blurred anonymous silhouettes walk slowly, heads bowed, all out of focus. NO main character. COLOR: pale amber warning glow on wrists, cold cyan neon on walls. NO dominant red.",
+  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands still, mic in right hand. She wears a matching grey IDENTIFICATION ARM BAND glowing pale amber on her left wrist. Neutral expression. COLOR: cold cyan key light on face, subtle amber from the wrist band.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S LIPS ONLY. Only her mouth fills the frame edge to edge: full lips, chin, part of jawline. Lips pressed tightly closed. Natural olive skin texture with visible pores. NO eyes, NO background. COLOR: harsh cold cyan from left, deep slate-blue shadow from right." },
 
 { id:'air', icon:'💨', name:'Forfait respiratoire', desc:'49€/mois pour respirer',
   voice:"Le nouveau forfait respiratoire entre en vigueur demain. Pour quarante-neuf euros par mois, les abonnés bénéficieront de douze heures d'air propre par semaine.",
   punch:"Forfait respiratoire : 49€ / mois.",
-  p1:"EXTREME WIDE SHOT. Street filled with THICK YELLOW-GRAY HAZE obscuring everything beyond 15 meters. Dozens of blurred silhouettes wear white and grey FILTER MASKS. Above, a small holographic OFFICIAL SIGN glows amber. NO main character. COLOR: sickly yellow-gray haze dominating, weak amber and cyan struggling through.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. She stands facing the camera but a dark grey FILTER MASK covers the lower half of her FACE, hiding mouth and nose. Her dark eyes are visible above, neutral, professional. Mic in right hand. COLOR: harsh amber-yellow light from above, cyan rim on shoulders.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE FILTER MASK ON HER FACE. Only the mask, nose bridge, strap over cheek, and condensation droplets on the plastic surface fill the frame. Eyes at very top edge. NO background, NO body. COLOR: harsh amber from above, deep shadow below." },
+  p1:"EXTREME WIDE SHOT. North African street filled with THICK YELLOW-GRAY HAZE obscuring everything beyond 15 meters. Dozens of blurred silhouettes wear white and grey FILTER MASKS. Above, a small holographic OFFICIAL SIGN glows amber in LATIN script. NO main character. NO East Asian characters. COLOR: sickly pale amber-yellow haze dominating, cold cyan struggling through.",
+  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands facing the camera but a dark grey FILTER MASK covers the lower half of her FACE. Her dark almond eyes are visible above, neutral, professional. Mic in right hand. COLOR: pale amber-yellow light from above, cold cyan rim on shoulders.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE FILTER MASK ON HER FACE. Only the mask, olive nose bridge, strap over cheek, and condensation droplets on the plastic fill the frame. Dark eyes at very top edge. NO background. COLOR: pale amber from above, deep slate-blue shadow below." },
 
 { id:'surveillance', icon:'👁️', name:'Bonus citoyen', desc:'200€ pour signaler',
   voice:"Le programme Bonus Citoyen est prolongé. Deux cents euros seront versés à chaque citoyen signalant un voisin pour comportement suspect. Les signalements anonymes seront multipliés par deux.",
-  punch:"200€ par signalement — anonyme et sans vérification.",
-  p1:"EXTREME WIDE SHOT. Street of NEON CYAN SURVEILLANCE CAMERAS mounted every 5 meters along the walls, all pointing down. Absolutely NO people visible, street EMPTY. Above, one gigantic holographic LOGO of a camera eye floats, glowing cyan. NO main character. COLOR: dominant cold cyan, dark amber warnings on walls.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. She stands facing the camera, mic in right hand. Behind her, out of focus, several cyan surveillance cameras. Neutral, no smile. Press badge glows on her chest. COLOR: cold cyan key light from right, deep amber shadow on left.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S RIGHT EYE ONLY. The eye fills the frame edge to edge. Sharp dark hazel iris with natural texture. In the pupil, a tiny cyan reflection of a surveillance camera lens. NO background. COLOR: cyan reflection inside dark pupil, hard cold light on iris." },
+  punch:"200€ par signalement — anonyme.",
+  p1:"EXTREME WIDE SHOT. North African street with NEON CYAN SURVEILLANCE CAMERAS mounted every 5 meters along the walls. Absolutely NO people visible, street EMPTY. Above, one gigantic holographic LOGO of a camera eye floats, glowing cold cyan. NO main character. NO East Asian characters. COLOR: dominant cold cyan, subtle pale amber warnings on walls. NO red.",
+  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands facing the camera, mic in right hand. Behind her, out of focus, several cyan surveillance cameras on a North African building. Neutral, no smile. Press badge glows cyan on her chest. COLOR: cold cyan key light from right, deep slate-blue shadow on left.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S RIGHT EYE ONLY. The eye fills the frame edge to edge. Sharp dark brown North African iris with visible natural texture. In the pupil, a tiny cyan reflection of a surveillance camera lens. NO background. COLOR: cyan reflection inside dark pupil, cold clinical light on iris." },
 
 { id:'corps', icon:'🦾', name:'Implant obligatoire', desc:'Dès 5 ans',
   voice:"L'implant d'identification devient obligatoire dès l'âge de cinq ans. Les enfants non implantés seront exclus du système scolaire et des transports publics. Le consentement parental n'est plus requis.",
-  punch:"Implant obligatoire dès 5 ans — refus = exclusion.",
-  p1:"WIDE BROADCAST SHOT. EMPTY alley. On the LEFT, a lit medical clinic storefront emits COLD WHITE light onto wet pavement. Above the door, a small holographic cyan CADUCEUS symbol glows. NO people. COLOR: cold clinical white from storefront, subtle cyan ambient, amber warning band on the floor.",
-  p2:"MEDIUM CLOSE-UP from SHOULDERS UP, LEFT SIDE PROFILE. The journalist's neck and ear fill the frame. The silver data implant BEHIND HER RIGHT EAR is the focal point, pulsing a cyan LED. Her face turned AWAY from camera. COLOR: cold cyan glow from the implant, deep shadow on the face, amber rim on hair.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE IMPLANT ONLY. Only the metal port BEHIND HER EAR fills the frame. Rain droplets on the silver surface. Cyan LED pulses brightly in darkness. Skin pores and ear cartilage visible around. NO face, NO eye. COLOR: bright cyan LED in absolute black background." },
+  punch:"Implant obligatoire dès 5 ans.",
+  p1:"WIDE BROADCAST SHOT. EMPTY North African alley. On the LEFT, a lit medical clinic storefront emits COLD WHITE light onto wet pavement. Above the door, a small holographic cyan CADUCEUS symbol glows. NO people. NO East Asian characters on signage. COLOR: cold clinical white from storefront, subtle cyan ambient, pale amber warning band on the floor.",
+  p2:"MEDIUM CLOSE-UP from SHOULDERS UP, LEFT SIDE PROFILE. The North African journalist's neck and ear fill the frame. The silver data implant BEHIND HER RIGHT EAR is the focal point, pulsing a cyan LED. Her face turned AWAY. COLOR: cold cyan glow from the implant, deep slate-blue shadow on the face, pale amber rim on hair.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE IMPLANT ONLY. Only the metal port BEHIND HER EAR fills the frame. Rain droplets on the silver surface. Cyan LED pulses brightly in darkness. Olive skin pores and ear cartilage visible. NO face, NO eye. COLOR: bright cyan LED in absolute black background, subtle pale amber rim on skin." },
 
 { id:'chomage', icon:'📉', name:'Chômage normalisé', desc:'Taux officiel : 0%',
   voice:"Le taux de chômage officiel atteint zéro pour cent pour la première fois dans l'histoire du pays. Les sans-emploi sont désormais classés comme 'en transition active'.",
   punch:"Chômage : 0% officiel.",
-  p1:"WIDE BROADCAST SHOT. Wet street with a giant holographic screen showing a STRAIGHT GREEN LINE rising, glowing cyan and green, no readable text. Below, blurred anonymous silhouettes sit on wet pavement, heads bowed. NO main character. COLOR: cyan and green glow from the screen, cold amber reflections in puddles.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. She stands facing the camera, mic in right hand near chin. Neutral expression. Behind her, out of focus, the glowing green line screen. Press badge glows on her chest. COLOR: cold green-cyan rim on shoulders, amber shadow on face.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S MOUTH ONLY. Her lips slightly parted, mid-sentence. Only lower face fills the frame: mouth, chin, jawline. Realistic skin texture, faint breath vapor. NO eyes, NO background. COLOR: harsh cyan from left, deep amber shadow on right." },
+  p1:"WIDE BROADCAST SHOT. Wet North African street with a giant holographic screen showing a STRAIGHT PALE CYAN LINE rising, glowing cyan and pale green, no readable text, no East Asian characters. Below, blurred anonymous silhouettes sit on wet pavement, heads bowed. NO main character. COLOR: cyan and pale green glow from screen, pale amber reflections in puddles.",
+  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands facing the camera, mic in right hand near chin. Neutral. Behind her, out of focus, the glowing cyan screen. Press badge glows cyan on her chest. COLOR: cold cyan-cyan rim on shoulders, subtle amber shadow on face.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S MOUTH ONLY. Her lips slightly parted, mid-sentence. Only lower face fills the frame: full lips, chin, jawline. Olive skin texture, faint breath vapor. NO eyes, NO background. COLOR: harsh cold cyan from left, deep slate-blue shadow on right." },
 
 { id:'resistance', icon:'⚔️', name:'Cellule neutralisée', desc:'8 morts — aucun commentaire',
   voice:"Une cellule insurgée a été neutralisée cette nuit dans le secteur est de la capitale. Huit individus ont été identifiés comme des menaces actives. L'opération s'est déroulée sans incident majeur.",
   punch:"8 morts — opération sans incident.",
-  p1:"EXTREME WIDE SHOT. EMPTY alley, dominated by DEEP RED NEON from a holographic RED ALERT sign floating above. Wet street reflects RED only. At the FAR END, a DISTANT MASS of dark military silhouettes stands in formation, small in frame. NO main character. COLOR: dominant red, deep black shadows, no other color.",
-  p2:"MEDIUM SHOT from CHEST UP of the journalist. She stands still, mic in right hand raised near chin. Expression HARDER, jaw slightly tense, eyes fixed. Behind her, out of focus, the RED alert glow. COLOR: hard RED side light on left half of her face, pure black shadow on right half.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S FACE, EYES AND UPPER CHEEKS ONLY. Face fills the frame. She stares DIRECTLY INTO THE CAMERA LENS. No smile. Deep RED light reflects in both eyes. Rain droplets on skin. NO street, NO crowd — pure BLACK behind her. COLOR: ONLY red, black, skin tones under red light." }
+  p1:"EXTREME WIDE SHOT. EMPTY North African alley, dominated by DEEP SLATE-BLUE NEON from a holographic ALERT sign floating above. Wet street reflects slate-blue only. At the FAR END, a DISTANT MASS of dark military silhouettes stands in formation, small in frame. NO main character. NO East Asian characters. COLOR: dominant deep slate-blue, black shadows, tiny amber alert accents. NO dominant red.",
+  p2:"MEDIUM SHOT from CHEST UP of the North African journalist. She stands still, mic in right hand raised near chin. Expression HARDER, jaw slightly tense, eyes fixed. Behind her, out of focus, the slate-blue alert glow. COLOR: cold slate-blue side light on left half of her face, deep black shadow on right half. NO red.",
+  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S FACE, EYES AND UPPER CHEEKS ONLY. Face fills the frame. She stares DIRECTLY INTO THE CAMERA LENS. No smile. Cold slate-blue light reflects in both dark brown almond eyes. Rain on olive skin. NO street, NO crowd — pure BLACK behind her. COLOR: ONLY slate-blue, black, and olive skin tones." }
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -348,8 +350,8 @@ const state = {
     { idx:2, key:'p3', title:'Détail choc', desc:'Très gros plan — preuve', img:null, imgBase64:null, source:null, status:'idle', prompt:'' }
   ],
   videos: [
-    { idx:0, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'broadcast-fixed', duration:169, progressText:'' },
-    { idx:1, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'dolly-in', duration:169, progressText:'' },
+    { idx:0, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'empty-lock', duration:169, progressText:'' },
+    { idx:1, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'broadcast-fixed', duration:169, progressText:'' },
     { idx:2, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'zoom-studio', duration:169, progressText:'' }
   ],
   isBusy: false,
@@ -391,11 +393,6 @@ function flashAutosave() {
   if (asDotT) clearTimeout(asDotT);
   asDotT = setTimeout(() => d.classList.remove('show'), 600);
 }
-function formatTime(s) {
-  if (s < 0) s = 0;
-  const m = Math.floor(s/60), sec = Math.floor(s%60);
-  return m + ':' + (sec<10?'0':'') + sec;
-}
 
 // ═══════════════════════════════════════════════════════════════
 // API KEY
@@ -423,7 +420,7 @@ function updateApiUI() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CHARACTER DNA
+// CHARACTER DNA — ETHNICITY LOCK 3×
 // ═══════════════════════════════════════════════════════════════
 function buildIdentityBlock() {
   const name = $('c-name').value.trim() || 'JOURNALIST';
@@ -437,9 +434,10 @@ function buildIdentityBlock() {
   const bottom = $('c-bottom').value.trim();
   const shoes = $('c-shoes').value.trim();
   const acc = $('c-acc').value.trim();
-  return `ETHNICITY LOCK (MANDATORY): ${name} is NORTH AFRICAN ALGERIAN / MAGHREBI. Olive skin, North African facial features. NOT East Asian, NOT Chinese, NOT Japanese, NOT Korean. NON-NEGOTIABLE. ` +
+  return `ETHNICITY LOCK (MANDATORY, MUST BE RESPECTED IN EVERY SINGLE SHOT): ${name} is NORTH AFRICAN ALGERIAN / MAGHREBI. Olive skin tone, dark brown almond-shaped eyes, dark hair, North African facial bone structure. She is ABSOLUTELY NOT East Asian. NOT Chinese. NOT Japanese. NOT Korean. NOT Vietnamese. NOT Filipino. Her ethnicity is NON-NEGOTIABLE. ` +
   `CHARACTER — ${name}: ${age} years old, ${eth}, ${face}, ${hair}. Marks: ${mark}. Implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Accessory: ${acc}. ` +
-  `REMINDER: ${name} is Algerian / North African, NOT East Asian. `;
+  `REMINDER 1: ${name} is Algerian / North African, ABSOLUTELY NOT East Asian. ` +
+  `REMINDER 2: The scene is a North African / Mediterranean futuristic city. Signage is in LATIN and ARABIC script only. NO Chinese, NO Japanese, NO Korean characters anywhere. `;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -548,7 +546,7 @@ function buildPrompt(slot) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VIDEO PROMPT
+// VIDEO PROMPT — ANTI-HALLUCINATION
 // ═══════════════════════════════════════════════════════════════
 function buildVideoPrompt(idx) {
   const c = state.concept;
@@ -557,13 +555,19 @@ function buildVideoPrompt(idx) {
   const sceneKey = 'p' + (idx+1);
   const sceneDesc = c[sceneKey] || '';
 
-  let p = 'Cinematic broadcast shot. Photorealistic, film grain, broadcast overlay feel, no CGI. ';
+  let p = 'Cinematic broadcast shot. Photorealistic, film grain, no CGI. ';
   p += 'MOTION: ' + eff.prompt + ' ';
   p += 'ONE SINGLE DIRECTION LOCK: camera moves continuously in ONE direction only, NO return. ';
   p += 'SCENE: ' + sceneDesc + ' ';
-  p += 'STRICT: maintain exact journalist appearance, clothing, environment, lighting from the keyframe. ';
-  p += 'SUBTLE ANIMATION: blinking eyes, breathing chest, rain falling, neon flickering, hologram glowing. ';
-  p += 'No text overlays beyond what is already in the keyframe. No watermarks, no cuts. No morphing faces.';
+  p += 'STRICT CONTENT LOCK: reproduce the input image EXACTLY. Do NOT add any new character, person, silhouette, human figure, or animal that is not already visible in the input image. ';
+  p += 'Do NOT invent people. Do NOT add faces. Do NOT change the number of visible humans. ';
+  p += 'If the input image has zero people, the output must have zero people. ';
+  p += 'If the input image has one person, the output must have exactly one person — the SAME one. ';
+  p += 'NO new elements, NO new objects, NO new architecture. ';
+  p += 'ETHNICITY LOCK: if a person is visible, they are NORTH AFRICAN ALGERIAN / MAGHREBI. NOT East Asian. NOT Chinese. NOT Japanese. NOT Korean. ';
+  p += 'STRICT APPEARANCE LOCK: maintain exact journalist face, hair, clothing, implant, badge from the input image. ';
+  p += 'SUBTLE ANIMATION ONLY: blinking eyes, breathing chest, rain falling, neon flickering, steam drifting, hologram pulsing. Nothing else moves. ';
+  p += 'No text overlays beyond what is already in the keyframe. No watermarks, no cuts, no scene changes. No morphing faces.';
 
   if (p.length > MAX_PROMPT) p = p.slice(0, MAX_PROMPT);
   return p;
@@ -627,14 +631,8 @@ async function callImageAPI(prompt) {
   throw new Error('Image : ' + lastErr);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// VIDEO API — accepte URL OU base64
-// ═══════════════════════════════════════════════════════════════
 async function createVideoTask(startRef, endRef, prompt, numFrames) {
   if (!state.apiKey) throw new Error('Clé API manquante');
-
-  // Si les deux sont des URLs http, on utilise mode keyframes (comportement actuel)
-  // Sinon on utilise le mode single image base64 (nouveau, testé par l'autre app)
   const isUrl1 = typeof startRef === 'string' && startRef.startsWith('http');
   const isUrl2 = typeof endRef === 'string' && endRef.startsWith('http');
 
@@ -647,7 +645,6 @@ async function createVideoTask(startRef, endRef, prompt, numFrames) {
       height: VID_H, width: VID_W
     };
   } else {
-    // Mode base64 : on prend startRef (URL ou base64). Si startRef est une URL et endRef base64, on garde startRef URL.
     const img = (typeof startRef === 'string' && startRef.startsWith('http')) ? startRef : startRef;
     body = {
       model: MODEL_VIDEO, prompt,
@@ -752,7 +749,6 @@ function renderSlots() {
     if (locked) {
       html += `<div class="hint">Termine le plan ${i} d'abord.</div>`;
     } else {
-      // Deux options : générer avec IA ou uploader
       html += `<div class="btn-row" style="gap:.4rem;">`;
       html += `<button class="btn small" data-gen="${i}" style="flex:1" ${state.isBusy || !state.apiKey ? 'disabled' : ''}>🤖 IA</button>`;
       html += `<button class="btn small purple" data-upload="${i}" style="flex:1">📤 UPLOAD</button>`;
@@ -763,7 +759,6 @@ function renderSlots() {
         html += `<button class="btn small ghost" data-regen="${i}" style="flex:1">↻ RÉGÉNÉRER IA</button>`;
         html += `</div>`;
       }
-      // Input hidden pour upload
       html += `<input type="file" accept="image/*" class="upload-in" id="up-${i}" data-up-input="${i}">`;
     }
 
@@ -794,8 +789,8 @@ async function handleUpload(i, file) {
   try {
     const b64 = await fileToBase64(file);
     const slot = state.slots[i];
-    slot.img = b64;      // affiché directement
-    slot.imgBase64 = b64; // stocké pour la vidéo
+    slot.img = b64;
+    slot.imgBase64 = b64;
     slot.source = 'upload';
     slot.status = 'done';
     log('📤 Plan ' + (i+1) + ' uploadé (' + Math.round(file.size/1024) + ' Ko)', 'o');
@@ -833,7 +828,6 @@ function renderVideos() {
     else if (v.status === 'gen') html += `<div class="slot-img-ph"><div class="spinner" style="width:40px;height:40px;border-width:3px;margin-bottom:.8rem;"></div><div style="color:var(--amber);font-weight:700;">Génération…</div></div>`;
     else html += `<div class="slot-img-ph">Vidéo ${i+1} — à générer</div>`;
 
-    // Sélecteur d'effet + durée
     html += `<label style="margin-top:.4rem">Effet broadcast</label>`;
     html += `<select data-veffect="${i}" ${v.status === 'gen' ? 'disabled' : ''}>`;
     EFFECTS.forEach(e => { html += `<option value="${e.id}" ${v.effect === e.id ? 'selected' : ''}>${e.icon} ${esc(e.name)}</option>`; });
@@ -946,7 +940,6 @@ async function generateVideo(i, silent = false) {
   const startSlot = state.slots[i];
   const endSlot = state.slots[i+1] || startSlot;
 
-  // Référence à envoyer : URL si IA, base64 si upload
   const startRef = startSlot.source === 'upload' ? startSlot.imgBase64 : startSlot.img;
   const endRef = endSlot.source === 'upload' ? endSlot.imgBase64 : endSlot.img;
 
@@ -1158,7 +1151,6 @@ async function downloadAllImages() {
   for (let i = 0; i < ready.length; i++) {
     const s = ready[i];
     if (s.source === 'upload' && s.imgBase64) {
-      // Base64 → téléchargement direct
       const a = document.createElement('a');
       a.href = s.imgBase64; a.download = `news_${state.concept.id}_plan${s.idx+1}_upload.png`;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
@@ -1238,7 +1230,6 @@ async function downloadZip() {
     if (!s.img) continue;
     try {
       if (s.source === 'upload' && s.imgBase64) {
-        // Base64 → décoder en blob
         const res = await fetch(s.imgBase64);
         const b = await res.blob();
         folder.file('plan' + (s.idx+1) + '_upload.png', b);
@@ -1253,10 +1244,10 @@ async function downloadZip() {
     if (v.url) { try { const res = await fetch(v.url); const b = await res.blob(); folder.file('video' + (v.idx+1) + '.mp4', b); } catch (e) {} }
   }
   const c = state.concept;
-  let txt = 'NEWS//STUDIO — ' + c.name + '\n\nVOIX-OFF :\n' + $('vo-text').value + '\n\nTITRE CHOC :\n' + $('vo-punch').value + '\n';
+  let txt = 'NEWS//STUDIO v2.1 — ' + c.name + '\n\nVOIX-OFF :\n' + $('vo-text').value + '\n\nTITRE CHOC :\n' + $('vo-punch').value + '\n';
   folder.file('script.txt', txt);
   folder.file('sous-titres.srt', generateSRT());
-  folder.file('README.txt', 'News//Studio v2.0\nDépêche : ' + c.name + '\nGénéré : ' + new Date().toLocaleString('fr-FR') + '\n');
+  folder.file('README.txt', 'News//Studio v2.1\nDépêche : ' + c.name + '\nPersonnage : Yasmine Benali (nord-africaine)\nVille : nord-africaine méditerranéenne\nPalette : cyan institutionnel + amber warning\nGénéré : ' + new Date().toLocaleString('fr-FR') + '\n');
   const blob = await zip.generateAsync({ type:'blob' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1272,7 +1263,7 @@ async function copyPunch() {
 function resetAll() {
   if (!confirm('Effacer tout ?')) return;
   state.slots.forEach(s => { s.img = null; s.imgBase64 = null; s.source = null; s.status = 'idle'; s.prompt = ''; });
-  state.videos.forEach((v, i) => { v.url = null; v.status = 'idle'; v.videoId = null; v.progress = 0; v.effect = EFFECTS[i].id; v.duration = 169; });
+  state.videos.forEach((v, i) => { v.url = null; v.status = 'idle'; v.videoId = null; v.progress = 0; v.effect = EFFECTS[i === 0 ? 1 : i === 1 ? 0 : 4].id; v.duration = 169; });
   clearState();
   renderSlots(); renderVideos();
   toast('Réinitialisé', 'ok');
@@ -1328,8 +1319,9 @@ function init() {
   window.addEventListener('beforeunload', saveState);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
 
-  log('NEWS//STUDIO v2.0 prêt', 'o');
-  log('Upload + 8 effets broadcast + base64 direct', 'i');
+  log('NEWS//STUDIO v2.1 prêt', 'o');
+  log('Écritures latines + arabe · Palette cyan/amber · Ethnie nord-africaine verrouillée', 'i');
+  log('9 effets broadcast dont "Plan vide verrouillé"', 'i');
   if (state.restored) log('Session restaurée.', 'o');
 }
 
