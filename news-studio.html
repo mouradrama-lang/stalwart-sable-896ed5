@@ -993,8 +993,10 @@ async function generateVideo(i,silent=false){
 if(state.isBusy&&!silent)return;
 if(!state.apiKey){toast('Ajoute ta clé API','err');return;}
 
-const startSlot=state.slots[i];
-const endSlot=state.slots[i+1]||startSlot;
+// Vidéo 3 : utilise image 2 comme début pour continuité
+const startSlot = (i === 2) ? state.slots[1] : state.slots[i];
+const endSlot = state.slots[i+1] || state.slots[i];
+
 
 const startRef=startSlot.source==='upload'?startSlot.imgBase64:startSlot.img;
 const endRef=endSlot.source==='upload'?endSlot.imgBase64:endSlot.img;
