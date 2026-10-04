@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEWS//STUDIO v2.1</title>
+<title>NEWS//STUDIO v2.2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -22,7 +22,7 @@ h1{font-size:1.4rem;font-weight:900;letter-spacing:.05em;background:linear-gradi
 .ph .ch{color:var(--faint);font-size:.7rem;transition:.2s}
 .panel.open .ch{transform:rotate(180deg)}
 .pb{max-height:0;overflow:hidden;transition:max-height .4s}
-.panel.open .pb{max-height:40000px}
+.panel.open .pb{max-height:50000px}
 .pc{padding:0 1.05rem 1.05rem}
 label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:.35rem;font-weight:700;margin-top:.65rem}
 label:first-child{margin-top:0}
@@ -40,20 +40,20 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 .card.sel .dc,.card.sel .nm{color:#000}
 .btn{width:100%;padding:.9rem;border-radius:10px;border:none;background:linear-gradient(135deg,var(--cyan),#0077cc);color:#000;font-size:.88rem;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.6rem}
 .btn:disabled{opacity:.3;cursor:not-allowed}
-.btn.amber{background:linear-gradient(135deg,var(--amber),#cc8800)}
 .btn.small{padding:.55rem .8rem;font-size:.68rem;width:auto;margin-bottom:0;letter-spacing:.05em}
 .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--ink)}
 .btn.ok{background:linear-gradient(135deg,#00d47e,#008850);color:#fff}
 .btn.err{background:transparent;border:1px solid var(--err);color:var(--err)}
 .btn.warn{background:linear-gradient(135deg,var(--amber),#cc6600);color:#000}
 .btn.purple{background:linear-gradient(135deg,#8a4cf7,#5a2ec7);color:#fff}
+.btn.lime{background:linear-gradient(135deg,#a3e635,#65a30d);color:#000}
 .btn-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
 .api{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.7rem}
 .api.ok{border-color:var(--ok)}
 .console{background:#000;border:1px solid var(--border);border-radius:8px;padding:.65rem;margin-bottom:.6rem;max-height:200px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:.68rem;line-height:1.55}
 .cl{padding:.08rem 0}
 .ct{color:var(--faint);margin-right:.4rem}
-.ci{color:var(--cyan)}.co{color:var(--ok)}.ce{color:var(--err)}.cw{color:var(--amber)}
+.ci{color:var(--cyan)}.co{color:var(--ok)}.ce{color:var(--err)}.cw{color:var(--amber)}.cp{color:#8a4cf7}
 .slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.6rem}
 .slot.locked{border-color:var(--faint);opacity:.4}
 .slot.active{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,212,255,.3)}
@@ -77,6 +77,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
 .vopts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.4rem 0}
 .vopts select{padding:.5rem .6rem;font-size:.75rem}
+.override-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.6rem;margin-top:.4rem}
+.override-box textarea{min-height:80px;font-size:.72rem;font-family:ui-monospace,monospace}
+.char-lib-row{display:flex;gap:.4rem;align-items:center;margin-top:.5rem}
+.char-lib-row select{flex:1;padding:.6rem;font-size:.8rem}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.35rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 .status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:.65rem 1rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:.3s;z-index:100}
@@ -93,7 +97,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <body>
 
 <h1>News//Studio</h1>
-<div class="sub">v2.1 · Nord-Africain · Anti-hallucination</div>
+<div class="sub">v2.2 · Genre lock · Biblio · Prompt override</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
 <div class="api" id="api-box">
@@ -106,9 +110,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <div class="panel open" id="p-concept">
   <div class="ph" data-t="p-concept"><div class="pt"><span class="n">1</span> Dépêche 2030</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Choisis une dépêche.</div>
     <div class="grid" id="concepts"></div>
-    <label>Script voix-off journaliste</label>
+    <label>Script voix-off</label>
     <textarea id="vo-text" style="min-height:110px;font-size:.82rem"></textarea>
     <label>Titre choc</label>
     <input type="text" id="vo-punch">
@@ -116,28 +119,51 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 </div>
 
 <div class="panel" id="p-char">
-  <div class="ph" data-t="p-char"><div class="pt"><span class="n">2</span> Journaliste (Character DNA)</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-char"><div class="pt"><span class="n">2</span> Character DNA</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
+    <label>📚 Bibliothèque de personnages</label>
+    <div class="char-lib-row">
+      <select id="char-lib-select"><option value="">— Aucun —</option></select>
+      <button class="btn small ghost" id="char-lib-load">CHARGER</button>
+      <button class="btn small ghost" id="char-lib-del">✕</button>
+    </div>
+    <label>Nom du personnage à sauvegarder</label>
+    <div class="char-lib-row">
+      <input type="text" id="char-lib-name" placeholder="Ex: Anis Journaliste">
+      <button class="btn small lime" id="char-lib-save">💾</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn small ghost" id="char-export" style="flex:1">📤 EXPORT JSON</button>
+      <button class="btn small ghost" id="char-import" style="flex:1">📥 IMPORT JSON</button>
+    </div>
+    <input type="file" accept=".json" id="char-import-file" class="upload-in">
+
     <label>Nom</label><input type="text" id="c-name" value="YASMINE BENALI">
+    <label>Genre (VERROUILLÉ)</label>
+    <select id="c-gender">
+      <option value="female" selected>Femme</option>
+      <option value="male">Homme</option>
+      <option value="nonbinary">Non-binaire</option>
+    </select>
     <label>Âge</label><input type="text" id="c-age" value="34">
-    <label>Sexe / ethnie / morphologie</label>
-    <input type="text" id="c-eth" value="female, North African Algerian, olive skin, tall, poised professional anchor posture">
+    <label>Ethnie / morphologie</label>
+    <input type="text" id="c-eth" value="North African Algerian, olive skin, tall, poised professional anchor posture">
     <label>Visage</label>
-    <textarea id="c-face" style="min-height:50px">sharp almond-shaped dark brown eyes, defined arched eyebrows, straight nose with a slight broad bridge, full lips with defined cupid's bow, high cheekbones, warm olive skin tone</textarea>
-    <label>Cheveux</label>
-    <input type="text" id="c-hair" value="thick dark brown almost black wavy hair pulled back into a tight low bun with a sharp side part">
-    <label>Marques</label>
-    <input type="text" id="c-mark" value="small natural mole beneath the left eye, subtle professional makeup, visible pores">
-    <label>Implant</label>
+    <textarea id="c-face" style="min-height:50px">sharp almond-shaped dark brown eyes, defined arched eyebrows, straight nose, full lips, high cheekbones, warm olive skin tone</textarea>
+    <label>Cheveux / couvre-chef</label>
+    <input type="text" id="c-hair" value="thick dark brown almost black wavy hair pulled back into a tight low bun">
+    <label>Marques distinctives</label>
+    <input type="text" id="c-mark" value="small natural mole beneath the left eye, visible pores">
+    <label>Implant cyberpunk</label>
     <input type="text" id="c-implant" value="thin silver data implant behind the right ear with pulsing cyan LED">
     <label>Haut</label>
-    <input type="text" id="c-top" value="dark navy corporate blazer with a subtle holographic press badge glowing on the left chest, crisp white shirt underneath">
+    <input type="text" id="c-top" value="dark navy corporate blazer with a holographic press badge glowing on the left chest">
     <label>Bas</label>
     <input type="text" id="c-bottom" value="matching dark navy trousers">
     <label>Chaussures</label>
     <input type="text" id="c-shoes" value="polished black leather shoes">
-    <label>Accessoire</label>
-    <input type="text" id="c-acc" value="slim matte-black broadcast microphone in the right hand with a holographic channel logo, silver wristwatch on left wrist">
+    <label>Accessoire signature</label>
+    <input type="text" id="c-acc" value="slim matte-black broadcast microphone with a holographic channel logo, silver wristwatch on left wrist">
   </div></div>
 </div>
 
@@ -150,9 +176,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 </div>
 
 <div class="panel open" id="p-video">
-  <div class="ph" data-t="p-video"><div class="pt"><span class="n">4</span> Génération vidéo + Effets</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-video"><div class="pt"><span class="n">4</span> Génération vidéo</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Chaque vidéo a son propre effet, mouvement et durée.</div>
+    <div class="hint">Chaque vidéo a son propre effet, durée, et prompt override.</div>
     <div id="video-slots"></div>
     <button class="btn warn" id="batch-videos" style="margin-top:.6rem">⚡ GÉNÉRER LES 3 VIDÉOS</button>
   </div></div>
@@ -163,7 +189,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
   <div class="pb"><div class="pc">
     <label>Voix</label><select id="tts-voice"><option value="">Chargement…</option></select>
     <label>Vitesse</label>
-    <select id="tts-rate"><option value="0.75">Lente</option><option value="0.85" selected>Journaliste (0.85x)</option><option value="1">Normale</option><option value="1.15">Rapide</option></select>
+    <select id="tts-rate"><option value="0.75">Lente</option><option value="0.85" selected>Journaliste</option><option value="1">Normale</option></select>
     <label>Hauteur</label>
     <select id="tts-pitch"><option value="0.6">Très grave</option><option value="0.8" selected>Grave pro</option><option value="0.95">Médium</option><option value="1.1">Aiguë</option></select>
     <div class="audio-row">
@@ -200,7 +226,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
   <div class="pb"><div class="pc">
     <video class="preview-video" id="prev-video" playsinline></video>
     <div class="btn-row">
-      <button class="btn small ok" id="prev-play" style="flex:1">▶ JOUER SÉQUENCE</button>
+      <button class="btn small ok" id="prev-play" style="flex:1">▶ JOUER</button>
       <button class="btn small ghost" id="prev-stop" style="flex:1">⏹ STOP</button>
     </div>
     <div class="hint" id="prev-info" style="text-align:center;margin-top:.4rem"></div>
@@ -227,1102 +253,1142 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">News//Studio v2.1 · Nord-Africain · Anti-hallucination</div>
+<div class="footer-note">News//Studio v2.2 · Genre lock · Bibliothèque · Prompt override</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
-const API_BASE = 'https://apihub.agnes-ai.com/v1';
-const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
-const MODEL_IMAGE = 'agnes-image-2.5-flash';
-const MODEL_VIDEO = 'agnes-video-v2.0';
-const IMG_W = 1024, IMG_H = 1792;
-const VID_W = 576, VID_H = 1024;
-const MAX_PROMPT = 1800;
-const INITIAL_WAIT = 105;
-const POLL_INTERVAL = 5;
-const STORAGE_KEY = 'news_studio_v2_1';
+const API_BASE='https://apihub.agnes-ai.com/v1';
+const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
+const MODEL_IMAGE='agnes-image-2.5-flash';
+const MODEL_VIDEO='agnes-video-v2.0';
+const IMG_W=1024,IMG_H=1792,VID_W=576,VID_H=1024;
+const MAX_PROMPT=1800,INITIAL_WAIT=105,POLL_INTERVAL=5;
+const STORAGE_KEY='news_studio_v2_2';
+const CHAR_LIB_KEY='news_char_library_v1';
+
+const STYLE_BASE='Ultra photorealistic cinematic broadcast imagery. Analog 35mm film texture. Futuristic North African / Mediterranean international megacity at night, official state television broadcast aesthetic. Wet asphalt with neon reflections, vertical neon signs with LATIN and ARABIC script ONLY. ABSOLUTELY NO East Asian characters, NO Chinese, NO Japanese, NO Korean text. Massive scrolling LED tickers with LATIN or ARABIC headlines. Holographic channel logos suspended mid-air, cold institutional cyan. Dominant palette: cold cyan, pale amber-yellow warning, bone-white, deep slate-blue shadows. NO dominant RED, NO crescent moon, NO religious symbols. Cold clinical corporate lighting. Oppressive, controlled, official. No illustration, no CGI, no cartoon. No smiles. ';
 
 // ═══════════════════════════════════════════════════════════════
-// STYLE — NORD-AFRICAIN + CYAN/AMBER
+// EFFETS
 // ═══════════════════════════════════════════════════════════════
-const STYLE_BASE =
-'Ultra photorealistic cinematic broadcast imagery. Analog 35mm film texture with digital broadcast overlays. ' +
-'Futuristic North African / Mediterranean international megacity at night, seen through the lens of an official state television broadcast. ' +
-'Wet asphalt with neon reflections, vertical neon signs with LATIN and ARABIC script ONLY, holographic public screens floating at street level. ' +
-'ABSOLUTELY NO East Asian characters, NO Chinese, NO Japanese, NO Korean text, NO Asian city aesthetic. ' +
-'Massive scrolling LED tickers on every wall displaying headlines in LATIN alphabet or ARABIC script only. ' +
-'Holographic channel logos suspended mid-air, glowing cold institutional cyan. ' +
-'Dominant color palette: institutional cold cyan, pale warning amber-yellow, bone-white highlights, deep slate-blue shadows. ' +
-'ABSOLUTELY NO dominant RED. Red is used ONLY as a tiny emergency alert accent, NEVER as ambient decoration. ' +
-'Cold clinical corporate lighting, oppressively controlled atmosphere. ' +
-'No illustration, no CGI, no cartoon. No smiles, no warmth. ';
-
-const CHARACTER_FACE_RULE =
-'CRITICAL ETHNICITY LOCK (MANDATORY, NON-NEGOTIABLE): The journalist is NORTH AFRICAN ALGERIAN / MAGHREBI. Olive skin, dark brown almond eyes, dark hair, North African facial bone structure. She is ABSOLUTELY NOT East Asian. NOT Chinese. NOT Japanese. NOT Korean. NOT Vietnamese. NOT Filipino. Her ethnicity MUST NEVER change between shots. ' +
-'CRITICAL IDENTITY LOCK: The SAME female journalist appears in every shot. EXACT SAME face, hair, clothing, implant every image. Never alter her. ';
-
-// ═══════════════════════════════════════════════════════════════
-// 9 EFFETS BROADCAST
-// ═══════════════════════════════════════════════════════════════
-const EFFECTS = [
-{ id:'broadcast-fixed', icon:'🎙️', name:'Broadcast fixe', desc:'Caméra posée, ZÉRO ajout', prompt:'Almost completely static broadcast shot, fixed locked-off camera, MINIMAL animation: only subtle breathing, blinking eyes if a person is present, slight neon flicker in background. NO camera movement at all. NO new elements introduced. The scene must remain IDENTICAL to the input image.' },
-{ id:'empty-lock', icon:'🔒', name:'Plan vide verrouillé', desc:'Aucun humain — pour décors vides', prompt:'Completely STATIC shot. NO camera movement. NO new characters. NO new figures appearing. NO people added. The image must stay EXACTLY as it is, only subtle atmospheric motion: rain falling, steam drifting slowly, neon flickering, hologram pulsing. If the scene is empty, it MUST stay empty. No humans visible, ever.' },
-{ id:'glitch', icon:'📺', name:'Glitch broadcast', desc:'Micro-coupures numériques', prompt:'Subtle digital glitch effect on the broadcast, occasional RGB split, scan lines flickering, brief horizontal distortion like a bad satellite feed. No new elements added.' },
-{ id:'breaking', icon:'⚡', name:'Breaking news', desc:'Flash amber alerte', prompt:'Amber breaking-news alert pulse in the scene, pulsing amber glow hitting the subject face, emergency broadcast overlay feel. NO dominant red, only amber warning light.' },
-{ id:'zoom-studio', icon:'🔍', name:'Zoom studio', desc:'Zoom lent sur le visage', prompt:'Slow continuous zoom in on the subject face, one direction only, no return, cinematic tension building. No new elements added.' },
-{ id:'dolly-in', icon:'🎬', name:'Dolly in', desc:'Avancée cinéma', prompt:'Slow cinematic dolly in, camera pushing forward, subject breathing, natural fluid motion. No new elements added.' },
-{ id:'track-right', icon:'➡️', name:'Tracking droit', desc:'Balayage latéral', prompt:'Very slow tracking shot moving laterally to the right, cinematic panorama. No new elements added.' },
-{ id:'handheld-live', icon:'📹', name:'Caméra épaule (live)', desc:'Live reportage', prompt:'Subtle handheld camera with micro-movements, like a live broadcast on location, breathing frame, documentary feel. No new elements added.' }
+const EFFECTS=[
+{id:'broadcast-fixed',icon:'🎙️',name:'Broadcast fixe',desc:'Caméra figée',prompt:'Almost completely static broadcast shot, fixed camera, MINIMAL animation: subtle breathing, blinking eyes if a person is present, slight neon flicker. NO camera movement. NO new elements.'},
+{id:'empty-lock',icon:'🔒',name:'Plan vide verrouillé',desc:'Aucun humain',prompt:'Completely STATIC shot. NO camera movement. NO new characters. The image stays EXACTLY as is, only subtle atmospheric motion: rain, steam drift, neon flicker. If empty, it stays empty.'},
+{id:'glitch',icon:'📺',name:'Glitch broadcast',desc:'Micro-coupures',prompt:'Subtle digital glitch effect, occasional RGB split, scan lines flickering, brief horizontal distortion like a bad satellite feed. No new elements.'},
+{id:'breaking',icon:'⚡',name:'Breaking news',desc:'Flash amber',prompt:'Amber breaking-news alert pulse, pulsing amber glow hitting the subject face, emergency broadcast overlay feel. NO red.'},
+{id:'zoom-studio',icon:'🔍',name:'Zoom studio',desc:'Zoom lent visage',prompt:'Slow continuous zoom in on the subject face, one direction only, no return.'},
+{id:'dolly-in',icon:'🎬',name:'Dolly in',desc:'Avancée cinéma',prompt:'Slow cinematic dolly in, camera pushing forward, natural fluid motion.'},
+{id:'track-right',icon:'➡️',name:'Tracking droit',desc:'Balayage latéral',prompt:'Very slow tracking shot moving laterally to the right.'},
+{id:'handheld-live',icon:'📹',name:'Caméra épaule',desc:'Live reportage',prompt:'Subtle handheld camera with micro-movements, live broadcast on location feel.'}
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// 8 DÉPÊCHES — Palette cyan/amber (sauf resistance = rouge)
+// CONCEPTS
 // ═══════════════════════════════════════════════════════════════
-const CONCEPTS = [
-{ id:'canicule', icon:'🔥', name:'Canicule', desc:'47°C — 340 morts',
-  voice:"Le thermomètre de la capitale affiche 47 degrés Celsius à 14 heures. Les autorités sanitaires confirment 340 décès liés à la chaleur depuis ce matin. Le ministère remercie les citoyens pour leur patience.",
-  punch:"47°C — 340 morts — merci pour votre patience.",
-  p1:"WIDE BROADCAST SHOT. Massive HOLOGRAPHIC PUBLIC SCREEN floating above a wet North African futuristic street, displaying an official AMBER warning banner with abstract alert symbols in LATIN and ARABIC script only. NO East Asian characters. Street EMPTY of main character. Heat haze visible. COLOR: dominant AMBER alert on the screen, cold cyan and pale amber neon on the walls below.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman, olive skin, dark almond eyes, dark hair. She stands still facing the camera, broadcast microphone up near her face. Neutral expression. Holographic press badge glows cyan on her blazer chest. Behind her, out of focus, the glowing AMBER warning screen. COLOR: cold cyan rim light on shoulders, pale amber reflection on face. NO dominant red.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE BROADCAST MICROPHONE. Only the microphone fills the frame edge to edge, the journalist's olive-skinned hand visible behind it. Small holographic channel logo floats above the mic head, glowing cyan. Rain droplets on the matte-black surface. NO face visible. COLOR: cyan hologram glow, pale amber rim on the hand, deep black background." },
-
-{ id:'emploi', icon:'💼', name:'Automatisation', desc:'12M emplois supprimés',
-  voice:"Le ministère du Travail annonce un record historique. Douze millions d'emplois ont été automatisés ce trimestre. La productivité nationale a augmenté de quatre cents pour cent.",
-  punch:"12 millions d'emplois supprimés — record historique.",
-  p1:"WIDE BROADCAST SHOT. Wet North African street with a huge LED billboard showing an abstract GRAPH rising sharply, glowing amber and cyan. NO readable text, NO East Asian characters. A few blurred anonymous silhouettes walk past, out of focus. NO main character. COLOR: amber data glow dominating, cold cyan neon reflections in puddles.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman, olive skin. She stands still, mic in her right hand near her chin. Neutral expression. Press badge glows cyan on her chest. Behind her, out of focus, the glowing amber billboard. COLOR: pale amber rim light on her face, cold cyan shadow.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE HOLOGRAPHIC PRESS BADGE STILL PINNED ON HER BLAZER. She is wearing it — we see the navy fabric, the pin clip, the collar edge. The badge glows cold cyan. Rain droplets on the blazer. NO face. COLOR: cyan hologram glow, dark navy fabric shadow around." },
-
-{ id:'silence', icon:'🤫', name:'Réforme du silence', desc:'10 000 arrestations',
-  voice:"La réforme du silence entre en vigueur à minuit. Dix mille arrestations ont déjà été effectuées cette semaine pour propos non conformes. Les citoyens sont invités à signaler toute parole suspecte.",
-  punch:"10 000 arrestations pour propos non conformes.",
-  p1:"WIDE BROADCAST SHOT. Wet North African street where every citizen wears a plain grey IDENTIFICATION ARM BAND glowing pale amber on their left wrist. Blurred anonymous silhouettes walk slowly, heads bowed, all out of focus. NO main character. COLOR: pale amber warning glow on wrists, cold cyan neon on walls. NO dominant red.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands still, mic in right hand. She wears a matching grey IDENTIFICATION ARM BAND glowing pale amber on her left wrist. Neutral expression. COLOR: cold cyan key light on face, subtle amber from the wrist band.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S LIPS ONLY. Only her mouth fills the frame edge to edge: full lips, chin, part of jawline. Lips pressed tightly closed. Natural olive skin texture with visible pores. NO eyes, NO background. COLOR: harsh cold cyan from left, deep slate-blue shadow from right." },
-
-{ id:'air', icon:'💨', name:'Forfait respiratoire', desc:'49€/mois pour respirer',
-  voice:"Le nouveau forfait respiratoire entre en vigueur demain. Pour quarante-neuf euros par mois, les abonnés bénéficieront de douze heures d'air propre par semaine.",
-  punch:"Forfait respiratoire : 49€ / mois.",
-  p1:"EXTREME WIDE SHOT. North African street filled with THICK YELLOW-GRAY HAZE obscuring everything beyond 15 meters. Dozens of blurred silhouettes wear white and grey FILTER MASKS. Above, a small holographic OFFICIAL SIGN glows amber in LATIN script. NO main character. NO East Asian characters. COLOR: sickly pale amber-yellow haze dominating, cold cyan struggling through.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands facing the camera but a dark grey FILTER MASK covers the lower half of her FACE. Her dark almond eyes are visible above, neutral, professional. Mic in right hand. COLOR: pale amber-yellow light from above, cold cyan rim on shoulders.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE FILTER MASK ON HER FACE. Only the mask, olive nose bridge, strap over cheek, and condensation droplets on the plastic fill the frame. Dark eyes at very top edge. NO background. COLOR: pale amber from above, deep slate-blue shadow below." },
-
-{ id:'surveillance', icon:'👁️', name:'Bonus citoyen', desc:'200€ pour signaler',
-  voice:"Le programme Bonus Citoyen est prolongé. Deux cents euros seront versés à chaque citoyen signalant un voisin pour comportement suspect. Les signalements anonymes seront multipliés par deux.",
-  punch:"200€ par signalement — anonyme.",
-  p1:"EXTREME WIDE SHOT. North African street with NEON CYAN SURVEILLANCE CAMERAS mounted every 5 meters along the walls. Absolutely NO people visible, street EMPTY. Above, one gigantic holographic LOGO of a camera eye floats, glowing cold cyan. NO main character. NO East Asian characters. COLOR: dominant cold cyan, subtle pale amber warnings on walls. NO red.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands facing the camera, mic in right hand. Behind her, out of focus, several cyan surveillance cameras on a North African building. Neutral, no smile. Press badge glows cyan on her chest. COLOR: cold cyan key light from right, deep slate-blue shadow on left.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S RIGHT EYE ONLY. The eye fills the frame edge to edge. Sharp dark brown North African iris with visible natural texture. In the pupil, a tiny cyan reflection of a surveillance camera lens. NO background. COLOR: cyan reflection inside dark pupil, cold clinical light on iris." },
-
-{ id:'corps', icon:'🦾', name:'Implant obligatoire', desc:'Dès 5 ans',
-  voice:"L'implant d'identification devient obligatoire dès l'âge de cinq ans. Les enfants non implantés seront exclus du système scolaire et des transports publics. Le consentement parental n'est plus requis.",
-  punch:"Implant obligatoire dès 5 ans.",
-  p1:"WIDE BROADCAST SHOT. EMPTY North African alley. On the LEFT, a lit medical clinic storefront emits COLD WHITE light onto wet pavement. Above the door, a small holographic cyan CADUCEUS symbol glows. NO people. NO East Asian characters on signage. COLOR: cold clinical white from storefront, subtle cyan ambient, pale amber warning band on the floor.",
-  p2:"MEDIUM CLOSE-UP from SHOULDERS UP, LEFT SIDE PROFILE. The North African journalist's neck and ear fill the frame. The silver data implant BEHIND HER RIGHT EAR is the focal point, pulsing a cyan LED. Her face turned AWAY. COLOR: cold cyan glow from the implant, deep slate-blue shadow on the face, pale amber rim on hair.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE IMPLANT ONLY. Only the metal port BEHIND HER EAR fills the frame. Rain droplets on the silver surface. Cyan LED pulses brightly in darkness. Olive skin pores and ear cartilage visible. NO face, NO eye. COLOR: bright cyan LED in absolute black background, subtle pale amber rim on skin." },
-
-{ id:'chomage', icon:'📉', name:'Chômage normalisé', desc:'Taux officiel : 0%',
-  voice:"Le taux de chômage officiel atteint zéro pour cent pour la première fois dans l'histoire du pays. Les sans-emploi sont désormais classés comme 'en transition active'.",
-  punch:"Chômage : 0% officiel.",
-  p1:"WIDE BROADCAST SHOT. Wet North African street with a giant holographic screen showing a STRAIGHT PALE CYAN LINE rising, glowing cyan and pale green, no readable text, no East Asian characters. Below, blurred anonymous silhouettes sit on wet pavement, heads bowed. NO main character. COLOR: cyan and pale green glow from screen, pale amber reflections in puddles.",
-  p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist, North African Algerian woman. She stands facing the camera, mic in right hand near chin. Neutral. Behind her, out of focus, the glowing cyan screen. Press badge glows cyan on her chest. COLOR: cold cyan-cyan rim on shoulders, subtle amber shadow on face.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S MOUTH ONLY. Her lips slightly parted, mid-sentence. Only lower face fills the frame: full lips, chin, jawline. Olive skin texture, faint breath vapor. NO eyes, NO background. COLOR: harsh cold cyan from left, deep slate-blue shadow on right." },
-
-{ id:'resistance', icon:'⚔️', name:'Cellule neutralisée', desc:'8 morts — aucun commentaire',
-  voice:"Une cellule insurgée a été neutralisée cette nuit dans le secteur est de la capitale. Huit individus ont été identifiés comme des menaces actives. L'opération s'est déroulée sans incident majeur.",
-  punch:"8 morts — opération sans incident.",
-  p1:"EXTREME WIDE SHOT. EMPTY North African alley, dominated by DEEP SLATE-BLUE NEON from a holographic ALERT sign floating above. Wet street reflects slate-blue only. At the FAR END, a DISTANT MASS of dark military silhouettes stands in formation, small in frame. NO main character. NO East Asian characters. COLOR: dominant deep slate-blue, black shadows, tiny amber alert accents. NO dominant red.",
-  p2:"MEDIUM SHOT from CHEST UP of the North African journalist. She stands still, mic in right hand raised near chin. Expression HARDER, jaw slightly tense, eyes fixed. Behind her, out of focus, the slate-blue alert glow. COLOR: cold slate-blue side light on left half of her face, deep black shadow on right half. NO red.",
-  p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S FACE, EYES AND UPPER CHEEKS ONLY. Face fills the frame. She stares DIRECTLY INTO THE CAMERA LENS. No smile. Cold slate-blue light reflects in both dark brown almond eyes. Rain on olive skin. NO street, NO crowd — pure BLACK behind her. COLOR: ONLY slate-blue, black, and olive skin tones." }
+const CONCEPTS=[
+{id:'canicule',icon:'🔥',name:'Canicule',desc:'47°C — 340 morts',
+voice:"Le thermomètre de la capitale affiche 47 degrés Celsius à 14 heures. Les autorités sanitaires confirment 340 décès liés à la chaleur depuis ce matin. Le ministère remercie les citoyens pour leur patience.",
+punch:"47°C — 340 morts — merci pour votre patience.",
+p1:"WIDE BROADCAST SHOT. Massive HOLOGRAPHIC PUBLIC SCREEN floating above a wet North African futuristic street, displaying an official AMBER warning banner with abstract alert symbols in LATIN and ARABIC script only. Street EMPTY of main character. Heat haze visible. COLOR: dominant AMBER alert on the screen, cold cyan and pale amber neon on the walls below.",
+p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. Neutral expression, holographic press badge glowing cyan on blazer chest. Behind her out of focus: the glowing AMBER warning screen. COLOR: cold cyan rim light on shoulders, pale amber reflection on face.",
+p3:"EXTREME MACRO CLOSE-UP OF THE BROADCAST MICROPHONE. Only the mic fills the frame edge to edge, hand visible behind it. Small holographic channel logo floats above the mic head, glowing cyan. Rain droplets on the matte-black surface. NO face. COLOR: cyan hologram glow, pale amber rim on the hand, deep black background."},
+{id:'emploi',icon:'💼',name:'Automatisation',desc:'12M emplois',
+voice:"Le ministère du Travail annonce un record historique. Douze millions d'emplois ont été automatisés ce trimestre. La productivité nationale a augmenté de quatre cents pour cent.",
+punch:"12 millions d'emplois supprimés — record historique.",
+p1:"WIDE BROADCAST SHOT. Wet North African street with huge LED billboard showing abstract GRAPH rising sharply, amber and cyan. NO readable text, NO East Asian characters. Blurred anonymous silhouettes walk past, out of focus. NO main character. COLOR: amber data glow, cyan reflections in puddles.",
+p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. Mic in right hand near chin. Neutral. Behind her out of focus: the amber billboard. COLOR: pale amber rim on face, cold cyan shadow.",
+p3:"EXTREME MACRO CLOSE-UP OF THE PRESS BADGE STILL PINNED ON HER BLAZER. She is wearing it, we see the fabric, the clip, the collar. Badge glows cold cyan. Rain on blazer. NO face. COLOR: cyan hologram glow, dark navy fabric shadow."},
+{id:'silence',icon:'🤫',name:'Réforme du silence',desc:'10 000 arrestations',
+voice:"La réforme du silence entre en vigueur à minuit. Dix mille arrestations ont déjà été effectuées cette semaine pour propos non conformes.",
+punch:"10 000 arrestations pour propos non conformes.",
+p1:"WIDE BROADCAST SHOT. Wet North African street where every citizen wears a plain grey IDENTIFICATION ARM BAND glowing pale amber on their left wrist. Blurred anonymous silhouettes walk slowly, heads bowed. NO main character. COLOR: pale amber warning glow on wrists, cold cyan neon on walls.",
+p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. She wears a matching grey IDENTIFICATION ARM BAND glowing pale amber on her left wrist. Mic in hand. Neutral. COLOR: cold cyan key light on face, subtle amber from the wrist band.",
+p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S LIPS ONLY. Only her mouth fills the frame: lips, chin, part of jawline. Lips pressed tightly closed. Natural skin texture with visible pores. NO eyes, NO background. COLOR: harsh cold cyan from left, deep slate-blue shadow from right."},
+{id:'air',icon:'💨',name:'Forfait respiratoire',desc:'49€/mois',
+voice:"Le nouveau forfait respiratoire entre en vigueur demain. Pour quarante-neuf euros par mois, les abonnés bénéficieront de douze heures d'air propre par semaine.",
+punch:"Forfait respiratoire : 49€ / mois.",
+p1:"EXTREME WIDE SHOT. North African street filled with THICK YELLOW-GRAY HAZE obscuring everything beyond 15 meters. Blurred silhouettes wear white and grey FILTER MASKS. Holographic OFFICIAL SIGN glows amber in LATIN script. NO main character. NO East Asian characters. COLOR: sickly pale amber-yellow haze, cold cyan struggling through.",
+p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. A dark grey FILTER MASK covers ONLY the lower half of her FACE (mouth and nose). Her dark eyes and eyebrows are fully visible above the mask. Simple surgical mask, no gadgets. Mic in right hand. COLOR: pale amber-yellow from above, cold cyan rim on shoulders.",
+p3:"EXTREME MACRO CLOSE-UP OF A DARK GREY SURGICAL FILTER MASK ON A PURE BLACK BACKGROUND. The mask fills the ENTIRE frame edge to edge — we see only the woven grey cotton texture, the metal nose clip, the two elastic straps, tiny condensation droplets. NOTHING ELSE. NO face, NO eyes, NO skin, NO street, NO neon, NO city. The mask FLOATS on absolute blackness. Museum product photography style. Cold cyan rim light on the left edge, subtle pale amber on the right edge."},
+{id:'surveillance',icon:'👁️',name:'Bonus citoyen',desc:'200€ pour signaler',
+voice:"Le programme Bonus Citoyen est prolongé. Deux cents euros seront versés à chaque citoyen signalant un voisin pour comportement suspect.",
+punch:"200€ par signalement — anonyme.",
+p1:"EXTREME WIDE SHOT. North African street with NEON CYAN SURVEILLANCE CAMERAS mounted every 5 meters along the walls. Absolutely NO people visible, street EMPTY. Gigantic holographic LOGO of a camera eye floats, glowing cold cyan. NO main character. NO East Asian characters. COLOR: dominant cold cyan, subtle pale amber warnings on walls. NO red.",
+p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. Mic in right hand. Behind her out of focus: several cyan surveillance cameras on a North African building. Neutral, no smile. Press badge glows cyan on her chest. COLOR: cold cyan key light from right, deep slate-blue shadow on left.",
+p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S RIGHT EYE ONLY. The eye fills the frame edge to edge. Sharp dark brown iris with visible natural texture. Tiny cyan reflection of a surveillance camera lens in the pupil. NO background. COLOR: cyan reflection inside dark pupil, cold clinical light on iris."},
+{id:'corps',icon:'🦾',name:'Implant obligatoire',desc:'Dès 5 ans',
+voice:"L'implant d'identification devient obligatoire dès l'âge de cinq ans. Les enfants non implantés seront exclus du système scolaire et des transports publics.",
+punch:"Implant obligatoire dès 5 ans.",
+p1:"WIDE BROADCAST SHOT. EMPTY North African alley. On the LEFT, a lit medical clinic storefront emits COLD WHITE light onto wet pavement. Small holographic cyan CADUCEUS symbol glows above the door. NO people. NO East Asian characters. COLOR: cold clinical white, subtle cyan ambient, pale amber warning band on the floor.",
+p2:"MEDIUM CLOSE-UP from SHOULDERS UP, LEFT SIDE PROFILE. The journalist's neck and ear fill the frame. Silver data implant BEHIND HER RIGHT EAR pulses cyan LED. Face turned AWAY. COLOR: cold cyan glow from the implant, deep slate-blue shadow, pale amber rim on hair.",
+p3:"EXTREME MACRO CLOSE-UP OF THE IMPLANT ONLY. Only the metal port BEHIND HER EAR fills the frame. Rain droplets on the silver surface. Cyan LED pulses brightly in darkness. Skin pores and ear cartilage visible. NO face, NO eye. COLOR: bright cyan LED in absolute black background."},
+{id:'chomage',icon:'📉',name:'Chômage normalisé',desc:'Taux : 0%',
+voice:"Le taux de chômage officiel atteint zéro pour cent pour la première fois dans l'histoire du pays. Les sans-emploi sont classés comme 'en transition active'.",
+punch:"Chômage : 0% officiel.",
+p1:"WIDE BROADCAST SHOT. Wet North African street with a giant holographic screen showing a STRAIGHT PALE CYAN LINE rising. NO readable text, NO East Asian characters. Blurred anonymous silhouettes sit on wet pavement, heads bowed. NO main character. COLOR: cyan and pale green glow, pale amber reflections in puddles.",
+p2:"MEDIUM CLOSE-UP from CHEST UP of the journalist. Mic in right hand near chin. Neutral. Behind her out of focus: the glowing cyan screen. Press badge glows cyan on her chest. COLOR: cold cyan rim on shoulders, subtle amber shadow on face.",
+p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S MOUTH ONLY. Her lips slightly parted, mid-sentence. Only lower face fills the frame. Natural skin texture, faint breath vapor. NO eyes, NO background. COLOR: harsh cold cyan from left, deep slate-blue shadow on right."},
+{id:'resistance',icon:'⚔️',name:'Cellule neutralisée',desc:'8 morts',
+voice:"Une cellule insurgée a été neutralisée cette nuit dans le secteur est de la capitale. Huit individus ont été identifiés comme des menaces actives. L'opération s'est déroulée sans incident majeur.",
+punch:"8 morts — opération sans incident.",
+p1:"EXTREME WIDE SHOT. EMPTY North African alley, dominated by DEEP SLATE-BLUE NEON from a holographic ALERT sign floating above. Wet street reflects slate-blue. At the FAR END, a DISTANT MASS of dark military silhouettes stands in formation. NO main character. NO East Asian characters. COLOR: dominant deep slate-blue, black shadows, tiny amber alert accents. NO red.",
+p2:"MEDIUM SHOT from CHEST UP of the journalist. Expression HARDER, jaw slightly tense, eyes fixed. Mic in right hand. Behind her out of focus: the slate-blue alert glow. COLOR: cold slate-blue side light on left half of face, deep black shadow on right half.",
+p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S FACE, EYES AND UPPER CHEEKS ONLY. Face fills the frame. She stares DIRECTLY INTO THE CAMERA LENS. No smile. Cold slate-blue light reflects in both eyes. Rain on skin. Pure BLACK behind her. COLOR: ONLY slate-blue, black, and skin tones."}
 ];
 
 // ═══════════════════════════════════════════════════════════════
 // ÉTAT
 // ═══════════════════════════════════════════════════════════════
-const state = {
-  concept: CONCEPTS[0],
-  apiKey: '',
-  slots: [
-    { idx:0, key:'p1', title:'Establishing', desc:'Plan large — décor broadcast', img:null, imgBase64:null, source:null, status:'idle', prompt:'' },
-    { idx:1, key:'p2', title:'Journaliste', desc:'Plan moyen — visage, micro', img:null, imgBase64:null, source:null, status:'idle', prompt:'' },
-    { idx:2, key:'p3', title:'Détail choc', desc:'Très gros plan — preuve', img:null, imgBase64:null, source:null, status:'idle', prompt:'' }
-  ],
-  videos: [
-    { idx:0, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'empty-lock', duration:169, progressText:'' },
-    { idx:1, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'broadcast-fixed', duration:169, progressText:'' },
-    { idx:2, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:'zoom-studio', duration:169, progressText:'' }
-  ],
-  isBusy: false,
-  restored: false,
-  audioCtx: null
+const state={
+concept:CONCEPTS[0],
+apiKey:'',
+slots:[
+{idx:0,key:'p1',title:'Establishing',desc:'Plan large — décor broadcast',img:null,imgBase64:null,source:null,status:'idle',prompt:'',uploadDesc:''},
+{idx:1,key:'p2',title:'Journaliste',desc:'Plan moyen — visage, micro',img:null,imgBase64:null,source:null,status:'idle',prompt:'',uploadDesc:''},
+{idx:2,key:'p3',title:'Détail choc',desc:'Très gros plan — preuve',img:null,imgBase64:null,source:null,status:'idle',prompt:'',uploadDesc:''}
+],
+videos:[
+{idx:0,url:null,status:'idle',videoId:null,progress:0,elapsed:0,effect:'empty-lock',duration:169,progressText:'',promptOverride:''},
+{idx:1,url:null,status:'idle',videoId:null,progress:0,elapsed:0,effect:'broadcast-fixed',duration:169,progressText:'',promptOverride:''},
+{idx:2,url:null,status:'idle',videoId:null,progress:0,elapsed:0,effect:'zoom-studio',duration:169,progressText:'',promptOverride:''}
+],
+isBusy:false,
+restored:false,
+audioCtx:null
 };
 
 // ═══════════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════════
-const $ = id => document.getElementById(id);
-const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-function log(msg, type='i') {
-  const el = $('log'); if (!el) return;
-  const t = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const d = document.createElement('div');
-  d.className = 'cl';
-  d.innerHTML = `<span class="ct">${t}</span><span class="c${type}">${esc(msg)}</span>`;
-  el.appendChild(d); el.scrollTop = el.scrollHeight;
+function log(msg,type='i'){
+const el=$('log');if(!el)return;
+const t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const d=document.createElement('div');d.className='cl';
+d.innerHTML=`<span class="ct">${t}</span><span class="c${type}">${esc(msg)}</span>`;
+el.appendChild(d);el.scrollTop=el.scrollHeight;
 }
-let toastT = null;
-function toast(msg, type='ok', dur=2500) {
-  const el = $('toast'); el.textContent = msg;
-  el.className = 'toast show ' + type;
-  if (toastT) clearTimeout(toastT);
-  toastT = setTimeout(() => el.classList.remove('show'), dur);
+let toastT=null;
+function toast(msg,type='ok',dur=2500){
+const el=$('toast');el.textContent=msg;el.className='toast show '+type;
+if(toastT)clearTimeout(toastT);
+toastT=setTimeout(()=>el.classList.remove('show'),dur);
 }
-function setStatus(t) {
-  const b = $('status');
-  if (t) { b.classList.add('show'); $('status-text').textContent = t; }
-  else b.classList.remove('show');
+function setStatus(t){
+const b=$('status');
+if(t){b.classList.add('show');$('status-text').textContent=t;}
+else b.classList.remove('show');
 }
-let asDotT = null;
-function flashAutosave() {
-  const d = $('autosave-dot');
-  d.classList.add('show');
-  if (asDotT) clearTimeout(asDotT);
-  asDotT = setTimeout(() => d.classList.remove('show'), 600);
+let asDotT=null;
+function flashAutosave(){
+const d=$('autosave-dot');d.classList.add('show');
+if(asDotT)clearTimeout(asDotT);
+asDotT=setTimeout(()=>d.classList.remove('show'),600);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // API KEY
 // ═══════════════════════════════════════════════════════════════
-function loadKey() {
-  try { state.apiKey = localStorage.getItem('news_api_key') || ''; } catch (e) { state.apiKey = ''; }
-  $('api-key').value = state.apiKey;
-  updateApiUI();
+function loadKey(){try{state.apiKey=localStorage.getItem('news_api_key')||'';}catch(e){state.apiKey='';}$('api-key').value=state.apiKey;updateApiUI();}
+function saveKey(){
+const k=$('api-key').value.trim();
+if(!k){try{localStorage.removeItem('news_api_key');}catch(e){}state.apiKey='';updateApiUI();toast('Clé effacée','err');return;}
+try{localStorage.setItem('news_api_key',k);}catch(e){}
+state.apiKey=k;updateApiUI();toast('Clé enregistrée','ok');scheduleAutosave();
 }
-function saveKey() {
-  const k = $('api-key').value.trim();
-  if (!k) { try { localStorage.removeItem('news_api_key'); } catch (e) {} state.apiKey = ''; updateApiUI(); toast('Clé effacée','err'); return; }
-  try { localStorage.setItem('news_api_key', k); } catch (e) {}
-  state.apiKey = k;
-  updateApiUI();
-  toast('Clé enregistrée','ok');
-  scheduleAutosave();
-}
-function updateApiUI() {
-  const box = $('api-box'), st = $('api-status');
-  if (state.apiKey) { box.classList.add('ok'); st.textContent = 'Active · ' + state.apiKey.slice(0,8) + '…' + state.apiKey.slice(-4); }
-  else { box.classList.remove('ok'); st.textContent = 'Non configurée'; }
-  renderSlots();
-  renderVideos();
+function updateApiUI(){
+const box=$('api-box'),st=$('api-status');
+if(state.apiKey){box.classList.add('ok');st.textContent='Active · '+state.apiKey.slice(0,8)+'…'+state.apiKey.slice(-4);}
+else{box.classList.remove('ok');st.textContent='Non configurée';}
+renderSlots();renderVideos();
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CHARACTER DNA — ETHNICITY LOCK 3×
+// CHARACTER DNA + GENDER LOCK
 // ═══════════════════════════════════════════════════════════════
-function buildIdentityBlock() {
-  const name = $('c-name').value.trim() || 'JOURNALIST';
-  const age = $('c-age').value.trim();
-  const eth = $('c-eth').value.trim();
-  const face = $('c-face').value.trim();
-  const hair = $('c-hair').value.trim();
-  const mark = $('c-mark').value.trim();
-  const implant = $('c-implant').value.trim();
-  const top = $('c-top').value.trim();
-  const bottom = $('c-bottom').value.trim();
-  const shoes = $('c-shoes').value.trim();
-  const acc = $('c-acc').value.trim();
-  return `ETHNICITY LOCK (MANDATORY, MUST BE RESPECTED IN EVERY SINGLE SHOT): ${name} is NORTH AFRICAN ALGERIAN / MAGHREBI. Olive skin tone, dark brown almond-shaped eyes, dark hair, North African facial bone structure. She is ABSOLUTELY NOT East Asian. NOT Chinese. NOT Japanese. NOT Korean. NOT Vietnamese. NOT Filipino. Her ethnicity is NON-NEGOTIABLE. ` +
-  `CHARACTER — ${name}: ${age} years old, ${eth}, ${face}, ${hair}. Marks: ${mark}. Implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Accessory: ${acc}. ` +
-  `REMINDER 1: ${name} is Algerian / North African, ABSOLUTELY NOT East Asian. ` +
-  `REMINDER 2: The scene is a North African / Mediterranean futuristic city. Signage is in LATIN and ARABIC script only. NO Chinese, NO Japanese, NO Korean characters anywhere. `;
+function buildIdentityBlock(){
+const name=$('c-name').value.trim()||'JOURNALIST';
+const gender=$('c-gender').value;
+const age=$('c-age').value.trim();
+const eth=$('c-eth').value.trim();
+const face=$('c-face').value.trim();
+const hair=$('c-hair').value.trim();
+const mark=$('c-mark').value.trim();
+const implant=$('c-implant').value.trim();
+const top=$('c-top').value.trim();
+const bottom=$('c-bottom').value.trim();
+const shoes=$('c-shoes').value.trim();
+const acc=$('c-acc').value.trim();
+
+let genderLock='';
+if(gender==='male'){genderLock='GENDER LOCK (MANDATORY): '+name+' is MALE. Male body, male features, male voice. NO female features, NO feminine silhouette, NO dress, NO skirt, NO feminine attire, NO makeup, NO long feminine hair. Male corporate broadcast wear only. ';}
+else if(gender==='female'){genderLock='GENDER LOCK (MANDATORY): '+name+' is FEMALE. Female body, female features, female voice. Feminine corporate broadcast wear. ';}
+else{genderLock='GENDER LOCK: '+name+' is non-binary. ';}
+
+return `ETHNICITY LOCK (MANDATORY): ${name} is NORTH AFRICAN ALGERIAN / MAGHREBI. Olive skin, dark hair, North African facial bone structure. ABSOLUTELY NOT East Asian, NOT Chinese, NOT Japanese, NOT Korean. ` +
+genderLock +
+`CHARACTER — ${name}: ${gender}, ${age} years old, ${eth}, ${face}, ${hair}. Marks: ${mark}. Implant: ${implant}. Wears: ${top}, ${bottom}, ${shoes}. Accessory: ${acc}. ` +
+`SCENE: North African / Mediterranean futuristic city. Signage in LATIN and ARABIC script only. NO Chinese, NO Japanese, NO Korean. `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BIBLIOTHÈQUE PERSONNAGES
+// ═══════════════════════════════════════════════════════════════
+function getCharLib(){try{return JSON.parse(localStorage.getItem(CHAR_LIB_KEY)||'{}');}catch(e){return{};}}
+function saveCharLib(lib){try{localStorage.setItem(CHAR_LIB_KEY,JSON.stringify(lib));}catch(e){}}
+
+function collectCharData(){
+return {
+name:$('c-name').value,gender:$('c-gender').value,age:$('c-age').value,eth:$('c-eth').value,
+face:$('c-face').value,hair:$('c-hair').value,mark:$('c-mark').value,implant:$('c-implant').value,
+top:$('c-top').value,bottom:$('c-bottom').value,shoes:$('c-shoes').value,acc:$('c-acc').value
+};
+}
+function applyCharData(d){
+if(!d)return;
+if(d.name!=null)$('c-name').value=d.name;
+if(d.gender!=null)$('c-gender').value=d.gender;
+if(d.age!=null)$('c-age').value=d.age;
+if(d.eth!=null)$('c-eth').value=d.eth;
+if(d.face!=null)$('c-face').value=d.face;
+if(d.hair!=null)$('c-hair').value=d.hair;
+if(d.mark!=null)$('c-mark').value=d.mark;
+if(d.implant!=null)$('c-implant').value=d.implant;
+if(d.top!=null)$('c-top').value=d.top;
+if(d.bottom!=null)$('c-bottom').value=d.bottom;
+if(d.shoes!=null)$('c-shoes').value=d.shoes;
+if(d.acc!=null)$('c-acc').value=d.acc;
+scheduleAutosave();
+}
+function renderCharLib(){
+const sel=$('char-lib-select');if(!sel)return;
+const lib=getCharLib();const names=Object.keys(lib).sort();
+let html='<option value="">— Aucun —</option>';
+names.forEach(n=>{html+=`<option value="${esc(n)}">${esc(n)}</option>`;});
+sel.innerHTML=html;
+}
+function saveCharToLib(){
+const name=$('char-lib-name').value.trim();
+if(!name){toast('Donne un nom','err');return;}
+const lib=getCharLib();
+lib[name]=Object.assign({},collectCharData(),{savedAt:Date.now()});
+saveCharLib(lib);renderCharLib();$('char-lib-name').value='';
+toast('Personnage sauvegardé : '+name,'ok');
+}
+function loadCharFromLib(){
+const name=$('char-lib-select').value;
+if(!name){toast('Sélectionne','err');return;}
+const lib=getCharLib();
+if(lib[name]){applyCharData(lib[name]);toast('Chargé : '+name,'ok');}
+}
+function delCharFromLib(){
+const name=$('char-lib-select').value;
+if(!name){toast('Sélectionne','err');return;}
+if(!confirm('Supprimer « '+name+' » ?'))return;
+const lib=getCharLib();delete lib[name];saveCharLib(lib);renderCharLib();
+toast('Supprimé','warn');
+}
+function exportCharJSON(){
+const data=collectCharData();
+const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='character_'+Date.now()+'.json';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+URL.revokeObjectURL(url);
+toast('Personnage exporté','ok');
+}
+function importCharJSON(){
+$('char-import-file').click();
 }
 
 // ═══════════════════════════════════════════════════════════════
 // AUTOSAVE
 // ═══════════════════════════════════════════════════════════════
-let autosaveTimer = null;
-function scheduleAutosave() {
-  if (autosaveTimer) clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(saveState, 800);
+let autosaveTimer=null;
+function scheduleAutosave(){
+if(autosaveTimer)clearTimeout(autosaveTimer);
+autosaveTimer=setTimeout(saveState,800);
 }
-function saveState() {
-  try {
-    const data = {
-      conceptId: state.concept.id,
-      voText: $('vo-text').value, voPunch: $('vo-punch').value,
-      char: {
-        name:$('c-name').value, age:$('c-age').value, eth:$('c-eth').value,
-        face:$('c-face').value, hair:$('c-hair').value, mark:$('c-mark').value,
-        implant:$('c-implant').value, top:$('c-top').value, bottom:$('c-bottom').value,
-        shoes:$('c-shoes').value, acc:$('c-acc').value
-      },
-      slots: state.slots.map(s => ({ img:s.img, imgBase64:s.imgBase64, source:s.source, status:s.status, prompt:s.prompt })),
-      videos: state.videos.map(v => ({ url:v.url, videoId:v.videoId, effect:v.effect, duration:v.duration })),
-      savedAt: Date.now()
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    flashAutosave();
-  } catch (e) {}
+function saveState(){
+try{
+const data={
+conceptId:state.concept.id,
+voText:$('vo-text').value,voPunch:$('vo-punch').value,
+char:collectCharData(),
+slots:state.slots.map(s=>({img:s.img,imgBase64:s.imgBase64,source:s.source,status:s.status,prompt:s.prompt,uploadDesc:s.uploadDesc})),
+videos:state.videos.map(v=>({url:v.url,videoId:v.videoId,effect:v.effect,duration:v.duration,promptOverride:v.promptOverride})),
+savedAt:Date.now()
+};
+localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+flashAutosave();
+}catch(e){}
 }
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return false;
-    const d = JSON.parse(raw);
-    const c = CONCEPTS.find(x => x.id === d.conceptId);
-    if (c) state.concept = c;
-    if (d.voText != null) $('vo-text').value = d.voText;
-    if (d.voPunch != null) $('vo-punch').value = d.voPunch;
-    if (d.char) Object.keys(d.char).forEach(k => { const el = $('c-'+k); if (el) el.value = d.char[k]; });
-    if (d.slots) d.slots.forEach((s, i) => {
-      if (state.slots[i]) {
-        state.slots[i].img = s.img || null;
-        state.slots[i].imgBase64 = s.imgBase64 || null;
-        state.slots[i].source = s.source || null;
-        state.slots[i].status = s.status || 'idle';
-        state.slots[i].prompt = s.prompt || '';
-      }
-    });
-    if (d.videos) d.videos.forEach((v, i) => {
-      if (state.videos[i]) {
-        state.videos[i].url = v.url || null;
-        state.videos[i].videoId = v.videoId || null;
-        if (v.effect) state.videos[i].effect = v.effect;
-        if (v.duration) state.videos[i].duration = v.duration;
-      }
-    });
-    log('💾 Session restaurée', 'o');
-    return true;
-  } catch (e) { return false; }
+function loadState(){
+try{
+const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return false;
+const d=JSON.parse(raw);
+const c=CONCEPTS.find(x=>x.id===d.conceptId);if(c)state.concept=c;
+if(d.voText!=null)$('vo-text').value=d.voText;
+if(d.voPunch!=null)$('vo-punch').value=d.voPunch;
+if(d.char)applyCharData(d.char);
+if(d.slots)d.slots.forEach((s,i)=>{if(state.slots[i]){
+state.slots[i].img=s.img||null;state.slots[i].imgBase64=s.imgBase64||null;
+state.slots[i].source=s.source||null;state.slots[i].status=s.status||'idle';
+state.slots[i].prompt=s.prompt||'';state.slots[i].uploadDesc=s.uploadDesc||'';
+}});
+if(d.videos)d.videos.forEach((v,i)=>{if(state.videos[i]){
+state.videos[i].url=v.url||null;state.videos[i].videoId=v.videoId||null;
+if(v.effect)state.videos[i].effect=v.effect;
+if(v.duration)state.videos[i].duration=v.duration;
+if(v.promptOverride!=null)state.videos[i].promptOverride=v.promptOverride;
+}});
+log('💾 Session restaurée','o');
+return true;
+}catch(e){return false;}
 }
-function clearState() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
+function clearState(){try{localStorage.removeItem(STORAGE_KEY);}catch(e){}}
 
 // ═══════════════════════════════════════════════════════════════
 // CONCEPT RENDER
 // ═══════════════════════════════════════════════════════════════
-function renderConcepts() {
-  const g = $('concepts'); g.innerHTML = '';
-  CONCEPTS.forEach(c => {
-    const el = document.createElement('div');
-    el.className = 'card' + (c.id === state.concept.id ? ' sel' : '');
-    el.innerHTML = `<span class="ic">${c.icon}</span><span class="nm">${esc(c.name)}</span><span class="dc">${esc(c.desc)}</span>`;
-    el.addEventListener('click', () => {
-      state.concept = c;
-      $('vo-text').value = c.voice;
-      $('vo-punch').value = c.punch;
-      renderConcepts();
-      state.slots.forEach(s => { s.img = null; s.imgBase64 = null; s.source = null; s.status = 'idle'; s.prompt = ''; });
-      state.videos.forEach(v => { v.url = null; v.status = 'idle'; v.videoId = null; v.progress = 0; });
-      renderSlots(); renderVideos();
-      scheduleAutosave();
-      toast('Dépêche : ' + c.name, 'ok', 1500);
-    });
-    g.appendChild(el);
-  });
+function renderConcepts(){
+const g=$('concepts');g.innerHTML='';
+CONCEPTS.forEach(c=>{
+const el=document.createElement('div');
+el.className='card'+(c.id===state.concept.id?' sel':'');
+el.innerHTML=`<span class="ic">${c.icon}</span><span class="nm">${esc(c.name)}</span><span class="dc">${esc(c.desc)}</span>`;
+el.addEventListener('click',()=>{
+state.concept=c;$('vo-text').value=c.voice;$('vo-punch').value=c.punch;
+renderConcepts();
+state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';});
+state.videos.forEach(v=>{v.url=null;v.status='idle';v.videoId=null;v.progress=0;v.promptOverride='';});
+renderSlots();renderVideos();scheduleAutosave();
+toast('Dépêche : '+c.name,'ok',1500);
+});
+g.appendChild(el);
+});
 }
 
 // ═══════════════════════════════════════════════════════════════
-// IMAGE PROMPT
+// PROMPT IMAGE
 // ═══════════════════════════════════════════════════════════════
-function buildPrompt(slot) {
-  const c = state.concept;
-  const sceneDesc = c[slot.key] || '';
-  const charBlock = buildIdentityBlock();
-  let p = '════ MOST IMPORTANT INSTRUCTION ════ ';
-  p += sceneDesc + ' ';
-  p += '════ REPEAT ════ ';
-  p += sceneDesc + ' ';
-  p += '════ FOLLOW STRICTLY ════ ';
-  p += sceneDesc + ' ';
-  p += STYLE_BASE + ' ';
-  p += CHARACTER_FACE_RULE + ' ';
-  p += charBlock + ' ';
-  p += 'Vertical 9:16 cinematic composition. No text, no watermark, no logo. ';
-  if (p.length > MAX_PROMPT) p = p.slice(0, MAX_PROMPT);
-  return p;
+function buildPrompt(slot){
+const c=state.concept;
+const sceneDesc=c[slot.key]||'';
+const charBlock=buildIdentityBlock();
+let p='════ MOST IMPORTANT INSTRUCTION ════ ';
+p+=sceneDesc+' ';
+p+='════ REPEAT ════ ';
+p+=sceneDesc+' ';
+p+=STYLE_BASE+' ';
+p+=charBlock+' ';
+p+='Vertical 9:16 cinematic composition. No text, no watermark, no logo. ';
+if(p.length>MAX_PROMPT)p=p.slice(0,MAX_PROMPT);
+return p;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VIDEO PROMPT — ANTI-HALLUCINATION
+// PROMPT VIDÉO — avec override + gender lock
 // ═══════════════════════════════════════════════════════════════
-function buildVideoPrompt(idx) {
-  const c = state.concept;
-  const v = state.videos[idx];
-  const eff = EFFECTS.find(e => e.id === v.effect) || EFFECTS[0];
-  const sceneKey = 'p' + (idx+1);
-  const sceneDesc = c[sceneKey] || '';
+function buildVideoPrompt(idx){
+const v=state.videos[idx];
+// Override manuel
+if(v.promptOverride && v.promptOverride.trim().length>10){
+return v.promptOverride.trim();
+}
+// Prompt auto
+const c=state.concept;
+const eff=EFFECTS.find(e=>e.id===v.effect)||EFFECTS[0];
+const sceneKey='p'+(idx+1);
+const sceneDesc=c[sceneKey]||'';
+const gender=$('c-gender').value;
 
-  let p = 'Cinematic broadcast shot. Photorealistic, film grain, no CGI. ';
-  p += 'MOTION: ' + eff.prompt + ' ';
-  p += 'ONE SINGLE DIRECTION LOCK: camera moves continuously in ONE direction only, NO return. ';
-  p += 'SCENE: ' + sceneDesc + ' ';
-  p += 'STRICT CONTENT LOCK: reproduce the input image EXACTLY. Do NOT add any new character, person, silhouette, human figure, or animal that is not already visible in the input image. ';
-  p += 'Do NOT invent people. Do NOT add faces. Do NOT change the number of visible humans. ';
-  p += 'If the input image has zero people, the output must have zero people. ';
-  p += 'If the input image has one person, the output must have exactly one person — the SAME one. ';
-  p += 'NO new elements, NO new objects, NO new architecture. ';
-  p += 'ETHNICITY LOCK: if a person is visible, they are NORTH AFRICAN ALGERIAN / MAGHREBI. NOT East Asian. NOT Chinese. NOT Japanese. NOT Korean. ';
-  p += 'STRICT APPEARANCE LOCK: maintain exact journalist face, hair, clothing, implant, badge from the input image. ';
-  p += 'SUBTLE ANIMATION ONLY: blinking eyes, breathing chest, rain falling, neon flickering, steam drifting, hologram pulsing. Nothing else moves. ';
-  p += 'No text overlays beyond what is already in the keyframe. No watermarks, no cuts, no scene changes. No morphing faces.';
+const slot=state.slots[idx];
+const isUpload=slot.source==='upload';
 
-  if (p.length > MAX_PROMPT) p = p.slice(0, MAX_PROMPT);
-  return p;
+let p='Cinematic broadcast shot. Photorealistic, film grain, no CGI. ';
+p+='MOTION: '+eff.prompt+' ';
+p+='ONE SINGLE DIRECTION LOCK: camera moves continuously in ONE direction only, NO return. ';
+
+if(isUpload && slot.uploadDesc){
+// Si upload, on utilise la description du contenu
+p+='SCENE CONTENT: '+slot.uploadDesc+' ';
+}else{
+p+='SCENE: '+sceneDesc+' ';
+}
+
+p+='STRICT CONTENT LOCK: reproduce the input image EXACTLY. Do NOT add any new character, person, silhouette, human figure, or animal not already visible in the input. ';
+p+='Do NOT invent people. Do NOT add faces. Do NOT change the number of visible humans. ';
+p+='If the input has zero people, output has zero people. If the input has one person, output has exactly one — the SAME one. ';
+p+='NO new elements, NO new objects, NO new architecture. ';
+
+// Gender lock
+if(gender==='male'){
+p+='GENDER LOCK: the subject is MALE. NO female features, NO feminine silhouette, NO dress, NO skirt, NO feminine hair, NO makeup. Male body, male attire only. ';
+}else if(gender==='female'){
+p+='GENDER LOCK: the subject is FEMALE. Female body, female attire only. ';
+}
+
+p+='ETHNICITY LOCK: if a person is visible, they are NORTH AFRICAN ALGERIAN / MAGHREBI. NOT East Asian. NOT Chinese. NOT Japanese. NOT Korean. ';
+p+='STRICT APPEARANCE LOCK: maintain exact face, hair, clothing, implant, badge from the input image. ';
+p+='SUBTLE ANIMATION ONLY: blinking eyes, breathing chest, rain falling, neon flickering, steam drifting. Nothing else moves. ';
+p+='No text overlays beyond what is already in the keyframe. No watermarks, no cuts, no scene changes. No morphing faces.';
+
+if(p.length>MAX_PROMPT)p=p.slice(0,MAX_PROMPT);
+return p;
 }
 
 // ═══════════════════════════════════════════════════════════════
 // FETCH
 // ═══════════════════════════════════════════════════════════════
-async function fetchRetry(url, opts, maxRetry, label) {
-  for (let i = 0; i <= maxRetry; i++) {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 90000);
-      const res = await fetch(url, { ...opts, signal: ctrl.signal });
-      clearTimeout(t);
-      if ((res.status === 500 || res.status === 502 || res.status === 503) && i < maxRetry) {
-        const w = Math.pow(2, i) * 3000;
-        log(label + ' HTTP ' + res.status + ' — retry ' + Math.round(w/1000) + 's', 'w');
-        await sleep(w); continue;
-      }
-      if (res.status === 429 && i < maxRetry) {
-        log(label + ' rate limited — attente 15s', 'w');
-        await sleep(15000); continue;
-      }
-      return res;
-    } catch (e) {
-      if (i < maxRetry) await sleep(Math.pow(2, i) * 2000);
-      else throw new Error(label + ' : ' + e.message);
-    }
-  }
-  throw new Error(label + ' échec');
+async function fetchRetry(url,opts,maxRetry,label){
+for(let i=0;i<=maxRetry;i++){
+try{
+const ctrl=new AbortController();
+const t=setTimeout(()=>ctrl.abort(),90000);
+const res=await fetch(url,{...opts,signal:ctrl.signal});
+clearTimeout(t);
+if((res.status===500||res.status===502||res.status===503)&&i<maxRetry){
+const w=Math.pow(2,i)*3000;
+log(label+' HTTP '+res.status+' — retry','w');
+await sleep(w);continue;
+}
+if(res.status===429&&i<maxRetry){log(label+' rate limited','w');await sleep(15000);continue;}
+return res;
+}catch(e){
+if(i<maxRetry)await sleep(Math.pow(2,i)*2000);
+else throw new Error(label+' : '+e.message);
+}
+}
+throw new Error(label+' échec');
 }
 
-async function callImageAPI(prompt) {
-  if (!state.apiKey) throw new Error('Clé API manquante');
-  const sizes = [`${IMG_W}x${IMG_H}`, '1024x1792', '1024x1024', '768x1024', '512x512'];
-  let lastErr = null;
-  for (const size of sizes) {
-    const variants = [
-      { model: MODEL_IMAGE, prompt, size, response_format:'url' },
-      { model: MODEL_IMAGE, prompt, size, extra_body:{ response_format:'url' } },
-      { model: MODEL_IMAGE, prompt, size }
-    ];
-    for (const body of variants) {
-      try {
-        const res = await fetchRetry(API_BASE + '/images/generations',
-          { method:'POST', headers:{ 'Authorization':'Bearer ' + state.apiKey, 'Content-Type':'application/json' }, body: JSON.stringify(body) },
-          1, 'Image');
-        if (res.ok) {
-          const d = await res.json();
-          const url = d.data?.[0]?.url || d.data?.[0]?.b64_json;
-          if (url) { log('Image OK — ' + size, 'o'); return url; }
-        } else {
-          const txt = await res.text();
-          lastErr = 'HTTP ' + res.status + ' : ' + txt.slice(0, 150);
-          log('Échec ' + size + ' — ' + lastErr, 'w');
-        }
-      } catch (e) { lastErr = e.message; }
-    }
-  }
-  throw new Error('Image : ' + lastErr);
+async function callImageAPI(prompt){
+if(!state.apiKey)throw new Error('Clé API manquante');
+const sizes=[`${IMG_W}x${IMG_H}`,'1024x1792','1024x1024','768x1024','512x512'];
+let lastErr=null;
+for(const size of sizes){
+const variants=[
+{model:MODEL_IMAGE,prompt,size,response_format:'url'},
+{model:MODEL_IMAGE,prompt,size,extra_body:{response_format:'url'}},
+{model:MODEL_IMAGE,prompt,size}
+];
+for(const body of variants){
+try{
+const res=await fetchRetry(API_BASE+'/images/generations',
+{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},
+1,'Image');
+if(res.ok){
+const d=await res.json();
+const url=d.data?.[0]?.url||d.data?.[0]?.b64_json;
+if(url){log('Image OK — '+size,'o');return url;}
+}else{
+const txt=await res.text();
+lastErr='HTTP '+res.status+' : '+txt.slice(0,150);
+log('Échec '+size+' — '+lastErr,'w');
+}
+}catch(e){lastErr=e.message;}
+}
+}
+throw new Error('Image : '+lastErr);
 }
 
-async function createVideoTask(startRef, endRef, prompt, numFrames) {
-  if (!state.apiKey) throw new Error('Clé API manquante');
-  const isUrl1 = typeof startRef === 'string' && startRef.startsWith('http');
-  const isUrl2 = typeof endRef === 'string' && endRef.startsWith('http');
-
-  let body;
-  if (isUrl1 && isUrl2) {
-    body = {
-      model: MODEL_VIDEO, prompt,
-      extra_body: { image: [startRef, endRef], mode: 'keyframes' },
-      num_frames: numFrames, frame_rate: 24,
-      height: VID_H, width: VID_W
-    };
-  } else {
-    const img = (typeof startRef === 'string' && startRef.startsWith('http')) ? startRef : startRef;
-    body = {
-      model: MODEL_VIDEO, prompt,
-      image: img,
-      num_frames: numFrames, frame_rate: 24
-    };
-  }
-
-  const res = await fetchRetry(API_BASE + '/videos',
-    { method:'POST', headers:{ 'Authorization':'Bearer ' + state.apiKey, 'Content-Type':'application/json' }, body: JSON.stringify(body) },
-    2, 'Vidéo');
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error('Création vidéo HTTP ' + res.status + ' : ' + txt.slice(0, 200));
-  }
-  const d = await res.json();
-  const id = d.video_id || d.id || d.data?.video_id;
-  if (!id) throw new Error('Pas de video_id dans la réponse');
-  return id;
+async function createVideoTask(startRef,endRef,prompt,numFrames){
+if(!state.apiKey)throw new Error('Clé API manquante');
+const isUrl1=typeof startRef==='string'&&startRef.startsWith('http');
+const isUrl2=typeof endRef==='string'&&endRef.startsWith('http');
+let body;
+if(isUrl1&&isUrl2){
+body={model:MODEL_VIDEO,prompt,extra_body:{image:[startRef,endRef],mode:'keyframes'},num_frames:numFrames,frame_rate:24,height:VID_H,width:VID_W};
+}else{
+body={model:MODEL_VIDEO,prompt,image:startRef,num_frames:numFrames,frame_rate:24};
+}
+const res=await fetchRetry(API_BASE+'/videos',
+{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},
+2,'Vidéo');
+if(!res.ok){const txt=await res.text();throw new Error('Création vidéo HTTP '+res.status+' : '+txt.slice(0,200));}
+const d=await res.json();
+const id=d.video_id||d.id||d.data?.video_id;
+if(!id)throw new Error('Pas de video_id');
+return id;
 }
 
-async function pollVideo(videoId, onProgress) {
-  const start = Date.now();
-  for (let r = Math.round(INITIAL_WAIT); r > 0; r--) {
-    const e = Math.round((Date.now() - start) / 1000);
-    const p = Math.min(Math.round((e / INITIAL_WAIT) * 90), 85);
-    onProgress('Préparation…', p, e);
-    await sleep(1000);
-  }
-  for (let a = 0; a < 400; a++) {
-    const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
-    try {
-      const res = await fetch(url, { headers:{ 'Authorization':'Bearer ' + state.apiKey } });
-      if (res.status === 429) { await sleep(20000); continue; }
-      if (res.status === 404) { await sleep(POLL_INTERVAL * 1000); continue; }
-      if (!res.ok) { await sleep(POLL_INTERVAL * 1000); continue; }
-      const d = await res.json();
-      const status = (d.status || '').toLowerCase();
-      const apiProgress = d.progress || 0;
-      const elapsed = Math.round((Date.now() - start) / 1000);
-      const timeProgress = Math.min(Math.round((elapsed / INITIAL_WAIT) * 90), 92);
-      const p = Math.max(apiProgress, timeProgress);
-      if (status === 'completed' || status === 'succeeded' || status === 'done') {
-        const u = d.metadata?.url || d.url || d.output?.url || d.data?.url;
-        if (!u) throw new Error('Pas d\'URL vidéo');
-        return u;
-      }
-      if (status === 'failed' || status === 'error' || status === 'cancelled') {
-        throw new Error('Échec API : ' + (d.error || status));
-      }
-      onProgress('Génération…', p, elapsed);
-    } catch (e) {
-      if (e.message.startsWith('Échec')) throw e;
-    }
-    await sleep(POLL_INTERVAL * 1000);
-  }
-  throw new Error('Timeout vidéo');
+async function pollVideo(videoId,onProgress){
+const start=Date.now();
+for(let r=Math.round(INITIAL_WAIT);r>0;r--){
+const e=Math.round((Date.now()-start)/1000);
+const p=Math.min(Math.round((e/INITIAL_WAIT)*90),85);
+onProgress('Préparation…',p,e);
+await sleep(1000);
+}
+for(let a=0;a<400;a++){
+const url=POLL_BASE+'?video_id='+encodeURIComponent(videoId)+'&model_name='+encodeURIComponent(MODEL_VIDEO);
+try{
+const res=await fetch(url,{headers:{'Authorization':'Bearer '+state.apiKey}});
+if(res.status===429){await sleep(20000);continue;}
+if(res.status===404){await sleep(POLL_INTERVAL*1000);continue;}
+if(!res.ok){await sleep(POLL_INTERVAL*1000);continue;}
+const d=await res.json();
+const status=(d.status||'').toLowerCase();
+const apiProgress=d.progress||0;
+const elapsed=Math.round((Date.now()-start)/1000);
+const timeProgress=Math.min(Math.round((elapsed/INITIAL_WAIT)*90),92);
+const p=Math.max(apiProgress,timeProgress);
+if(status==='completed'||status==='succeeded'||status==='done'){
+const u=d.metadata?.url||d.url||d.output?.url||d.data?.url;
+if(!u)throw new Error('Pas d\'URL vidéo');
+return u;
+}
+if(status==='failed'||status==='error'||status==='cancelled')throw new Error('Échec API : '+(d.error||status));
+onProgress('Génération…',p,elapsed);
+}catch(e){if(e.message.startsWith('Échec'))throw e;}
+await sleep(POLL_INTERVAL*1000);
+}
+throw new Error('Timeout vidéo');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// FILE → BASE64
-// ═══════════════════════════════════════════════════════════════
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = e => resolve(e.target.result);
-    r.onerror = () => reject(new Error('Lecture échouée'));
-    r.readAsDataURL(file);
-  });
+function fileToBase64(file){
+return new Promise((resolve,reject)=>{
+const r=new FileReader();
+r.onload=e=>resolve(e.target.result);
+r.onerror=()=>reject(new Error('Lecture échouée'));
+r.readAsDataURL(file);
+});
 }
 
 // ═══════════════════════════════════════════════════════════════
 // SLOTS RENDER
 // ═══════════════════════════════════════════════════════════════
-function renderSlots() {
-  const c = $('slots'); c.innerHTML = '';
-  state.slots.forEach((slot, i) => {
-    const prev = i > 0 ? state.slots[i-1] : null;
-    const locked = prev && prev.status !== 'done';
-    const done = slot.status === 'done';
-    let cls = 'slot';
-    if (locked) cls += ' locked';
-    else if (!done) cls += ' active';
-    if (done) cls += ' done';
+function renderSlots(){
+const c=$('slots');c.innerHTML='';
+state.slots.forEach((slot,i)=>{
+const prev=i>0?state.slots[i-1]:null;
+const locked=prev&&prev.status!=='done';
+const done=slot.status==='done';
+let cls='slot';
+if(locked)cls+=' locked';else if(!done)cls+=' active';
+if(done)cls+=' done';
 
-    const el = document.createElement('div');
-    el.className = cls;
+const el=document.createElement('div');el.className=cls;
 
-    let srcBadge = '';
-    if (slot.source === 'ai') srcBadge = '<span class="badge-src badge-ai">IA</span>';
-    else if (slot.source === 'upload') srcBadge = '<span class="badge-src badge-up">UPLOAD</span>';
+let srcBadge='';
+if(slot.source==='ai')srcBadge='<span class="badge-src badge-ai">IA</span>';
+else if(slot.source==='upload')srcBadge='<span class="badge-src badge-up">UPLOAD</span>';
 
-    let html = `<div class="slot-header"><div class="slot-title">${esc(slot.title)}${srcBadge}</div><span class="slot-num">PLAN ${i+1}</span></div>`;
-    html += `<div class="slot-body">${esc(slot.desc)}</div>`;
+let html=`<div class="slot-header"><div class="slot-title">${esc(slot.title)}${srcBadge}</div><span class="slot-num">PLAN ${i+1}</span></div>`;
+html+=`<div class="slot-body">${esc(slot.desc)}</div>`;
 
-    if (slot.img) html += `<img class="slot-img" src="${slot.img}" alt="Plan ${i+1}">`;
-    else html += `<div class="slot-img-ph">Plan ${i+1} — non généré</div>`;
+if(slot.img)html+=`<img class="slot-img" src="${slot.img}" alt="Plan ${i+1}">`;
+else html+=`<div class="slot-img-ph">Plan ${i+1} — non généré</div>`;
 
-    html += `<div class="slot-status">${slot.status === 'idle' ? '○ en attente' : slot.status === 'gen' ? '◐ génération…' : slot.status === 'done' ? '● terminé' : '✕ erreur'}</div>`;
-    html += `<div class="bar"><div class="bar-fill" style="width:${slot.status === 'gen' ? 60 : slot.status === 'done' ? 100 : 0}%"></div></div>`;
+html+=`<div class="slot-status">${slot.status==='idle'?'○ en attente':slot.status==='gen'?'◐ génération…':slot.status==='done'?'● terminé':'✕ erreur'}</div>`;
+html+=`<div class="bar"><div class="bar-fill" style="width:${slot.status==='gen'?60:slot.status==='done'?100:0}%"></div></div>`;
 
-    if (locked) {
-      html += `<div class="hint">Termine le plan ${i} d'abord.</div>`;
-    } else {
-      html += `<div class="btn-row" style="gap:.4rem;">`;
-      html += `<button class="btn small" data-gen="${i}" style="flex:1" ${state.isBusy || !state.apiKey ? 'disabled' : ''}>🤖 IA</button>`;
-      html += `<button class="btn small purple" data-upload="${i}" style="flex:1">📤 UPLOAD</button>`;
-      html += `</div>`;
-      if (slot.img) {
-        html += `<div class="btn-row">`;
-        html += `<button class="btn small ok" data-next="${i}" style="flex:1">${i<2?'✓ VALIDER & PLAN '+(i+2):'✓ VALIDER'}</button>`;
-        html += `<button class="btn small ghost" data-regen="${i}" style="flex:1">↻ RÉGÉNÉRER IA</button>`;
-        html += `</div>`;
-      }
-      html += `<input type="file" accept="image/*" class="upload-in" id="up-${i}" data-up-input="${i}">`;
-    }
-
-    el.innerHTML = html;
-    c.appendChild(el);
-  });
-
-  c.querySelectorAll('[data-gen]').forEach(b => b.addEventListener('click', () => generateSlot(+b.dataset.gen)));
-  c.querySelectorAll('[data-upload]').forEach(b => b.addEventListener('click', () => {
-    const i = +b.dataset.upload;
-    const input = c.querySelector(`#up-${i}`);
-    if (input) input.click();
-  }));
-  c.querySelectorAll('[data-up-input]').forEach(inp => inp.addEventListener('change', async (e) => {
-    const i = +inp.dataset.upInput;
-    const file = e.target.files[0];
-    if (!file) return;
-    await handleUpload(i, file);
-    inp.value = '';
-  }));
-  c.querySelectorAll('[data-regen]').forEach(b => b.addEventListener('click', () => regenerateSlot(+b.dataset.regen)));
-  c.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => validateSlot(+b.dataset.next)));
+if(locked){
+html+=`<div class="hint">Termine le plan ${i} d'abord.</div>`;
+}else{
+html+=`<div class="btn-row" style="gap:.4rem;">`;
+html+=`<button class="btn small" data-gen="${i}" style="flex:1" ${state.isBusy||!state.apiKey?'disabled':''}>🤖 IA</button>`;
+html+=`<button class="btn small purple" data-upload="${i}" style="flex:1">📤 UPLOAD</button>`;
+html+=`</div>`;
+if(slot.img){
+html+=`<div class="btn-row">`;
+html+=`<button class="btn small ok" data-next="${i}" style="flex:1">${i<2?'✓ VALIDER & PLAN '+(i+2):'✓ VALIDER'}</button>`;
+html+=`<button class="btn small ghost" data-regen="${i}" style="flex:1">↻</button>`;
+html+=`</div>`;
+}
+// Description upload (si upload)
+if(slot.source==='upload'){
+html+=`<label style="margin-top:.5rem;font-size:.6rem;">Description du contenu (pour la vidéo)</label>`;
+html+=`<textarea data-uploaddesc="${i}" placeholder="Ex: homme en costume noir avec micro, rue nord-africaine cyberpunk..." style="min-height:60px;font-size:.75rem">${esc(slot.uploadDesc||'')}</textarea>`;
+}
+html+=`<input type="file" accept="image/*" class="upload-in" id="up-${i}" data-up-input="${i}">`;
 }
 
-async function handleUpload(i, file) {
-  if (!file.type.startsWith('image/')) { toast('Fichier non image', 'err'); return; }
-  setStatus('Upload plan ' + (i+1) + '…');
-  try {
-    const b64 = await fileToBase64(file);
-    const slot = state.slots[i];
-    slot.img = b64;
-    slot.imgBase64 = b64;
-    slot.source = 'upload';
-    slot.status = 'done';
-    log('📤 Plan ' + (i+1) + ' uploadé (' + Math.round(file.size/1024) + ' Ko)', 'o');
-    toast('Plan ' + (i+1) + ' importé', 'ok');
-  } catch (e) {
-    log('❌ Upload : ' + e.message, 'e');
-    toast('Erreur upload', 'err');
-  }
-  setStatus(null);
-  renderSlots(); renderVideos(); saveState();
+el.innerHTML=html;
+c.appendChild(el);
+});
+
+c.querySelectorAll('[data-gen]').forEach(b=>b.addEventListener('click',()=>generateSlot(+b.dataset.gen)));
+c.querySelectorAll('[data-upload]').forEach(b=>b.addEventListener('click',()=>{
+const i=+b.dataset.upload;
+const input=c.querySelector(`#up-${i}`);
+if(input)input.click();
+}));
+c.querySelectorAll('[data-up-input]').forEach(inp=>inp.addEventListener('change',async(e)=>{
+const i=+inp.dataset.upInput;
+const file=e.target.files[0];
+if(!file)return;
+await handleUpload(i,file);
+inp.value='';
+}));
+c.querySelectorAll('[data-uploaddesc]').forEach(ta=>ta.addEventListener('input',()=>{
+const i=+ta.dataset.uploaddesc;
+state.slots[i].uploadDesc=ta.value;
+scheduleAutosave();
+}));
+c.querySelectorAll('[data-regen]').forEach(b=>b.addEventListener('click',()=>regenerateSlot(+b.dataset.regen)));
+c.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>validateSlot(+b.dataset.next)));
+}
+
+async function handleUpload(i,file){
+if(!file.type.startsWith('image/')){toast('Fichier non image','err');return;}
+setStatus('Upload plan '+(i+1)+'…');
+try{
+const b64=await fileToBase64(file);
+const slot=state.slots[i];
+slot.img=b64;slot.imgBase64=b64;slot.source='upload';slot.status='done';
+log('📤 Plan '+(i+1)+' uploadé ('+Math.round(file.size/1024)+' Ko)','o');
+toast('Plan '+(i+1)+' importé. N\'oublie pas la description !','ok',3000);
+}catch(e){
+log('❌ Upload : '+e.message,'e');
+toast('Erreur upload','err');
+}
+setStatus(null);
+renderSlots();renderVideos();saveState();
 }
 
 // ═══════════════════════════════════════════════════════════════
 // VIDEOS RENDER
 // ═══════════════════════════════════════════════════════════════
-function renderVideos() {
-  const c = $('video-slots'); if (!c) return;
-  c.innerHTML = '';
+function renderVideos(){
+const c=$('video-slots');if(!c)return;
+c.innerHTML='';
 
-  const allImagesReady = state.slots.every(s => s.status === 'done');
-  if (!allImagesReady) {
-    c.innerHTML = `<div class="hint" style="text-align:center;padding:1rem;">Génère ou upload les 3 images d'abord.</div>`;
-    $('batch-videos').disabled = true;
-    return;
-  }
-  $('batch-videos').disabled = false;
+const allReady=state.slots.every(s=>s.status==='done');
+if(!allReady){
+c.innerHTML=`<div class="hint" style="text-align:center;padding:1rem;">Génère ou upload les 3 images d'abord.</div>`;
+$('batch-videos').disabled=true;
+return;
+}
+$('batch-videos').disabled=false;
 
-  state.videos.forEach((v, i) => {
-    const el = document.createElement('div');
-    el.className = 'video-slot' + (v.status === 'done' ? ' done' : v.status === 'gen' ? ' processing' : '');
+state.videos.forEach((v,i)=>{
+const el=document.createElement('div');
+el.className='video-slot'+(v.status==='done'?' done':v.status==='gen'?' processing':'');
 
-    let html = `<div class="slot-header"><div class="slot-title">Vidéo Plan ${i+1}</div><span class="slot-num">${v.status === 'done' ? '● PRÊT' : v.status === 'gen' ? '◐ EN COURS' : '○ À GÉNÉRER'}</span></div>`;
+let html=`<div class="slot-header"><div class="slot-title">Vidéo Plan ${i+1}</div><span class="slot-num">${v.status==='done'?'● PRÊT':v.status==='gen'?'◐ EN COURS':'○ À GÉNÉRER'}</span></div>`;
 
-    if (v.url) html += `<video class="slot-video" src="${v.url}" controls playsinline preload="metadata"></video>`;
-    else if (v.status === 'gen') html += `<div class="slot-img-ph"><div class="spinner" style="width:40px;height:40px;border-width:3px;margin-bottom:.8rem;"></div><div style="color:var(--amber);font-weight:700;">Génération…</div></div>`;
-    else html += `<div class="slot-img-ph">Vidéo ${i+1} — à générer</div>`;
+if(v.url)html+=`<video class="slot-video" src="${v.url}" controls playsinline preload="metadata"></video>`;
+else if(v.status==='gen')html+=`<div class="slot-img-ph"><div class="spinner" style="width:40px;height:40px;border-width:3px;margin-bottom:.8rem;"></div><div style="color:var(--amber);font-weight:700;">Génération…</div></div>`;
+else html+=`<div class="slot-img-ph">Vidéo ${i+1} — à générer</div>`;
 
-    html += `<label style="margin-top:.4rem">Effet broadcast</label>`;
-    html += `<select data-veffect="${i}" ${v.status === 'gen' ? 'disabled' : ''}>`;
-    EFFECTS.forEach(e => { html += `<option value="${e.id}" ${v.effect === e.id ? 'selected' : ''}>${e.icon} ${esc(e.name)}</option>`; });
-    html += `</select>`;
+html+=`<label style="margin-top:.4rem">Effet</label>`;
+html+=`<select data-veffect="${i}" ${v.status==='gen'?'disabled':''}>`;
+EFFECTS.forEach(e=>{html+=`<option value="${e.id}" ${v.effect===e.id?'selected':''}>${e.icon} ${esc(e.name)}</option>`;});
+html+=`</select>`;
 
-    html += `<div class="vopts">`;
-    html += `<select data-vduration="${i}" ${v.status === 'gen' ? 'disabled' : ''}>`;
-    html += `<option value="121" ${v.duration===121?'selected':''}>5 sec</option>`;
-    html += `<option value="169" ${v.duration===169?'selected':''}>7 sec</option>`;
-    html += `<option value="241" ${v.duration===241?'selected':''}>10 sec</option>`;
-    html += `</select>`;
-    html += `<span class="hint" style="align-self:center;margin-top:.4rem">Durée</span>`;
-    html += `</div>`;
+html+=`<div class="vopts">`;
+html+=`<select data-vduration="${i}" ${v.status==='gen'?'disabled':''}>`;
+html+=`<option value="121" ${v.duration===121?'selected':''}>5 sec</option>`;
+html+=`<option value="169" ${v.duration===169?'selected':''}>7 sec</option>`;
+html+=`<option value="241" ${v.duration===241?'selected':''}>10 sec</option>`;
+html+=`</select>`;
+html+=`<span class="hint" style="align-self:center;margin-top:.4rem">Durée</span>`;
+html+=`</div>`;
 
-    if (v.status === 'gen') {
-      html += `<div class="slot-status" id="vp-${i}">${v.progressText || ''}</div>`;
-      html += `<div class="bar"><div class="bar-fill" id="vbar-${i}" style="width:${v.progress || 0}%"></div></div>`;
-    } else if (v.url) {
-      html += `<div class="btn-row">`;
-      html += `<button class="btn small ghost" data-vdl="${i}" style="flex:1">💾 TÉLÉCHARGER</button>`;
-      html += `<button class="btn small err" data-vregen="${i}" style="flex:1">↻ RÉGÉNÉRER</button>`;
-      html += `</div>`;
-    } else {
-      html += `<button class="btn small warn" data-vgen="${i}" style="width:100%" ${state.isBusy || !state.apiKey ? 'disabled' : ''}>🎬 GÉNÉRER VIDÉO ${i+1}</button>`;
-    }
+// Override prompt
+html+=`<label style="margin-top:.4rem">✏️ Prompt override (optionnel)</label>`;
+html+=`<textarea data-voverride="${i}" placeholder="Laisse vide pour le prompt auto. Sinon écris ici un prompt personnalisé." style="min-height:70px;font-size:.72rem;font-family:ui-monospace,monospace">${esc(v.promptOverride||'')}</textarea>`;
 
-    el.innerHTML = html;
-    c.appendChild(el);
-  });
+if(v.status==='gen'){
+html+=`<div class="slot-status" id="vp-${i}">${v.progressText||''}</div>`;
+html+=`<div class="bar"><div class="bar-fill" id="vbar-${i}" style="width:${v.progress||0}%"></div></div>`;
+}else if(v.url){
+html+=`<div class="btn-row">`;
+html+=`<button class="btn small ghost" data-vdl="${i}" style="flex:1">💾</button>`;
+html+=`<button class="btn small err" data-vregen="${i}" style="flex:1">↻ RÉGÉNÉRER</button>`;
+html+=`</div>`;
+}else{
+html+=`<button class="btn small warn" data-vgen="${i}" style="width:100%" ${state.isBusy||!state.apiKey?'disabled':''}>🎬 GÉNÉRER VIDÉO ${i+1}</button>`;
+}
 
-  c.querySelectorAll('[data-vgen]').forEach(b => b.addEventListener('click', () => generateVideo(+b.dataset.vgen, false)));
-  c.querySelectorAll('[data-vregen]').forEach(b => b.addEventListener('click', () => {
-    const i = +b.dataset.vregen;
-    state.videos[i].url = null; state.videos[i].status = 'idle'; state.videos[i].videoId = null; state.videos[i].progress = 0;
-    renderVideos(); saveState();
-    generateVideo(i, false);
-  }));
-  c.querySelectorAll('[data-vdl]').forEach(b => b.addEventListener('click', () => {
-    const v = state.videos[+b.dataset.vdl];
-    if (v.url) downloadFile(v.url, 'news_' + state.concept.id + '_video' + (+b.dataset.vdl + 1) + '.mp4');
-  }));
-  c.querySelectorAll('[data-veffect]').forEach(s => s.addEventListener('change', () => {
-    state.videos[+s.dataset.veffect].effect = s.value;
-    saveState();
-  }));
-  c.querySelectorAll('[data-vduration]').forEach(s => s.addEventListener('change', () => {
-    state.videos[+s.dataset.vduration].duration = parseInt(s.value);
-    saveState();
-  }));
+el.innerHTML=html;
+c.appendChild(el);
+});
+
+c.querySelectorAll('[data-vgen]').forEach(b=>b.addEventListener('click',()=>generateVideo(+b.dataset.vgen,false)));
+c.querySelectorAll('[data-vregen]').forEach(b=>b.addEventListener('click',()=>{
+const i=+b.dataset.vregen;
+state.videos[i].url=null;state.videos[i].status='idle';state.videos[i].videoId=null;state.videos[i].progress=0;
+renderVideos();saveState();
+generateVideo(i,false);
+}));
+c.querySelectorAll('[data-vdl]').forEach(b=>b.addEventListener('click',()=>{
+const v=state.videos[+b.dataset.vdl];
+if(v.url)downloadFile(v.url,'news_'+state.concept.id+'_video'+(+b.dataset.vdl+1)+'.mp4');
+}));
+c.querySelectorAll('[data-veffect]').forEach(s=>s.addEventListener('change',()=>{
+state.videos[+s.dataset.veffect].effect=s.value;saveState();
+}));
+c.querySelectorAll('[data-vduration]').forEach(s=>s.addEventListener('change',()=>{
+state.videos[+s.dataset.vduration].duration=parseInt(s.value);saveState();
+}));
+c.querySelectorAll('[data-voverride]').forEach(ta=>ta.addEventListener('input',()=>{
+state.videos[+ta.dataset.voverride].promptOverride=ta.value;scheduleAutosave();
+}));
 }
 
 // ═══════════════════════════════════════════════════════════════
 // IMAGE GEN
 // ═══════════════════════════════════════════════════════════════
-async function generateSlot(i) {
-  if (state.isBusy) return;
-  if (!state.apiKey) { toast('Ajoute ta clé API', 'err'); return; }
-  state.isBusy = true;
-  const slot = state.slots[i];
-  slot.status = 'gen'; slot.img = null; slot.imgBase64 = null;
-  renderSlots();
-  const prompt = buildPrompt(slot);
-  slot.prompt = prompt;
-  log('▶ Image ' + (i+1) + ' — IA', 'i');
-  setStatus('Génération image ' + (i+1) + '…');
-  try {
-    const url = await callImageAPI(prompt);
-    slot.img = url; slot.imgBase64 = null; slot.source = 'ai'; slot.status = 'done';
-    log('✅ Image ' + (i+1) + ' OK', 'o');
-    toast('Plan ' + (i+1) + ' prêt', 'ok');
-  } catch (e) {
-    slot.status = 'idle';
-    log('❌ Image ' + (i+1) + ' : ' + e.message, 'e');
-    toast('Erreur', 'err');
-  }
-  state.isBusy = false; setStatus(null);
-  renderSlots(); renderVideos(); saveState();
+async function generateSlot(i){
+if(state.isBusy)return;
+if(!state.apiKey){toast('Ajoute ta clé API','err');return;}
+state.isBusy=true;
+const slot=state.slots[i];
+slot.status='gen';slot.img=null;slot.imgBase64=null;
+renderSlots();
+const prompt=buildPrompt(slot);
+slot.prompt=prompt;
+log('▶ Image '+(i+1)+' — IA','i');
+setStatus('Génération image '+(i+1)+'…');
+try{
+const url=await callImageAPI(prompt);
+slot.img=url;slot.imgBase64=null;slot.source='ai';slot.status='done';
+log('✅ Image '+(i+1)+' OK','o');
+toast('Plan '+(i+1)+' prêt','ok');
+}catch(e){
+slot.status='idle';
+log('❌ Image '+(i+1)+' : '+e.message,'e');
+toast('Erreur','err');
+}
+state.isBusy=false;setStatus(null);
+renderSlots();renderVideos();saveState();
 }
 
-async function regenerateSlot(i) {
-  state.slots[i].status = 'idle';
-  state.slots[i].img = null; state.slots[i].imgBase64 = null; state.slots[i].source = null;
-  state.videos[i] = { idx:i, url:null, status:'idle', videoId:null, progress:0, elapsed:0, effect:state.videos[i].effect, duration:state.videos[i].duration, progressText:'' };
-  renderSlots(); renderVideos(); saveState();
-  await generateSlot(i);
+async function regenerateSlot(i){
+state.slots[i].status='idle';
+state.slots[i].img=null;state.slots[i].imgBase64=null;state.slots[i].source=null;
+state.videos[i]={idx:i,url:null,status:'idle',videoId:null,progress:0,elapsed:0,effect:state.videos[i].effect,duration:state.videos[i].duration,progressText:'',promptOverride:state.videos[i].promptOverride};
+renderSlots();renderVideos();saveState();
+await generateSlot(i);
 }
 
-function validateSlot(i) {
-  if (i < 2) {
-    state.slots[i+1].status = 'idle';
-    renderSlots(); renderVideos(); saveState();
-    toast('Plan ' + (i+2) + ' débloqué', 'ok', 1500);
-    const slots = document.querySelectorAll('.slot');
-    if (slots[i+1]) slots[i+1].scrollIntoView({ behavior:'smooth', block:'center' });
-  } else {
-    toast('Images complètes ✓ Passe aux vidéos', 'ok', 3000);
-    const pv = $('p-video');
-    if (pv) { pv.classList.add('open'); pv.scrollIntoView({ behavior:'smooth' }); }
-    renderVideos();
-  }
+function validateSlot(i){
+if(i<2){
+state.slots[i+1].status='idle';
+renderSlots();renderVideos();saveState();
+toast('Plan '+(i+2)+' débloqué','ok',1500);
+const slots=document.querySelectorAll('.slot');
+if(slots[i+1])slots[i+1].scrollIntoView({behavior:'smooth',block:'center'});
+}else{
+toast('Images complètes ✓ Passe aux vidéos','ok',3000);
+const pv=$('p-video');
+if(pv){pv.classList.add('open');pv.scrollIntoView({behavior:'smooth'});}
+renderVideos();
+}
 }
 
 // ═══════════════════════════════════════════════════════════════
 // VIDEO GEN
 // ═══════════════════════════════════════════════════════════════
-async function generateVideo(i, silent = false) {
-  if (state.isBusy && !silent) return;
-  if (!state.apiKey) { toast('Ajoute ta clé API', 'err'); return; }
+async function generateVideo(i,silent=false){
+if(state.isBusy&&!silent)return;
+if(!state.apiKey){toast('Ajoute ta clé API','err');return;}
 
-  const startSlot = state.slots[i];
-  const endSlot = state.slots[i+1] || startSlot;
+const startSlot=state.slots[i];
+const endSlot=state.slots[i+1]||startSlot;
 
-  const startRef = startSlot.source === 'upload' ? startSlot.imgBase64 : startSlot.img;
-  const endRef = endSlot.source === 'upload' ? endSlot.imgBase64 : endSlot.img;
+const startRef=startSlot.source==='upload'?startSlot.imgBase64:startSlot.img;
+const endRef=endSlot.source==='upload'?endSlot.imgBase64:endSlot.img;
 
-  if (!startRef) { toast('Image plan ' + (i+1) + ' manquante', 'err'); return; }
+if(!startRef){toast('Image plan '+(i+1)+' manquante','err');return;}
 
-  const v = state.videos[i];
-  v.status = 'gen'; v.url = null; v.progress = 0; v.elapsed = 0;
-  v.progressText = 'Création de la tâche…';
-  renderVideos();
+const v=state.videos[i];
+v.status='gen';v.url=null;v.progress=0;v.elapsed=0;
+v.progressText='Création de la tâche…';
+renderVideos();
 
-  const prompt = buildVideoPrompt(i);
-  log('▶ Vidéo ' + (i+1) + ' — ' + (v.duration/24).toFixed(1) + 's · ' + v.effect, 'i');
-  if (!silent) setStatus('Création vidéo ' + (i+1) + '…');
+const prompt=buildVideoPrompt(i);
+log('▶ Vidéo '+(i+1)+' — '+(v.duration/24).toFixed(1)+'s · '+v.effect,'i');
+if(v.promptOverride&&v.promptOverride.trim().length>10)log('  ✏️ Prompt override actif','i');
+if(!silent)setStatus('Création vidéo '+(i+1)+'…');
 
-  try {
-    const videoId = await createVideoTask(startRef, endRef, prompt, v.duration);
-    v.videoId = videoId;
-    log('  Task : ' + videoId, 'i');
-    saveState();
+try{
+const videoId=await createVideoTask(startRef,endRef,prompt,v.duration);
+v.videoId=videoId;
+log('  Task : '+videoId,'i');
+saveState();
 
-    const finalUrl = await pollVideo(videoId, (label, p, e) => {
-      v.progress = p; v.elapsed = e;
-      v.progressText = label + ' ' + p + '% · ' + e + 's';
-      const el = $('vp-' + i); if (el) el.textContent = v.progressText;
-      const bar = $('vbar-' + i); if (bar) bar.style.width = p + '%';
-      if (!silent) setStatus('Vidéo ' + (i+1) + ' — ' + p + '%');
-    });
+const finalUrl=await pollVideo(videoId,(label,p,e)=>{
+v.progress=p;v.elapsed=e;
+v.progressText=label+' '+p+'% · '+e+'s';
+const el=$('vp-'+i);if(el)el.textContent=v.progressText;
+const bar=$('vbar-'+i);if(bar)bar.style.width=p+'%';
+if(!silent)setStatus('Vidéo '+(i+1)+' — '+p+'%');
+});
 
-    v.url = finalUrl; v.status = 'done'; v.progress = 100;
-    log('✅ Vidéo ' + (i+1) + ' OK', 'o');
-    if (!silent) toast('Vidéo ' + (i+1) + ' prête ✓', 'ok', 3000);
-    return true;
-  } catch (e) {
-    v.status = 'idle'; v.url = null;
-    log('❌ Vidéo ' + (i+1) + ' : ' + e.message, 'e');
-    if (!silent) toast('Erreur vidéo', 'err');
-    return false;
-  } finally {
-    renderVideos(); saveState();
-    if (!silent) setStatus(null);
-  }
+v.url=finalUrl;v.status='done';v.progress=100;
+log('✅ Vidéo '+(i+1)+' OK','o');
+if(!silent)toast('Vidéo '+(i+1)+' prête ✓','ok',3000);
+return true;
+}catch(e){
+v.status='idle';v.url=null;
+log('❌ Vidéo '+(i+1)+' : '+e.message,'e');
+if(!silent)toast('Erreur vidéo','err');
+return false;
+}finally{
+renderVideos();saveState();
+if(!silent)setStatus(null);
+}
 }
 
-async function batchVideos() {
-  if (state.isBusy) { toast('Déjà en cours', 'warn'); return; }
-  if (!state.apiKey) { toast('Ajoute ta clé API', 'err'); return; }
-  if (!state.slots.every(s => s.status === 'done')) { toast('Génère les 3 images d\'abord', 'err'); return; }
-  if (!confirm('Générer les 3 vidéos ? (~15-20 minutes)')) return;
-  state.isBusy = true;
-  log('⚡ Batch : 3 vidéos', 'o');
-  for (let i = 0; i < 3; i++) {
-    if (state.videos[i].url && state.videos[i].url.startsWith('http')) { log('Vidéo ' + (i+1) + ' déjà prête', 'i'); continue; }
-    setStatus('Batch : vidéo ' + (i+1) + ' / 3');
-    await generateVideo(i, true);
-    if (i < 2) { log('Pause 60s…', 'i'); await sleep(62000); }
-  }
-  state.isBusy = false; setStatus(null);
-  log('⚡ Batch terminé', 'o');
-  toast('Batch terminé', 'ok', 4000);
+async function batchVideos(){
+if(state.isBusy){toast('Déjà en cours','warn');return;}
+if(!state.apiKey){toast('Ajoute ta clé API','err');return;}
+if(!state.slots.every(s=>s.status==='done')){toast('Génère les 3 images d\'abord','err');return;}
+if(!confirm('Générer les 3 vidéos ? (~15-20 minutes)'))return;
+state.isBusy=true;
+log('⚡ Batch : 3 vidéos','o');
+for(let i=0;i<3;i++){
+if(state.videos[i].url&&state.videos[i].url.startsWith('http')){log('Vidéo '+(i+1)+' déjà prête','i');continue;}
+setStatus('Batch : vidéo '+(i+1)+' / 3');
+await generateVideo(i,true);
+if(i<2){log('Pause 60s…','i');await sleep(62000);}
+}
+state.isBusy=false;setStatus(null);
+log('⚡ Batch terminé','o');
+toast('Batch terminé','ok',4000);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // TTS
 // ═══════════════════════════════════════════════════════════════
-function loadVoices() {
-  if (!('speechSynthesis' in window)) { $('tts-voice').innerHTML = '<option>Aucune voix</option>'; return; }
-  const voices = speechSynthesis.getVoices();
-  const sel = $('tts-voice'); sel.innerHTML = '';
-  const fr = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('fr'));
-  if (fr.length === 0) sel.innerHTML = '<option value="">Voix par défaut</option>';
-  else fr.forEach(v => { const o = document.createElement('option'); o.value = v.name; o.textContent = '🇫🇷 ' + v.name; sel.appendChild(o); });
+function loadVoices(){
+if(!('speechSynthesis' in window)){$('tts-voice').innerHTML='<option>Aucune voix</option>';return;}
+const voices=speechSynthesis.getVoices();
+const sel=$('tts-voice');sel.innerHTML='';
+const fr=voices.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('fr'));
+if(fr.length===0)sel.innerHTML='<option value="">Voix par défaut</option>';
+else fr.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent='🇫🇷 '+v.name;sel.appendChild(o);});
 }
-function speakText(text) {
-  return new Promise(resolve => {
-    if (!('speechSynthesis' in window)) { resolve(); return; }
-    speechSynthesis.cancel();
-    setTimeout(() => {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'fr-FR';
-      u.rate = parseFloat($('tts-rate').value) || 0.85;
-      u.pitch = parseFloat($('tts-pitch').value) || 0.8;
-      u.volume = 1;
-      const name = $('tts-voice').value;
-      if (name) { const v = speechSynthesis.getVoices().find(x => x.name === name); if (v) { u.voice = v; u.lang = v.lang; } }
-      u.onend = resolve; u.onerror = resolve;
-      speechSynthesis.speak(u);
-    }, 150);
-  });
+function speakText(text){
+return new Promise(resolve=>{
+if(!('speechSynthesis' in window)){resolve();return;}
+speechSynthesis.cancel();
+setTimeout(()=>{
+const u=new SpeechSynthesisUtterance(text);
+u.lang='fr-FR';
+u.rate=parseFloat($('tts-rate').value)||0.85;
+u.pitch=parseFloat($('tts-pitch').value)||0.8;
+u.volume=1;
+const name=$('tts-voice').value;
+if(name){const v=speechSynthesis.getVoices().find(x=>x.name===name);if(v){u.voice=v;u.lang=v.lang;}}
+u.onend=resolve;u.onerror=resolve;
+speechSynthesis.speak(u);
+},150);
+});
 }
-function stopSpeech() { if ('speechSynthesis' in window) speechSynthesis.cancel(); }
-function ttsPlay() {
-  const txt = $('vo-text').value.trim();
-  if (!txt) { toast('Écris un script', 'err'); return; }
-  $('tts-status').textContent = 'Lecture…';
-  speakText(txt).then(() => { $('tts-status').textContent = ''; });
+function stopSpeech(){if('speechSynthesis' in window)speechSynthesis.cancel();}
+function ttsPlay(){
+const txt=$('vo-text').value.trim();
+if(!txt){toast('Écris un script','err');return;}
+$('tts-status').textContent='Lecture…';
+speakText(txt).then(()=>{$('tts-status').textContent='';});
 }
-function ttsStop() {
-  stopSpeech();
-  $('tts-status').textContent = 'Arrêté';
-  setTimeout(() => $('tts-status').textContent = '', 1500);
-}
+function ttsStop(){stopSpeech();$('tts-status').textContent='Arrêté';setTimeout(()=>$('tts-status').textContent='',1500);}
 
 // ═══════════════════════════════════════════════════════════════
 // DRONE
 // ═══════════════════════════════════════════════════════════════
-let droneNodes = null;
-function startDrone() {
-  stopDrone();
-  try {
-    const ctx = state.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    state.audioCtx = ctx;
-    if (ctx.state === 'suspended') ctx.resume();
-    const style = $('mus-style').value;
-    const vol = parseFloat($('mus-vol').value) || 0.1;
-    const master = ctx.createGain(); master.gain.value = vol; master.connect(ctx.destination);
-    const filter = ctx.createBiquadFilter(); filter.type = 'lowpass';
-    filter.frequency.value = style === 'industrial' ? 900 : style === 'breaking' ? 700 : 500;
-    filter.Q.value = 2; filter.connect(master);
-    const freqs = style === 'tense' ? [55,82.5,110] : style === 'ambient' ? [73.4,146.8] : [55,65.4,82.5,98];
-    const oscs = [];
-    freqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      osc.type = i === 0 ? 'sawtooth' : 'sine';
-      osc.frequency.value = f;
-      const g = ctx.createGain(); g.gain.value = 0.3/freqs.length;
-      osc.connect(g); g.connect(filter); osc.start(); oscs.push(osc);
-    });
-    const pulseFreq = style === 'breaking' ? 1.2 : style === 'tense' ? 2.5 : 0.15;
-    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = pulseFreq;
-    const lfoGain = ctx.createGain(); lfoGain.gain.value = style === 'breaking' ? 12 : 30;
-    lfo.connect(lfoGain); lfoGain.connect(filter.frequency); lfo.start(); oscs.push(lfo);
-    droneNodes = { ctx, master, filter, oscs };
-    $('mus-status').textContent = '▶ Drone · ' + style;
-  } catch (e) { log('Erreur drone : ' + e.message, 'e'); }
+let droneNodes=null;
+function startDrone(){
+stopDrone();
+try{
+const ctx=state.audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+state.audioCtx=ctx;
+if(ctx.state==='suspended')ctx.resume();
+const style=$('mus-style').value;
+const vol=parseFloat($('mus-vol').value)||0.1;
+const master=ctx.createGain();master.gain.value=vol;master.connect(ctx.destination);
+const filter=ctx.createBiquadFilter();filter.type='lowpass';
+filter.frequency.value=style==='industrial'?900:style==='breaking'?700:500;
+filter.Q.value=2;filter.connect(master);
+const freqs=style==='tense'?[55,82.5,110]:style==='ambient'?[73.4,146.8]:[55,65.4,82.5,98];
+const oscs=[];
+freqs.forEach((f,i)=>{
+const osc=ctx.createOscillator();osc.type=i===0?'sawtooth':'sine';osc.frequency.value=f;
+const g=ctx.createGain();g.gain.value=0.3/freqs.length;
+osc.connect(g);g.connect(filter);osc.start();oscs.push(osc);
+});
+const pulseFreq=style==='breaking'?1.2:style==='tense'?2.5:0.15;
+const lfo=ctx.createOscillator();lfo.type='sine';lfo.frequency.value=pulseFreq;
+const lfoGain=ctx.createGain();lfoGain.gain.value=style==='breaking'?12:30;
+lfo.connect(lfoGain);lfoGain.connect(filter.frequency);lfo.start();oscs.push(lfo);
+droneNodes={ctx,master,filter,oscs};
+$('mus-status').textContent='▶ Drone · '+style;
+}catch(e){log('Erreur drone : '+e.message,'e');}
 }
-function stopDrone() {
-  if (!droneNodes) return;
-  try { droneNodes.oscs.forEach(o => { try { o.stop(); } catch (e) {} }); droneNodes.master.disconnect(); droneNodes = null; $('mus-status').textContent = '⏹ Arrêté'; } catch (e) {}
+function stopDrone(){
+if(!droneNodes)return;
+try{droneNodes.oscs.forEach(o=>{try{o.stop();}catch(e){}});droneNodes.master.disconnect();droneNodes=null;$('mus-status').textContent='⏹ Arrêté';}catch(e){}
 }
-async function recordDrone() {
-  startDrone();
-  if (!droneNodes) return;
-  try {
-    const dest = droneNodes.ctx.createMediaStreamDestination();
-    droneNodes.master.connect(dest);
-    const mr = new MediaRecorder(dest.stream);
-    const chunks = [];
-    mr.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-    mr.onstop = () => {
-      const blob = new Blob(chunks, { type:'audio/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'news_drone_' + Date.now() + '.webm';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 3000);
-      $('mus-status').textContent = '✓ Drone exporté';
-    };
-    mr.start();
-    $('mus-status').textContent = '● Enregistrement 30 secondes…';
-    setTimeout(() => { mr.stop(); stopDrone(); }, 30000);
-  } catch (e) { log('Erreur enreg : ' + e.message, 'e'); }
+async function recordDrone(){
+startDrone();if(!droneNodes)return;
+try{
+const dest=droneNodes.ctx.createMediaStreamDestination();
+droneNodes.master.connect(dest);
+const mr=new MediaRecorder(dest.stream);const chunks=[];
+mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+mr.onstop=()=>{
+const blob=new Blob(chunks,{type:'audio/webm'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='news_drone_'+Date.now()+'.webm';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+setTimeout(()=>URL.revokeObjectURL(url),3000);
+$('mus-status').textContent='✓ Drone exporté';
+};
+mr.start();
+$('mus-status').textContent='● Enregistrement 30 secondes…';
+setTimeout(()=>{mr.stop();stopDrone();},30000);
+}catch(e){log('Erreur enreg : '+e.message,'e');}
 }
 
 // ═══════════════════════════════════════════════════════════════
 // PREVIEW
 // ═══════════════════════════════════════════════════════════════
-let prevIndex = 0, prevPlaying = false;
-function playPreview() {
-  const ready = state.videos.filter(v => v.url);
-  if (!ready.length) { toast('Aucune vidéo', 'err'); return; }
-  prevPlaying = true; prevIndex = 0;
-  playNextPreview(); startDrone();
+let prevIndex=0,prevPlaying=false;
+function playPreview(){
+const ready=state.videos.filter(v=>v.url);
+if(!ready.length){toast('Aucune vidéo','err');return;}
+prevPlaying=true;prevIndex=0;
+playNextPreview();startDrone();
 }
-function playNextPreview() {
-  if (!prevPlaying) return;
-  const ready = state.videos.filter(v => v.url);
-  if (prevIndex >= ready.length) { stopPreview(); return; }
-  const v = ready[prevIndex];
-  const vid = $('prev-video');
-  vid.src = v.url; vid.play().catch(() => {});
-  $('prev-info').textContent = 'Plan ' + (v.idx + 1) + ' / 3';
-  vid.onended = () => { if (prevPlaying) { prevIndex++; setTimeout(playNextPreview, 300); } };
+function playNextPreview(){
+if(!prevPlaying)return;
+const ready=state.videos.filter(v=>v.url);
+if(prevIndex>=ready.length){stopPreview();return;}
+const v=ready[prevIndex];
+const vid=$('prev-video');
+vid.src=v.url;vid.play().catch(()=>{});
+$('prev-info').textContent='Plan '+(v.idx+1)+' / 3';
+vid.onended=()=>{if(prevPlaying){prevIndex++;setTimeout(playNextPreview,300);}};
 }
-function stopPreview() {
-  prevPlaying = false;
-  $('prev-video').pause(); $('prev-video').currentTime = 0;
-  stopDrone();
-  $('prev-info').textContent = 'Arrêté';
+function stopPreview(){
+prevPlaying=false;
+$('prev-video').pause();$('prev-video').currentTime=0;
+stopDrone();
+$('prev-info').textContent='Arrêté';
 }
 
 // ═══════════════════════════════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════════════════════════════
-async function downloadFile(url, filename) {
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const obj = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = obj; a.download = filename;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(obj), 3000);
-    return blob;
-  } catch (e) { window.open(url, '_blank'); return null; }
+async function downloadFile(url,filename){
+try{
+const res=await fetch(url);
+const blob=await res.blob();
+const obj=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=obj;a.download=filename;
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+setTimeout(()=>URL.revokeObjectURL(obj),3000);
+return blob;
+}catch(e){window.open(url,'_blank');return null;}
 }
-async function downloadAllImages() {
-  const ready = state.slots.filter(s => s.img);
-  if (!ready.length) { toast('Aucune image', 'err'); return; }
-  for (let i = 0; i < ready.length; i++) {
-    const s = ready[i];
-    if (s.source === 'upload' && s.imgBase64) {
-      const a = document.createElement('a');
-      a.href = s.imgBase64; a.download = `news_${state.concept.id}_plan${s.idx+1}_upload.png`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    } else {
-      await downloadFile(s.img, `news_${state.concept.id}_plan${s.idx+1}.png`);
-    }
-    await sleep(400);
-  }
-  toast('Images téléchargées', 'ok');
+async function downloadAllImages(){
+const ready=state.slots.filter(s=>s.img);
+if(!ready.length){toast('Aucune image','err');return;}
+for(let i=0;i<ready.length;i++){
+const s=ready[i];
+if(s.source==='upload'&&s.imgBase64){
+const a=document.createElement('a');
+a.href=s.imgBase64;a.download=`news_${state.concept.id}_plan${s.idx+1}_upload.png`;
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+}else{
+await downloadFile(s.img,`news_${state.concept.id}_plan${s.idx+1}.png`);
 }
-async function downloadAllVideos() {
-  const ready = state.videos.filter(v => v.url);
-  if (!ready.length) { toast('Aucune vidéo', 'err'); return; }
-  for (const v of ready) {
-    await downloadFile(v.url, `news_${state.concept.id}_video${v.idx+1}.mp4`);
-    await sleep(600);
-  }
-  toast('Vidéos téléchargées', 'ok');
+await sleep(400);
 }
-function generateSRT() {
-  let srt = '', t = 0;
-  const durations = state.videos.map(v => (v.duration || 169) / 24);
-  state.slots.forEach((s, i) => {
-    const start = t, dur = durations[i] || 7, end = t + dur;
-    srt += (i + 1) + '\n' + formatSRTTime(start) + ' --> ' + formatSRTTime(end) + '\n';
-    const c = state.concept;
-    let line = i === 0 ? c.voice.slice(0,100) : i === 1 ? c.voice.slice(100,200) : c.punch;
-    srt += line + '\n\n';
-    t = end;
-  });
-  return srt;
+toast('Images téléchargées','ok');
 }
-function formatSRTTime(s) {
-  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.floor(s%60), ms = Math.floor((s%1)*1000);
-  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')+','+String(ms).padStart(3,'0');
+async function downloadAllVideos(){
+const ready=state.videos.filter(v=>v.url);
+if(!ready.length){toast('Aucune vidéo','err');return;}
+for(const v of ready){
+await downloadFile(v.url,`news_${state.concept.id}_video${v.idx+1}.mp4`);
+await sleep(600);
 }
-function downloadSRT() {
-  const srt = generateSRT();
-  const blob = new Blob([srt], { type:'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'news_' + state.concept.id + '_sous-titres.srt';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('Sous-titres téléchargés', 'ok');
+toast('Vidéos téléchargées','ok');
 }
-function downloadScript() {
-  const c = state.concept;
-  let txt = '═══════════════════════════════════════════\n';
-  txt += 'NEWS//STUDIO — ' + c.name + '\n';
-  txt += '═══════════════════════════════════════════\n\n';
-  txt += 'DÉPÊCHE : ' + c.desc + '\n\n';
-  txt += '── VOIX-OFF ──\n' + $('vo-text').value + '\n\n';
-  txt += '── TITRE CHOC ──\n' + $('vo-punch').value + '\n\n';
-  txt += '── PLANS ──\n';
-  state.slots.forEach((s, i) => { txt += (i+1) + '. ' + s.title + ' — ' + s.desc + ' [' + (s.source || 'none') + ']\n'; });
-  txt += '\n── EFFETS VIDÉO ──\n';
-  state.videos.forEach(v => {
-    const e = EFFECTS.find(x => x.id === v.effect);
-    txt += 'Vidéo ' + (v.idx+1) + ' : ' + (e ? e.name : '') + ' · ' + (v.duration/24).toFixed(1) + 's\n';
-  });
-  const blob = new Blob([txt], { type:'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'news_' + c.id + '_script.txt';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('Script téléchargé', 'ok');
+function generateSRT(){
+let srt='',t=0;
+const durations=state.videos.map(v=>(v.duration||169)/24);
+state.slots.forEach((s,i)=>{
+const start=t,dur=durations[i]||7,end=t+dur;
+srt+=(i+1)+'\n'+formatSRTTime(start)+' --> '+formatSRTTime(end)+'\n';
+const c=state.concept;
+let line=i===0?c.voice.slice(0,100):i===1?c.voice.slice(100,200):c.punch;
+srt+=line+'\n\n';
+t=end;
+});
+return srt;
 }
-async function downloadZip() {
-  if (typeof JSZip === 'undefined') { toast('JSZip non chargé', 'err'); return; }
-  const zip = new JSZip();
-  const folder = zip.folder('news_' + state.concept.id);
-  toast('Construction du ZIP…', 'ok', 3000);
+function formatSRTTime(s){
+const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60),ms=Math.floor((s%1)*1000);
+return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')+','+String(ms).padStart(3,'0');
+}
+function downloadSRT(){
+const srt=generateSRT();
+const blob=new Blob([srt],{type:'text/plain;charset=utf-8'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='news_'+state.concept.id+'_sous-titres.srt';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+URL.revokeObjectURL(url);
+toast('Sous-titres téléchargés','ok');
+}
+function downloadScript(){
+const c=state.concept;
+let txt='═══════════════════════════════════════════\n';
+txt+='NEWS//STUDIO v2.2 — '+c.name+'\n';
+txt+='═══════════════════════════════════════════\n\n';
+txt+='DÉPÊCHE : '+c.desc+'\n\n';
+txt+='── VOIX-OFF ──\n'+$('vo-text').value+'\n\n';
+txt+='── TITRE CHOC ──\n'+$('vo-punch').value+'\n\n';
+txt+='── PERSONNAGE ──\n'+buildIdentityBlock()+'\n\n';
+txt+='── PLANS ──\n';
+state.slots.forEach((s,i)=>{txt+=(i+1)+'. '+s.title+' ['+(s.source||'none')+']\n';});
+txt+='\n── EFFETS VIDÉO ──\n';
+state.videos.forEach(v=>{
+const e=EFFECTS.find(x=>x.id===v.effect);
+txt+='Vidéo '+(v.idx+1)+' : '+(e?e.name:'')+' · '+(v.duration/24).toFixed(1)+'s';
+if(v.promptOverride&&v.promptOverride.trim().length>10)txt+=' [PROMPT OVERRIDE]';
+txt+='\n';
+});
+const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='news_'+c.id+'_script.txt';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+URL.revokeObjectURL(url);
+toast('Script téléchargé','ok');
+}
+async function downloadZip(){
+if(typeof JSZip==='undefined'){toast('JSZip non chargé','err');return;}
+const zip=new JSZip();
+const folder=zip.folder('news_'+state.concept.id);
+toast('Construction du ZIP…','ok',3000);
 
-  for (const s of state.slots) {
-    if (!s.img) continue;
-    try {
-      if (s.source === 'upload' && s.imgBase64) {
-        const res = await fetch(s.imgBase64);
-        const b = await res.blob();
-        folder.file('plan' + (s.idx+1) + '_upload.png', b);
-      } else if (s.img.startsWith('http')) {
-        const res = await fetch(s.img);
-        const b = await res.blob();
-        folder.file('plan' + (s.idx+1) + '.png', b);
-      }
-    } catch (e) {}
-  }
-  for (const v of state.videos) {
-    if (v.url) { try { const res = await fetch(v.url); const b = await res.blob(); folder.file('video' + (v.idx+1) + '.mp4', b); } catch (e) {} }
-  }
-  const c = state.concept;
-  let txt = 'NEWS//STUDIO v2.1 — ' + c.name + '\n\nVOIX-OFF :\n' + $('vo-text').value + '\n\nTITRE CHOC :\n' + $('vo-punch').value + '\n';
-  folder.file('script.txt', txt);
-  folder.file('sous-titres.srt', generateSRT());
-  folder.file('README.txt', 'News//Studio v2.1\nDépêche : ' + c.name + '\nPersonnage : Yasmine Benali (nord-africaine)\nVille : nord-africaine méditerranéenne\nPalette : cyan institutionnel + amber warning\nGénéré : ' + new Date().toLocaleString('fr-FR') + '\n');
-  const blob = await zip.generateAsync({ type:'blob' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'news_' + c.id + '_' + Date.now() + '.zip';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('ZIP téléchargé ✓', 'ok', 4000);
+for(const s of state.slots){
+if(!s.img)continue;
+try{
+if(s.source==='upload'&&s.imgBase64){
+const res=await fetch(s.imgBase64);const b=await res.blob();
+folder.file('plan'+(s.idx+1)+'_upload.png',b);
+}else if(s.img.startsWith('http')){
+const res=await fetch(s.img);const b=await res.blob();
+folder.file('plan'+(s.idx+1)+'.png',b);
 }
-async function copyPunch() {
-  try { await navigator.clipboard.writeText($('vo-punch').value); toast('Titre copié', 'ok'); }
-  catch (e) { toast('Erreur', 'err'); }
+}catch(e){}
 }
-function resetAll() {
-  if (!confirm('Effacer tout ?')) return;
-  state.slots.forEach(s => { s.img = null; s.imgBase64 = null; s.source = null; s.status = 'idle'; s.prompt = ''; });
-  state.videos.forEach((v, i) => { v.url = null; v.status = 'idle'; v.videoId = null; v.progress = 0; v.effect = EFFECTS[i === 0 ? 1 : i === 1 ? 0 : 4].id; v.duration = 169; });
-  clearState();
-  renderSlots(); renderVideos();
-  toast('Réinitialisé', 'ok');
+for(const v of state.videos){
+if(v.url){try{const res=await fetch(v.url);const b=await res.blob();folder.file('video'+(v.idx+1)+'.mp4',b);}catch(e){}}
+}
+const c=state.concept;
+let txt='NEWS//STUDIO v2.2 — '+c.name+'\n\nPERSONNAGE :\n'+buildIdentityBlock()+'\n\nVOIX-OFF :\n'+$('vo-text').value+'\n\nTITRE :\n'+$('vo-punch').value+'\n';
+folder.file('script.txt',txt);
+folder.file('sous-titres.srt',generateSRT());
+folder.file('personnage.json',JSON.stringify(collectCharData(),null,2));
+const blob=await zip.generateAsync({type:'blob'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='news_'+c.id+'_'+Date.now()+'.zip';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+URL.revokeObjectURL(url);
+toast('ZIP téléchargé ✓','ok',4000);
+}
+async function copyPunch(){
+try{await navigator.clipboard.writeText($('vo-punch').value);toast('Titre copié','ok');}
+catch(e){toast('Erreur','err');}
+}
+function resetAll(){
+if(!confirm('Effacer tout ?'))return;
+state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';});
+state.videos.forEach((v,i)=>{v.url=null;v.status='idle';v.videoId=null;v.progress=0;v.promptOverride='';v.effect=EFFECTS[i===0?1:i===1?0:4].id;v.duration=169;});
+clearState();
+renderSlots();renderVideos();
+toast('Réinitialisé','ok');
 }
 
 // ═══════════════════════════════════════════════════════════════
 // ACCORDÉON
 // ═══════════════════════════════════════════════════════════════
-document.querySelectorAll('[data-t]').forEach(h => {
-  h.addEventListener('click', () => document.getElementById(h.dataset.t).classList.toggle('open'));
+document.querySelectorAll('[data-t]').forEach(h=>{
+h.addEventListener('click',()=>document.getElementById(h.dataset.t).classList.toggle('open'));
 });
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-function init() {
-  loadKey();
-  state.restored = loadState();
-  renderConcepts();
-  if (!state.restored) {
-    $('vo-text').value = state.concept.voice;
-    $('vo-punch').value = state.concept.punch;
-  }
-  renderSlots();
-  renderVideos();
+function init(){
+loadKey();
+state.restored=loadState();
+renderConcepts();
+if(!state.restored){
+$('vo-text').value=state.concept.voice;
+$('vo-punch').value=state.concept.punch;
+}
+renderSlots();renderVideos();renderCharLib();
 
-  $('api-save').addEventListener('click', saveKey);
-  $('batch-videos').addEventListener('click', batchVideos);
-  $('dl-all').addEventListener('click', downloadAllImages);
-  $('dl-videos').addEventListener('click', downloadAllVideos);
-  $('dl-zip').addEventListener('click', downloadZip);
-  $('dl-srt').addEventListener('click', downloadSRT);
-  $('dl-script').addEventListener('click', downloadScript);
-  $('copy-punch').addEventListener('click', copyPunch);
-  $('reset-all').addEventListener('click', resetAll);
+$('api-save').addEventListener('click',saveKey);
+$('batch-videos').addEventListener('click',batchVideos);
+$('dl-all').addEventListener('click',downloadAllImages);
+$('dl-videos').addEventListener('click',downloadAllVideos);
+$('dl-zip').addEventListener('click',downloadZip);
+$('dl-srt').addEventListener('click',downloadSRT);
+$('dl-script').addEventListener('click',downloadScript);
+$('copy-punch').addEventListener('click',copyPunch);
+$('reset-all').addEventListener('click',resetAll);
 
-  loadVoices();
-  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = loadVoices;
-  $('tts-play').addEventListener('click', ttsPlay);
-  $('tts-stop').addEventListener('click', ttsStop);
-  $('mus-play').addEventListener('click', startDrone);
-  $('mus-stop').addEventListener('click', stopDrone);
-  $('mus-record').addEventListener('click', recordDrone);
-  $('prev-play').addEventListener('click', playPreview);
-  $('prev-stop').addEventListener('click', stopPreview);
+// Biblio personnages
+$('char-lib-save').addEventListener('click',saveCharToLib);
+$('char-lib-load').addEventListener('click',loadCharFromLib);
+$('char-lib-del').addEventListener('click',delCharFromLib);
+$('char-export').addEventListener('click',exportCharJSON);
+$('char-import').addEventListener('click',importCharJSON);
+$('char-import-file').addEventListener('change',async(e)=>{
+const f=e.target.files[0];if(!f)return;
+try{
+const txt=await f.text();
+const data=JSON.parse(txt);
+applyCharData(data);
+toast('Personnage importé ✓','ok');
+}catch(err){toast('JSON invalide','err');}
+e.target.value='';
+});
 
-  ['vo-text','vo-punch','c-name','c-age','c-eth','c-face','c-hair','c-mark','c-implant','c-top','c-bottom','c-shoes','c-acc'].forEach(id => {
-    const el = $(id);
-    if (el) { el.addEventListener('input', scheduleAutosave); el.addEventListener('change', scheduleAutosave); }
-  });
+loadVoices();
+if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=loadVoices;
+$('tts-play').addEventListener('click',ttsPlay);
+$('tts-stop').addEventListener('click',ttsStop);
+$('mus-play').addEventListener('click',startDrone);
+$('mus-stop').addEventListener('click',stopDrone);
+$('mus-record').addEventListener('click',recordDrone);
+$('prev-play').addEventListener('click',playPreview);
+$('prev-stop').addEventListener('click',stopPreview);
 
-  setInterval(() => { if (!state.isBusy) saveState(); }, 5000);
-  window.addEventListener('beforeunload', saveState);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
+['vo-text','vo-punch','c-name','c-age','c-eth','c-face','c-hair','c-mark','c-implant','c-top','c-bottom','c-shoes','c-acc'].forEach(id=>{
+const el=$(id);
+if(el){el.addEventListener('input',scheduleAutosave);el.addEventListener('change',scheduleAutosave);}
+});
+$('c-gender').addEventListener('change',scheduleAutosave);
 
-  log('NEWS//STUDIO v2.1 prêt', 'o');
-  log('Écritures latines + arabe · Palette cyan/amber · Ethnie nord-africaine verrouillée', 'i');
-  log('9 effets broadcast dont "Plan vide verrouillé"', 'i');
-  if (state.restored) log('Session restaurée.', 'o');
+setInterval(()=>{if(!state.isBusy)saveState();},5000);
+window.addEventListener('beforeunload',saveState);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
+
+log('NEWS//STUDIO v2.2 prêt','o');
+log('✨ Nouveautés : genre lock · biblio · export/import · override prompt','cp');
+if(state.restored)log('Session restaurée.','o');
 }
 
 init();
