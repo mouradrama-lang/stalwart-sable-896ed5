@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Manhwa//Studio — Le Revenant</title>
+<title>Manhwa//Studio v2.0 — Fusion</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#050510;--panel:#0c0c1a;--panel2:#13132a;--border:#252545;--cyan:#00e5ff;--amber:#ffb84d;--purple:#8b5cf6;--ink:#eaeaf5;--dim:#8888a5;--faint:#454565;--ok:#2d8a4e;--err:#e94560;--warn:#d4a017}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem .8rem 7rem;font-size:15px;line-height:1.5;max-width:900px;margin:0 auto}
-h1{font-size:1.5rem;font-weight:900;letter-spacing:.02em;background:linear-gradient(135deg,#00e5ff,#8b5cf6,#ffb84d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;text-align:center;margin-bottom:.2rem}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem .8rem 22rem;font-size:15px;line-height:1.5;max-width:900px;margin:0 auto}
+h1{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#00e5ff,#8b5cf6,#ffb84d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;text-align:center;margin-bottom:.2rem}
 .sub{font-size:.65rem;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;text-align:center;margin-bottom:1rem}
 .toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel);color:var(--ink);padding:.75rem 1.2rem;border-radius:10px;font-size:.82rem;font-weight:600;box-shadow:0 4px 30px rgba(0,0,0,.7);border:1px solid var(--border);z-index:9999;opacity:0;transition:.3s;max-width:90vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.ok{border-color:var(--ok)}.toast.err{border-color:var(--err)}
+.toast.ok{border-color:var(--ok)}.toast.err{border-color:var(--err)}.toast.warn{border-color:var(--warn)}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:.7rem;overflow:hidden}
 .ph{padding:.85rem 1.05rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
 .ph:active{background:var(--panel2)}
@@ -62,7 +62,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 .slot-num{font-size:.62rem;background:var(--purple);color:#fff;padding:.15rem .5rem;border-radius:10px;font-weight:900}
 .slot-body{font-size:.75rem;color:var(--dim);margin-bottom:.5rem;line-height:1.4;font-style:italic}
 .slot-img{width:100%;border-radius:6px;margin-bottom:.45rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block}
-.slot-img-ph{width:100%;aspect-ratio:9/16;border-radius:6px;background:var(--bg);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.68rem;margin-bottom:.45rem;flex-direction:column;gap:.5rem;text-align:center;padding:1rem}
+.slot-img.loading{display:flex;align-items:center;justify-content:center;background:var(--bg);border:2px dashed var(--border);color:var(--faint);font-size:.68rem;position:relative;overflow:hidden}
+.slot-img.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(0,229,255,0.08) 50%,transparent 70%);animation:shimmer 1.8s linear infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .slot-video{width:100%;border-radius:6px;margin-bottom:.45rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block;background:#000}
 .slot-status{font-size:.62rem;color:var(--faint);font-family:ui-monospace,monospace;margin-bottom:.45rem}
 .bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-bottom:.4rem}
@@ -85,21 +87,65 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:.65rem 1rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:.3s;z-index:100}
 .status-bar.show{transform:translateY(0)}
-.autosave-dot{position:fixed;top:1rem;right:1rem;width:8px;height:8px;border-radius:50%;background:var(--ok);opacity:0;transition:opacity .3s;z-index:9999;box-shadow:0 0 12px var(--ok)}
-.autosave-dot.show{opacity:1}
 .audio-row{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}
 .audio-row .btn{flex:1;min-width:90px;margin-bottom:0}
-.preview-video{width:100%;border-radius:8px;background:#000;aspect-ratio:9/16;max-height:70vh;object-fit:contain;margin-bottom:.5rem}
 .upload-in{display:none}
 .char-locked{background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(0,229,255,.1));border:1px solid var(--purple);border-radius:10px;padding:.9rem;font-size:.78rem;line-height:1.5}
 .char-locked strong{color:var(--purple);text-transform:uppercase;font-size:.65rem;letter-spacing:.1em;display:block;margin-bottom:.3rem}
+.media-log{margin-top:.6rem;font-size:.7rem;font-family:ui-monospace,monospace;max-height:200px;overflow-y:auto}
+.media-log-entry{display:flex;gap:.5rem;padding:.4rem .5rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:.3rem;align-items:center}
+.ml-tag{font-size:.55rem;padding:.1rem .35rem;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;flex-shrink:0}
+.ml-tag.image{background:rgba(0,229,255,0.15);color:var(--cyan);border:1px solid #1a6a80}
+.ml-tag.video{background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid var(--purple)}
+.ml-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--cyan);font-size:.65rem}
+.ml-url a{color:var(--cyan);text-decoration:none}
+.debug-panel{position:fixed;bottom:0;left:0;right:0;height:260px;background:#05050a;border-top:2px solid var(--cyan);z-index:200;display:flex;flex-direction:column;font-family:ui-monospace,monospace;box-shadow:0 -8px 32px rgba(0,0,0,.7);transition:height .3s}
+.debug-panel.collapsed{height:36px}
+.debug-header{display:flex;justify-content:space-between;align-items:center;padding:.5rem .8rem;background:linear-gradient(90deg,#0f0f18,#1a1a28);border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.debug-title{font-size:.72rem;color:var(--cyan);letter-spacing:.15em;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:.5rem}
+.debug-badge{font-size:.6rem;padding:.1rem .4rem;background:var(--cyan);color:#000;border-radius:2px;font-weight:700}
+.debug-actions{display:flex;gap:.3rem}
+.debug-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:.62rem;padding:.25rem .55rem;border-radius:2px;cursor:pointer}
+.debug-actions button:hover{color:var(--cyan);border-color:var(--cyan)}
+.debug-body{flex:1;overflow-y:auto;padding:.5rem .7rem 1rem;font-size:.72rem;line-height:1.45;color:#c8c8d0}
+.debug-entry{margin-bottom:.3rem;padding:.25rem .4rem;border-left:2px solid transparent;border-radius:2px;word-break:break-word}
+.debug-entry.info{border-left-color:var(--faint)}
+.debug-entry.success{border-left-color:var(--ok);background:rgba(45,138,78,.04)}
+.debug-entry.warn{border-left-color:var(--warn);background:rgba(212,160,23,.04)}
+.debug-entry.error{border-left-color:var(--err);background:rgba(233,69,96,.06);color:#f0a0a0}
+.debug-entry.api{border-left-color:var(--cyan);background:rgba(0,229,255,.04)}
+.debug-entry.response{border-left-color:var(--purple);background:rgba(139,92,246,.04)}
+.debug-time{color:var(--faint);margin-right:.5rem;font-size:.65rem}
+.debug-cat{color:var(--cyan);font-weight:600;margin-right:.4rem;font-size:.65rem}
+.debug-msg{color:#d8d8e0}
+.debug-data{margin-top:.3rem;padding:.4rem .5rem;background:#0a0a12;border:1px solid var(--border);border-radius:2px;font-size:.68rem;color:#a8d8b0;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-all;line-height:1.4}
+.save-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1rem 1.05rem;margin-bottom:.7rem}
+.save-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem}
+.save-actions button{flex:1;min-width:120px;padding:.7rem .8rem;border-radius:8px;border:1px solid var(--purple);background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(0,229,255,.1));color:var(--ink);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.save-actions button.blue{border-color:var(--cyan);color:var(--cyan)}
+.save-name-input{width:100%;padding:.65rem .85rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:ui-monospace,monospace;font-size:.78rem;margin-bottom:.6rem}
+.saves-list{font-size:.72rem;font-family:ui-monospace,monospace;max-height:280px;overflow-y:auto}
+.save-entry{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.6rem .7rem;background:var(--panel2);border:1px solid var(--border);border-radius:8px;margin-bottom:.35rem}
+.se-info{flex:1;min-width:0}
+.se-name{font-size:.82rem;color:var(--cyan);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.se-meta{font-size:.62rem;color:var(--dim);margin-top:.15rem}
+.se-btns{display:flex;gap:.3rem;flex-shrink:0}
+.save-entry button{background:transparent;padding:.3rem .55rem;border-radius:4px;font-size:.65rem;cursor:pointer;font-family:inherit}
+.save-entry button.load{border:1px solid var(--cyan);color:var(--cyan)}
+.save-entry button.del{border:1px solid var(--err);color:var(--err)}
+.save-empty{text-align:center;padding:1rem;color:var(--faint);font-style:italic}
+.preview-video{width:100%;border-radius:8px;background:#000;aspect-ratio:9/16;max-height:70vh;object-fit:contain;margin-bottom:.5rem}
 .footer-note{text-align:center;font-size:.6rem;color:var(--faint);margin-top:1.5rem;padding-bottom:1rem;letter-spacing:.1em;text-transform:uppercase}
+#noSleepCanvas,#noSleepVideo{position:fixed;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1}
+.autosave-dot{position:fixed;top:1rem;right:1rem;width:8px;height:8px;border-radius:50%;background:var(--ok);opacity:0;transition:opacity .3s;z-index:9999;box-shadow:0 0 12px var(--ok)}
+.autosave-dot.show{opacity:1}
+@media(max-width:480px){h1{font-size:1.3rem}.debug-panel{height:220px}}
 </style>
 </head>
 <body>
 
 <h1>Manhwa//Studio</h1>
-<div class="sub">v1.1 · Le Revenant · 10 épisodes</div>
+<div class="sub">v2.0 · Fusion · Yacine · Le Revenant</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
 <div class="api" id="api-box">
@@ -109,67 +155,98 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
   <div style="font-size:.65rem;color:var(--dim);margin-top:.45rem" id="api-status">Non configurée</div>
 </div>
 
+<div class="save-panel" id="save-panel">
+  <h3 style="font-size:.72rem;text-transform:uppercase;letter-spacing:.15em;color:var(--cyan);margin-bottom:.6rem">💾 Sauvegardes <span id="saves-count" style="font-size:.62rem;background:var(--purple);color:#fff;padding:.1rem .45rem;border-radius:8px">0</span></h3>
+  <input type="text" class="save-name-input" id="save-name-input" placeholder="Nom de la sauvegarde (optionnel)">
+  <div class="save-actions">
+    <button type="button" id="save-current-btn">💾 Sauvegarder</button>
+    <button type="button" class="blue" id="export-zip-btn">📦 Exporter ZIP</button>
+  </div>
+  <div class="saves-list" id="saves-list"><div class="save-empty">Aucune sauvegarde</div></div>
+</div>
+
+<div class="panel open" id="p-mode">
+  <div class="ph" data-t="p-mode"><div class="pt"><span class="n">1</span> Mode</div><span class="ch">▼</span></div>
+  <div class="pb"><div class="pc">
+    <div class="grid" id="mode-grid">
+      <div class="card sel" data-mode="preset"><span class="ic">📖</span><span class="nm">10 épisodes écrits</span><span class="dc">Yacine · Alger 2032</span></div>
+      <div class="card" data-mode="custom"><span class="ic">✨</span><span class="nm">Épisode personnalisé</span><span class="dc">Génération auto IA</span></div>
+    </div>
+  </div></div>
+</div>
+
 <div class="panel open" id="p-char">
   <div class="ph" data-t="p-char"><div class="pt"><span class="n">DNA</span> Personnage verrouillé</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
     <div class="char-locked">
       <strong>YACINE — Le Revenant</strong>
-      Homme nord-africain algérien, 32 ans. Visage ovale, mâchoire définie. Peau olive mate. Cheveux brun foncé mi-longs <em>humides</em>, rejetés en arrière. Barbe de trois jours + moustache. Yeux marron noisette enfoncés, paupières lourdes. <strong style="color:var(--cyan)">3 signatures obligatoires :</strong> cicatrice fine au-dessus du sourcil droit, implant argenté derrière l'oreille gauche (LED cyan), tatouage géométrique cou droit. Veste tactique noire col haut, sangles, LED cyan sur coutures, chaîne argentée, col roulé noir.
+      Homme nord-africain algérien, 32 ans. Visage ovale, mâchoire définie. Peau olive mate. Cheveux brun foncé mi-longs <em>humides</em>, rejetés en arrière. Barbe trois jours + moustache. Yeux marron noisette enfoncés. <strong>3 signatures :</strong> cicatrice sourcil droit, implant oreille gauche (LED cyan), tatouage cou droit. Veste tactique noire col haut, sangles, LED cyan, chaîne argentée, col roulé noir.
     </div>
   </div></div>
 </div>
 
 <div class="panel open" id="p-ep">
-  <div class="ph" data-t="p-ep"><div class="pt"><span class="n">1</span> Épisode</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-ep"><div class="pt"><span class="n">2</span> Épisode</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Sélectionne l'épisode. Chaque épisode = 3 plans séquentiels.</div>
-    <div class="ep-grid" id="episodes"></div>
+    <div id="preset-block">
+      <div class="hint">Sélectionne l'épisode. Chaque épisode = 3 plans séquentiels.</div>
+      <div class="ep-grid" id="episodes"></div>
+    </div>
+    <div id="custom-block" style="display:none">
+      <label>Ton idée (une phrase suffit)</label>
+      <textarea id="idea-input" placeholder="Ex : Yacine découvre une lettre cachetée..." style="min-height:80px"></textarea>
+      <label>Genre visuel</label>
+      <div class="grid" id="genres"></div>
+      <div class="hint">ℹ️ Le personnage reste YACINE — seule l'histoire change.</div>
+    </div>
     <label>Narration voix-off (modifiable)</label>
     <textarea id="vo-text" style="min-height:100px;font-size:.82rem"></textarea>
-    <label>Phrase chute (texte final)</label>
+    <label>Phrase chute</label>
     <input type="text" id="vo-punch">
   </div></div>
 </div>
 
 <div class="panel open" id="p-gen">
-  <div class="ph" data-t="p-gen"><div class="pt"><span class="n">2</span> Génération images</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-gen"><div class="pt"><span class="n">3</span> Génération images</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">3 plans séquentiels. Chaque plan est validé avant de passer au suivant.</div>
+    <div class="hint">🔒 Character lock renforcé · 3 signatures obligatoires · Keyframes chainées.</div>
     <div id="slots"></div>
+    <div class="btn-row">
+      <button class="btn small purple" id="gen-all-images">⚡ GÉNÉRER LES 3 (parallèle x3)</button>
+    </div>
   </div></div>
 </div>
 
 <div class="panel open" id="p-video">
-  <div class="ph" data-t="p-video"><div class="pt"><span class="n">3</span> Génération vidéo</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-video"><div class="pt"><span class="n">4</span> Génération vidéo</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Effet + durée + prompt override par vidéo.</div>
+    <div class="hint">Chaque vidéo a son effet, durée et prompt override.</div>
     <div id="video-slots"></div>
     <button class="btn warn" id="batch-videos" style="margin-top:.6rem">⚡ GÉNÉRER LES 3 VIDÉOS</button>
   </div></div>
 </div>
 
 <div class="panel" id="p-voice">
-  <div class="ph" data-t="p-voice"><div class="pt"><span class="n">4</span> Voix-off (TTS)</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-voice"><div class="pt"><span class="n">5</span> Voix-off (TTS)</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
     <label>Voix</label><select id="tts-voice"><option value="">Chargement…</option></select>
     <label>Vitesse</label>
-    <select id="tts-rate"><option value="0.75">Très lente</option><option value="0.85" selected>Posée (recommandé)</option><option value="1">Normale</option></select>
+    <select id="tts-rate"><option value="0.75">Très lente</option><option value="0.85" selected>Posée</option><option value="1">Normale</option></select>
     <label>Hauteur</label>
     <select id="tts-pitch"><option value="0.55">Très grave</option><option value="0.7" selected>Grave</option><option value="0.9">Médium</option></select>
     <div class="audio-row">
       <button class="btn small" id="tts-play">▶ ÉCOUTER</button>
       <button class="btn small ghost" id="tts-stop">⏹ STOP</button>
     </div>
-    <div id="tts-status" class="hint"></div>
   </div></div>
 </div>
 
 <div class="panel" id="p-music">
-  <div class="ph" data-t="p-music"><div class="pt"><span class="n">5</span> Drone musical</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-music"><div class="pt"><span class="n">6</span> Drone musical</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
     <label>Style</label>
     <select id="mus-style">
-      <option value="melancholic" selected>Mélancolique (recommandé)</option>
+      <option value="melancholic" selected>Mélancolique</option>
       <option value="tense">Tendu</option>
       <option value="nostalgic">Nostalgique</option>
       <option value="urban">Urbain froid</option>
@@ -181,12 +258,11 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
       <button class="btn small ghost" id="mus-stop">⏹ STOP</button>
       <button class="btn small ok" id="mus-record">● ENREGISTRER 30S</button>
     </div>
-    <div id="mus-status" class="hint"></div>
   </div></div>
 </div>
 
 <div class="panel" id="p-export">
-  <div class="ph" data-t="p-export"><div class="pt"><span class="n">6</span> Export</div><span class="ch">▼</span></div>
+  <div class="ph" data-t="p-export"><div class="pt"><span class="n">7</span> Export</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
     <button class="btn" id="dl-zip">📦 TOUT EXPORTER EN .ZIP</button>
     <button class="btn ghost" id="dl-all">TÉLÉCHARGER LES IMAGES</button>
@@ -201,9 +277,29 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
   <div class="pb"><div class="pc"><div class="console" id="log"></div></div></div>
 </div>
 
+<div class="panel" id="p-medialog">
+  <div class="ph" data-t="p-medialog"><div class="pt"><span class="n">·</span> Médias <span id="medialog-count" style="font-size:.62rem;background:var(--purple);color:#fff;padding:.1rem .45rem;border-radius:8px">0</span></div><span class="ch">▼</span></div>
+  <div class="pb"><div class="pc"><div class="media-log" id="media-log"><div style="text-align:center;color:var(--faint);padding:.5rem;font-style:italic">Les URLs apparaîtront ici</div></div></div></div>
+</div>
+
+<div class="debug-panel collapsed" id="debug-panel">
+  <div class="debug-header" id="debug-header">
+    <div class="debug-title">🖥️ Debug <span class="debug-badge" id="debug-count">0</span></div>
+    <div class="debug-actions">
+      <button type="button" id="debug-copy-btn">Copier</button>
+      <button type="button" id="debug-clear-btn">Effacer</button>
+      <button type="button" id="debug-collapse-btn">+</button>
+    </div>
+  </div>
+  <div class="debug-body" id="debug-body"></div>
+</div>
+
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">Manhwa//Studio v1.1 · Le Revenant · 10 épisodes</div>
+<div class="footer-note">Manhwa//Studio v2.0 · Fusion · Yacine verrouillé</div>
+
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -211,143 +307,137 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 // ═══════════════════════════════════════════════════════════════
 const API_BASE='https://apihub.agnes-ai.com/v1';
 const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT='agnes-2.5-flash';
 const MODEL_IMAGE='agnes-image-2.5-flash';
 const MODEL_VIDEO='agnes-video-v2.0';
 const IMG_W=1024,IMG_H=1792,VID_W=576,VID_H=1024;
 const MAX_PROMPT=3500;
 const INITIAL_WAIT=105;
 const POLL_INTERVAL=5;
-const STORAGE_KEY='manhwa_studio_v1_1';
+const STORAGE_KEY='manhwa_studio_v2';
+const SAVES_KEY='manhwa_saves_v2';
+const AUTOSAVE_KEY='manhwa_autosave_v2';
+const API_KEY_STORAGE='manhwa_api_key';
+const WAKE_LOCK_PREF='manhwa_wakelock';
 
-// ═══════════════════════════════════════════════════════════════
-// STYLE LOCK
-// ═══════════════════════════════════════════════════════════════
 const STYLE_LOCK=
-'Semi-realistic Korean manhwa illustration style, webtoon aesthetic. Clean linework, soft cel-shading, painterly digital art. ' +
-'Cyberpunk North African megacity (Alger, 2032) at night, rainy. Wet asphalt with cyan and warm amber reflections. ' +
-'Vertical neon signs with ARABIC and LATIN script only. ABSOLUTELY NO Chinese, NO Japanese, NO Korean characters. ' +
-'Holographic cyan screens floating at street level. Dense anonymous crowd in soft blur. Rain visible in the air, raindrops on surfaces. ' +
-'Dominant palette: institutional cyan, deep slate blue, dark black, warm amber accents. ' +
-'Cinematic lighting, rim light from neon signs, deep shadows, film grain overlay. ' +
-'Serious, melancholic, dystopian mood. No smiles, no warmth. ' +
-'NO CGI, NO 3D render, NO photorealistic rendering, NO cartoon, NO chibi, NO anime big eyes. ';
+'Semi-realistic Korean manhwa illustration style, webtoon aesthetic. Clean linework, soft cel-shading, painterly digital art. '+
+'Cyberpunk North African megacity (Alger, 2032) at night, rainy. Wet asphalt with cyan and warm amber reflections. '+
+'Vertical neon signs with ARABIC and LATIN script only. ABSOLUTELY NO Chinese, NO Japanese, NO Korean characters. '+
+'Holographic cyan screens floating at street level. Dense anonymous crowd in soft blur. Rain visible in the air. '+
+'Dominant palette: institutional cyan, deep slate blue, dark black, warm amber accents. '+
+'Cinematic lighting, rim light from neon signs, deep shadows, film grain overlay. '+
+'Serious, melancholic, dystopian mood. No smiles. '+
+'NO CGI, NO 3D render, NO photorealistic, NO cartoon, NO chibi, NO anime big eyes. ';
 
-// ═══════════════════════════════════════════════════════════════
-// CHARACTER LOCK — RENFORCÉ v1.1
-// ═══════════════════════════════════════════════════════════════
 const CHARACTER_LOCK=
-'⚠️ ABSOLUTE CHARACTER REFERENCE — REPRODUCE THIS EXACT MAN IN EVERY SCENE: ' +
-'YACINE, a North African Algerian man, 32 years old. ' +
-'FACE: oval face with defined jawline and hollow cheeks, tan olive skin with visible natural texture and faint weathering. ' +
-'HAIR: dark brown almost black shoulder-length hair, WET from rain, pushed back behind the ears with a few loose strands falling naturally on the forehead. Hair MUST reach the base of the neck — NOT short, NOT buzz cut. ' +
-'FACIAL HAIR: full three-day dark beard AND full mustache. ' +
-'EYES: deep-set dark hazel eyes with heavy upper eyelids, tired but alert gaze, no smile, no warmth. ' +
-'SIGNATURE FEATURES (ALL 3 MUST BE VISIBLE): ' +
-'(1) thin pale scar above the RIGHT eyebrow. ' +
-'(2) small silver cybernetic implant behind the LEFT ear with a pulsing CYAN LED. ' +
-'(3) large GEOMETRIC BLACK TATTOO on the RIGHT side of the neck, visible above the collar. ' +
-'OUTFIT (IDENTICAL every scene): black futuristic tactical techwear jacket with a HIGH reinforced collar that reaches the chin, chunky metal buckles on the straps, TWO cyan LED strips on the jacket seams (one on the collar edge, one on the chest strap), silver chain necklace visible on the chest, black turtleneck underneath. ' +
-'MANNER: serious, melancholic, unreadable expression. No smile. Wet hair and jacket. ' +
-'THE MAN IN THIS SCENE MUST BE THIS EXACT CHARACTER. If any of the 3 signature features (scar, implant, neck tattoo) is missing, the image is WRONG. ';
+'⚠️ ABSOLUTE CHARACTER REFERENCE — REPRODUCE THIS EXACT MAN IN EVERY SCENE: '+
+'YACINE, North African Algerian man, 32 years old. '+
+'FACE: oval face, defined jawline, hollow cheeks, tan olive skin with visible natural texture. '+
+'HAIR: dark brown almost black shoulder-length hair, WET from rain, pushed back behind ears with a few loose strands on forehead. Hair MUST reach base of neck — NOT short, NOT buzz cut. '+
+'FACIAL HAIR: full three-day dark beard AND full mustache. '+
+'EYES: deep-set dark hazel eyes, heavy upper eyelids, tired but alert, no smile. '+
+'SIGNATURE FEATURES (ALL 3 MUST BE VISIBLE): '+
+'(1) thin pale scar above the RIGHT eyebrow. '+
+'(2) small silver cybernetic implant behind the LEFT ear with pulsing CYAN LED. '+
+'(3) large GEOMETRIC BLACK TATTOO on the RIGHT side of the neck. '+
+'OUTFIT: black futuristic tactical techwear jacket with HIGH reinforced collar reaching the chin, chunky metal buckles, TWO cyan LED strips on seams (collar edge + chest strap), silver chain necklace, black turtleneck underneath. '+
+'THE MAN IN THIS SCENE MUST BE THIS EXACT CHARACTER. If any of the 3 signature features is missing, the image is WRONG. ';
 
 const NO_HUMAN_FACES=
-'Background crowd must remain in SOFT BLUR with NO identifiable faces. ' +
-'Only YACINE has a visible face. All other humans are anonymous silhouettes. ';
+'Background crowd must remain in SOFT BLUR with NO identifiable faces. Only YACINE has a visible face. ';
 
-// ═══════════════════════════════════════════════════════════════
-// 10 ÉPISODES
-// ═══════════════════════════════════════════════════════════════
+const GENRES=[
+{id:'melancholic',icon:'🌧️',name:'Mélancolique',prompt:'melancholic drama, rainy night, quiet introspection, muted cyan and amber palette'},
+{id:'noir',icon:'🕵️',name:'Noir',prompt:'noir atmosphere, high contrast shadows, neon-lit streets, urban loneliness'},
+{id:'poetic',icon:'🌙',name:'Poétique',prompt:'poetic cinema, dreamlike, slow contemplative takes, mist, spiritual atmosphere'},
+{id:'thriller',icon:'🔪',name:'Thriller',prompt:'suspense thriller, tight framing, tense silence, muted palette'},
+{id:'scifi',icon:'🚀',name:'Science-fiction',prompt:'science fiction, retro-futurism, neon accents, monumental architecture'},
+{id:'intimate',icon:'💭',name:'Intime',prompt:'intimate drama, close personal moments, quiet human emotion, restrained cinematography'}
+];
+
 const EPISODES=[
-{id:1,title:'L\'arrivée',sub:'Bus de nuit · Gare routière · Foule anonyme',
+{id:1,title:'L\'arrivée',sub:'Bus de nuit · Gare routière',
 voice:"Le bus arrive à trois heures du matin. Douze ans depuis la dernière fois. La ville n'a pas dormi — elle n'a jamais dormi. Les phares éclairent la pluie, les néons arabes, les visages anonymes. Je descends. Le sol est mouillé. Je ne reconnais rien, mais je reconnais tout.",
 punch:"Je ne reconnais rien. Mais je reconnais tout.",
 s1:"EXTREME WIDE SHOT. Night bus arriving at a rainy bus station on the outskirts of the cyberpunk city of Alger, yellow headlights cutting through heavy rain. Vertical neon signs with ARABIC and LATIN script. Wet asphalt with cyan and amber reflections. Empty platform in the foreground. Anonymous blurred silhouette of YACINE stepping off the bus, small in the frame, seen from behind. Cold palette, cinematic.",
-s2:"MEDIUM WIDE SHOT. YACINE stands on the wet platform, a worn leather bag over his shoulder, seen from the SIDE. He looks up toward the glowing skyline of the city in the distance. Rain visible in the air. Holographic cyan advertisements floating above the station. His black techwear jacket with cyan LED strips wet from the rain. Anonymous blurred passengers walking past. Cold cyan rim light on his profile, amber accent from a distant street lamp.",
-s3:"MEDIUM CLOSE-UP of YACINE from the chest up, facing slightly to the right. Rain drops on his wet hair, water dripping from his chin. He looks directly INTO the camera with a tired, unreadable expression. Behind him, the blurred crowd moves. Thin scar above right eyebrow visible, cyan implant behind left ear pulsing. Silent determination. Deep shadows under the eyes."},
-
-{id:2,title:'Le premier regard',sub:'Colline · Baie d\'Alger · Maqam Echahid',
+s2:"MEDIUM WIDE SHOT. YACINE stands on the wet platform, a worn leather bag over his shoulder, seen from the SIDE. He looks up toward the glowing skyline of the city. Rain visible in the air. Holographic cyan ads floating above the station. His black techwear jacket with cyan LED strips wet from rain. Anonymous blurred passengers walking past. Cold cyan rim light on his profile.",
+s3:"MEDIUM CLOSE-UP of YACINE from the chest up, facing slightly right. Rain drops on his wet hair, water dripping from his chin. He looks directly INTO the camera with a tired, unreadable expression. Scar above right eyebrow visible, cyan implant behind left ear pulsing, neck tattoo visible. Silent determination."},
+{id:2,title:'Le premier regard',sub:'Colline · Baie d\'Alger',
 voice:"Je monte sur la colline. En bas, la baie. Le monument brille au milieu comme un phare. Douze ans que je l'avais oublié. Douze ans que lui ne m'a pas oublié. La ville m'attendait, immobile, patiente. Elle savait que je reviendrais.",
 punch:"La ville m'attendait. Elle savait.",
-s1:"EXTREME WIDE SHOT from a hilltop overlooking the bay of Alger at night. The illuminated Maqam Echahid monument stands in the middle-distance, glowing warm amber against the dark. The city spreads below with cyan and amber lights, neon signs, distant towers. Rainy atmosphere, low clouds. No humans visible. Cinematic, melancholic.",
-s2:"MEDIUM SHOT FROM BEHIND of YACINE, standing still at the edge of the hill, looking down at the city. His silhouette is small against the vast urban glow. His black techwear jacket catches the cyan rim light from the city below. Hands in his pockets. Wind moving his wet hair slightly. Rain visible in the air.",
-s3:"EXTREME MACRO CLOSE-UP of YACINE'S EYES ONLY. Fills the frame edge to edge. Dark hazel irises with visible natural texture and slight redness from tiredness. In each pupil, a tiny reflection of the city lights — cyan and amber dots. No smile, no movement. Rain drop falling across the frame. Absolute focus."},
-
-{id:3,title:'La Casbah',sub:'Ruelles anciennes · Pierres · Mémoire',
+s1:"EXTREME WIDE SHOT from a hilltop overlooking the bay of Alger at night. The illuminated Maqam Echahid monument glows warm amber against the dark. The city spreads below with cyan and amber lights, neon signs, distant towers. Rainy atmosphere. No humans visible. Cinematic, melancholic.",
+s2:"MEDIUM SHOT FROM BEHIND of YACINE, standing still at the edge of the hill, looking down at the city. Silhouette small against the vast urban glow. Black techwear jacket catches cyan rim light from the city below. Wind moving his wet hair. Rain visible in the air.",
+s3:"EXTREME MACRO CLOSE-UP of YACINE'S EYES. Fills the frame edge to edge. Dark hazel irises with visible texture and slight redness. In each pupil, a tiny reflection of the city lights — cyan and amber dots. No smile, no movement. Rain drop falling across the frame."},
+{id:3,title:'La Casbah',sub:'Ruelles anciennes · Pierres',
 voice:"La Casbah. Elle n'a pas bougé. Les mêmes pierres, les mêmes murs, le même linge suspendu. Seulement moi qui ai changé. Ma veste brille trop pour ces murs. Mes chaussures sont trop neuves pour ces rues. Je marche comme un étranger chez moi.",
 punch:"Ma veste brille trop pour ces murs.",
-s1:"WIDE SHOT of narrow ancient Casbah alley in Alger at night, wet cobblestone streets, weathered stone walls, laundry hanging between buildings. A single warm lamp glowing at the end of the alley. No neon, no tech. Contrast between ancient architecture and the cyberpunk world outside. Empty street, no humans. Melancholic atmosphere.",
-s2:"MEDIUM WIDE SHOT. YACINE walks slowly through the narrow Casbah alley, seen from the SIDE. His black techwear jacket with cyan LED strips stands out against the ancient stone walls. He looks down at the cobblestones. Rain falling softly. Warm amber light from a distant lamp, deep shadows on both sides. His silhouette is the only modern element in the frame.",
-s3:"MEDIUM CLOSE-UP of YACINE'S RIGHT HAND touching an old weathered stone wall. Fills the frame. His fingers gently trace the rough surface of the wall. Cyan LED reflection from his jacket sleeve on his hand. Rain droplets on the stone. His neck tattoo slightly visible at the edge of the frame. Intimate, meditative."},
-
-{id:4,title:'Le métro',sub:'Station futuriste · Foule · Solitude',
+s1:"WIDE SHOT of narrow ancient Casbah alley in Alger at night, wet cobblestone, weathered stone walls, laundry hanging between buildings. A single warm lamp at the end of the alley. No neon, no tech. Empty street, no humans. Melancholic.",
+s2:"MEDIUM WIDE SHOT. YACINE walks slowly through the Casbah alley, seen from the SIDE. His black techwear jacket with cyan LED strips stands out against ancient stone walls. He looks down at the cobblestones. Rain falling softly. Warm amber light from a distant lamp, deep shadows on both sides.",
+s3:"MEDIUM CLOSE-UP of YACINE'S RIGHT HAND touching an old stone wall. Fills the frame. His fingers trace the rough surface. Cyan LED reflection on his hand. Rain droplets on the stone. His neck tattoo visible at the edge. Intimate, meditative."},
+{id:4,title:'Le métro',sub:'Station futuriste · Foule',
 voice:"Je prends le métro. La foule est dense. Personne ne me regarde. Tout le monde regarde son hologramme personnel. Les annonces défilent en arabe et en français. Je suis immobile au milieu du mouvement. Comme un rocher dans une rivière. Sauf que je ne suis pas un rocher.",
 punch:"Comme un rocher dans une rivière. Sauf que je ne suis pas un rocher.",
-s1:"WIDE SHOT of a futuristic underground metro station in Alger 2032. Massive cyan neon strips along curved concrete walls. Floating holographic timetables in Arabic and Latin script. Dense anonymous crowd in soft motion blur. Empty platform in the foreground. Cold institutional lighting. Rain dripping from coat shoulders. Cinematic dystopian atmosphere.",
-s2:"MEDIUM SHOT of YACINE standing PERFECTLY STILL in the middle of the moving crowd. Everyone around him is MOTION-BLURRED. Only he is sharp. He stares straight forward, unblinking. Cyan light from the LED strips reflects on his wet face. His techwear jacket stands out in the blurred mass. Isolated, monumental, alienated.",
-s3:"EXTREME CLOSE-UP of YACINE'S FACE from the front, filling the frame. His eyes look slightly to the side, watching something off-frame. Rain droplets on his cheek, condensation on his chin. Cyan light from above, amber reflections from the metro screens. Tired gaze, no expression. The blurred crowd barely visible at the edges of the frame."},
-
+s1:"WIDE SHOT of a futuristic metro station in Alger 2032. Cyan neon strips along curved concrete walls. Floating holographic timetables in Arabic and Latin script. Dense anonymous crowd in soft motion blur. Empty platform in foreground. Cold institutional lighting.",
+s2:"MEDIUM SHOT of YACINE standing PERFECTLY STILL in the middle of the moving crowd. Everyone around him is MOTION-BLURRED. Only he is sharp. He stares straight forward, unblinking. Cyan light on his wet face. His techwear jacket stands out.",
+s3:"EXTREME CLOSE-UP of YACINE'S FACE from the front, filling the frame. His eyes look slightly to the side. Rain droplets on his cheek. Cyan light from above, amber reflections from metro screens. Tired gaze. Blurred crowd barely visible at the edges."},
 {id:5,title:'Le café',sub:'Café d\'angle · Vitre · Reflet',
 voice:"Le café existe encore. Même nom, même angle, mêmes tables. Sauf qu'aujourd'hui les serveurs sont des hologrammes et le menu défile sur écran. Je m'assois. Je commande un café. Il arrive froid, comme avant. Certaines choses ne changent jamais.",
 punch:"Certaines choses ne changent jamais.",
-s1:"WIDE SHOT of a corner café in Alger at night, seen from across the street. Warm amber glow from inside, vertical neon sign with ARABIC script above the door. Rain streaming down the windows. Through the glass, blurred silhouettes of customers. Wet asphalt outside with cyan and amber reflections. No clear humans, only blurred shapes.",
-s2:"MEDIUM SHOT of YACINE sitting alone at a table inside the café, seen THROUGH the rain-streaked window from outside. He holds a coffee cup, looking at it, not drinking. His face is partially reflected in the glass, partially visible behind it. Warm amber interior light on his face, cold cyan street light outside. Melancholic composition.",
-s3:"EXTREME CLOSE-UP of YACINE'S REFLECTION in the wet café window. Only his face visible, slightly distorted by the rain and glass. A café cup floats in the reflection at the bottom. Behind the reflection, blurred amber lights and cyan neon. His tired eyes look directly at his own reflection. No smile. Absolute stillness."},
-
-{id:6,title:'Le village',sub:'Souvenir · Kabylie · Lumière chaude',
-voice:"Le village me revient par flash. Les maisons blanches, les figuiers, la lumière du coucher. Le silence. L'air pur. Les gens qui te connaissent par ton prénom. J'aurais pu rester. J'aurais dû rester. Mais quelque chose m'appelait ici. Quelque chose d'ancien.",
+s1:"WIDE SHOT of a corner café in Alger at night, seen from across the street. Warm amber glow from inside, vertical neon sign with ARABIC script above the door. Rain streaming down the windows. Through the glass, blurred silhouettes of customers. Wet asphalt outside.",
+s2:"MEDIUM SHOT of YACINE sitting alone at a table inside the café, seen THROUGH the rain-streaked window from outside. He holds a coffee cup, looking at it, not drinking. Face partially reflected in the glass. Warm amber interior light, cold cyan street light outside.",
+s3:"EXTREME CLOSE-UP of YACINE'S REFLECTION in the wet café window. Only his face visible, slightly distorted by rain and glass. A cup floats in the reflection. Behind the reflection, blurred amber lights and cyan neon. His tired eyes look directly at his own reflection."},
+{id:6,title:'Le village',sub:'Souvenir · Kabylie',
+voice:"Le village me revient par flash. Les maisons blanches, les figuiers, la lumière du coucher. Le silence. L'air pur. Les gens qui te connaissent par ton prénom. J'aurais pu rester. J'aurais dû rester. Mais quelque chose m'appelait ici.",
 punch:"J'aurais dû rester.",
-s1:"WIDE SHOT of a Kabyle village in the Algerian mountains at golden hour. Whitewashed houses with terracotta roofs, fig trees, olive groves, distant mountain peaks. Warm golden light, no neon, no rain. Peaceful, timeless. No humans. Cinematic nostalgic composition.",
-s2:"MEDIUM CLOSE-UP of a WOODEN VILLAGE DOOR, half-open. Only the door and part of the wall visible. Warm light spilling from inside. A hand (Yacine's, older, from a memory) pushes the door gently. Weather-worn wood, iron hinges. No face visible.",
-s3:"EXTREME CLOSE-UP of YACINE'S EYES (from the memory, no tech, no scars, younger) filling the frame. Warm golden light reflects in his pupils. His hair is dry, natural, no jacket, just a simple shirt. Slight reflection of a mountain landscape in his eyes. No expression, only warmth. Almost peaceful."},
-
+s1:"WIDE SHOT of a Kabyle village in the Algerian mountains at golden hour. Whitewashed houses with terracotta roofs, fig trees, olive groves, distant mountain peaks. Warm golden light, no neon, no rain. Peaceful, timeless. No humans.",
+s2:"MEDIUM CLOSE-UP of a WOODEN VILLAGE DOOR, half-open. Only the door and part of the wall visible. Warm light spilling from inside. A hand pushes the door gently. Weather-worn wood, iron hinges. No face visible.",
+s3:"EXTREME CLOSE-UP of YACINE'S EYES (from the memory, no tech, no scars, younger). Warm golden light reflects in his pupils. His hair is dry, natural, no jacket, just a simple shirt. Slight reflection of a mountain landscape in his eyes. Almost peaceful."},
 {id:7,title:'La tour',sub:'Corporation · Verre · Surveillance',
-voice:"La tour. Verre et acier. Gardiens holographiques. Badges biométriques. On me laisse entrer — on me regarde toujours entrer, mais on me laisse. Trente étages plus haut, la ville ressemble à un circuit imprimé. Vu d'ici, personne n'est important. Vu d'ici, je ne suis personne.",
+voice:"La tour. Verre et acier. Gardiens holographiques. Badges biométriques. On me laisse entrer — on me regarde toujours entrer, mais on me laisse. Trente étages plus haut, la ville ressemble à un circuit imprimé. Vu d'ici, personne n'est important.",
 punch:"Vu d'ici, je ne suis personne.",
-s1:"WIDE SHOT of the entrance of a corporate tower in cyberpunk Alger 2032. Massive glass façade, polished steel, holographic security guards scanning, biometric badge readers glowing cyan. A few blurred silhouettes in business suits entering. Monumental scale. Cold institutional lighting. Rain outside reflecting on the glass. No identifiable faces.",
-s2:"MEDIUM WIDE SHOT of YACINE walking through the corporate tower lobby, seen from behind, SMALL in the frame. The space is enormous, brutalist, all glass and steel. His silhouette reflects in the polished floor. Cyan holographic screens float along the walls. He looks up at the ceiling. Anonymous, overwhelmed.",
-s3:"EXTREME CLOSE-UP of YACINE seen in REFLECTION on the floor-to-ceiling glass window of the 30th floor, looking out at the city below. His face is faintly reflected against the urban grid. He looks down. Behind the reflection, the city lights sprawl like a circuit board. Cyan and amber dots. Absolute stillness."},
-
+s1:"WIDE SHOT of the entrance of a corporate tower in cyberpunk Alger 2032. Massive glass façade, polished steel, holographic security guards scanning, biometric badge readers glowing cyan. Blurred silhouettes in business suits entering. Monumental scale. Cold institutional lighting.",
+s2:"MEDIUM WIDE SHOT of YACINE walking through the corporate lobby, seen from behind, SMALL in the frame. Space is enormous, brutalist, glass and steel. His silhouette reflects in the polished floor. Cyan holographic screens float along walls. He looks up. Anonymous, overwhelmed.",
+s3:"EXTREME CLOSE-UP of YACINE seen in REFLECTION on the floor-to-ceiling glass window of the 30th floor, looking out at the city below. His face faintly reflected against the urban grid. He looks down. Behind the reflection, the city sprawls like a circuit board. Cyan and amber dots."},
 {id:8,title:'Le port',sub:'Mer · Containers · Horizon',
 voice:"Le port. L'odeur du gasoil, du sel, de la rouille. Les containers empilés comme des briques. Un bateau part au loin. Vers Marseille, vers Barcelone, vers ailleurs. Je l'ai pris ce bateau, il y a douze ans. Je ne l'ai jamais regretté. Et je l'ai toujours regretté.",
 punch:"Je ne l'ai jamais regretté. Et je l'ai toujours regretté.",
-s1:"WIDE SHOT of the port of Alger at night. Stacks of shipping containers, cranes, cargo ships in the distance. Black oily water reflecting the amber and cyan lights. Rain falling softly. Industrial, monumental. No humans visible. Cinematic melancholic composition.",
-s2:"MEDIUM WIDE SHOT of YACINE standing at the edge of the dock, seen from the SIDE, facing the sea. Hands in his pockets. Wind moving his wet hair and the edge of his jacket. Behind him, the containers and the port lights. In front of him, the dark sea and the horizon. A cargo ship departing in the distance. Cyan rim light on his profile.",
-s3:"EXTREME WIDE SHOT of the horizon line, a cargo ship silhouetted against the faint dawn light. No humans. Just sea, sky, ship. Cold palette turning slightly warm at the horizon. A single cyan reflection on the black water. Monumental, quiet, meditative."},
-
+s1:"WIDE SHOT of the port of Alger at night. Stacks of shipping containers, cranes, cargo ships in the distance. Black oily water reflecting amber and cyan lights. Rain falling softly. Industrial, monumental. No humans.",
+s2:"MEDIUM WIDE SHOT of YACINE standing at the edge of the dock, seen from the SIDE, facing the sea. Hands in his pockets. Wind moving his wet hair and the edge of his jacket. Behind him, containers and port lights. In front, the dark sea and horizon. A cargo ship departing. Cyan rim light on his profile.",
+s3:"EXTREME WIDE SHOT of the horizon line, a cargo ship silhouetted against the faint dawn light. No humans. Sea, sky, ship. Cold palette turning slightly warm at the horizon. A single cyan reflection on the black water."},
 {id:9,title:'La rencontre',sub:'Lampadaire · Silhouette · Mains',
 voice:"Elle attend sous le lampadaire. Douze ans qu'elle attend, peut-être. Ou peut-être qu'elle est là par hasard. Je ne sais pas encore. Je m'approche. Je ne vois pas son visage. Je vois ses mains. Ses mains que je reconnaîtrais entre mille. Mes mains tremblent. Les siennes non.",
 punch:"Ses mains que je reconnaîtrais entre mille.",
-s1:"WIDE SHOT of a rainy night street in cyberpunk Alger. A SINGLE woman's silhouette standing under a lonely streetlamp, seen FROM BEHIND. She wears a long dark coat. Rain falls around her. The street is empty except for her. Cyan neon signs in Arabic and Latin script in the background. Warm amber lamp light on her silhouette. Mysterious, cinematic.",
-s2:"MEDIUM WIDE SHOT of YACINE approaching the woman, seen from BEHIND HIM. He walks slowly toward her, his back to the camera, his silhouette getting larger. The woman remains still, from behind, in the distance. Rain visible in the air. Cyan rim light on Yacine's shoulder, amber light on the woman. Tension, anticipation.",
-s3:"EXTREME MACRO CLOSE-UP of TWO HANDS approaching each other but NOT touching. Yacine's hand (with techwear cuff, cyan LED strip) and the woman's hand (simple, elegant, no tech) floating in the frame. Rain droplets on both hands. Cyan light on his side, warm amber on hers. Absolute stillness. No faces, no bodies, only hands."},
-
+s1:"WIDE SHOT of a rainy night street in cyberpunk Alger. A SINGLE woman's silhouette standing under a lonely streetlamp, seen FROM BEHIND. She wears a long dark coat. Rain falls around her. The street is empty. Cyan neon signs in Arabic and Latin script in background. Warm amber lamp light on her.",
+s2:"MEDIUM WIDE SHOT of YACINE approaching the woman, seen from BEHIND HIM. He walks slowly toward her, back to camera, silhouette getting larger. The woman remains still, from behind, in the distance. Rain visible. Cyan rim light on Yacine's shoulder, amber light on the woman.",
+s3:"EXTREME MACRO CLOSE-UP of TWO HANDS approaching each other but NOT touching. Yacine's hand (techwear cuff, cyan LED strip) and the woman's hand (simple, no tech) floating in the frame. Rain droplets on both. Cyan light on his side, warm amber on hers. Absolute stillness."},
 {id:10,title:'Le choix',sub:'Deux routes · Pluie · Décision',
 voice:"Deux routes devant moi. À gauche, la ville. Ses néons, son bruit, ses hologrammes, ses promesses vides. À droite, la route de sortie. Le village, le silence, la lumière chaude. Je regarde les deux. Je ne choisis pas tout de suite. La pluie tombe. La ville attend. Le village attend. Moi aussi, j'attends.",
 punch:"La ville attend. Le village attend. Moi aussi.",
-s1:"EXTREME WIDE SHOT of a fork in the road at the edge of cyberpunk Alger at night. On the LEFT, the city glows with cyan and amber neon, towers, holograms. On the RIGHT, a simple dark road disappears into the rainy countryside. In the CENTER of the fork, the silhouette of YACINE, standing still, seen from behind. Rain falling heavily. Monumental, symbolic composition.",
-s2:"MEDIUM CLOSE-UP of YACINE in profile, looking LEFT toward the city. Rain streaming down his face. His scar visible above the right eyebrow, his implant pulsing cyan behind the left ear, his neck tattoo catching the light. Expression: hesitant, tired, but alive. Cyan city light on the left side of his face, warm amber from an off-frame source on the right.",
-s3:"EXTREME WIDE SHOT of a single silhouette (Yacine) walking AWAY from the camera into the rainy distance. Small in the frame. The city glows behind him, but he is moving forward, toward the dark horizon. Rain, mist, low clouds. Cyan and amber lights reflecting on the wet road. No discernible direction — the viewer decides where he is going."}
+s1:"EXTREME WIDE SHOT of a fork in the road at the edge of cyberpunk Alger at night. On the LEFT, the city glows with cyan and amber neon, towers, holograms. On the RIGHT, a simple dark road disappears into the rainy countryside. In the CENTER, the silhouette of YACINE, standing still, seen from behind. Rain falling heavily.",
+s2:"MEDIUM CLOSE-UP of YACINE in profile, looking LEFT toward the city. Rain streaming down his face. His scar visible above right eyebrow, implant pulsing cyan behind left ear, neck tattoo catching the light. Expression: hesitant, tired, but alive. Cyan city light on the left side of face, warm amber from off-frame right.",
+s3:"EXTREME WIDE SHOT of a single silhouette (Yacine) walking AWAY from the camera into the rainy distance. Small in the frame. The city glows behind him, but he is moving forward, toward the dark horizon. Rain, mist, low clouds. Cyan and amber lights reflecting on the wet road."}
 ];
 
-// ═══════════════════════════════════════════════════════════════
-// EFFETS VIDÉO
-// ═══════════════════════════════════════════════════════════════
 const EFFECTS=[
-{id:'static',icon:'🔒',name:'Statique verrouillé',desc:'Aucun ajout',prompt:'Completely STATIC shot. NO camera movement. NO new elements. NO people added. The image stays EXACTLY as is, only subtle atmospheric motion: rain falling, distant neon flicker, wet reflections shifting gently.'},
-{id:'slow-dolly',icon:'🎬',name:'Dolly in lent',desc:'Avancée douce',prompt:'Slow cinematic dolly in, camera pushing forward, one direction only, no return. Rain falling, natural atmospheric motion. No new elements added.'},
-{id:'slow-zoom',icon:'🔍',name:'Zoom lent visage',desc:'Rapprochement',prompt:'Slow continuous zoom in on the main subject, one direction only, no return. No new elements. Cinematic tension building.'},
-{id:'track-right',icon:'➡️',name:'Tracking droit',desc:'Balayage latéral',prompt:'Very slow tracking shot moving laterally to the right, one direction only, no return. Rain continues.'},
-{id:'atmospheric',icon:'🌧️',name:'Atmosphérique pluie',desc:'Pluie, néons',prompt:'Static camera. Only atmospheric motion: rain falling continuously, neon signs flickering gently, wet reflections shifting, distant holograms pulsing. No new elements, no people added.'},
-{id:'drift',icon:'💨',name:'Dérive brume',desc:'Brume qui bouge',prompt:'Static camera. Only slow mist and steam drifting through the scene, subtle rain, gentle wind moving hair or fabric. No new elements.'},
-{id:'neon-pulse',icon:'✨',name:'Pulse néon',desc:'Néons qui respirent',prompt:'Static camera. Only neon signs pulsing slowly, LEDs breathing, holograms flickering. Everything else still. No new elements.'},
-{id:'emerge',icon:'🌑',name:'Émergence',desc:'Révélation lente',prompt:'Slow reveal from darkness to light, subject gradually emerging from shadow. No camera movement, no new elements, no people added.'}
+{id:'static',icon:'🔒',name:'Statique verrouillé',prompt:'Completely STATIC shot. NO camera movement. NO new elements. NO people added. The image stays EXACTLY as is, only subtle atmospheric motion: rain falling, distant neon flicker.'},
+{id:'slow-dolly',icon:'🎬',name:'Dolly in lent',prompt:'Slow cinematic dolly in, camera pushing forward, one direction only, no return. Rain falling, natural atmospheric motion. No new elements added.'},
+{id:'slow-zoom',icon:'🔍',name:'Zoom lent visage',prompt:'Slow continuous zoom in on the main subject, one direction only, no return. No new elements. Cinematic tension building.'},
+{id:'track-right',icon:'➡️',name:'Tracking droit',prompt:'Very slow tracking shot moving laterally to the right, one direction only, no return. Rain continues.'},
+{id:'atmospheric',icon:'🌧️',name:'Atmosphérique pluie',prompt:'Static camera. Only atmospheric motion: rain falling continuously, neon signs flickering gently, wet reflections shifting, distant holograms pulsing. No new elements, no people added.'},
+{id:'drift',icon:'💨',name:'Dérive brume',prompt:'Static camera. Only slow mist and steam drifting through the scene, subtle rain, gentle wind moving hair or fabric. No new elements.'},
+{id:'neon-pulse',icon:'✨',name:'Pulse néon',prompt:'Static camera. Only neon signs pulsing slowly, LEDs breathing, holograms flickering. Everything else still.'},
+{id:'emerge',icon:'🌑',name:'Émergence',prompt:'Slow reveal from darkness to light, subject gradually emerging from shadow. No camera movement, no new elements, no people added.'}
 ];
 
 // ═══════════════════════════════════════════════════════════════
 // ÉTAT
 // ═══════════════════════════════════════════════════════════════
 const state={
+mode:'preset',
 episode:EPISODES[0],
+customIdea:'',
+customGenre:'melancholic',
 apiKey:'',
 slots:[
 {idx:0,img:null,imgBase64:null,source:null,status:'idle',prompt:'',uploadDesc:''},
@@ -360,7 +450,11 @@ videos:[
 {idx:2,url:null,status:'idle',videoId:null,progress:0,effect:'slow-zoom',duration:169,progressText:'',promptOverride:''}
 ],
 isBusy:false,
-audioCtx:null
+audioCtx:null,
+imageIntervalMs:3400,
+videoIntervalMs:75000,
+imgAttempts:0,
+vidAttempts:0
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -370,6 +464,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
+let debugEntries=[];
 function log(msg,type='i'){
 const el=$('log');if(!el)return;
 const t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -377,36 +472,74 @@ const d=document.createElement('div');d.className='cl';
 d.innerHTML=`<span class="ct">${t}</span><span class="c${type}">${esc(msg)}</span>`;
 el.appendChild(d);el.scrollTop=el.scrollHeight;
 }
+function debugLog(level,cat,msg,data){
+const body=$('debug-body');if(!body)return;
+const time=new Date().toLocaleTimeString('fr-FR',{hour12:false});
+const entry=document.createElement('div');entry.className='debug-entry '+level;
+let html=`<span class="debug-time">${time}</span><span class="debug-cat">[${esc(cat)}]</span><span class="debug-msg">${esc(msg)}</span>`;
+if(data!==undefined&&data!==null){
+let str;if(typeof data==='string')str=data;else{try{str=JSON.stringify(data,null,2);}catch(e){str=String(data);}}
+if(str.length>4000)str=str.slice(0,4000)+'\n…[tronqué]';
+html+=`<pre class="debug-data">${esc(str)}</pre>`;
+}
+entry.innerHTML=html;body.appendChild(entry);
+debugEntries.push({time,level,cat,msg});
+if(debugEntries.length>800)debugEntries.shift();
+while(body.children.length>800)body.removeChild(body.firstChild);
+body.scrollTop=body.scrollHeight;
+$('debug-count').textContent=debugEntries.length;
+}
+function clearDebug(){const b=$('debug-body');if(b)b.innerHTML='';debugEntries=[];$('debug-count').textContent='0';}
+function copyDebug(){const lines=debugEntries.map(e=>e.time+' ['+e.cat+'] '+e.msg).join('\n');try{navigator.clipboard.writeText(lines).then(()=>toast('Console copiée','ok')).catch(()=>{});}catch(e){}}
+
 let toastT=null;
 function toast(msg,type='ok',dur=2500){
 const el=$('toast');el.textContent=msg;el.className='toast show '+type;
 if(toastT)clearTimeout(toastT);
 toastT=setTimeout(()=>el.classList.remove('show'),dur);
 }
-function setStatus(t){
-const b=$('status');
-if(t){b.classList.add('show');$('status-text').textContent=t;}
-else b.classList.remove('show');
-}
+function setStatus(t){const b=$('status');if(t){b.classList.add('show');$('status-text').textContent=t;}else b.classList.remove('show');}
 let asT=null;
-function flashAS(){
-const d=$('autosave-dot');d.classList.add('show');
-if(asT)clearTimeout(asT);
-asT=setTimeout(()=>d.classList.remove('show'),600);
+function flashAS(){const d=$('autosave-dot');d.classList.add('show');if(asT)clearTimeout(asT);asT=setTimeout(()=>d.classList.remove('show'),600);}
+function fileToBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('err'));r.readAsDataURL(file);});}
+
+// ═══════════════════════════════════════════════════════════════
+// MEDIA LOG
+// ═══════════════════════════════════════════════════════════════
+function addMediaLog(kind,url,label){
+const log=$('media-log');if(!log)return;
+const empty=log.querySelector('div[style]');if(empty)empty.remove();
+const t=new Date().toLocaleTimeString('fr-FR',{hour12:false});
+const el=document.createElement('div');el.className='media-log-entry';
+const short=url.length>100?url.slice(0,100)+'…':url;
+el.innerHTML=`<span class="ml-tag ${kind}">${kind}</span><span class="ml-url"><a href="${esc(url)}" target="_blank" rel="noopener">${esc(short)}</a></span><span style="color:var(--faint);font-size:.6rem">${t}</span>`;
+log.appendChild(el);
+$('medialog-count').textContent=log.querySelectorAll('.media-log-entry').length;
 }
-function fileToBase64(file){
-return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('err'));r.readAsDataURL(file);});
+
+// ═══════════════════════════════════════════════════════════════
+// WAKE LOCK
+// ═══════════════════════════════════════════════════════════════
+let wakeLockSentinel=null,canvasStream=null,canvasInterval=null;
+async function activateWakeLock(){
+if('wakeLock' in navigator){try{wakeLockSentinel=await navigator.wakeLock.request('screen');}catch(e){}}
+if(!wakeLockSentinel){try{const c=$('noSleepCanvas'),v=$('noSleepVideo');const ctx=c.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,2,2);let tg=false;canvasInterval=setInterval(()=>{tg=!tg;ctx.fillStyle=tg?'#000':'#010101';ctx.fillRect(0,0,2,2);},1000);canvasStream=c.captureStream(1);v.srcObject=canvasStream;v.muted=true;v.playsInline=true;v.play().catch(()=>{});}catch(e){}}
+}
+async function deactivateWakeLock(){
+if(wakeLockSentinel){try{await wakeLockSentinel.release();}catch(e){}wakeLockSentinel=null;}
+if(canvasInterval){clearInterval(canvasInterval);canvasInterval=null;}
+if(canvasStream){try{canvasStream.getTracks().forEach(t=>t.stop());}catch(e){}canvasStream=null;}
 }
 
 // ═══════════════════════════════════════════════════════════════
 // API KEY
 // ═══════════════════════════════════════════════════════════════
-function loadKey(){try{state.apiKey=localStorage.getItem('manhwa_key')||'';}catch(e){state.apiKey='';}$('api-key').value=state.apiKey;updateApiUI();}
+function loadKey(){try{state.apiKey=localStorage.getItem(API_KEY_STORAGE)||'';}catch(e){state.apiKey='';}$('api-key').value=state.apiKey;updateApiUI();}
 function saveKey(){
 const k=$('api-key').value.trim();
-if(!k){try{localStorage.removeItem('manhwa_key');}catch(e){}state.apiKey='';updateApiUI();toast('Clé effacée','err');return;}
-try{localStorage.setItem('manhwa_key',k);}catch(e){}
-state.apiKey=k;updateApiUI();toast('Clé enregistrée','ok');
+if(!k){try{localStorage.removeItem(API_KEY_STORAGE);}catch(e){}state.apiKey='';updateApiUI();toast('Clé effacée','err');return;}
+try{localStorage.setItem(API_KEY_STORAGE,k);}catch(e){}
+state.apiKey=k;updateApiUI();toast('Clé enregistrée','ok');scheduleSave();
 }
 function updateApiUI(){
 const box=$('api-box'),st=$('api-status');
@@ -416,18 +549,25 @@ renderSlots();renderVideos();
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROMPTS — VERSION v1.1 (character en premier)
+// PROMPTS
 // ═══════════════════════════════════════════════════════════════
 function buildImagePrompt(slot){
 const ep=state.episode;
-const sceneDesc=ep['s'+(slot.idx+1)]||'';
+let sceneDesc='';
+if(state.mode==='preset'){
+sceneDesc=ep['s'+(slot.idx+1)]||'';
+}else{
+// Custom : utilise le scénario généré si dispo
+sceneDesc=slot.customPrompt||slot.uploadDesc||'Custom scene for YACINE';
+}
 let p='';
-// 1. CHARACTER EN PREMIER (priorité absolue, jamais tronqué)
 p+=CHARACTER_LOCK+' ';
 p+=NO_HUMAN_FACES+' ';
-// 2. STYLE
 p+=STYLE_LOCK+' ';
-// 3. SCÈNE
+if(state.mode==='custom'){
+const g=GENRES.find(x=>x.id===state.customGenre);
+if(g)p+='GENRE: '+g.prompt+'. ';
+}
 p+='════ SCENE TO DEPICT ════ ';
 p+=sceneDesc+' ';
 p+='Vertical 9:16 composition. No text on signs except Arabic and Latin script. No watermark, no logo, no signature. ';
@@ -440,25 +580,51 @@ const v=state.videos[idx];
 if(v.promptOverride&&v.promptOverride.trim().length>15)return v.promptOverride.trim();
 const eff=EFFECTS.find(e=>e.id===v.effect)||EFFECTS[0];
 const ep=state.episode;
-const sceneDesc=ep['s'+(idx+1)]||'';
+const sceneDesc=state.mode==='preset'?(ep['s'+(idx+1)]||''):(state.slots[idx].customPrompt||state.slots[idx].uploadDesc||'');
 let p='Cinematic manhwa shot. Photorealistic illustration, film grain. ';
 p+='MOTION: '+eff.prompt+' ';
 p+='SCENE TO ANIMATE: '+sceneDesc+' ';
-p+='STRICT CHARACTER LOCK: preserve YACINE\'s EXACT face, shoulder-length wet hair, three-day beard + mustache, thin scar above the RIGHT eyebrow, cyan LED implant behind the LEFT ear, geometric neck tattoo on the RIGHT side, black techwear jacket with HIGH collar and cyan LED strips, silver chain necklace. ';
+p+='STRICT CHARACTER LOCK: preserve YACINE\'s EXACT face, shoulder-length wet hair, three-day beard + mustache, thin scar above RIGHT eyebrow, cyan LED implant behind LEFT ear, geometric neck tattoo on RIGHT side, black techwear jacket with HIGH collar and cyan LED strips, silver chain necklace. ';
 p+='STRICT CONTENT LOCK: reproduce the input image EXACTLY. Do NOT add any new character, person, face, or object. ';
-p+='If YACINE is visible, he must look IDENTICAL. ';
 p+='NO new humans. NO new faces in background. NO scene changes. ';
-p+='SUBTLE MOTION ONLY: rain falling, neon flicker, atmospheric drift, gentle head movement if relevant. ';
+p+='SUBTLE MOTION ONLY: rain falling, neon flicker, atmospheric drift, gentle head movement. ';
 p+='No cuts, no morphing.';
 if(p.length>MAX_PROMPT)p=p.slice(0,MAX_PROMPT);
 return p;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// EPISODE RENDER
+// RENDER MODE / EPISODES / GENRES
 // ═══════════════════════════════════════════════════════════════
+function renderModes(){
+document.querySelectorAll('#mode-grid .card').forEach(c=>{
+c.classList.toggle('sel',c.dataset.mode===state.mode);
+c.addEventListener('click',()=>{
+state.mode=c.dataset.mode;
+document.querySelectorAll('#mode-grid .card').forEach(x=>x.classList.remove('sel'));
+c.classList.add('sel');
+$('preset-block').style.display=state.mode==='preset'?'block':'none';
+$('custom-block').style.display=state.mode==='custom'?'block':'none';
+scheduleSave();
+});
+});
+$('preset-block').style.display=state.mode==='preset'?'block':'none';
+$('custom-block').style.display=state.mode==='custom'?'block':'none';
+}
+
+function renderGenres(){
+const g=$('genres');if(!g)return;g.innerHTML='';
+GENRES.forEach(gen=>{
+const el=document.createElement('div');
+el.className='card'+(state.customGenre===gen.id?' sel':'');
+el.innerHTML=`<span class="ic">${gen.icon}</span><span class="nm">${esc(gen.name)}</span>`;
+el.addEventListener('click',()=>{state.customGenre=gen.id;renderGenres();scheduleSave();});
+g.appendChild(el);
+});
+}
+
 function renderEpisodes(){
-const g=$('episodes');g.innerHTML='';
+const g=$('episodes');if(!g)return;g.innerHTML='';
 EPISODES.forEach(ep=>{
 const el=document.createElement('div');
 el.className='ep-card'+(state.episode.id===ep.id?' sel':'');
@@ -468,9 +634,9 @@ state.episode=ep;
 $('vo-text').value=ep.voice;
 $('vo-punch').value=ep.punch;
 renderEpisodes();
-state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';});
+state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';s.customPrompt='';});
 state.videos.forEach(v=>{v.url=null;v.status='idle';v.videoId=null;v.progress=0;v.promptOverride='';});
-renderSlots();renderVideos();saveState();
+renderSlots();renderVideos();scheduleSave();
 toast('Épisode '+ep.id+' : '+ep.title,'ok',1500);
 });
 g.appendChild(el);
@@ -490,15 +656,15 @@ let cls='slot';
 if(locked)cls+=' locked';else if(!done)cls+=' active';
 if(done)cls+=' done';
 const el=document.createElement('div');el.className=cls;
-const sceneDesc=state.episode['s'+(i+1)]||'';
+const sceneDesc=state.mode==='preset'?(state.episode['s'+(i+1)]||''):(slot.customPrompt||'');
 const shortDesc=sceneDesc.slice(0,120)+(sceneDesc.length>120?'…':'');
 let badge='';
-if(slot.source==='ai')badge='<span class="badge-src badge-ai">IA</span>';
-else if(slot.source==='upload')badge='<span class="badge-src badge-up">UPLOAD</span>';
+if(slot.source==='ai')badge='<span style="background:#4a6cf7;color:#fff;padding:.1rem .4rem;border-radius:6px;font-size:.55rem;margin-left:.3rem">IA</span>';
+else if(slot.source==='upload')badge='<span style="background:#8b5cf6;color:#fff;padding:.1rem .4rem;border-radius:6px;font-size:.55rem;margin-left:.3rem">UPLOAD</span>';
 let html=`<div class="slot-header"><div class="slot-title">Plan ${i+1}${badge}</div><span class="slot-num">${i+1}/3</span></div>`;
-html+=`<div class="slot-body">${esc(shortDesc)}</div>`;
+if(shortDesc)html+=`<div class="slot-body">${esc(shortDesc)}</div>`;
 if(slot.img)html+=`<img class="slot-img" src="${slot.img}">`;
-else html+=`<div class="slot-img-ph">Non généré</div>`;
+else html+=`<div class="slot-img loading">Plan ${i+1}</div>`;
 html+=`<div class="slot-status">${slot.status==='idle'?'○ en attente':slot.status==='gen'?'◐ génération…':slot.status==='done'?'● terminé':'✕ erreur'}</div>`;
 html+=`<div class="bar"><div class="bar-fill" style="width:${slot.status==='gen'?60:slot.status==='done'?100:0}%"></div></div>`;
 if(locked){html+=`<div class="hint">Termine le plan ${i} d'abord.</div>`;}
@@ -514,7 +680,7 @@ html+=`<button class="btn small ghost" data-regen="${i}" style="flex:1">↻</but
 html+=`</div>`;
 }
 if(slot.source==='upload'){
-html+=`<label style="margin-top:.5rem;font-size:.6rem;">Description de l'image (pour la vidéo)</label>`;
+html+=`<label style="margin-top:.5rem;font-size:.6rem;">Description (pour la vidéo)</label>`;
 html+=`<textarea data-ud="${i}" placeholder="Décris ce que l'image montre..." style="min-height:60px;font-size:.72rem">${esc(slot.uploadDesc||'')}</textarea>`;
 }
 html+=`<input type="file" accept="image/*" class="upload-in" id="up-${i}">`;
@@ -542,13 +708,13 @@ slot.img=b64;slot.imgBase64=b64;slot.source='upload';slot.status='done';
 log('📤 Plan '+(i+1)+' uploadé','o');
 toast('Plan '+(i+1)+' importé','ok',2500);
 }catch(e){toast('Erreur','err');}
-setStatus(null);renderSlots();renderVideos();saveState();
+setStatus(null);renderSlots();renderVideos();scheduleSave();
 }
 
 function validateSlot(i){
 if(i<2){
 state.slots[i+1].status='idle';
-renderSlots();renderVideos();saveState();
+renderSlots();renderVideos();scheduleSave();
 toast('Plan '+(i+2)+' débloqué','ok',1500);
 const slots=document.querySelectorAll('.slot');
 if(slots[i+1])slots[i+1].scrollIntoView({behavior:'smooth',block:'center'});
@@ -560,6 +726,9 @@ renderVideos();
 }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// VIDEOS RENDER
+// ═══════════════════════════════════════════════════════════════
 function renderVideos(){
 const c=$('video-slots');if(!c)return;
 c.innerHTML='';
@@ -571,8 +740,8 @@ const el=document.createElement('div');
 el.className='video-slot'+(v.status==='done'?' done':v.status==='gen'?' processing':'');
 let html=`<div class="slot-header"><div class="slot-title">Vidéo Plan ${i+1}</div><span class="slot-num">${v.status==='done'?'● PRÊT':v.status==='gen'?'◐ EN COURS':'○ À GÉNÉRER'}</span></div>`;
 if(v.url)html+=`<video class="slot-video" src="${v.url}" controls playsinline preload="metadata"></video>`;
-else if(v.status==='gen')html+=`<div class="slot-img-ph"><div class="spinner" style="width:40px;height:40px;border-width:3px;margin-bottom:.8rem;"></div><div style="color:var(--warn);">Génération…</div></div>`;
-else html+=`<div class="slot-img-ph">Vidéo à générer</div>`;
+else if(v.status==='gen')html+=`<div class="slot-img loading"><div class="spinner" style="width:40px;height:40px;border-width:3px"></div></div>`;
+else html+=`<div class="slot-img loading">Vidéo à générer</div>`;
 html+=`<label style="margin-top:.4rem">Effet</label>`;
 html+=`<select data-veffect="${i}" ${v.status==='gen'?'disabled':''}>`;
 EFFECTS.forEach(e=>{html+=`<option value="${e.id}" ${v.effect===e.id?'selected':''}>${e.icon} ${esc(e.name)}</option>`;});
@@ -585,7 +754,7 @@ html+=`<option value="241" ${v.duration===241?'selected':''}>10 sec</option>`;
 html+=`</select>`;
 html+=`<span class="hint" style="align-self:center">Durée</span>`;
 html+=`</div>`;
-html+=`<label style="margin-top:.4rem">✏️ Prompt override (optionnel)</label>`;
+html+=`<label style="margin-top:.4rem">✏️ Prompt override</label>`;
 html+=`<textarea data-vov="${i}" placeholder="Vide = prompt auto." style="min-height:60px;font-size:.7rem;font-family:ui-monospace">${esc(v.promptOverride||'')}</textarea>`;
 if(v.status==='gen'){
 html+=`<div class="slot-status" id="vp-${i}">${v.progressText||''}</div>`;
@@ -604,32 +773,44 @@ c.querySelectorAll('[data-vgen]').forEach(b=>b.addEventListener('click',()=>genV
 c.querySelectorAll('[data-vregen]').forEach(b=>b.addEventListener('click',()=>{
 const i=+b.dataset.vregen;
 state.videos[i].url=null;state.videos[i].status='idle';state.videos[i].videoId=null;state.videos[i].progress=0;
-renderVideos();saveState();genVideo(i,false);
+renderVideos();scheduleSave();genVideo(i,false);
 }));
 c.querySelectorAll('[data-vdl]').forEach(b=>b.addEventListener('click',()=>{
 const v=state.videos[+b.dataset.vdl];
 if(v.url)downloadFile(v.url,'manhwa_ep'+state.episode.id+'_plan'+(+b.dataset.vdl+1)+'.mp4');
 }));
-c.querySelectorAll('[data-veffect]').forEach(s=>s.addEventListener('change',()=>{state.videos[+s.dataset.veffect].effect=s.value;saveState();}));
-c.querySelectorAll('[data-vdur]').forEach(s=>s.addEventListener('change',()=>{state.videos[+s.dataset.vdur].duration=parseInt(s.value);saveState();}));
+c.querySelectorAll('[data-veffect]').forEach(s=>s.addEventListener('change',()=>{state.videos[+s.dataset.veffect].effect=s.value;scheduleSave();}));
+c.querySelectorAll('[data-vdur]').forEach(s=>s.addEventListener('change',()=>{state.videos[+s.dataset.vdur].duration=parseInt(s.value);scheduleSave();}));
 c.querySelectorAll('[data-vov]').forEach(ta=>ta.addEventListener('input',()=>{state.videos[+ta.dataset.vov].promptOverride=ta.value;scheduleSave();}));
 }
 
 // ═══════════════════════════════════════════════════════════════
-// API CALLS
+// API CALLS (avec adaptive rate limiter)
 // ═══════════════════════════════════════════════════════════════
-async function fetchRetry(url,opts,maxR,label){
+async function fetchRetry(url,opts,maxR,label,kind='default'){
 for(let i=0;i<=maxR;i++){
 try{
 const ctrl=new AbortController();
 const t=setTimeout(()=>ctrl.abort(),90000);
+debugLog('api','REQ '+label,(opts.method||'GET')+' '+url.split('?')[0]);
 const res=await fetch(url,{...opts,signal:ctrl.signal});
 clearTimeout(t);
-if((res.status===500||res.status===502||res.status===503)&&i<maxR){const w=Math.pow(2,i)*3000;log(label+' HTTP '+res.status,'w');await sleep(w);continue;}
-if(res.status===429&&i<maxR){log(label+' 429','w');await sleep(15000);continue;}
+debugLog('response','RÉP '+label,'HTTP '+res.status);
+if(res.status===429){
+if(kind==='image'){state.imgAttempts=0;state.imageIntervalMs=Math.min(state.imageIntervalMs+1500,12000);}
+if(kind==='video'){state.vidAttempts=0;state.videoIntervalMs=Math.min(state.videoIntervalMs+8000,90000);}
+const wait=[10,20,35,50,75][Math.min(i,4)];
+log(label+' 429 — attente '+wait+'s','w');
+await sleep(wait*1000);continue;
+}
+if(res.status===503&&i<maxR){await sleep([5,10,15,20,30][Math.min(i,4)]*1000);continue;}
+if(res.ok){
+if(kind==='image'){state.imgAttempts++;if(state.imgAttempts>=5&&state.imageIntervalMs>3200){state.imageIntervalMs-=200;state.imgAttempts=0;}}
+if(kind==='video'){state.vidAttempts++;if(state.vidAttempts>=3&&state.videoIntervalMs>62000){state.videoIntervalMs-=4000;state.vidAttempts=0;}}
+}
 return res;
 }catch(e){
-if(i<maxR)await sleep(Math.pow(2,i)*2000);
+if(i<maxR){const w=[3,5,8,12,20][Math.min(i,4)];await sleep(w*1000);}
 else throw new Error(label+' : '+e.message);
 }
 }
@@ -648,16 +829,12 @@ const variants=[
 ];
 for(const body of variants){
 try{
-const res=await fetchRetry(API_BASE+'/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},1,'Image');
+const res=await fetchRetry(API_BASE+'/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},1,'Image','image');
 if(res.ok){
 const d=await res.json();
 const url=d.data?.[0]?.url||d.data?.[0]?.b64_json;
 if(url){log('Image OK — '+size,'o');return url;}
-}else{
-const txt=await res.text();
-lastErr='HTTP '+res.status+' : '+txt.slice(0,150);
-log('Échec '+size+' — '+lastErr,'w');
-}
+}else{const txt=await res.text();lastErr='HTTP '+res.status+' : '+txt.slice(0,150);log('Échec '+size,'w');}
 }catch(e){lastErr=e.message;}
 }
 }
@@ -669,12 +846,9 @@ if(!state.apiKey)throw new Error('Clé manquante');
 const isUrl1=typeof startRef==='string'&&startRef.startsWith('http');
 const isUrl2=typeof endRef==='string'&&endRef.startsWith('http');
 let body;
-if(isUrl1&&isUrl2){
-body={model:MODEL_VIDEO,prompt,extra_body:{image:[startRef,endRef],mode:'keyframes'},num_frames:numFrames,frame_rate:24,height:VID_H,width:VID_W};
-}else{
-body={model:MODEL_VIDEO,prompt,image:startRef,num_frames:numFrames,frame_rate:24};
-}
-const res=await fetchRetry(API_BASE+'/videos',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},2,'Vidéo');
+if(isUrl1&&isUrl2){body={model:MODEL_VIDEO,prompt,extra_body:{image:[startRef,endRef],mode:'keyframes'},num_frames:numFrames,frame_rate:24,height:VID_H,width:VID_W};}
+else{body={model:MODEL_VIDEO,prompt,image:startRef,num_frames:numFrames,frame_rate:24};}
+const res=await fetchRetry(API_BASE+'/videos',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},2,'Vidéo','video');
 if(!res.ok){const txt=await res.text();throw new Error('HTTP '+res.status+' : '+txt.slice(0,200));}
 const d=await res.json();
 const id=d.video_id||d.id||d.data?.video_id;
@@ -716,6 +890,26 @@ throw new Error('Timeout');
 }
 
 // ═══════════════════════════════════════════════════════════════
+// QUEUE RATE-LIMITED (pour images parallèles)
+// ═══════════════════════════════════════════════════════════════
+function createQueue(maxC,minI){
+let running=0,lastStart=0;const q=[];let resolveIdle=null;
+function tryNext(){
+if(running>=maxC)return;
+if(q.length===0){if(running===0&&resolveIdle){resolveIdle();resolveIdle=null;}return;}
+const now=Date.now();
+const wait=Math.max(0,lastStart+minI-now);
+if(wait>0){setTimeout(tryNext,wait);return;}
+const task=q.shift();running++;lastStart=Date.now();
+task().finally(()=>{running--;setTimeout(tryNext,0);});
+}
+return {
+add(fn){return new Promise((res,rej)=>{q.push(()=>fn().then(res,rej));setTimeout(tryNext,0);});},
+idle(){return new Promise(r=>{if(running===0&&q.length===0)return r();resolveIdle=r;});}
+};
+}
+
+// ═══════════════════════════════════════════════════════════════
 // IMAGE GEN
 // ═══════════════════════════════════════════════════════════════
 async function genSlot(i){
@@ -732,6 +926,7 @@ setStatus('Génération plan '+(i+1)+'…');
 try{
 const url=await callImageAPI(prompt);
 slot.img=url;slot.source='ai';slot.status='done';
+addMediaLog('image',url,'Plan '+(i+1));
 log('✅ Plan '+(i+1)+' OK','o');
 toast('Plan '+(i+1)+' prêt','ok');
 }catch(e){
@@ -740,14 +935,44 @@ log('❌ Plan '+(i+1)+' : '+e.message,'e');
 toast('Erreur','err');
 }
 state.isBusy=false;setStatus(null);
-renderSlots();renderVideos();saveState();
+renderSlots();renderVideos();scheduleSave();
+}
+
+async function genAllImages(){
+if(state.isBusy)return;
+if(!state.apiKey){toast('Ajoute ta clé','err');return;}
+state.isBusy=true;
+log('⚡ Génération parallèle x3','o');
+setStatus('Génération parallèle des 3 plans…');
+const q=createQueue(3,state.imageIntervalMs);
+const tasks=state.slots.map((slot,i)=>q.add(async()=>{
+if(state.isBusy===false)return;
+const s=state.slots[i];
+s.status='gen';renderSlots();
+try{
+const prompt=buildImagePrompt(s);
+s.prompt=prompt;
+const url=await callImageAPI(prompt);
+s.img=url;s.source='ai';s.status='done';
+addMediaLog('image',url,'Plan '+(i+1));
+log('✅ Plan '+(i+1)+' OK','o');
+}catch(e){
+s.status='idle';log('❌ Plan '+(i+1)+' : '+e.message,'e');
+}
+renderSlots();
+}));
+await Promise.allSettled(tasks);
+await q.idle();
+state.isBusy=false;setStatus(null);
+renderSlots();renderVideos();scheduleSave();
+toast('Génération terminée','ok');
 }
 
 async function regenSlot(i){
 state.slots[i].status='idle';
 state.slots[i].img=null;state.slots[i].imgBase64=null;state.slots[i].source=null;
 state.videos[i]={idx:i,url:null,status:'idle',videoId:null,progress:0,effect:state.videos[i].effect,duration:state.videos[i].duration,progressText:'',promptOverride:state.videos[i].promptOverride};
-renderSlots();renderVideos();saveState();
+renderSlots();renderVideos();scheduleSave();
 await genSlot(i);
 }
 
@@ -767,11 +992,11 @@ v.status='gen';v.url=null;v.progress=0;v.progressText='Création…';
 renderVideos();
 const prompt=buildVideoPrompt(i);
 log('▶ Vidéo plan '+(i+1)+' — '+(v.duration/24).toFixed(1)+'s','i');
-if(v.promptOverride&&v.promptOverride.trim().length>15)log('  ✏️ Prompt override','i');
+if(v.promptOverride&&v.promptOverride.trim().length>15)log('  ✏️ Override','i');
 if(!silent)setStatus('Création vidéo '+(i+1)+'…');
 try{
 const vid=await createVideoTask(startRef,endRef,prompt,v.duration);
-v.videoId=vid;log('  Task : '+vid,'i');saveState();
+v.videoId=vid;log('  Task : '+vid,'i');scheduleSave();
 const finalUrl=await pollVideo(vid,(label,p,e)=>{
 v.progress=p;v.progressText=label+' '+p+'% · '+e+'s';
 const el=$('vp-'+i);if(el)el.textContent=v.progressText;
@@ -779,6 +1004,7 @@ const bar=$('vbar-'+i);if(bar)bar.style.width=p+'%';
 if(!silent)setStatus('Vidéo '+(i+1)+' — '+p+'%');
 });
 v.url=finalUrl;v.status='done';v.progress=100;
+addMediaLog('video',finalUrl,'Plan '+(i+1));
 log('✅ Vidéo '+(i+1)+' OK','o');
 if(!silent)toast('Vidéo '+(i+1)+' prête ✓','ok',3000);
 return true;
@@ -788,7 +1014,7 @@ log('❌ Vidéo '+(i+1)+' : '+e.message,'e');
 if(!silent)toast('Erreur vidéo','err');
 return false;
 }finally{
-renderVideos();saveState();
+renderVideos();scheduleSave();
 if(!silent)setStatus(null);
 }
 }
@@ -797,7 +1023,7 @@ async function batchVideos(){
 if(state.isBusy){toast('En cours','warn');return;}
 if(!state.slots.every(s=>s.status==='done')){toast('Génère les 3 images','err');return;}
 if(!confirm('Générer les 3 vidéos ? (~15-20 min)'))return;
-state.isBusy=true;log('⚡ Batch','o');
+state.isBusy=true;log('⚡ Batch vidéos','o');
 for(let i=0;i<3;i++){
 if(state.videos[i].url&&state.videos[i].url.startsWith('http'))continue;
 setStatus('Vidéo '+(i+1)+'/3');
@@ -825,9 +1051,7 @@ if(!('speechSynthesis' in window)){resolve();return;}
 speechSynthesis.cancel();
 setTimeout(()=>{
 const u=new SpeechSynthesisUtterance(text);
-u.lang='fr-FR';
-u.rate=parseFloat($('tts-rate').value)||0.85;
-u.pitch=parseFloat($('tts-pitch').value)||0.7;
+u.lang='fr-FR';u.rate=parseFloat($('tts-rate').value)||0.85;u.pitch=parseFloat($('tts-pitch').value)||0.7;
 const name=$('tts-voice').value;
 if(name){const v=speechSynthesis.getVoices().find(x=>x.name===name);if(v){u.voice=v;u.lang=v.lang;}}
 u.onend=resolve;u.onerror=resolve;
@@ -839,10 +1063,9 @@ function stopSpeech(){if('speechSynthesis' in window)speechSynthesis.cancel();}
 function ttsPlay(){
 const txt=$('vo-text').value.trim();
 if(!txt){toast('Script vide','err');return;}
-$('tts-status').textContent='Lecture…';
-speakText(txt).then(()=>{$('tts-status').textContent='';});
+speakText(txt);
 }
-function ttsStop(){stopSpeech();$('tts-status').textContent='Arrêté';setTimeout(()=>$('tts-status').textContent='',1500);}
+function ttsStop(){stopSpeech();}
 
 // ═══════════════════════════════════════════════════════════════
 // DRONE
@@ -862,22 +1085,19 @@ filter.Q.value=2;filter.connect(master);
 const freqs=style==='tense'?[55,82.5,110]:style==='urban'?[65.4,98,130.8]:style==='nostalgic'?[73.4,110,146.8]:[55,82.5,110,138.6];
 const oscs=[];
 freqs.forEach((f,i)=>{
-const osc=ctx.createOscillator();osc.type=i===0?'sawtooth':'sine';
-osc.frequency.value=f;
+const osc=ctx.createOscillator();osc.type=i===0?'sawtooth':'sine';osc.frequency.value=f;
 const g=ctx.createGain();g.gain.value=0.28/freqs.length;
 osc.connect(g);g.connect(filter);osc.start();oscs.push(osc);
 });
-const pulseFreq=style==='tense'?2.5:style==='urban'?1.5:0.15;
-const lfo=ctx.createOscillator();lfo.type='sine';lfo.frequency.value=pulseFreq;
-const lfoG=ctx.createGain();lfoG.gain.value=style==='urban'?12:25;
+const lfo=ctx.createOscillator();lfo.type='sine';lfo.frequency.value=style==='tense'?2.5:0.15;
+const lfoG=ctx.createGain();lfoG.gain.value=25;
 lfo.connect(lfoG);lfoG.connect(filter.frequency);lfo.start();oscs.push(lfo);
 droneNodes={ctx,master,filter,oscs};
-$('mus-status').textContent='▶ '+style;
 }catch(e){log('Erreur drone','e');}
 }
 function stopDrone(){
 if(!droneNodes)return;
-try{droneNodes.oscs.forEach(o=>{try{o.stop();}catch(e){}});droneNodes.master.disconnect();droneNodes=null;$('mus-status').textContent='⏹';}catch(e){}
+try{droneNodes.oscs.forEach(o=>{try{o.stop();}catch(e){}});droneNodes.master.disconnect();droneNodes=null;}catch(e){}
 }
 async function recordDrone(){
 startDrone();if(!droneNodes)return;
@@ -889,47 +1109,107 @@ mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
 mr.onstop=()=>{
 const blob=new Blob(chunks,{type:'audio/webm'});
 const url=URL.createObjectURL(blob);
-const a=document.createElement('a');
-a.href=url;a.download='manhwa_drone_ep'+state.episode.id+'.webm';
+const a=document.createElement('a');a.href=url;a.download='manhwa_drone.webm';
 document.body.appendChild(a);a.click();document.body.removeChild(a);
 setTimeout(()=>URL.revokeObjectURL(url),3000);
-$('mus-status').textContent='✓ exporté';
 };
-mr.start();$('mus-status').textContent='● Enregistrement 30s…';
+mr.start();
 setTimeout(()=>{mr.stop();stopDrone();},30000);
 }catch(e){log('Erreur enreg','e');}
 }
 
 // ═══════════════════════════════════════════════════════════════
-// AUTOSAVE
+// SAVE SYSTEM
 // ═══════════════════════════════════════════════════════════════
+function getSaves(){try{return JSON.parse(localStorage.getItem(SAVES_KEY)||'[]');}catch(e){return[];}}
+function setSaves(arr){try{localStorage.setItem(SAVES_KEY,JSON.stringify(arr));}catch(e){toast('Stockage plein','err');}}
+
+function buildSaveData(name){
+return{
+id:'save_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+timestamp:Date.now(),
+name:name||(state.mode==='preset'?state.episode.title:'Custom')+'-'+(state.episode.id||'x'),
+mode:state.mode,
+episodeId:state.episode.id,
+customIdea:state.customIdea,
+customGenre:state.customGenre,
+voText:$('vo-text').value,
+voPunch:$('vo-punch').value,
+slots:state.slots.map(s=>({img:s.img,imgBase64:s.imgBase64,source:s.source,status:s.status,prompt:s.prompt,uploadDesc:s.uploadDesc,customPrompt:s.customPrompt})),
+videos:state.videos.map(v=>({url:v.url,videoId:v.videoId,effect:v.effect,duration:v.duration,promptOverride:v.promptOverride}))
+};
+}
+function saveCurrent(name){
+const data=buildSaveData(name);
+const saves=getSaves();saves.unshift(data);
+if(saves.length>20)saves.splice(20);
+setSaves(saves);renderSaves();
+toast('Sauvegardé · '+data.name,'ok');
+flashAS();
+}
+function loadSave(id){
+const saves=getSaves();const save=saves.find(s=>s.id===id);
+if(!save){toast('Introuvable','err');return;}
+if(!confirm('Charger « '+save.name+' » ?'))return;
+state.mode=save.mode||'preset';
+if(save.episodeId){const ep=EPISODES.find(x=>x.id===save.episodeId);if(ep)state.episode=ep;}
+state.customIdea=save.customIdea||'';
+state.customGenre=save.customGenre||'melancholic';
+$('vo-text').value=save.voText||'';
+$('vo-punch').value=save.voPunch||'';
+if(save.slots)save.slots.forEach((s,i)=>{if(state.slots[i])Object.assign(state.slots[i],s);});
+if(save.videos)save.videos.forEach((v,i)=>{if(state.videos[i]){Object.assign(state.videos[i],v);state.videos[i].status=v.url?'done':'idle';}});
+renderModes();renderEpisodes();renderSlots();renderVideos();
+toast('Chargé · '+save.name,'ok');
+}
+function deleteSave(id){
+if(!confirm('Supprimer ?'))return;
+setSaves(getSaves().filter(s=>s.id!==id));
+renderSaves();toast('Supprimée','warn');
+}
+function renderSaves(){
+const list=$('saves-list');const countEl=$('saves-count');
+if(!list)return;
+const saves=getSaves();
+if(countEl)countEl.textContent=saves.length;
+if(saves.length===0){list.innerHTML='<div class="save-empty">Aucune sauvegarde</div>';return;}
+list.innerHTML='';
+saves.forEach(save=>{
+const el=document.createElement('div');el.className='save-entry';
+const date=new Date(save.timestamp).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'});
+const imgCount=(save.slots||[]).filter(x=>x&&x.img).length;
+const vidCount=(save.videos||[]).filter(x=>x&&x.url).length;
+el.innerHTML=`<div class="se-info"><div class="se-name">${esc(save.name)}</div><div class="se-meta">${date} · ${imgCount} img · ${vidCount} vid</div></div><div class="se-btns"><button type="button" class="load" data-load="${save.id}">Charger</button><button type="button" class="del" data-del="${save.id}">✕</button></div>`;
+el.querySelector('[data-load]').addEventListener('click',()=>loadSave(save.id));
+el.querySelector('[data-del]').addEventListener('click',()=>deleteSave(save.id));
+list.appendChild(el);
+});
+}
+
 let saveT=null;
 function scheduleSave(){if(saveT)clearTimeout(saveT);saveT=setTimeout(saveState,800);}
 function saveState(){
 try{
-const data={
-episodeId:state.episode.id,
-voText:$('vo-text').value,voPunch:$('vo-punch').value,
-slots:state.slots.map(s=>({img:s.img,imgBase64:s.imgBase64,source:s.source,status:s.status,prompt:s.prompt,uploadDesc:s.uploadDesc})),
-videos:state.videos.map(v=>({url:v.url,videoId:v.videoId,effect:v.effect,duration:v.duration,promptOverride:v.promptOverride})),
-savedAt:Date.now()
-};
-localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+const data=buildSaveData('autosave');
+localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(data));
 flashAS();
 }catch(e){}
 }
-function loadState(){
+function restoreAutosave(){
 try{
-const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return false;
-const d=JSON.parse(raw);
-if(d.episodeId){const ep=EPISODES.find(x=>x.id===d.episodeId);if(ep)state.episode=ep;}
-if(d.voText!=null)$('vo-text').value=d.voText;
-if(d.voPunch!=null)$('vo-punch').value=d.voPunch;
-if(d.slots)d.slots.forEach((s,i)=>{if(state.slots[i]){Object.assign(state.slots[i],s);}});
-if(d.videos)d.videos.forEach((v,i)=>{if(state.videos[i]){Object.assign(state.videos[i],v);state.videos[i].status=v.url?'done':'idle';}});
-log('💾 Session restaurée','o');
-return true;
-}catch(e){return false;}
+const raw=localStorage.getItem(AUTOSAVE_KEY);if(!raw)return;
+const data=JSON.parse(raw);
+if(!data||!data.timestamp)return;
+const age=Date.now()-data.timestamp;
+if(age>7*24*3600*1000)return;
+const ageMin=Math.round(age/60000);
+const ageStr=ageMin<1?'à l\'instant':ageMin<60?ageMin+' min':Math.round(ageMin/60)+' h';
+if(!confirm('Session précédente détectée ('+ageStr+'). La restaurer ?'))return;
+const saves=getSaves();
+const rd=Object.assign({},data,{id:'autosave_'+Date.now()});
+saves.unshift(rd);setSaves(saves);
+loadSave(rd.id);
+}catch(e){}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -950,10 +1230,10 @@ const ready=state.slots.filter(s=>s.img);
 if(!ready.length){toast('Aucune image','err');return;}
 for(const s of ready){
 if(s.source==='upload'&&s.imgBase64){
-const a=document.createElement('a');a.href=s.imgBase64;a.download='manhwa_ep'+state.episode.id+'_plan'+(s.idx+1)+'_upload.png';
+const a=document.createElement('a');a.href=s.imgBase64;a.download='manhwa_plan'+(s.idx+1)+'_upload.png';
 document.body.appendChild(a);a.click();document.body.removeChild(a);
 }else if(s.img&&s.img.startsWith('http')){
-await downloadFile(s.img,'manhwa_ep'+state.episode.id+'_plan'+(s.idx+1)+'.png');
+await downloadFile(s.img,'manhwa_plan'+(s.idx+1)+'.png');
 }
 await sleep(400);
 }
@@ -962,32 +1242,14 @@ toast('Images téléchargées','ok');
 async function downloadAllVideos(){
 const ready=state.videos.filter(v=>v.url);
 if(!ready.length){toast('Aucune vidéo','err');return;}
-for(const v of ready){await downloadFile(v.url,'manhwa_ep'+state.episode.id+'_video'+(v.idx+1)+'.mp4');await sleep(600);}
+for(const v of ready){await downloadFile(v.url,'manhwa_video'+(v.idx+1)+'.mp4');await sleep(600);}
 toast('Vidéos téléchargées','ok');
-}
-function downloadScript(){
-const ep=state.episode;
-let txt='═══════════════════════════════════════════\n';
-txt+='MANHWA//STUDIO — Épisode '+ep.id+' : '+ep.title+'\n';
-txt+='═══════════════════════════════════════════\n\n';
-txt+='SOUS-TITRE : '+ep.sub+'\n\n';
-txt+='── VOIX-OFF ──\n'+$('vo-text').value+'\n\n';
-txt+='── CHUTE ──\n'+$('vo-punch').value+'\n\n';
-txt+='── 3 PLANS ──\n';
-txt+='Plan 1 : '+ep.s1+'\n\n';
-txt+='Plan 2 : '+ep.s2+'\n\n';
-txt+='Plan 3 : '+ep.s3+'\n';
-const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
-const url=URL.createObjectURL(blob);
-const a=document.createElement('a');a.href=url;a.download='manhwa_ep'+ep.id+'.txt';
-document.body.appendChild(a);a.click();document.body.removeChild(a);
-URL.revokeObjectURL(url);
-toast('Script téléchargé','ok');
 }
 async function downloadZip(){
 if(typeof JSZip==='undefined'){toast('JSZip manquant','err');return;}
 const zip=new JSZip();
-const folder=zip.folder('manhwa_ep'+state.episode.id);
+const epName=state.mode==='preset'?'ep'+state.episode.id:'custom';
+const folder=zip.folder('manhwa_'+epName);
 toast('Construction ZIP…','ok',3000);
 for(const s of state.slots){
 if(!s.img)continue;
@@ -1004,32 +1266,44 @@ folder.file('plan'+(s.idx+1)+'.png',b);
 for(const v of state.videos){
 if(v.url){try{const res=await fetch(v.url);const b=await res.blob();folder.file('video'+(v.idx+1)+'.mp4',b);}catch(e){}}
 }
-const ep=state.episode;
-let txt='MANHWA//STUDIO\nÉpisode '+ep.id+' : '+ep.title+'\n\nVOIX-OFF :\n'+$('vo-text').value+'\n\nCHUTE :\n'+$('vo-punch').value+'\n';
+let txt='MANHWA//STUDIO v2.0\n';
+if(state.mode==='preset'){txt+='Épisode '+state.episode.id+' : '+state.episode.title+'\n';}
+else{txt+='Épisode personnalisé : '+state.customIdea+'\n';}
+txt+='\nVOIX-OFF :\n'+$('vo-text').value+'\n\nCHUTE :\n'+$('vo-punch').value+'\n';
 folder.file('script.txt',txt);
-folder.file('README.txt','Manhwa//Studio\nÉpisode '+ep.id+' : '+ep.title+'\nSous-titre : '+ep.sub+'\nGénéré : '+new Date().toLocaleString('fr-FR'));
+folder.file('README.txt','Manhwa//Studio v2.0\nYacine — Le Revenant\nGénéré : '+new Date().toLocaleString('fr-FR'));
 const blob=await zip.generateAsync({type:'blob'});
 const url=URL.createObjectURL(blob);
-const a=document.createElement('a');a.href=url;a.download='manhwa_ep'+ep.id+'_'+Date.now()+'.zip';
+const a=document.createElement('a');a.href=url;a.download='manhwa_'+epName+'_'+Date.now()+'.zip';
 document.body.appendChild(a);a.click();document.body.removeChild(a);
 URL.revokeObjectURL(url);
 toast('ZIP téléchargé ✓','ok',4000);
 }
+function downloadScript(){
+const epName=state.mode==='preset'?'Épisode '+state.episode.id+' : '+state.episode.title:'Custom';
+let txt='MANHWA//STUDIO\n'+epName+'\n\nVOIX-OFF :\n'+$('vo-text').value+'\n\nCHUTE :\n'+$('vo-punch').value+'\n';
+const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');a.href=url;a.download='manhwa_script.txt';
+document.body.appendChild(a);a.click();document.body.removeChild(a);
+URL.revokeObjectURL(url);
+toast('Script téléchargé','ok');
+}
 function resetAll(){
 if(!confirm('Tout effacer ?'))return;
-state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';});
+state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';s.customPrompt='';});
 state.videos.forEach((v,i)=>{v.url=null;v.status='idle';v.videoId=null;v.progress=0;v.promptOverride='';});
 state.slots[0].status='idle';
-try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+try{localStorage.removeItem(AUTOSAVE_KEY);}catch(e){}
 renderSlots();renderVideos();
 toast('Réinitialisé','ok');
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ACCORDÉON
+// ACCORDION
 // ═══════════════════════════════════════════════════════════════
 document.querySelectorAll('[data-t]').forEach(h=>{
-h.addEventListener('click',()=>document.getElementById(h.dataset.t).classList.toggle('open'));
+h.addEventListener('click',()=>$(h.dataset.t).classList.toggle('open'));
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1037,37 +1311,59 @@ h.addEventListener('click',()=>document.getElementById(h.dataset.t).classList.to
 // ═══════════════════════════════════════════════════════════════
 function init(){
 loadKey();
-loadState();
+renderModes();
+renderGenres();
+renderEpisodes();
 $('vo-text').value=state.episode.voice;
 $('vo-punch').value=state.episode.punch;
-renderEpisodes();
 renderSlots();
 renderVideos();
+renderSaves();
 
 $('api-save').addEventListener('click',saveKey);
-$('batch-videos').addEventListener('click',batchVideos);
+$('save-current-btn').addEventListener('click',()=>{
+const name=$('save-name-input').value.trim();
+saveCurrent(name);
+$('save-name-input').value='';
+});
+$('export-zip-btn').addEventListener('click',downloadZip);
+$('dl-zip').addEventListener('click',downloadZip);
 $('dl-all').addEventListener('click',downloadAllImages);
 $('dl-videos').addEventListener('click',downloadAllVideos);
-$('dl-zip').addEventListener('click',downloadZip);
 $('dl-script').addEventListener('click',downloadScript);
 $('reset-all').addEventListener('click',resetAll);
+$('batch-videos').addEventListener('click',batchVideos);
+$('gen-all-images').addEventListener('click',genAllImages);
 
-loadVoices();
-if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=loadVoices;
 $('tts-play').addEventListener('click',ttsPlay);
 $('tts-stop').addEventListener('click',ttsStop);
 $('mus-play').addEventListener('click',startDrone);
 $('mus-stop').addEventListener('click',stopDrone);
 $('mus-record').addEventListener('click',recordDrone);
 
-['vo-text','vo-punch'].forEach(id=>{const el=$(id);if(el)el.addEventListener('input',scheduleSave);});
+// Debug
+const dbgHeader=$('debug-header');
+if(dbgHeader)dbgHeader.addEventListener('click',e=>{
+if(e.target.tagName==='BUTTON')return;
+$('debug-panel').classList.toggle('collapsed');
+$('debug-collapse-btn').textContent=$('debug-panel').classList.contains('collapsed')?'+':'−';
+});
+$('debug-copy-btn').addEventListener('click',e=>{e.stopPropagation();copyDebug();});
+$('debug-clear-btn').addEventListener('click',e=>{e.stopPropagation();clearDebug();});
+$('debug-collapse-btn').addEventListener('click',e=>{e.stopPropagation();$('debug-panel').classList.toggle('collapsed');e.target.textContent=$('debug-panel').classList.contains('collapsed')?'+':'−';});
+
+loadVoices();
+if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=loadVoices;
 
 setInterval(()=>{if(!state.isBusy)saveState();},5000);
 window.addEventListener('beforeunload',saveState);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
 
-log('MANHWA//STUDIO v1.1 prêt','o');
-log('Character lock renforcé · Yacine verrouillé','cp');
+log('MANHWA//STUDIO v2.0 prêt','o');
+log('Character lock + Parallel images + Debug + Save','cp');
+debugLog('success','INIT','Manhwa//Studio v2.0 Fusion prêt');
+
+setTimeout(()=>restoreAutosave(),1500);
 }
 
 init();
