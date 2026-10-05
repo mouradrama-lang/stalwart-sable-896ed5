@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Short Drama Studio — Idée → Film</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -391,6 +392,26 @@ select option { background: var(--night-3); color: var(--ink); }
   body { padding-bottom: 20rem; }
   .debug-panel { height: 220px; }
 }
+
+/* ═══════ SYSTÈME DE SAUVEGARDE ═══════ */
+.save-panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:1rem}
+.save-panel h3{font-family:var(--font-serif);font-size:.75rem;text-transform:uppercase;letter-spacing:.2em;color:var(--ink);font-weight:500;margin-bottom:.7rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.save-panel h3 .badge{font-size:.6rem;padding:.15rem .5rem;background:transparent;color:var(--yellow);border:1px solid var(--yellow-deep);border-radius:2px}
+.save-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem}
+.save-actions button{flex:1;min-width:120px;padding:.7rem .8rem;border-radius:var(--radius);border:1px solid var(--yellow-deep);background:linear-gradient(135deg,rgba(232,123,53,0.15),rgba(229,193,90,0.1));color:var(--yellow-soft);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.save-actions button.blue{border-color:var(--blue-deep);background:linear-gradient(135deg,rgba(74,123,200,0.15),rgba(168,216,200,0.1));color:var(--blue-soft)}
+.save-name-input{width:100%;padding:.65rem .85rem;border-radius:var(--radius);border:1px solid var(--border);background:var(--night-2);color:var(--ink);font-family:var(--font-mono);font-size:.78rem;margin-bottom:.6rem}
+.save-name-input:focus{outline:none;border-color:var(--yellow-deep)}
+.saves-list{font-size:.72rem;color:var(--ink-dim);font-family:var(--font-mono);max-height:280px;overflow-y:auto}
+.save-entry{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.6rem .7rem;background:var(--night-2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:.35rem}
+.save-entry .se-info{flex:1;min-width:0}
+.save-entry .se-name{font-family:var(--font-serif);font-size:.82rem;color:var(--yellow-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.save-entry .se-meta{font-size:.62rem;color:var(--ink-dim);margin-top:.15rem;font-family:var(--font-mono)}
+.save-entry .se-btns{display:flex;gap:.3rem;flex-shrink:0}
+.save-entry button{background:transparent;padding:.3rem .55rem;border-radius:2px;font-size:.65rem;cursor:pointer;font-family:inherit}
+.save-entry button.load{border:1px solid var(--blue-deep);color:var(--blue-soft)}
+.save-entry button.del{border:1px solid var(--error);color:var(--error)}
+.save-empty{text-align:center;padding:1rem;color:var(--ink-faint);font-style:italic}
 </style>
 </head>
 <body>
@@ -428,6 +449,18 @@ select option { background: var(--night-3); color: var(--ink); }
   <div class="wake-status" id="wake-status">
     <span id="wake-status-text">💤 Veille automatique</span>
     <button type="button" id="wake-toggle-btn">Garder l'écran allumé</button>
+  </div>
+</div>
+
+<div class="save-panel" id="save-panel">
+  <h3>💾 Sauvegardes <span class="badge" id="saves-count">0</span></h3>
+  <input type="text" class="save-name-input" id="save-name-input" placeholder="Nom de la sauvegarde (optionnel)">
+  <div class="save-actions">
+    <button type="button" id="save-current-btn">💾 Sauvegarder</button>
+    <button type="button" class="blue" id="export-zip-btn">📦 Exporter ZIP</button>
+  </div>
+  <div class="saves-list" id="saves-list">
+    <div class="save-empty">Aucune sauvegarde</div>
   </div>
 </div>
 
@@ -590,7 +623,7 @@ select option { background: var(--night-3); color: var(--ink); }
 
 <script>
 // ══════════════════════════════════════════════════════════════════
-// CONFIG AGNES — identique à tes codes sources validés
+// CONFIG AGNES
 // ══════════════════════════════════════════════════════════════════
 const API_BASE = 'https://apihub.agnes-ai.com/v1';
 const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
@@ -606,13 +639,11 @@ const POETRY_TEMPERATURE = 0.95;
 const WORDS_PER_SCENE_TARGET = 10;
 const WORDS_PER_SCENE_MAX = 14;
 
-// MODIFIÉ : 1 au lieu de 3 pour garantir la cohérence des personnages
-const IMAGE_PARALLEL = 1; 
-// MODIFIÉ : Intervalle plus long car les images sont générées une par une
-const IMAGE_INTERVAL_MS = 5000; 
-const IMAGE_INTERVAL_MIN = 4000;
-const IMAGE_INTERVAL_MAX = 15000;
-const IMAGE_INTERVAL_SAFE = 5000;
+const IMAGE_PARALLEL = 3;
+const IMAGE_INTERVAL_MS = 3400;
+const IMAGE_INTERVAL_MIN = 3200;
+const IMAGE_INTERVAL_MAX = 12000;
+const IMAGE_INTERVAL_SAFE = 4000;
 
 const VIDEO_INTERVAL_MIN = 62000;
 const VIDEO_INTERVAL_MAX = 90000;
@@ -628,6 +659,8 @@ const DEBUG_MAX_ENTRIES = 800;
 const TIMING_CACHE_KEY = 'short_drama_timing_v1';
 const API_KEY_STORAGE = 'agnes_api_key';
 const WAKE_LOCK_PREF = 'agnes_wakelock_enabled';
+const SAVES_KEY = 'short_drama_saves_v1';
+const AUTOSAVE_KEY = 'short_drama_autosave_v1';
 
 // ══════════════════════════════════════════════════════════════════
 // GENRES
@@ -1166,7 +1199,7 @@ function bindRefInput() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// API FETCH — 5 niveaux de retry, backoff
+// API FETCH
 // ══════════════════════════════════════════════════════════════════
 async function apiFetch(url, options = {}, label = 'API', kind = 'default') {
   for (let attempt = 0; attempt < 7; attempt++) {
@@ -1242,7 +1275,7 @@ async function apiFetch(url, options = {}, label = 'API', kind = 'default') {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PARSER JSON — 5 stratégies (Kata Studio)
+// PARSER JSON — 5 stratégies
 // ══════════════════════════════════════════════════════════════════
 function escapeControlCharsInStrings(text) {
   let result = '';
@@ -1388,7 +1421,7 @@ function extractJson(text, kind) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PROMPTS — construction
+// PROMPTS
 // ══════════════════════════════════════════════════════════════════
 function buildScenarioPrompt(idea, sceneCount, mode) {
   const genre = GENRES.find(g => g.id === state.genre) || GENRES[4];
@@ -1489,13 +1522,10 @@ function buildPoetryPrompt(scenario, idea) {
 function buildImageGenerationPrompt(basePrompt, index, total, scenario) {
   const genre = GENRES.find(g => g.id === state.genre) || GENRES[4];
   const charList = scenario.characters.map(c => c.name + ': ' + c.description).join(' | ');
-  
-  // AJOUT : Règle stricte pour la cohérence des personnages
-  const strictCharacterRule = `CRITICAL CHARACTER CONSISTENCY: The characters MUST look EXACTLY the same in every single image. Do NOT change their face, hair, age, or clothing. Here is the precise description of the characters: ${charList}`;
-
   return [
     'STYLE: ' + genre.prompt,
-    strictCharacterRule,
+    '',
+    'CHARACTERS (must match exactly across all frames): ' + charList,
     '',
     'FRAME ' + (index + 1) + ' OF ' + total + ' — KEY CHAIN FRAME.',
     index === 0 ? 'This is the OPENING frame of the film.' :
@@ -1504,7 +1534,7 @@ function buildImageGenerationPrompt(basePrompt, index, total, scenario) {
     '',
     basePrompt,
     '',
-    'Format: portrait 9:16 vertical, cinematic photography, 35mm film grain.',
+    'Format: portrait 9:16 vertical, cinematic photography, 35mm film grain, consistent character design.',
     'No text, no watermark, no logo, no subtitle, no on-screen graphic.'
   ].join('\n');
 }
@@ -1580,7 +1610,6 @@ async function generateScenario() {
   if (!scenario || !scenario.scenes || !Array.isArray(scenario.scenes)) {
     throw new Error('Scénario invalide après 5 stratégies');
   }
-  // Ajustement
   if (scenario.scenes.length < state.sceneCount) {
     debugLog('warn', 'SCÉNARIO', 'Seulement ' + scenario.scenes.length + '/' + state.sceneCount + ' — duplication');
     const last = scenario.scenes[scenario.scenes.length - 1];
@@ -1776,7 +1805,7 @@ async function pollVideo(videoId, onProgress) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// QUEUE RATE-LIMITED (images parallèles)
+// QUEUE RATE-LIMITED
 // ══════════════════════════════════════════════════════════════════
 function createRateLimitedQueue(maxConcurrent, minIntervalMs) {
   let running = 0;
@@ -1814,7 +1843,7 @@ function createRateLimitedQueue(maxConcurrent, minIntervalMs) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// RENDU — scénario, images, queue, galerie
+// RENDU
 // ══════════════════════════════════════════════════════════════════
 function renderScenario() {
   const panel = document.getElementById('scenario-panel');
@@ -1950,7 +1979,7 @@ function addToGallery(videoUrl, sceneIndex) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PHASES — pipeline complet
+// PHASES
 // ══════════════════════════════════════════════════════════════════
 async function runScenarioPhase() {
   try {
@@ -1997,8 +2026,8 @@ async function runPoetryPhase() {
 
 async function runImagesPhase() {
   const total = state.imagePrompts.length;
-  setPhase('images', '🎨 Génération séquentielle de ' + total + ' images…', '');
-  debugLog('state', 'PHASE', 'Phase 3 — IMAGES séquentielle x' + IMAGE_PARALLEL + ' (' + total + ')');
+  setPhase('images', '🎨 Génération parallèle de ' + total + ' images…', '');
+  debugLog('state', 'PHASE', 'Phase 3 — IMAGES parallèle x' + IMAGE_PARALLEL + ' (' + total + ')');
   const queue = createRateLimitedQueue(IMAGE_PARALLEL, IMAGE_INTERVAL_MS);
   let completed = 0;
   const startTime = Date.now();
@@ -2019,7 +2048,7 @@ async function runImagesPhase() {
         const dt = ((Date.now() - t0) / 1000).toFixed(1);
         debugLog('success', 'IMAGE ' + (idx + 1) + '/' + total, 'OK en ' + dt + 's — ' + completed + '/' + total);
         setPhase('images', '🎨 Images : ' + completed + ' / ' + total,
-          '≈ ' + formatEta(Math.max(0, (total - completed) * 5)) + ' restant');
+          '≈ ' + formatEta(Math.max(0, (total - completed) * 4)) + ' restant');
       } catch (e) {
         if (e.message === 'Arrêt demandé') return;
         debugLog('error', 'IMAGE ' + (idx + 1), e.message);
@@ -2046,7 +2075,6 @@ async function runVideosPhase() {
   for (let i = 0; i < total; i++) {
     if (state.stopRequested) break;
     const item = state.videos[i];
-    // Détermine les keyframes
     let firstFrame, lastFrame;
     if (i === 0 && state.referenceImage) {
       firstFrame = state.referenceImage;
@@ -2055,7 +2083,6 @@ async function runVideosPhase() {
       firstFrame = state.images[i] ? state.images[i].url : (i === 0 && state.referenceImage ? state.referenceImage : null);
       lastFrame = state.images[i + 1] ? state.images[i + 1].url : (state.images[i] ? state.images[i].url : null);
     }
-    // Ajustement : si on a moins d'images que prévu, fallback
     if (!firstFrame && state.images[i]) firstFrame = state.images[i].url;
     if (!lastFrame && state.images[i]) lastFrame = state.images[i].url;
     if (!firstFrame || !lastFrame) {
@@ -2108,7 +2135,6 @@ async function runVideosPhase() {
       renderQueue();
       debugLog('error', 'SCÈNE ' + (i + 1), e.message);
     }
-    // Attente obligatoire de 62s entre deux créations vidéo
     if (i < total - 1 && !state.stopRequested) {
       let waitSec = Math.ceil(createVideoIntervalMs / 1000);
       for (let r = waitSec; r > 0; r--) {
@@ -2128,7 +2154,7 @@ async function runVideosPhase() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// TTS — narration
+// TTS
 // ══════════════════════════════════════════════════════════════════
 let speechSynth = null;
 function initSpeech() {
@@ -2171,14 +2197,256 @@ function stopSpeech() {
 }
 
 // ══════════════════════════════════════════════════════════════════
+// SYSTÈME DE SAUVEGARDE
+// ══════════════════════════════════════════════════════════════════
+function getSaves() {
+  try { return JSON.parse(localStorage.getItem(SAVES_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+function setSaves(arr) {
+  try { localStorage.setItem(SAVES_KEY, JSON.stringify(arr)); }
+  catch (e) { debugLog('error', 'SAVE', 'localStorage plein : ' + e.message); showToast('Stockage plein — supprime une sauvegarde', 'error', 4000); }
+}
+
+function buildSaveData(name) {
+  return {
+    id: 'save_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    timestamp: Date.now(),
+    name: name || (state.scenario && state.scenario.title) || (state.idea || '').slice(0, 40) || 'Sans titre',
+    idea: state.idea,
+    genre: state.genre,
+    mode: state.mode,
+    sceneCount: state.sceneCount,
+    durationFrames: state.durationFrames,
+    intensity: state.intensity,
+    ttsMode: state.ttsMode,
+    referenceImage: state.referenceImage,
+    scenario: state.scenario,
+    fullText: state.fullText,
+    dialogues: state.dialogues,
+    images: state.images,
+    videos: state.videos.map(v => ({
+      index: v.index, status: v.status, videoId: v.videoId,
+      videoUrl: v.videoUrl, progress: v.progress
+    })),
+    femaleCharacters: state.femaleCharacters
+  };
+}
+
+function saveCurrentState(name) {
+  const data = buildSaveData(name);
+  const saves = getSaves();
+  saves.unshift(data);
+  if (saves.length > 20) saves.splice(20);
+  setSaves(saves);
+  renderSavesList();
+  showToast('Sauvegardé · ' + data.name, 'success');
+  debugLog('success', 'SAVE', 'Sauvegarde : ' + data.name);
+}
+
+function loadSave(id) {
+  const saves = getSaves();
+  const save = saves.find(s => s.id === id);
+  if (!save) { showToast('Sauvegarde introuvable', 'error'); return; }
+  if (!confirm('Charger « ' + save.name + ' » ?')) return;
+
+  state.idea = save.idea || '';
+  state.genre = save.genre || 'drama';
+  state.mode = save.mode || 'sequence';
+  state.sceneCount = save.sceneCount || 8;
+  state.durationFrames = save.durationFrames || 161;
+  state.intensity = save.intensity || 'moderate';
+  state.ttsMode = save.ttsMode || 'voiceover';
+  state.referenceImage = save.referenceImage || null;
+  state.scenario = save.scenario || null;
+  state.fullText = save.fullText || '';
+  state.dialogues = save.dialogues || [];
+  state.images = save.images || [];
+  state.videos = save.videos || [];
+  state.femaleCharacters = save.femaleCharacters || [];
+
+  const ideaInput = document.getElementById('idea-input');
+  if (ideaInput) ideaInput.value = state.idea;
+  const modeSel = document.getElementById('mode-select');
+  if (modeSel) modeSel.value = state.mode;
+  const sceneSel = document.getElementById('scene-count-select');
+  if (sceneSel) sceneSel.value = String(state.sceneCount);
+  const durSel = document.getElementById('duration-select');
+  if (durSel) durSel.value = String(state.durationFrames);
+  const intSel = document.getElementById('intensity-select');
+  if (intSel) intSel.value = state.intensity;
+  const ttsSel = document.getElementById('tts-select');
+  if (ttsSel) ttsSel.value = state.ttsMode;
+
+  renderGenres();
+  updateRefPreview();
+  updateGenerateBtn();
+
+  if (state.scenario) {
+    state.imagePrompts = state.scenario.scenes.map(s => s.image_prompt);
+    state.imagePrompts.push(state.scenario.final_image_prompt);
+    renderScenario();
+    renderImagesGrid();
+    const galleryGrid = document.getElementById('gallery-grid');
+    const galleryEl = document.getElementById('gallery');
+    if (galleryGrid && galleryEl) {
+      galleryGrid.innerHTML = '';
+      let hasVideo = false;
+      state.videos.forEach((v, i) => {
+        if (v && v.videoUrl) { addToGallery(v.videoUrl, i); hasVideo = true; }
+      });
+      galleryEl.style.display = hasVideo ? 'block' : 'none';
+    }
+    renderQueue();
+  }
+
+  showToast('Chargé · ' + save.name, 'success');
+  debugLog('success', 'LOAD', 'Chargé : ' + save.name);
+}
+
+function deleteSave(id) {
+  if (!confirm('Supprimer cette sauvegarde ?')) return;
+  const saves = getSaves().filter(s => s.id !== id);
+  setSaves(saves);
+  renderSavesList();
+  showToast('Supprimée', 'warn');
+}
+
+function renderSavesList() {
+  const list = document.getElementById('saves-list');
+  const countEl = document.getElementById('saves-count');
+  if (!list) return;
+  const saves = getSaves();
+  if (countEl) countEl.textContent = String(saves.length);
+  if (saves.length === 0) {
+    list.innerHTML = '<div class="save-empty">Aucune sauvegarde</div>';
+    return;
+  }
+  list.innerHTML = '';
+  saves.forEach(save => {
+    const el = document.createElement('div');
+    el.className = 'save-entry';
+    const date = new Date(save.timestamp).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+    const imgCount = (save.images || []).filter(x => x && x.url).length;
+    const vidCount = (save.videos || []).filter(x => x && x.videoUrl).length;
+    el.innerHTML =
+      '<div class="se-info">' +
+        '<div class="se-name">' + esc(save.name) + '</div>' +
+        '<div class="se-meta">' + date + ' · ' + imgCount + ' img · ' + vidCount + ' vid</div>' +
+      '</div>' +
+      '<div class="se-btns">' +
+        '<button type="button" class="load" data-load="' + save.id + '">Charger</button>' +
+        '<button type="button" class="del" data-del="' + save.id + '">✕</button>' +
+      '</div>';
+    el.querySelector('[data-load]').addEventListener('click', () => loadSave(save.id));
+    el.querySelector('[data-del]').addEventListener('click', () => deleteSave(save.id));
+    list.appendChild(el);
+  });
+}
+
+let autosaveTimer = null;
+function scheduleAutosave() {
+  if (autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => {
+    if (!state.scenario && !state.idea) return;
+    try {
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(buildSaveData('Auto-save')));
+    } catch (e) {}
+  }, 3000);
+}
+
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (!data || !data.timestamp) return;
+    const age = Date.now() - data.timestamp;
+    if (age > 7 * 24 * 3600 * 1000) return;
+    const ageMin = Math.round(age / 60000);
+    const ageStr = ageMin < 1 ? 'à l\'instant' : ageMin < 60 ? ageMin + ' min' : Math.round(ageMin / 60) + ' h';
+    if (!confirm('Session précédente détectée (' + ageStr + '). La restaurer ?')) return;
+    const saves = getSaves();
+    const restoreData = Object.assign({}, data, { id: 'autosave_' + Date.now() });
+    saves.unshift(restoreData);
+    setSaves(saves);
+    loadSave(restoreData.id);
+  } catch (e) { debugLog('warn', 'AUTOSAVE', 'Restauration échouée : ' + e.message); }
+}
+
+async function exportZip() {
+  if (typeof JSZip === 'undefined') { showToast('JSZip non chargé', 'error'); return; }
+  if (!state.scenario) { showToast('Rien à exporter — génère un film d\'abord', 'error'); return; }
+  showToast('Construction du ZIP…', 'success', 3000);
+  const zip = new JSZip();
+  const folder = zip.folder('short_drama_' + (state.scenario.title || 'film').replace(/[^a-z0-9]/gi, '_').slice(0, 30));
+  for (let i = 0; i < state.images.length; i++) {
+    const img = state.images[i];
+    if (!img || !img.url) continue;
+    try {
+      const res = await fetch(img.url);
+      const blob = await res.blob();
+      folder.file('frame_' + (i + 1) + '.jpg', blob);
+    } catch (e) { debugLog('warn', 'ZIP', 'Image ' + (i + 1) + ' : ' + e.message); }
+  }
+  for (let i = 0; i < state.videos.length; i++) {
+    const v = state.videos[i];
+    if (!v || !v.videoUrl) continue;
+    try {
+      const res = await fetch(v.videoUrl);
+      const blob = await res.blob();
+      folder.file('scene_' + (i + 1) + '.mp4', blob);
+    } catch (e) { debugLog('warn', 'ZIP', 'Vidéo ' + (i + 1) + ' : ' + e.message); }
+  }
+  let txt = 'SHORT DRAMA STUDIO — ' + (state.scenario.title || 'Film') + '\n';
+  txt += '═'.repeat(50) + '\n\n';
+  txt += 'LOGLINE : ' + (state.scenario.logline || '') + '\n\n';
+  txt += 'PERSONNAGES :\n';
+  (state.scenario.characters || []).forEach(c => {
+    txt += '• ' + c.name + ' (' + c.gender + ') — ' + c.description + '\n';
+  });
+  txt += '\n' + '═'.repeat(50) + '\n\n';
+  txt += 'SCÈNES :\n\n';
+  state.scenario.scenes.forEach((s, i) => {
+    txt += '── Scène ' + (i + 1) + ' (' + (s.emotion || '?') + ') ──\n';
+    txt += 'Orateur : ' + (s.speaker || '?') + '\n';
+    if (state.dialogues[i] && state.dialogues[i].line) {
+      txt += '« ' + state.dialogues[i].line + ' »\n';
+    }
+    txt += 'Action : ' + s.action_prompt + '\n\n';
+  });
+  folder.file('scenario.txt', txt);
+  if (state.fullText) folder.file('poeme_complet.txt', state.fullText);
+  folder.file('README.txt',
+    'Short Drama Studio — Export\n' +
+    'Titre : ' + (state.scenario.title || '') + '\n' +
+    'Genre : ' + state.genre + '\n' +
+    'Mode : ' + state.mode + '\n' +
+    'Scènes : ' + state.sceneCount + '\n' +
+    'Frames : ' + state.durationFrames + '\n' +
+    'Date : ' + new Date().toLocaleString('fr-FR')
+  );
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'short_drama_' + Date.now() + '.zip';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('ZIP téléchargé ✓', 'success', 4000);
+  debugLog('success', 'ZIP', 'Export terminé');
+}
+
+// ══════════════════════════════════════════════════════════════════
 // DÉMARRAGE
 // ══════════════════════════════════════════════════════════════════
 async function startGeneration() {
   if (state.isRunning) return;
   if (!getApiKey()) {
     showToast('Ajoutez votre clé API', 'error');
-    const apiInput = document.getElementById('api-key-input');
-    if (apiInput) apiInput.focus();
+    document.getElementById('api-key-input').focus();
     return;
   }
   if (state.idea.trim().length < 10) {
@@ -2196,38 +2464,24 @@ async function startGeneration() {
   state.videos = [];
   state.dialogues = [];
   state.femaleCharacters = [];
-  
-  // Reset UI avec vérifications (FIX pour Cannot set properties of null)
-  const galleryGrid = document.getElementById('gallery-grid');
-  if (galleryGrid) galleryGrid.innerHTML = '';
-  const gallery = document.getElementById('gallery');
-  if (gallery) gallery.style.display = 'none';
-  const scenarioCard = document.getElementById('scenario-card');
-  if (scenarioCard) scenarioCard.innerHTML = '';
-  const scenarioPanel = document.getElementById('scenario-panel');
-  if (scenarioPanel) scenarioPanel.classList.remove('visible');
-  const imagesGrid = document.getElementById('images-grid');
-  if (imagesGrid) imagesGrid.innerHTML = '';
-  const queue = document.getElementById('queue');
-  if (queue) { queue.innerHTML = ''; queue.style.display = 'none'; }
-  const rawScenario = document.getElementById('raw-scenario');
-  if (rawScenario) rawScenario.textContent = '';
-  const rawDialogue = document.getElementById('raw-dialogue');
-  if (rawDialogue) rawDialogue.textContent = '';
-  const mediaLog = document.getElementById('media-log');
-  if (mediaLog) mediaLog.innerHTML = '<div style="font-size:0.72rem;color:var(--ink-dim);font-family:var(--font-mono);">Les URLs apparaîtront ici.</div>';
-  const medialogCount = document.getElementById('medialog-count');
-  if (medialogCount) medialogCount.textContent = '0';
-  const stopBtn = document.getElementById('stop-btn');
-  if (stopBtn) stopBtn.classList.add('visible');
-  const generateBtn = document.getElementById('generate-btn');
-  if (generateBtn) generateBtn.disabled = true;
-  const phaseBar = document.getElementById('phase-bar');
-  if (phaseBar) phaseBar.classList.add('visible');
-
+  document.getElementById('gallery-grid').innerHTML = '';
+  document.getElementById('gallery').style.display = 'none';
+  document.getElementById('scenario-card').innerHTML = '';
+  document.getElementById('scenario-panel').classList.remove('visible');
+  document.getElementById('images-grid').innerHTML = '';
+  document.getElementById('queue').innerHTML = '';
+  document.getElementById('queue').style.display = 'none';
+  document.getElementById('raw-scenario').textContent = '';
+  document.getElementById('raw-dialogue').textContent = '';
+  document.getElementById('media-log').innerHTML =
+    '<div style="font-size:0.72rem;color:var(--ink-dim);font-family:var(--font-mono);">Les URLs apparaîtront ici.</div>';
+  document.getElementById('medialog-count').textContent = '0';
+  document.getElementById('stop-btn').classList.add('visible');
+  document.getElementById('generate-btn').disabled = true;
+  document.getElementById('phase-bar').classList.add('visible');
   await ensureWakeLockActive();
+  scheduleAutosave();
   const totalStart = Date.now();
-  
   debugLog('state', 'START', '════════════════════════════════════════');
   debugLog('state', 'START', 'DÉMARRAGE — Short Drama Studio');
   debugLog('state', 'CONFIG', 'Idée : ' + state.idea);
@@ -2238,51 +2492,40 @@ async function startGeneration() {
   debugLog('state', 'CONFIG', 'Intensité : ' + state.intensity);
   debugLog('state', 'CONFIG', 'TTS : ' + state.ttsMode);
   debugLog('state', 'CONFIG', 'Référence : ' + (state.referenceImage ? Math.round(state.referenceImage.length / 1024) + ' Ko' : 'absente'));
-
   let success = false;
   try {
     const okScenario = await runScenarioPhase();
     if (!okScenario || state.stopRequested) throw new Error('Arrêt demandé');
-    
     state.femaleCharacters = state.scenario.characters
       .filter(c => c.gender === 'femme' || /fifi|luna|miss|mme|madame|marguerite|élise|sophie|claire|marie/i.test(c.name))
       .map(c => c.name.toLowerCase());
-
     await runPoetryPhase();
     if (state.stopRequested) throw new Error('Arrêt demandé');
-    
     const okImages = await runImagesPhase();
     if (state.stopRequested) throw new Error('Arrêt demandé');
     if (!okImages) showToast('Images manquantes — vidéos partielles', 'warn', 3500);
-    
     await runVideosPhase();
     setPhase('done', '✦ Film terminé ✦', '');
     success = true;
+    scheduleAutosave();
   } catch (e) {
     debugLog('error', 'GLOBAL', e.message);
-    showToast('Erreur : ' + e.message.slice(0, 60), 'error', 4000);
   }
-
   const totalElapsed = (Date.now() - totalStart) / 1000;
   const doneV = state.videos.filter(v => v.status === 'done').length;
   const totalV = state.videos.length;
   const summary = state.stopRequested
     ? 'Arrêté — ' + doneV + '/' + totalV + ' plans'
     : '✦ ' + doneV + '/' + totalV + ' plans en ' + formatEta(totalElapsed) + ' ✦';
-
   debugLog('state', 'FIN', summary);
   debugLog('state', 'FIN', '════════════════════════════════════════');
   setStatus(summary);
   await sleep(4500);
   setStatus(null);
-  
   state.isRunning = false;
   state.stopRequested = false;
-  const stopBtnEl = document.getElementById('stop-btn');
-  if (stopBtnEl) stopBtnEl.classList.remove('visible');
-  
+  document.getElementById('stop-btn').classList.remove('visible');
   updateGenerateBtn();
-  
   if (success) showToast('Film prêt — ' + doneV + ' plans', 'success', 4000);
   else if (doneV > 0) showToast(doneV + ' plan' + (doneV > 1 ? 's' : ''), 'warn', 3500);
   else showToast('Aucun plan généré', 'error', 3500);
@@ -2301,7 +2544,6 @@ function stopGeneration() {
 (function init() {
   initSpeech();
 
-  // Boutons API / stop / debug
   const saveBtn = document.getElementById('api-save-btn');
   if (saveBtn) saveBtn.addEventListener('click', saveApiKey);
   const stopBtn = document.getElementById('stop-btn');
@@ -2311,23 +2553,21 @@ function stopGeneration() {
     if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); }
   });
 
-  // Sections collapsibles
   document.querySelectorAll('[data-toggle]').forEach(header => {
     header.addEventListener('click', () => {
       document.getElementById(header.dataset.toggle).classList.toggle('open');
     });
   });
 
-  // Input idée
   const ideaInput = document.getElementById('idea-input');
   if (ideaInput) {
     ideaInput.addEventListener('input', e => {
       state.idea = e.target.value;
       updateGenerateBtn();
+      scheduleAutosave();
     });
   }
 
-  // Suggestions d'idées
   const chipsEl = document.getElementById('idea-chips');
   if (chipsEl) {
     chipsEl.innerHTML = IDEA_SUGGESTIONS.map(t =>
@@ -2343,10 +2583,8 @@ function stopGeneration() {
     });
   }
 
-  // Référence image
   bindRefInput();
 
-  // Sélecteurs
   const modeSelect = document.getElementById('mode-select');
   if (modeSelect) modeSelect.addEventListener('change', e => { state.mode = e.target.value; });
   const sceneSelect = document.getElementById('scene-count-select');
@@ -2364,15 +2602,12 @@ function stopGeneration() {
   const ttsSelect = document.getElementById('tts-select');
   if (ttsSelect) ttsSelect.addEventListener('change', e => { state.ttsMode = e.target.value; });
 
-  // Bouton générer
   const generateBtn = document.getElementById('generate-btn');
   if (generateBtn) generateBtn.addEventListener('click', startGeneration);
 
-  // Wake lock
   const wakeBtn = document.getElementById('wake-toggle-btn');
   if (wakeBtn) wakeBtn.addEventListener('click', toggleWakeLock);
 
-  // Debug panel
   const debugHeader = document.getElementById('debug-header');
   if (debugHeader) debugHeader.addEventListener('click', (e) => {
     if (e.target.tagName === 'BUTTON') return;
@@ -2385,7 +2620,6 @@ function stopGeneration() {
   const debugCopyBtn = document.getElementById('debug-copy-btn');
   if (debugCopyBtn) debugCopyBtn.addEventListener('click', (e) => { e.stopPropagation(); copyDebug(); });
 
-  // Raw viewers
   const rawScenarioToggle = document.getElementById('raw-scenario-toggle');
   if (rawScenarioToggle) {
     rawScenarioToggle.addEventListener('click', () => {
@@ -2405,14 +2639,23 @@ function stopGeneration() {
     });
   }
 
-  // Wake lock préférence
+  // Sauvegardes
+  const saveCurrentBtn = document.getElementById('save-current-btn');
+  if (saveCurrentBtn) saveCurrentBtn.addEventListener('click', () => {
+    const name = document.getElementById('save-name-input').value.trim();
+    saveCurrentState(name);
+    document.getElementById('save-name-input').value = '';
+  });
+  const exportZipBtn = document.getElementById('export-zip-btn');
+  if (exportZipBtn) exportZipBtn.addEventListener('click', exportZip);
+  renderSavesList();
+
   try {
     const saved = localStorage.getItem(WAKE_LOCK_PREF);
     wakeLockEnabled = saved === '1';
   } catch (e) {}
   if (wakeLockEnabled) activateWakeLock().then(() => updateWakeStatus());
 
-  // Rendus initiaux
   updateApiPanel();
   updateTimingDisplay();
   updateWakeStatus();
@@ -2424,9 +2667,12 @@ function stopGeneration() {
   debugLog('info', 'INIT', 'Pipeline : IDÉE → SCÉNARIO → POÉSIE → IMAGES → VIDÉOS');
   debugLog('info', 'INIT', 'Modèles : ' + MODEL_TEXT + ' / ' + MODEL_IMAGE + ' / ' + MODEL_VIDEO);
   debugLog('info', 'INIT', 'Durée : ' + state.durationFrames + ' frames @ ' + FRAME_RATE + ' fps = ' + (state.durationFrames / FRAME_RATE).toFixed(2) + 's');
-  debugLog('info', 'INIT', 'Images : séquentiel (1 par 1) @ ' + IMAGE_INTERVAL_MS + 'ms');
+  debugLog('info', 'INIT', 'Images : parallèle x' + IMAGE_PARALLEL + ' @ ' + IMAGE_INTERVAL_MS + 'ms');
   debugLog('info', 'INIT', 'Vidéo : 1er poll après ' + VIDEO_FIRST_POLL_DELAY_SEC + 's');
   debugLog('info', 'INIT', 'Parseur JSON : 5 stratégies actives');
+  debugLog('info', 'INIT', 'Sauvegardes : localStorage actif');
+
+  setTimeout(() => restoreAutosave(), 1500);
 })();
 </script>
 </body>
