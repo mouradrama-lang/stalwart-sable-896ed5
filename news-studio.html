@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEWS//STUDIO v3.0 — Broadcast Dystopique</title>
+<title>NEWS//STUDIO v3.1 — Visage persistant</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -126,6 +126,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 .save-entry button.load{border:1px solid var(--cyan);color:var(--cyan)}
 .save-entry button.del{border:1px solid var(--err);color:var(--err)}
 .save-empty{text-align:center;padding:1rem;color:var(--faint);font-style:italic}
+#face-zone{border:2px dashed var(--border);border-radius:10px;padding:1.2rem;text-align:center;cursor:pointer;margin-top:.6rem;position:relative;transition:all .2s}
+#face-zone:hover{border-color:var(--cyan);background:rgba(0,212,255,.03)}
+#face-zone.has-image{padding:0;border-style:solid;border-color:var(--ok)}
+#face-zone img{width:100%;border-radius:8px;max-height:400px;object-fit:contain;display:block;background:#000}
+#face-zone .face-label{position:absolute;bottom:0;left:0;right:0;padding:.5rem .7rem;background:linear-gradient(transparent,rgba(0,0,0,.9));font-size:.7rem;color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;text-align:center;border-radius:0 0 8px 8px}
+#face-zone .face-remove{position:absolute;top:.5rem;right:.5rem;background:rgba(255,51,85,.85);color:#fff;border:none;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .footer-note{text-align:center;font-size:.6rem;color:var(--faint);margin-top:1.5rem;padding-bottom:1rem;letter-spacing:.1em;text-transform:uppercase}
 #noSleepCanvas,#noSleepVideo{position:fixed;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1}
 .autosave-dot{position:fixed;top:1rem;right:1rem;width:8px;height:8px;border-radius:50%;background:var(--ok);opacity:0;transition:opacity .3s;z-index:9999;box-shadow:0 0 12px var(--ok)}
@@ -136,7 +142,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <body>
 
 <h1>News//Studio</h1>
-<div class="sub">v3.0 · Fusion · Broadcast Dystopique · Alger 2032</div>
+<div class="sub">v3.1 · Visage persistant · Broadcast Dystopique</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
 <div class="api" id="api-box">
@@ -144,6 +150,25 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
   <input type="password" id="api-key" placeholder="sk-..." autocomplete="off">
   <button class="btn small" id="api-save" style="margin-top:.45rem;width:100%">ENREGISTRER</button>
   <div style="font-size:.65rem;color:var(--dim);margin-top:.45rem" id="api-status">Non configurée</div>
+</div>
+
+<div class="panel open" id="p-face">
+  <div class="ph" data-t="p-face"><div class="pt"><span class="n">FACE</span> Visage de référence</div><span class="ch">▼</span></div>
+  <div class="pb"><div class="pc">
+    <div class="hint">Upload une fois ta photo. Elle sera utilisée pour TOUTES les générations d'images (sauf si tu uploades manuellement un plan).</div>
+    <div id="face-zone">
+      <input type="file" accept="image/*" id="face-input" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+      <div style="font-size:2rem;opacity:.5">📸</div>
+      <div style="font-size:.82rem;margin-top:.3rem">Clique pour uploader ton visage</div>
+      <div style="font-size:.65rem;color:var(--faint);margin-top:.2rem">JPG, PNG · Visage bien visible</div>
+    </div>
+    <label style="margin-top:.7rem">Mode de génération</label>
+    <select id="face-mode">
+      <option value="off">📝 Texte uniquement (description détaillée)</option>
+      <option value="reference" selected>🎭 Avec mon visage (img2img automatique)</option>
+    </select>
+    <div class="hint" style="margin-top:.4rem">En mode "Avec mon visage", l'IA recevra ta photo et essaiera de préserver le visage.</div>
+  </div></div>
 </div>
 
 <div class="save-panel" id="save-panel">
@@ -161,7 +186,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
   <div class="pb"><div class="pc">
     <div class="char-locked">
       <strong>LE JOURNALISTE — Broadcast Alger 2032</strong>
-      Homme nord-africain algérien, début trentaine. Visage ovale, mâchoire définie, peau olive mate avec texture naturelle. Cheveux brun foncé mi-longs, raie au milieu, tombant sur les oreilles. Barbe foncée de trois jours + moustache fournie. Yeux marron foncé enfoncés, regard sérieux, fatigué mais alerte. Costume noir élégant sur col roulé noir. Micro broadcast noir en main droite. Expression neutre, professionnelle, aucune émotion. 3 signatures visuelles strictes.
+      Homme nord-africain algérien, début trentaine. Visage ovale, mâchoire définie, peau olive mate. Cheveux brun foncé mi-longs, raie au milieu, tombant sur les oreilles. Barbe foncée de trois jours + moustache fournie. Yeux marron foncé enfoncés. Costume noir élégant sur col roulé noir. Micro broadcast noir en main droite. Expression neutre, professionnelle.
     </div>
   </div></div>
 </div>
@@ -181,7 +206,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <div class="panel open" id="p-gen">
   <div class="ph" data-t="p-gen"><div class="pt"><span class="n">2</span> Génération images</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">🔒 Character lock renforcé · 3 signatures obligatoires · Écritures arabes + latines uniquement.</div>
+    <div class="hint">🔒 Character lock renforcé · Écritures arabes + latines · Visage préservé si mode actif.</div>
     <div id="slots"></div>
     <div class="btn-row">
       <button class="btn small purple" id="gen-all-images">⚡ GÉNÉRER LES 3 (parallèle x3)</button>
@@ -268,7 +293,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">News//Studio v3.0 · Fusion · Broadcast Dystopique</div>
+<div class="footer-note">News//Studio v3.1 · Visage persistant · Broadcast</div>
 
 <canvas id="noSleepCanvas" width="2" height="2"></canvas>
 <video id="noSleepVideo" playsinline muted loop></video>
@@ -282,13 +307,14 @@ const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
 const MODEL_IMAGE='agnes-image-2.5-flash';
 const MODEL_VIDEO='agnes-video-v2.0';
 const IMG_W=1024,IMG_H=1792,VID_W=576,VID_H=1024;
-const MAX_PROMPT=3500;
+const MAX_PROMPT=4200;
 const INITIAL_WAIT=105;
 const POLL_INTERVAL=5;
-const STORAGE_KEY='news_studio_v3';
-const SAVES_KEY='news_saves_v3';
-const AUTOSAVE_KEY='news_autosave_v3';
+const STORAGE_KEY='news_studio_v3_1';
+const SAVES_KEY='news_saves_v3_1';
+const AUTOSAVE_KEY='news_autosave_v3_1';
 const API_KEY_STORAGE='news_api_key';
+const FACE_STORAGE_KEY='news_face_ref';
 
 // ═══════════════════════════════════════════════════════════════
 // STYLE LOCK — BROADCAST NORD-AFRICAIN
@@ -306,22 +332,44 @@ const STYLE_LOCK=
 'No illustration, no CGI, no cartoon. No smiles, no warmth. ';
 
 // ═══════════════════════════════════════════════════════════════
-// CHARACTER LOCK — VERROUILLÉ SUR LA PHOTO
+// CHARACTER LOCK — VERROUILLÉ
 // ═══════════════════════════════════════════════════════════════
 const CHARACTER_LOCK=
-'⚠️ ABSOLUTE CHARACTER REFERENCE — REPRODUCE THIS EXACT MAN IN EVERY SCENE: ' +
-'THE JOURNALIST, a NORTH AFRICAN ALGERIAN man in his early 30s. ' +
-'FACE: oval face with defined jawline and hollow cheeks, tan olive skin with visible natural texture and faint weathering. ' +
-'HAIR: dark brown almost black shoulder-length hair, middle part, falling naturally over the ears and reaching the base of the neck. NOT short, NOT buzz cut. ' +
-'FACIAL HAIR: full dark three-day beard AND full mustache, well-trimmed but visible. ' +
-'EYES: deep-set dark brown eyes with heavy upper eyelids, tired but alert gaze, serious unreadable expression, no smile, no warmth. ' +
-'SIGNATURE FEATURES (ALL 3 MUST BE VISIBLE): ' +
-'(1) slightly pronounced vertical frown lines between the eyebrows. ' +
-'(2) sharp defined jawline with subtle shadow of the beard. ' +
-'(3) broad forehead with visible natural skin texture and faint age lines. ' +
-'OUTFIT (IDENTICAL every scene): elegant black suit jacket with sharp lapels, plain BLACK high-neck TURTLENECK underneath (NO shirt collar, NO tie, NO white shirt). Silver wristwatch on the left wrist. ' +
-'ACCESSORY: slim matte-black BROADCAST MICROPHONE held in the RIGHT hand, silver grille on top, positioned at chest level. ' +
-'THE MAN IN THIS SCENE MUST BE THIS EXACT CHARACTER. If any of the 3 signature features is missing or if he does not match this description, the image is WRONG. ';
+'⚠️⚠️⚠️ IDENTITY LOCK — MAXIMUM PRIORITY. REPRODUCE THIS EXACT MAN IDENTICALLY IN EVERY SCENE: ' +
+'THE JOURNALIST is a NORTH AFRICAN ALGERIAN man, 34 years old. ' +
+'FACE (REPRODUCE WITH ABSOLUTE FIDELITY): ' +
+'- SLIGHTLY ELONGATED OVAL face, NOT round, NOT square. ' +
+'- PROMINENT STRAIGHT NOSE with a subtle slight bump on the bridge. ' +
+'- DEEP-SET DARK BROWN EYES under heavy upper eyelids with visible natural bags under the eyes. ' +
+'- THICK DARK EYEBROWS, close to the eyes, slightly arched. ' +
+'- THIN LIPS, natural color, no smile. ' +
+'- PRONOUNCED CHEEKBONES, hollow cheeks. ' +
+'- SHARP JAWLINE with a slight dimple shadow. ' +
+'- FOREHEAD with two horizontal lines visible. ' +
+'- OLIVE SKIN with natural texture and faint dark circles under the eyes. ' +
+'HAIR (IDENTICAL every scene): ' +
+'- DARK BROWN almost BLACK hair, MEDIUM LENGTH reaching just below the ears. ' +
+'- MIDDLE PART, strands falling on BOTH sides of the face, natural movement. ' +
+'- Hair has a slight natural wave, not straight, not curly. ' +
+'- NEVER short, NEVER buzz cut, NEVER slicked back. ' +
+'FACIAL HAIR (IDENTICAL every scene): ' +
+'- FULL DARK BEARD covering the jaw and chin, roughly 3-day growth. ' +
+'- CONNECTED MUSTACHE, thick, reaching the corners of the mouth. ' +
+'- Beard is DARK BROWN with a few grey strands visible. ' +
+'- NEVER clean-shaven, NEVER thin stubble, NEVER goatee-only. ' +
+'OUTFIT (IDENTICAL every scene): ' +
+'- SHARP BLACK SUIT JACKET with peak lapels, matte fabric. ' +
+'- PLAIN BLACK HIGH-NECK TURTLENECK underneath, no visible shirt collar. ' +
+'- NO tie, NO white shirt, NO bow tie, NO pocketsquare. ' +
+'- SILVER STAINLESS WRISTWATCH on the LEFT wrist, round dial, visible. ' +
+'ACCESSORY (IDENTICAL every scene): ' +
+'- SLIM MATTE-BLACK BROADCAST MICROPHONE in the RIGHT hand. ' +
+'- SILVER MESH GRILLE on top, black cylindrical body. ' +
+'- Mic is held at chest level, tilted slightly up. ' +
+'EXPRESSION (IDENTICAL every scene): ' +
+'- SERIOUS, NEUTRAL, UNREADABLE. No smile. No warmth. ' +
+'- Eyes looking directly into the camera. ' +
+'⚠️ CRITICAL FINAL CHECK: The man in the generated image MUST look like the SAME PERSON as in every other scene. If the face, hair, or beard looks different, the image is REJECTED. This identity is NON-NEGOTIABLE. ';
 
 const NO_HUMAN_FACES=
 'Background crowd must remain in SOFT BLUR with NO identifiable faces. Only THE JOURNALIST has a visible face. ';
@@ -334,7 +382,7 @@ const CONCEPTS=[
 voice:"Le thermomètre de la capitale affiche 47 degrés Celsius à 14 heures. Les autorités sanitaires confirment 340 décès liés à la chaleur depuis ce matin. Le ministère remercie les citoyens pour leur patience.",
 punch:"47°C — 340 morts — merci pour votre patience.",
 p1:"WIDE BROADCAST SHOT. Massive HOLOGRAPHIC PUBLIC SCREEN floating above a wet North African futuristic street, displaying an official AMBER warning banner with abstract alert symbols in LATIN and ARABIC script only. NO East Asian characters. Street EMPTY of main character. Heat haze visible. COLOR: dominant AMBER alert on the screen, cold cyan and pale amber neon on the walls below.",
-p2:"MEDIUM CLOSE-UP from CHEST UP of THE JOURNALIST (North African Algerian man). He stands still facing the camera, broadcast microphone up near his face. Neutral expression. Holographic press badge glows cyan on his black suit. Behind him, out of focus, the glowing AMBER warning screen. COLOR: cold cyan rim light on shoulders, pale amber reflection on face.",
+p2:"MEDIUM CLOSE-UP from CHEST UP of THE JOURNALIST. He stands still facing the camera, broadcast microphone up near his face. Neutral expression. Holographic press badge glows cyan on his black suit. Behind him, out of focus, the glowing AMBER warning screen. COLOR: cold cyan rim light on shoulders, pale amber reflection on face.",
 p3:"EXTREME MACRO CLOSE-UP OF THE BROADCAST MICROPHONE. Only the microphone fills the frame edge to edge, the journalist's olive-skinned hand visible behind it. Small holographic channel logo floats above the mic head, glowing cyan. Rain droplets on the matte-black surface. NO face visible. COLOR: cyan hologram glow, pale amber rim on the hand, deep black background."},
 {id:'emploi',icon:'💼',name:'Automatisation',desc:'12M emplois supprimés',
 voice:"Le ministère du Travail annonce un record historique. Douze millions d'emplois ont été automatisés ce trimestre. La productivité nationale a augmenté de quatre cents pour cent.",
@@ -381,7 +429,7 @@ p3:"EXTREME MACRO CLOSE-UP OF THE JOURNALIST'S FACE, EYES AND UPPER CHEEKS ONLY.
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// 8 EFFETS VIDÉO
+// EFFETS VIDÉO
 // ═══════════════════════════════════════════════════════════════
 const EFFECTS=[
 {id:'static',icon:'🔒',name:'Statique verrouillé',desc:'Aucun ajout',prompt:'Completely STATIC shot. NO camera movement. NO new elements. NO people added. The image stays EXACTLY as is, only subtle atmospheric motion: rain falling, distant neon flicker.'},
@@ -465,6 +513,98 @@ function flashAS(){const d=$('autosave-dot');d.classList.add('show');if(asT)clea
 function fileToBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('err'));r.readAsDataURL(file);});}
 
 // ═══════════════════════════════════════════════════════════════
+// FACE REFERENCE — visage persistant
+// ═══════════════════════════════════════════════════════════════
+function loadFaceRef() {
+  try { return localStorage.getItem(FACE_STORAGE_KEY) || null; }
+  catch (e) { return null; }
+}
+function saveFaceRef(b64) {
+  try {
+    if (b64) localStorage.setItem(FACE_STORAGE_KEY, b64);
+    else localStorage.removeItem(FACE_STORAGE_KEY);
+    return true;
+  } catch (e) {
+    toast('Stockage plein — image trop lourde', 'err');
+    return false;
+  }
+}
+function compressFaceImage(dataUrl, maxSide = 1024) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      const scale = Math.min(1, maxSide / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+async function handleFaceUpload(file) {
+  if (!file || !file.type.startsWith('image/')) { toast('Fichier non image', 'err'); return; }
+  setStatus('Traitement de la photo…');
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const compressed = await compressFaceImage(e.target.result);
+      if (saveFaceRef(compressed)) {
+        renderFaceZone();
+        toast('Visage enregistré ✓', 'ok');
+        debugLog('success', 'FACE', 'Visage chargé (' + Math.round(compressed.length / 1024) + ' Ko)');
+      }
+    } catch (err) { toast('Erreur traitement', 'err'); }
+    setStatus(null);
+  };
+  reader.onerror = () => { toast('Erreur lecture', 'err'); setStatus(null); };
+  reader.readAsDataURL(file);
+}
+function renderFaceZone() {
+  const zone = $('face-zone');
+  if (!zone) return;
+  const b64 = loadFaceRef();
+  if (b64) {
+    zone.classList.add('has-image');
+    zone.innerHTML =
+      '<img src="' + b64 + '" alt="">' +
+      '<div class="face-label">✓ Visage de référence actif</div>' +
+      '<button type="button" class="face-remove" id="face-remove-btn">✕</button>' +
+      '<input type="file" accept="image/*" id="face-input" style="display:none">';
+    const btn = $('face-remove-btn');
+    if (btn) btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!confirm('Supprimer le visage de référence ?')) return;
+      saveFaceRef(null);
+      renderFaceZone();
+      toast('Visage supprimé', 'warn');
+    });
+  } else {
+    zone.classList.remove('has-image');
+    zone.innerHTML =
+      '<input type="file" accept="image/*" id="face-input" style="position:absolute;inset:0;opacity:0;cursor:pointer">' +
+      '<div style="font-size:2rem;opacity:.5">📸</div>' +
+      '<div style="font-size:.82rem;margin-top:.3rem">Clique pour uploader ton visage</div>' +
+      '<div style="font-size:.65rem;color:var(--faint);margin-top:.2rem">JPG, PNG · Visage bien visible</div>';
+  }
+  const input = $('face-input');
+  if (input) input.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleFaceUpload(file);
+  });
+}
+function getFaceMode() {
+  const sel = $('face-mode');
+  return sel ? sel.value : 'off';
+}
+
+// ═══════════════════════════════════════════════════════════════
 // MEDIA LOG
 // ═══════════════════════════════════════════════════════════════
 function addMediaLog(kind,url,label){
@@ -515,7 +655,22 @@ renderSlots();renderVideos();
 function buildImagePrompt(slot){
 const c=state.concept;
 const sceneDesc=c['p'+(slot.idx+1)]||'';
+const useFace = getFaceMode() === 'reference' && loadFaceRef();
 let p='';
+
+if (useFace) {
+  p+='⚠️ PRESERVE THE EXACT FACE, HAIR, BEARD from the reference image. The person is IDENTICAL. ';
+  p+='ONLY change the environment, lighting, and atmosphere as described below. ';
+  p+='DO NOT change the face shape, eyes, nose, mouth, hair, or beard. ';
+  p+=NO_HUMAN_FACES+' ';
+  p+=STYLE_LOCK+' ';
+  p+='════ SCENE TO DEPICT ════ ';
+  p+=sceneDesc+' ';
+  p+='Vertical 9:16 composition. No text on signs except Arabic and Latin script. No watermark, no logo, no signature. ';
+  if(p.length>MAX_PROMPT)p=p.slice(0,MAX_PROMPT);
+  return p;
+}
+
 p+=CHARACTER_LOCK+' ';
 p+=NO_HUMAN_FACES+' ';
 p+=STYLE_LOCK+' ';
@@ -703,13 +858,13 @@ c.querySelectorAll('[data-vov]').forEach(ta=>ta.addEventListener('input',()=>{st
 }
 
 // ═══════════════════════════════════════════════════════════════
-// API CALLS — adaptive rate limiter
+// API CALLS — avec support img2img (5 variantes)
 // ═══════════════════════════════════════════════════════════════
 async function fetchRetry(url,opts,maxR,label,kind='default'){
 for(let i=0;i<=maxR;i++){
 try{
 const ctrl=new AbortController();
-const t=setTimeout(()=>ctrl.abort(),90000);
+const t=setTimeout(()=>ctrl.abort(),120000);
 debugLog('api','REQ '+label,(opts.method||'GET')+' '+url.split('?')[0]);
 const res=await fetch(url,{...opts,signal:ctrl.signal});
 clearTimeout(t);
@@ -738,23 +893,45 @@ throw new Error(label+' échec');
 async function callImageAPI(prompt){
 if(!state.apiKey)throw new Error('Clé manquante');
 const sizes=[`${IMG_W}x${IMG_H}`,'1024x1792','1024x1024','768x1024','512x512'];
+const faceB64 = loadFaceRef();
+const useFace = getFaceMode() === 'reference' && faceB64;
 let lastErr=null;
+
 for(const size of sizes){
-const variants=[
-{model:MODEL_IMAGE,prompt,size,response_format:'url'},
-{model:MODEL_IMAGE,prompt,size,extra_body:{response_format:'url'}},
-{model:MODEL_IMAGE,prompt,size}
-];
-for(const body of variants){
-try{
-const res=await fetchRetry(API_BASE+'/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},1,'Image','image');
-if(res.ok){
-const d=await res.json();
-const url=d.data?.[0]?.url||d.data?.[0]?.b64_json;
-if(url){log('Image OK — '+size,'o');return url;}
-}else{const txt=await res.text();lastErr='HTTP '+res.status+' : '+txt.slice(0,150);log('Échec '+size,'w');}
-}catch(e){lastErr=e.message;}
-}
+  let variants;
+  if (useFace) {
+    variants = [
+      { model: MODEL_IMAGE, prompt, size, image: faceB64, response_format: 'url' },
+      { model: MODEL_IMAGE, prompt, size, image_url: faceB64, response_format: 'url' },
+      { model: MODEL_IMAGE, prompt, size, extra_body: { image: faceB64, response_format: 'url' } },
+      { model: MODEL_IMAGE, prompt, size, extra_body: { image_url: faceB64, response_format: 'url' } },
+      { model: MODEL_IMAGE, prompt, size, reference_image: faceB64, response_format: 'url' }
+    ];
+  } else {
+    variants = [
+      { model: MODEL_IMAGE, prompt, size, response_format: 'url' },
+      { model: MODEL_IMAGE, prompt, size, extra_body: { response_format: 'url' } },
+      { model: MODEL_IMAGE, prompt, size }
+    ];
+  }
+
+  for(const body of variants){
+    try{
+      const res=await fetchRetry(API_BASE+'/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},1,'Image','image');
+      if(res.ok){
+        const d=await res.json();
+        const url=d.data?.[0]?.url||d.data?.[0]?.b64_json;
+        if(url){
+          log('Image OK — '+size+(useFace?' · avec visage':''),'o');
+          return url;
+        }
+      }else{
+        const txt=await res.text();
+        lastErr='HTTP '+res.status+' : '+txt.slice(0,150);
+        if (useFace) log('Échec variante face — '+lastErr.slice(0,80),'w');
+      }
+    }catch(e){lastErr=e.message;}
+  }
 }
 throw new Error('Image : '+lastErr);
 }
@@ -839,7 +1016,8 @@ slot.status='gen';slot.img=null;slot.imgBase64=null;slot.source=null;
 renderSlots();
 const prompt=buildImagePrompt(slot);
 slot.prompt=prompt;
-log('▶ Image plan '+(i+1)+' ('+prompt.length+' car.)','i');
+const useFace = getFaceMode() === 'reference' && loadFaceRef();
+log('▶ Image plan '+(i+1)+' ('+prompt.length+' car.)'+(useFace?' · mode visage':' · mode texte'),'i');
 setStatus('Génération plan '+(i+1)+'…');
 try{
 const url=await callImageAPI(prompt);
@@ -860,7 +1038,8 @@ async function genAllImages(){
 if(state.isBusy)return;
 if(!state.apiKey){toast('Ajoute ta clé','err');return;}
 state.isBusy=true;
-log('⚡ Génération parallèle x3','o');
+const useFace = getFaceMode() === 'reference' && loadFaceRef();
+log('⚡ Génération parallèle x3'+(useFace?' · mode visage':''),'o');
 setStatus('Génération parallèle des 3 plans…');
 const q=createQueue(3,state.imageIntervalMs);
 const tasks=state.slots.map((slot,i)=>q.add(async()=>{
@@ -1161,11 +1340,11 @@ else if(s.img.startsWith('http')){const res=await fetch(s.img);const b=await res
 for(const v of state.videos){
 if(v.url){try{const res=await fetch(v.url);const b=await res.blob();folder.file('video'+(v.idx+1)+'.mp4',b);}catch(e){}}
 }
-let txt='NEWS//STUDIO v3.0 — '+state.concept.name+'\n\n';
+let txt='NEWS//STUDIO v3.1 — '+state.concept.name+'\n\n';
 txt+='── VOIX-OFF ──\n'+$('vo-text').value+'\n\n';
 txt+='── TITRE CHOC ──\n'+$('vo-punch').value+'\n';
 folder.file('script.txt',txt);
-folder.file('README.txt','News//Studio v3.0\nDépêche : '+state.concept.name+'\nJournaliste verrouillé\nGénéré : '+new Date().toLocaleString('fr-FR'));
+folder.file('README.txt','News//Studio v3.1\nDépêche : '+state.concept.name+'\nGénéré : '+new Date().toLocaleString('fr-FR'));
 const blob=await zip.generateAsync({type:'blob'});
 const url=URL.createObjectURL(blob);
 const a=document.createElement('a');a.href=url;a.download='news_'+state.concept.id+'_'+Date.now()+'.zip';
@@ -1174,7 +1353,7 @@ URL.revokeObjectURL(url);
 toast('ZIP téléchargé ✓','ok',4000);
 }
 function downloadScript(){
-let txt='NEWS//STUDIO v3.0 — '+state.concept.name+'\n\nVOIX-OFF :\n'+$('vo-text').value+'\n\nTITRE CHOC :\n'+$('vo-punch').value+'\n';
+let txt='NEWS//STUDIO v3.1 — '+state.concept.name+'\n\nVOIX-OFF :\n'+$('vo-text').value+'\n\nTITRE CHOC :\n'+$('vo-punch').value+'\n';
 const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
 const url=URL.createObjectURL(blob);
 const a=document.createElement('a');a.href=url;a.download='news_script.txt';
@@ -1183,7 +1362,7 @@ URL.revokeObjectURL(url);
 toast('Script téléchargé','ok');
 }
 function resetAll(){
-if(!confirm('Tout effacer ?'))return;
+if(!confirm('Tout effacer (sauf le visage) ?'))return;
 state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';});
 state.videos.forEach((v,i)=>{v.url=null;v.status='idle';v.videoId=null;v.progress=0;v.promptOverride='';});
 state.slots[0].status='idle';
@@ -1204,6 +1383,7 @@ h.addEventListener('click',()=>$(h.dataset.t).classList.toggle('open'));
 // ═══════════════════════════════════════════════════════════════
 function init(){
 loadKey();
+renderFaceZone();
 renderConcepts();
 $('vo-text').value=state.concept.voice;
 $('vo-punch').value=state.concept.punch;
@@ -1247,9 +1427,9 @@ setInterval(()=>{if(!state.isBusy)saveState();},5000);
 window.addEventListener('beforeunload',saveState);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
 
-log('NEWS//STUDIO v3.0 prêt','o');
-log('Character lock + Parallel + Debug + Save','cp');
-debugLog('success','INIT','News//Studio v3.0 Fusion prêt');
+log('NEWS//STUDIO v3.1 prêt','o');
+log('Visage persistant + Parallel + Debug + Save','cp');
+debugLog('success','INIT','News//Studio v3.1 Fusion prêt');
 
 setTimeout(()=>restoreAutosave(),1500);
 }
