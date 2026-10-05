@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MouraDrama - Studios de Création Numérique</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #ff006e;
+      --secondary: #8338ec;
+      --accent: #3a86ff;
+      --dark: #1a1a2e;
+      --light: #f5f5f5;
+      --text: #2d2d2d;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--dark) 0%, #0f3460 100%);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(26, 26, 46, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    nav .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    nav a {
+      color: var(--light);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      color: var(--primary);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 70px;
+      padding: 100px 2rem;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 0, 110, 0.15), transparent);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -50%;
+      left: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(51, 134, 252, 0.15), transparent);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(30px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ff006e, #3a86ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      color: #d0d0d0;
+      font-weight: 300;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 10px 30px rgba(255, 0, 110, 0.3);
+      border: none;
+      cursor: pointer;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(255, 0, 110, 0.5);
+    }
+
+    /* Studios Grid */
+    .studios {
+      padding: 80px 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      text-align: center;
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      position: relative;
+      padding-bottom: 1.5rem;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .card:hover::before {
+      left: 100%;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(255, 0, 110, 0.5);
+      box-shadow: 0 20px 40px rgba(255, 0, 110, 0.2);
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: #b0b0b0;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-link {
+      display: inline-block;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .card-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(255, 0, 110, 0.4);
+    }
+
+    /* Featured */
+    .featured {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .featured-card {
+      background: linear-gradient(135deg, #8338ec, #3a86ff);
+      border-radius: 15px;
+      padding: 3rem 2rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+      border-radius: 50%;
+    }
+
+    .featured-card h3 {
+      position: relative;
+      z-index: 2;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .featured-card p {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(26, 26, 46, 0.9);
+      color: #b0b0b0;
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid rgba(255, 0, 110, 0.2);
+    }
+
+    footer p {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Scroll smooth */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <div class="container">
+      <div class="logo">🎬 MouraDrama</div>
+      <ul>
+        <li><a href="#studios">Studios</a></li>
+        <li><a href="#featured">À découvrir</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Bienvenue dans MouraDrama</h1>
+      <p>Explorez nos studios créatifs de cinéma, animation et production numérique</p>
+      <button class="cta-button" onclick="document.getElementById('studios').scrollIntoView()">
+        Découvrir les studios
+      </button>
+    </div>
+  </section>
+
+  <!-- Studios Section -->
+  <section class="studios" id="studios">
+    <h2 class="section-title">Nos Studios</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>🎬 Studio Cinématique</h3>
+        <p>Production vidéo professionnelle et cinéma numérique</p>
+        <a href="cinematic-studio.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>🎨 Studio Animation</h3>
+        <p>Création d'animations 2D et 3D innovantes</p>
+        <a href="anima.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>🤖 AI Studio</h3>
+        <p>Outils d'intelligence artificielle pour la création</p>
+        <a href="ai-studio.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>📺 Studio Vidéo</h3>
+        <p>Production vidéo et streaming live</p>
+        <a href="studio-video.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>👶 Kids Studio</h3>
+        <p>Contenu créatif pour enfants et jeunesse</p>
+        <a href="kids-studio.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>📰 News Studio</h3>
+        <p>Actualités et documentaires numériques</p>
+        <a href="news-studio.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>🎭 Dramaturgie</h3>
+        <p>Création théâtrale et dramatique</p>
+        <a href="studio-dramaturgie.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>📚 Documentaire</h3>
+        <p>Production documentaire et reportages</p>
+        <a href="ai-documentaire.html" class="card-link">Accéder</a>
+      </div>
+      <div class="card">
+        <h3>🎪 Atelier</h3>
+        <p>Ateliers de formation et tutoriels</p>
+        <a href="atelier.html" class="card-link">Accéder</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Section -->
+  <section class="studios" id="featured">
+    <h2 class="section-title">À Découvrir</h2>
+    <div class="featured">
+      <div class="featured-card">
+        <h3>🌟 Studio Principal</h3>
+        <p>Notre hub créatif central avec tous les outils et ressources pour vos projets audiovisuels.</p>
+        <a href="studio.html" class="card-link">Visiter</a>
+      </div>
+      <div class="featured-card" style="background: linear-gradient(135deg, #ff006e, #fb5607);">
+        <h3>🚀 CineForge</h3>
+        <p>Plateforme avancée de production vidéo avec effets numériques et post-production.</p>
+        <a href="cineforge.html" class="card-link">Explorer</a>
+      </div>
+      <div class="featured-card" style="background: linear-gradient(135deg, #06ffa5, #118ab2);">
+        <h3>💫 Story Creator</h3>
+        <p>Créez des histoires immersives avec nos outils de narration interactive.</p>
+        <a href="story.html" class="card-link">Commencer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <p>&copy; 2024 MouraDrama - Tous droits réservés</p>
+    <p>Une plateforme créative pour l'audiovisuel et la production numérique</p>
+    <p>🚀 Construire, Créer, Partager</p>
+  </footer>
+</body>
+</html>
