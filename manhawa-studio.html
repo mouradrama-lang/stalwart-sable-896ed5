@@ -99,7 +99,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <body>
 
 <h1>Manhwa//Studio</h1>
-<div class="sub">Le Revenant · 10 épisodes · Alger 2032</div>
+<div class="sub">v1.1 · Le Revenant · 10 épisodes</div>
 <div class="autosave-dot" id="autosave-dot"></div>
 
 <div class="api" id="api-box">
@@ -114,7 +114,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
   <div class="pb"><div class="pc">
     <div class="char-locked">
       <strong>YACINE — Le Revenant</strong>
-      Homme nord-africain algérien, 32 ans. Visage ovale, mâchoire définie, peau olive mate avec texture naturelle. Barbe de trois jours et moustache soignée avec quelques poils gris. Cheveux brun foncé mi-longs, humides, rejetés en arrière avec quelques mèches sur le front. Yeux marron noisette enfoncés, paupières lourdes, regard fatigué mais alerte. <em>Cicatrice fine au-dessus du sourcil droit. Implant cybernétique argenté derrière l'oreille gauche avec LED cyan. Tatouage géométrique sur le côté droit du cou.</em> Veste tactique noire à col haut renforcé, sangles métalliques, bandes LED cyan sur les coutures, chaîne argentée, col roulé noir dessous. Expression composée, sérieuse, aucun sourire.
+      Homme nord-africain algérien, 32 ans. Visage ovale, mâchoire définie. Peau olive mate. Cheveux brun foncé mi-longs <em>humides</em>, rejetés en arrière. Barbe de trois jours + moustache. Yeux marron noisette enfoncés, paupières lourdes. <strong style="color:var(--cyan)">3 signatures obligatoires :</strong> cicatrice fine au-dessus du sourcil droit, implant argenté derrière l'oreille gauche (LED cyan), tatouage géométrique cou droit. Veste tactique noire col haut, sangles, LED cyan sur coutures, chaîne argentée, col roulé noir.
     </div>
   </div></div>
 </div>
@@ -122,7 +122,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 <div class="panel open" id="p-ep">
   <div class="ph" data-t="p-ep"><div class="pt"><span class="n">1</span> Épisode</div><span class="ch">▼</span></div>
   <div class="pb"><div class="pc">
-    <div class="hint">Sélectionne l'épisode à produire. Chaque épisode = 3 plans séquentiels.</div>
+    <div class="hint">Sélectionne l'épisode. Chaque épisode = 3 plans séquentiels.</div>
     <div class="ep-grid" id="episodes"></div>
     <label>Narration voix-off (modifiable)</label>
     <textarea id="vo-text" style="min-height:100px;font-size:.82rem"></textarea>
@@ -203,7 +203,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--cyan)}
 
 <div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
 <div class="toast" id="toast"></div>
-<div class="footer-note">Manhwa//Studio · Le Revenant · 10 épisodes</div>
+<div class="footer-note">Manhwa//Studio v1.1 · Le Revenant · 10 épisodes</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -214,10 +214,10 @@ const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
 const MODEL_IMAGE='agnes-image-2.5-flash';
 const MODEL_VIDEO='agnes-video-v2.0';
 const IMG_W=1024,IMG_H=1792,VID_W=576,VID_H=1024;
-const MAX_PROMPT=1800;
+const MAX_PROMPT=3500;
 const INITIAL_WAIT=105;
 const POLL_INTERVAL=5;
-const STORAGE_KEY='manhwa_studio_v1';
+const STORAGE_KEY='manhwa_studio_v1_1';
 
 // ═══════════════════════════════════════════════════════════════
 // STYLE LOCK
@@ -232,24 +232,30 @@ const STYLE_LOCK=
 'Serious, melancholic, dystopian mood. No smiles, no warmth. ' +
 'NO CGI, NO 3D render, NO photorealistic rendering, NO cartoon, NO chibi, NO anime big eyes. ';
 
+// ═══════════════════════════════════════════════════════════════
+// CHARACTER LOCK — RENFORCÉ v1.1
+// ═══════════════════════════════════════════════════════════════
 const CHARACTER_LOCK=
-'CHARACTER (SAME every scene): YACINE, a North African Algerian man, 32 years old. ' +
-'Oval face with defined jawline, tan olive skin with natural texture and faint weathering. ' +
-'Three-day dark beard with well-groomed mustache, a few grey strands mixed in. ' +
-'Dark brown almost black shoulder-length hair, slightly wet, pushed back behind ears, a few loose strands on the forehead. ' +
-'Deep-set dark hazel eyes with heavy upper eyelids, tired but alert gaze, no smile. ' +
-'Thin pale scar above the right eyebrow. ' +
-'Small silver cybernetic implant behind the LEFT ear with pulsing cyan LED. ' +
-'Geometric black tattoo visible on the RIGHT side of the neck. ' +
-'Wears a black futuristic tactical techwear jacket with high reinforced collar, chunky metal buckles, cyan LED strips along seams, silver chain necklace, dark turtleneck underneath. ' +
-'This SAME character appears in every scene. Never alter his face, hair, scars, implant, tattoo or clothing. ';
+'⚠️ ABSOLUTE CHARACTER REFERENCE — REPRODUCE THIS EXACT MAN IN EVERY SCENE: ' +
+'YACINE, a North African Algerian man, 32 years old. ' +
+'FACE: oval face with defined jawline and hollow cheeks, tan olive skin with visible natural texture and faint weathering. ' +
+'HAIR: dark brown almost black shoulder-length hair, WET from rain, pushed back behind the ears with a few loose strands falling naturally on the forehead. Hair MUST reach the base of the neck — NOT short, NOT buzz cut. ' +
+'FACIAL HAIR: full three-day dark beard AND full mustache. ' +
+'EYES: deep-set dark hazel eyes with heavy upper eyelids, tired but alert gaze, no smile, no warmth. ' +
+'SIGNATURE FEATURES (ALL 3 MUST BE VISIBLE): ' +
+'(1) thin pale scar above the RIGHT eyebrow. ' +
+'(2) small silver cybernetic implant behind the LEFT ear with a pulsing CYAN LED. ' +
+'(3) large GEOMETRIC BLACK TATTOO on the RIGHT side of the neck, visible above the collar. ' +
+'OUTFIT (IDENTICAL every scene): black futuristic tactical techwear jacket with a HIGH reinforced collar that reaches the chin, chunky metal buckles on the straps, TWO cyan LED strips on the jacket seams (one on the collar edge, one on the chest strap), silver chain necklace visible on the chest, black turtleneck underneath. ' +
+'MANNER: serious, melancholic, unreadable expression. No smile. Wet hair and jacket. ' +
+'THE MAN IN THIS SCENE MUST BE THIS EXACT CHARACTER. If any of the 3 signature features (scar, implant, neck tattoo) is missing, the image is WRONG. ';
 
 const NO_HUMAN_FACES=
 'Background crowd must remain in SOFT BLUR with NO identifiable faces. ' +
 'Only YACINE has a visible face. All other humans are anonymous silhouettes. ';
 
 // ═══════════════════════════════════════════════════════════════
-// 10 ÉPISODES — LE REVENANT
+// 10 ÉPISODES
 // ═══════════════════════════════════════════════════════════════
 const EPISODES=[
 {id:1,title:'L\'arrivée',sub:'Bus de nuit · Gare routière · Foule anonyme',
@@ -410,20 +416,20 @@ renderSlots();renderVideos();
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROMPTS
+// PROMPTS — VERSION v1.1 (character en premier)
 // ═══════════════════════════════════════════════════════════════
 function buildImagePrompt(slot){
 const ep=state.episode;
 const sceneDesc=ep['s'+(slot.idx+1)]||'';
 let p='';
-p+='════ FRAMING LOCK ════ ';
-p+=sceneDesc+' ';
-p+='════ REPEAT ════ ';
-p+=sceneDesc+' ';
-p+='════ STYLE ════ ';
-p+=STYLE_LOCK+' ';
+// 1. CHARACTER EN PREMIER (priorité absolue, jamais tronqué)
 p+=CHARACTER_LOCK+' ';
 p+=NO_HUMAN_FACES+' ';
+// 2. STYLE
+p+=STYLE_LOCK+' ';
+// 3. SCÈNE
+p+='════ SCENE TO DEPICT ════ ';
+p+=sceneDesc+' ';
 p+='Vertical 9:16 composition. No text on signs except Arabic and Latin script. No watermark, no logo, no signature. ';
 if(p.length>MAX_PROMPT)p=p.slice(0,MAX_PROMPT);
 return p;
@@ -438,8 +444,9 @@ const sceneDesc=ep['s'+(idx+1)]||'';
 let p='Cinematic manhwa shot. Photorealistic illustration, film grain. ';
 p+='MOTION: '+eff.prompt+' ';
 p+='SCENE TO ANIMATE: '+sceneDesc+' ';
+p+='STRICT CHARACTER LOCK: preserve YACINE\'s EXACT face, shoulder-length wet hair, three-day beard + mustache, thin scar above the RIGHT eyebrow, cyan LED implant behind the LEFT ear, geometric neck tattoo on the RIGHT side, black techwear jacket with HIGH collar and cyan LED strips, silver chain necklace. ';
 p+='STRICT CONTENT LOCK: reproduce the input image EXACTLY. Do NOT add any new character, person, face, or object. ';
-p+='If YACINE is visible, preserve his EXACT face, hair, scar, implant, tattoo, and black techwear jacket. ';
+p+='If YACINE is visible, he must look IDENTICAL. ';
 p+='NO new humans. NO new faces in background. NO scene changes. ';
 p+='SUBTLE MOTION ONLY: rain falling, neon flicker, atmospheric drift, gentle head movement if relevant. ';
 p+='No cuts, no morphing.';
@@ -1059,8 +1066,8 @@ setInterval(()=>{if(!state.isBusy)saveState();},5000);
 window.addEventListener('beforeunload',saveState);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
 
-log('MANHWA//STUDIO prêt','o');
-log('Yacine · Le Revenant · 10 épisodes','cp');
+log('MANHWA//STUDIO v1.1 prêt','o');
+log('Character lock renforcé · Yacine verrouillé','cp');
 }
 
 init();
