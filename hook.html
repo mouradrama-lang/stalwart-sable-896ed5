@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TikTok Hook Factory — Générateur de Hooks Viraux</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #000000; --bg-2: #0a0a0f; --panel: #12121a; --panel-2: #1a1a24;
+  --border: #2a2a36; --border-soft: #20202a;
+  --cyan: #00e5ff; --cyan-soft: #5cf2ff; --cyan-deep: #0088aa;
+  --pink: #ff1e56; --pink-soft: #ff5a84; --pink-deep: #a01035;
+  --violet: #8b5cf6; --violet-soft: #a880ff;
+  --lime: #a3ff12;
+  --ink: #f0f0f5; --ink-dim: #8888a0; --ink-faint: #4a4a5a;
+  --success: #22c55e; --error: #ef4444; --warn: #f59e0b;
+  --radius: 6px;
+  --font-display: 'Archivo Black', 'Impact', 'Helvetica Neue', sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+html, body { background: var(--bg); overscroll-behavior: none; }
+body {
+  font-family: var(--font-sans); background: var(--bg);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(0,229,255,0.08) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(255,30,86,0.08) 0%, transparent 40%);
+  background-attachment: fixed; color: var(--ink); min-height: 100vh;
+  padding: 1.2rem 1rem 20rem; font-size: 15px; line-height: 1.5;
+  max-width: 900px; margin: 0 auto; letter-spacing: 0.01em;
+}
+header { margin-bottom: 1.5rem; text-align: center; position: relative; padding: 0.5rem 0 1.2rem; }
+header::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 60px; height: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--pink)); border-radius: 2px; }
+h1 {
+  font-family: var(--font-display); font-size: 2rem; font-weight: 900;
+  letter-spacing: -0.02em; text-transform: uppercase; line-height: 1;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--ink) 45%, var(--pink) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 20px rgba(0,229,255,0.15));
+}
+.subtitle { font-size: 0.82rem; color: var(--ink-dim); letter-spacing: 0.02em; }
+
+.toast {
+  position: fixed; top: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  background: var(--panel); color: var(--ink);
+  border: 1px solid var(--border); border-left: 3px solid var(--cyan);
+  padding: 0.8rem 1.3rem; border-radius: var(--radius);
+  font-size: 0.85rem; font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 40px rgba(0,229,255,0.1);
+  z-index: 1000; opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1.2), opacity 0.35s ease;
+  max-width: 90vw; text-align: center;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--error); }
+.toast.warn { border-left-color: var(--warn); }
+.toast .toast-icon { font-size: 1rem; color: var(--cyan); }
+
+.info-banner {
+  background: linear-gradient(135deg, rgba(0,229,255,0.05), rgba(255,30,86,0.05));
+  border: 1px solid var(--border); border-left: 3px solid var(--cyan);
+  padding: 0.95rem 1.1rem; border-radius: var(--radius);
+  font-size: 0.79rem; color: var(--ink-dim);
+  margin-bottom: 1rem; line-height: 1.55; position: relative;
+}
+.info-banner::before { content: '⚡'; position: absolute; top: 0.5rem; right: 0.9rem;
+  font-size: 1.4rem; opacity: 0.35; }
+.info-banner strong { color: var(--ink); font-weight: 600; }
+.info-banner strong.hl-cyan { color: var(--cyan-soft); }
+.info-banner strong.hl-pink { color: var(--pink-soft); }
+.info-banner strong.hl-violet { color: var(--violet-soft); }
+.info-banner strong.hl-lime { color: var(--lime); }
+
+.section {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 0.9rem; overflow: hidden;
+}
+.section.open { box-shadow: 0 0 0 1px rgba(0,229,255,0.08), 0 4px 20px rgba(0,0,0,0.3); }
+.section-header {
+  padding: 0.9rem 1.1rem; cursor: pointer; user-select: none;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-header:active { background: var(--panel-2); }
+.section-title {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em;
+  color: var(--ink); font-weight: 700;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.section-title .badge {
+  display: inline-block; padding: 0.15rem 0.55rem;
+  background: transparent; color: var(--cyan);
+  border: 1px solid var(--cyan-deep); border-radius: 3px;
+  font-size: 0.58rem; letter-spacing: 0.1em; font-weight: 700;
+}
+.section-title .badge.pink { color: var(--pink-soft); border-color: var(--pink-deep); }
+.section-title .badge.violet { color: var(--violet-soft); border-color: #6a3fa8; }
+.section-title .badge.lime { color: var(--lime); border-color: #5a8a0a; }
+.section-title .badge.err { color: var(--error); border-color: #7a2a2a; }
+.section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.3s; }
+.section.open .section-header .chevron { transform: rotate(180deg); color: var(--cyan); }
+.section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.section.open .section-body { max-height: 8000px; }
+.section-content { padding: 0 1.1rem 1.1rem; }
+
+.api-panel {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.1rem 1.2rem; margin-bottom: 1rem;
+}
+.api-panel.ok { box-shadow: inset 3px 0 0 var(--success); }
+.api-key-input {
+  width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-2);
+  color: var(--ink); font-family: var(--font-mono); font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+}
+.api-key-input:focus { outline: none; border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
+.api-save-btn {
+  width: 100%; padding: 0.85rem 1.2rem; border-radius: var(--radius);
+  border: none; background: linear-gradient(135deg, var(--cyan), var(--cyan-deep));
+  color: #000; font-size: 0.85rem; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; margin-bottom: 0.6rem;
+}
+.api-save-btn:active { transform: scale(0.99); }
+.api-status-line {
+  font-size: 0.74rem; padding: 0.55rem 0.85rem; border-radius: var(--radius);
+  display: flex; align-items: center; gap: 0.55rem;
+  background: var(--bg-2); color: var(--ink-dim);
+  border: 1px solid var(--border-soft);
+}
+.api-status-line.ok {
+  background: rgba(34,197,94,0.08); color: var(--success);
+  border-color: rgba(34,197,94,0.3); font-weight: 600;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink-faint); flex-shrink: 0; }
+.api-status-line.ok .status-dot { background: var(--success);
+  box-shadow: 0 0 8px var(--success); }
+.api-hint { font-size: 0.7rem; color: var(--ink-dim); margin-top: 0.5rem; }
+.api-hint a { color: var(--cyan-soft); text-decoration: none;
+  border-bottom: 1px dotted var(--cyan-deep); }
+.stat-line { font-size: 0.7rem; color: var(--ink-dim); margin-top: 0.5rem;
+  padding: 0.45rem 0.7rem; background: var(--bg-2); border-radius: var(--radius);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;
+  border: 1px solid var(--border-soft); font-family: var(--font-mono); }
+.wake-status { font-size: 0.7rem; padding: 0.55rem 0.75rem;
+  border-radius: var(--radius); margin-top: 0.45rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(0,229,255,0.06); color: var(--cyan-soft);
+  border: 1px solid var(--cyan-deep); flex-wrap: wrap; gap: 0.5rem; }
+.wake-status.active { background: rgba(34,197,94,0.08);
+  color: var(--success); border-color: rgba(34,197,94,0.3); }
+.wake-status.warn { background: rgba(245,158,11,0.08);
+  color: var(--warn); border-color: rgba(245,158,11,0.3); }
+.wake-status button { background: transparent; border: 1px solid currentColor;
+  color: inherit; padding: 0.3rem 0.65rem; border-radius: var(--radius);
+  font-size: 0.66rem; cursor: pointer; letter-spacing: 0.05em; font-weight: 600; }
+
+.subject-textarea {
+  width: 100%; min-height: 80px; padding: 0.9rem 1rem;
+  border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--bg-2); color: var(--ink);
+  font-family: var(--font-sans); font-size: 0.92rem; line-height: 1.5;
+  resize: vertical;
+}
+.subject-textarea:focus { outline: none; border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
+.subject-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem; }
+.subject-chip {
+  padding: 0.35rem 0.7rem; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg-2);
+  color: var(--ink-dim); font-size: 0.7rem; cursor: pointer;
+  transition: all 0.15s; font-weight: 500;
+}
+.subject-chip:hover { color: var(--cyan-soft); border-color: var(--cyan-deep);
+  background: rgba(0,229,255,0.05); }
+
+/* ANGLES */
+.angles-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 0.5rem;
+}
+.angle-card {
+  padding: 0.75rem 0.85rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-2);
+  cursor: pointer; transition: all 0.15s; text-align: center;
+  position: relative;
+}
+.angle-card:hover { border-color: var(--border); background: var(--panel-2); }
+.angle-card.selected {
+  background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(255,30,86,0.06));
+  border-color: var(--cyan); color: var(--cyan-soft);
+  box-shadow: 0 0 20px rgba(0,229,255,0.15);
+}
+.angle-card .a-emoji { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+.angle-card .a-name { font-size: 0.78rem; font-weight: 700; line-height: 1.2; }
+.angle-card .a-desc { font-size: 0.62rem; opacity: 0.7; margin-top: 0.2rem; line-height: 1.2; }
+
+.control-row { margin-bottom: 0.9rem; }
+.control-row:last-child { margin-bottom: 0; }
+.control-label {
+  display: block; font-size: 0.7rem; color: var(--ink-dim);
+  margin-bottom: 0.4rem; text-transform: uppercase;
+  letter-spacing: 0.12em; font-weight: 700;
+}
+select {
+  width: 100%; padding: 0.75rem 0.9rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-2);
+  color: var(--ink); font-family: var(--font-sans); font-size: 0.88rem;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%2300e5ff' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat; background-position: right 0.95rem center;
+  background-size: 10px; cursor: pointer;
+}
+select:focus { outline: none; border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
+select option { background: var(--panel); color: var(--ink); }
+
+.ref-drop {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 1.3rem 1rem; background: var(--bg-2); text-align: center;
+  cursor: pointer; transition: all 0.2s; position: relative;
+}
+.ref-drop:hover { border-color: var(--cyan-deep); background: rgba(0,229,255,0.03); }
+.ref-drop.has-image { padding: 0; border-style: solid; border-color: var(--cyan-deep); }
+.ref-drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.ref-drop .ref-icon { font-size: 1.8rem; color: var(--cyan); opacity: 0.6; margin-bottom: 0.4rem; }
+.ref-drop .ref-text { font-size: 0.8rem; color: var(--ink-dim); line-height: 1.5; }
+.ref-drop .ref-text strong { color: var(--cyan-soft); }
+.ref-drop .ref-hint { font-size: 0.66rem; color: var(--ink-faint);
+  margin-top: 0.35rem; font-family: var(--font-mono); }
+.ref-preview { position: relative; display: block; width: 100%;
+  max-height: 340px; overflow: hidden; }
+.ref-preview img { width: 100%; height: auto; display: block;
+  max-height: 340px; object-fit: contain; background: #000; }
+.ref-preview .ref-remove { position: absolute; top: 0.5rem; right: 0.5rem;
+  background: rgba(239,68,68,0.9); color: #fff; border: none;
+  width: 30px; height: 30px; border-radius: 50%; font-size: 1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.ref-preview .ref-label { position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 0.45rem 0.65rem;
+  background: linear-gradient(transparent, rgba(0,0,0,0.9));
+  font-size: 0.68rem; font-family: var(--font-mono);
+  color: var(--cyan-soft); letter-spacing: 0.08em; }
+
+.btn-primary {
+  width: 100%; padding: 1.15rem; border-radius: var(--radius);
+  border: none; background: linear-gradient(135deg, var(--cyan) 0%, var(--pink) 100%);
+  color: #000; font-size: 0.95rem; font-weight: 900;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  cursor: pointer; margin-bottom: 0.9rem;
+  box-shadow: 0 0 40px rgba(0,229,255,0.25);
+  font-family: var(--font-display);
+}
+.btn-primary:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+.btn-primary:active:not(:disabled) { transform: scale(0.985); }
+.btn-stop {
+  width: 100%; padding: 0.85rem; border-radius: var(--radius);
+  border: 1px solid var(--error); background: transparent;
+  color: var(--error); font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; margin-bottom: 0.9rem; display: none;
+}
+.btn-stop.visible { display: block; }
+
+.phase-bar {
+  background: var(--panel); border: 1px solid var(--border);
+  border-left: 3px solid var(--cyan); border-radius: var(--radius);
+  padding: 0.85rem 1rem; margin-bottom: 1rem; display: none;
+}
+.phase-bar.visible { display: block; }
+.phase-steps { display: flex; gap: 0.35rem; margin-bottom: 0.65rem; flex-wrap: wrap; }
+.phase-step {
+  flex: 1; min-width: 65px; padding: 0.45rem 0.55rem;
+  border-radius: var(--radius); background: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  font-size: 0.56rem; text-transform: uppercase;
+  letter-spacing: 0.08em; text-align: center;
+  color: var(--ink-faint); font-weight: 700;
+}
+.phase-step.active { color: var(--cyan); border-color: var(--cyan-deep);
+  background: rgba(0,229,255,0.06); }
+.phase-step.done { color: var(--success);
+  border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.05); }
+.phase-info { font-size: 0.72rem; font-family: var(--font-mono);
+  color: var(--ink-dim); display: flex; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.4rem; }
+
+.hooks-panel { display: none; margin-top: 1.2rem; }
+.hooks-panel.visible { display: block; }
+.hook-item {
+  background: var(--panel); border: 1px solid var(--border);
+  border-left: 3px solid var(--border); border-radius: var(--radius);
+  padding: 0.9rem 1rem; margin-bottom: 0.6rem;
+  transition: all 0.3s;
+}
+.hook-item.active { border-left-color: var(--cyan);
+  box-shadow: 0 0 20px rgba(0,229,255,0.1); }
+.hook-item.done { border-left-color: var(--success); }
+.hook-item.failed { border-left-color: var(--error); }
+.hook-item .h-header {
+  display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;
+}
+.hook-item .h-num {
+  font-family: var(--font-display); font-size: 1.1rem;
+  font-weight: 900; color: var(--cyan); min-width: 32px;
+  text-shadow: 0 0 12px rgba(0,229,255,0.4);
+}
+.hook-item .h-angle {
+  font-size: 0.62rem; padding: 0.18rem 0.55rem; border-radius: 3px;
+  background: rgba(255,30,86,0.15); color: var(--pink-soft);
+  border: 1px solid var(--pink-deep); font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.hook-item .h-vo {
+  font-family: var(--font-display); font-size: 1.05rem;
+  font-weight: 800; color: var(--ink); line-height: 1.3;
+  margin: 0.35rem 0; letter-spacing: -0.01em;
+}
+.hook-item .h-desc { font-size: 0.72rem; color: var(--ink-dim);
+  line-height: 1.45; margin-top: 0.3rem; }
+.hook-item .h-visual { font-size: 0.66rem; color: var(--ink-faint);
+  font-family: var(--font-mono); margin-top: 0.4rem;
+  border-left: 2px solid var(--border-soft); padding-left: 0.55rem; }
+
+.queue-summary {
+  background: var(--panel); border: 1px solid var(--border);
+  border-left: 3px solid var(--cyan); border-radius: var(--radius);
+  padding: 0.75rem 0.95rem; margin-bottom: 0.6rem;
+  font-size: 0.76rem; display: flex; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono);
+}
+.queue-summary .progress-text { color: var(--cyan); font-weight: 700; }
+.queue-summary .eta-text { color: var(--ink-dim); }
+
+/* GALLERY TIKTOK-STYLE */
+.gallery { margin-top: 1.5rem; }
+.gallery-title {
+  font-family: var(--font-display); font-size: 1rem;
+  font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 0.9rem; padding-bottom: 0.6rem;
+  border-bottom: 2px solid transparent;
+  background: linear-gradient(90deg, var(--cyan), var(--pink)) border-box;
+  background-size: 100% 2px; background-repeat: no-repeat;
+  background-position: bottom left;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.gallery-title::before { content: '▶'; color: var(--pink); font-size: 0.8rem; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 0.9rem;
+}
+.hook-video-card {
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); background: #000;
+  position: relative; aspect-ratio: 9/16;
+  animation: fadeIn 0.4s ease;
+}
+.hook-video-card video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.hook-video-card .hv-overlay {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 0.55rem 0.65rem;
+  background: linear-gradient(transparent, rgba(0,0,0,0.95));
+  pointer-events: none;
+}
+.hook-video-card .hv-num {
+  font-family: var(--font-display); font-size: 0.72rem;
+  color: var(--cyan); font-weight: 900; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 0.15rem;
+}
+.hook-video-card .hv-vo {
+  font-size: 0.78rem; font-weight: 700; color: #fff;
+  line-height: 1.25; letter-spacing: -0.005em;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pending-video-card {
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); background: var(--bg-2);
+  aspect-ratio: 9/16;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1rem; text-align: center;
+  position: relative;
+}
+.pending-video-card .pv-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border-soft);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.75rem;
+}
+.pending-video-card .pv-label {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--cyan-soft); letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 0.4rem;
+}
+.pending-video-card .pv-progress {
+  font-size: 0.66rem; color: var(--ink-dim);
+  font-family: var(--font-mono); margin-bottom: 0.55rem;
+}
+.pending-video-card .pv-bar {
+  width: 100%; height: 5px; background: var(--bg);
+  border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;
+}
+.pending-video-card .pv-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  border-radius: 3px; transition: width 0.5s ease;
+}
+.pending-video-card.measuring { border-color: var(--cyan-deep); }
+.pending-video-card.measuring .pv-spinner { border-top-color: var(--cyan); }
+.pending-video-card.failed .pv-spinner { animation: none; border-color: var(--error);
+  border-top-color: var(--error); }
+.pending-video-card .pv-error {
+  font-size: 0.65rem; color: var(--error); margin-top: 0.35rem;
+  line-height: 1.3;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.status-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--panel); border-top: 1px solid var(--border);
+  color: var(--ink); padding: 0.8rem 1.1rem;
+  font-size: 0.75rem; display: flex; align-items: center; gap: 0.65rem;
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1);
+  z-index: 100; font-family: var(--font-mono);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+}
+.status-bar.visible { transform: translateY(0); }
+.status-bar .spinner {
+  width: 12px; height: 12px;
+  border: 2px solid rgba(0,229,255,0.2); border-top-color: var(--cyan);
+  border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0;
+}
+.hidden { display: none !important; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+#noSleepCanvas { position: fixed; top: 0; left: 0; width: 1px; height: 1px;
+  opacity: 0.01; pointer-events: none; z-index: -1; }
+#noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px;
+  opacity: 0.01; pointer-events: none; z-index: -1; }
+
+.debug-panel {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 250px; background: #050508;
+  border-top: 2px solid var(--cyan-deep); z-index: 200;
+  display: flex; flex-direction: column;
+  font-family: var(--font-mono);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.7);
+  transition: height 0.3s ease;
+}
+.debug-panel.collapsed { height: 34px; }
+.debug-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.45rem 0.75rem;
+  background: linear-gradient(90deg, #0a0a12, #141420);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; cursor: pointer; user-select: none;
+}
+.debug-title {
+  font-size: 0.68rem; color: var(--cyan);
+  letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700;
+  display: flex; align-items: center; gap: 0.45rem;
+}
+.debug-title .debug-badge {
+  font-size: 0.58rem; padding: 0.1rem 0.35rem;
+  background: var(--cyan); color: #000; border-radius: 2px; font-weight: 800;
+}
+.debug-actions { display: flex; gap: 0.3rem; }
+.debug-actions button {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--ink-dim); font-size: 0.6rem; padding: 0.22rem 0.5rem;
+  border-radius: 2px; cursor: pointer; letter-spacing: 0.05em;
+  font-family: inherit; font-weight: 600;
+}
+.debug-actions button:hover { color: var(--cyan); border-color: var(--cyan-deep); }
+.debug-body {
+  flex: 1; overflow-y: auto; padding: 0.45rem 0.65rem 1rem;
+  font-size: 0.68rem; line-height: 1.45; color: #c8c8d0;
+}
+.debug-entry {
+  margin-bottom: 0.28rem; padding: 0.22rem 0.38rem;
+  border-left: 2px solid transparent; border-radius: 2px;
+  word-break: break-word;
+}
+.debug-entry.info { border-left-color: var(--ink-faint); }
+.debug-entry.success { border-left-color: var(--success); background: rgba(34,197,94,0.04); }
+.debug-entry.warn { border-left-color: var(--warn); background: rgba(245,158,11,0.04); }
+.debug-entry.error { border-left-color: var(--error); background: rgba(239,68,68,0.06); color: #f0a0a0; }
+.debug-entry.api { border-left-color: var(--cyan); background: rgba(0,229,255,0.04); }
+.debug-entry.response { border-left-color: var(--violet); background: rgba(139,92,246,0.04); }
+.debug-entry.state { border-left-color: var(--pink); background: rgba(255,30,86,0.04); }
+.debug-entry.ai { border-left-color: var(--lime); background: rgba(163,255,18,0.04); }
+.debug-time { color: var(--ink-faint); margin-right: 0.45rem; font-size: 0.62rem; }
+.debug-cat { color: var(--cyan-soft); font-weight: 700;
+  margin-right: 0.4rem; font-size: 0.62rem; }
+.debug-msg { color: #d8d8e0; }
+.debug-data {
+  margin-top: 0.3rem; padding: 0.4rem 0.5rem;
+  background: #08080d; border: 1px solid var(--border-soft);
+  border-radius: 2px; font-size: 0.64rem; color: #a8d8b0;
+  max-height: 170px; overflow: auto;
+  white-space: pre-wrap; word-break: break-all; line-height: 1.4;
+}
+
+.raw-viewer-toggle {
+  font-size: 0.6rem; color: var(--cyan-soft); cursor: pointer;
+  margin-top: 0.4rem; border-bottom: 1px dotted var(--cyan-deep);
+  display: inline-block; letter-spacing: 0.05em;
+}
+.raw-viewer {
+  margin-top: 0.55rem; padding: 0.65rem;
+  background: #050508; border: 1px solid var(--border);
+  border-radius: var(--radius); font-family: var(--font-mono);
+  font-size: 0.65rem; color: #a8d8b0; max-height: 320px;
+  overflow: auto; white-space: pre-wrap;
+  word-break: break-all; line-height: 1.45; display: none;
+}
+.raw-viewer.visible { display: block; }
+
+.media-log { margin-top: 0.9rem; }
+.media-log-entry {
+  display: flex; gap: 0.55rem; padding: 0.45rem;
+  background: var(--bg-2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); margin-bottom: 0.32rem;
+  font-size: 0.68rem; align-items: center; font-family: var(--font-mono);
+}
+.media-log-entry .ml-tag {
+  font-size: 0.56rem; padding: 0.14rem 0.36rem;
+  border-radius: 2px; text-transform: uppercase;
+  letter-spacing: 0.08em; font-weight: 800; flex-shrink: 0;
+}
+.media-log-entry .ml-tag.image {
+  background: rgba(0,229,255,0.15); color: var(--cyan-soft);
+  border: 1px solid var(--cyan-deep);
+}
+.media-log-entry .ml-tag.video {
+  background: rgba(255,30,86,0.15); color: var(--pink-soft);
+  border: 1px solid var(--pink-deep);
+}
+.media-log-entry .ml-url {
+  flex: 1; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; color: var(--cyan-soft); font-size: 0.63rem;
+}
+.media-log-entry .ml-time { color: var(--ink-faint); font-size: 0.6rem; flex-shrink: 0; }
+.media-log-entry a { color: var(--cyan-soft); text-decoration: none; }
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.55rem; }
+  body { padding: 1rem 0.85rem 20rem; }
+  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); }
+  .phase-step { font-size: 0.48rem; padding: 0.32rem 0.22rem; }
+  .debug-panel { height: 220px; }
+  .hook-item .h-vo { font-size: 0.95rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>TikTok Hook Factory</h1>
+  <p class="subtitle">Un sujet. Cinq hooks viraux. Automatiquement.</p>
+</header>
+
+<div class="info-banner">
+  <strong>Le concept :</strong> tu donnes <strong class="hl-cyan">un sujet</strong> (produit, idée, thème),
+  l'IA génère <strong class="hl-pink">plusieurs hooks viraux différents</strong> (angle choc, curiosité, émotion, humour…)
+  et crée pour chacun <strong class="hl-violet">une vidéo verticale 9:16</strong> prête pour TikTok, Reels, Shorts.
+  Chaque hook a <strong class="hl-lime">son propre angle émotionnel</strong>. Sans musique — TikTok en ajoutera.
+</div>
+
+<div class="api-panel" id="api-panel">
+  <input type="password" class="api-key-input" id="api-key-input"
+    placeholder="Collez votre clé API ici (sk-...)" autocomplete="off" spellcheck="false">
+  <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+  <div class="api-status-line" id="api-status-line">
+    <span class="status-dot"></span>
+    <span id="api-status-text">Aucune clé API enregistrée</span>
+  </div>
+  <div class="api-hint">
+    Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a>
+    → Settings → API Keys
+  </div>
+  <div class="stat-line">
+    <span>📊 Vitesse vidéo : <span id="stat-speed">en attente</span></span>
+    <span id="stat-samples">0 génération</span>
+  </div>
+  <div class="wake-status" id="wake-status">
+    <span id="wake-status-text">💤 Veille automatique</span>
+    <button type="button" id="wake-toggle-btn">Garder l'écran allumé</button>
+  </div>
+</div>
+
+<div class="section open" id="section-subject">
+  <div class="section-header" data-toggle="section-subject">
+    <span class="section-title">🎯 Votre sujet <span class="badge">obligatoire</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <textarea class="subject-textarea" id="subject-input"
+      placeholder="Ex : Une montre connectée qui analyse ton sommeil. Un café artisanal brésilien. Une formation en IA pour débutants. Un podcast sur la mythologie nordique."></textarea>
+    <div class="subject-chips" id="subject-chips"></div>
+  </div></div>
+</div>
+
+<div class="section open" id="section-angles">
+  <div class="section-header" data-toggle="section-angles">
+    <span class="section-title">⚡ Angles viraux <span class="badge pink" id="angles-count-badge">6 angles</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="angles-grid" id="angles-grid"></div>
+  </div></div>
+</div>
+
+<div class="section" id="section-ref">
+  <div class="section-header" data-toggle="section-ref">
+    <span class="section-title">🖼️ Image de référence <span class="badge violet">optionnel</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="ref-drop" id="ref-drop">
+      <input type="file" accept="image/*" id="ref-image-input">
+      <div class="ref-icon">⚡</div>
+      <div class="ref-text"><strong>Cliquez pour choisir une image</strong><br>Produit, visage, décor…</div>
+      <div class="ref-hint">Cette image sera le point de départ de chaque hook.</div>
+    </div>
+  </div></div>
+</div>
+
+<div class="section" id="section-settings">
+  <div class="section-header" data-toggle="section-settings">
+    <span class="section-title">⚙️ Paramètres de génération</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="control-row">
+      <label class="control-label">Nombre de hooks</label>
+      <select id="hook-count-select">
+        <option value="3">3 hooks — test rapide</option>
+        <option value="5" selected>5 hooks — recommandé</option>
+        <option value="8">8 hooks — batch complet</option>
+        <option value="10">10 hooks — maximum</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Durée de chaque hook</label>
+      <select id="duration-select">
+        <option value="121" selected>5 secondes — punchy TikTok</option>
+        <option value="145">6 secondes — standard</option>
+        <option value="169">7 secondes — respiration</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Mode de mouvement</label>
+      <select id="motion-select">
+        <option value="dynamic" selected>🔥 Dynamique — caméra qui bouge, coupes rythmées</option>
+        <option value="product">📦 Produit — focus produit, rotation, reflets</option>
+        <option value="face">🙋 Visage — gros plan, intensité, regard caméra</option>
+        <option value="scene">🌍 Scène — ambiance, environnement, immersion</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Narration vocale (TTS)</label>
+      <select id="tts-select">
+        <option value="on" selected>🎙️ Activée — le texte est dit en voix off</option>
+        <option value="off">🔇 Désactivée — hook muet (sous-titres TikTok)</option>
+      </select>
+    </div>
+  </div></div>
+</div>
+
+<button type="button" class="btn-primary" id="generate-btn" disabled>Ajoutez votre clé API</button>
+<button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+
+<div class="phase-bar" id="phase-bar">
+  <div class="phase-steps">
+    <div class="phase-step" data-phase="ideation">1 · Idéation</div>
+    <div class="phase-step" data-phase="images">2 · Visuels</div>
+    <div class="phase-step" data-phase="videos">3 · Vidéos</div>
+    <div class="phase-step" data-phase="done">4 · Terminé</div>
+  </div>
+  <div class="phase-info">
+    <span id="phase-detail">En attente</span>
+    <span id="phase-eta"></span>
+  </div>
+</div>
+
+<div class="hooks-panel" id="hooks-panel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.65rem;">
+    <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;">
+      🎬 Hooks générés
+    </div>
+    <div style="font-size:0.68rem;color:var(--ink-dim);font-family:var(--font-mono);" id="hooks-progress">0/0</div>
+  </div>
+  <div id="hooks-list"></div>
+  <span class="raw-viewer-toggle" id="raw-toggle">▸ Voir la réponse brute (JSON)</span>
+  <pre class="raw-viewer" id="raw-viewer"></pre>
+</div>
+
+<div class="gallery" id="gallery" style="display:none;">
+  <div class="gallery-title">Hooks vidéo prêts à poster</div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<div class="section" id="section-medialog" style="margin-top:1.3rem;">
+  <div class="section-header" data-toggle="section-medialog">
+    <span class="section-title">🗂️ Journal des médias <span class="badge lime" id="medialog-count">0</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="media-log" id="media-log">
+      <div style="font-size:0.7rem;color:var(--ink-dim);font-family:var(--font-mono);">
+        Les URLs des images et vidéos apparaîtront ici.
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<div class="status-bar" id="status-bar">
+  <div class="spinner"></div>
+  <span id="status-text">Préparation…</span>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✓</span>
+  <span id="toast-text">Message</span>
+</div>
+
+<div class="debug-panel" id="debug-panel">
+  <div class="debug-header" id="debug-header">
+    <div class="debug-title">⚡ Console live <span class="debug-badge" id="debug-count">0</span></div>
+    <div class="debug-actions">
+      <button type="button" id="debug-copy-btn">Copier</button>
+      <button type="button" id="debug-clear-btn">Effacer</button>
+      <button type="button" id="debug-collapse-btn">−</button>
+    </div>
+  </div>
+  <div class="debug-body" id="debug-body"></div>
+</div>
+
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG AGNES — identique à tes codes sources validés
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+
+const TEXT_MAX_TOKENS = 6000;
+const TEXT_TEMPERATURE = 0.9;
+
+const IMAGE_PARALLEL = 3;
+const IMAGE_INTERVAL_MS = 3400;
+const IMAGE_INTERVAL_MIN = 3200;
+const IMAGE_INTERVAL_MAX = 12000;
+const IMAGE_INTERVAL_SAFE = 4000;
+
+const VIDEO_INTERVAL_MIN = 62000;
+const VIDEO_INTERVAL_MAX = 90000;
+const VIDEO_INTERVAL_SAFE = 75000;
+const VIDEO_FIRST_POLL_DELAY_SEC = 80;
+const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
+const VIDEO_MAX_POLL_ATTEMPTS = 100;
+
+const REF_MAX_SIDE = 1280;
+const DEBUG_MAX_ENTRIES = 800;
+const TIMING_CACHE_KEY = 'tiktok_hook_timing_v1';
+const API_KEY_STORAGE = 'agnes_api_key';
+const WAKE_LOCK_PREF = 'agnes_wakelock_enabled';
+
+// ══════════════════════════════════════════════════════════════════
+// ANGLES VIRAUX
+// ══════════════════════════════════════════════════════════════════
+const HOOK_ANGLES = [
+  { id: 'shock', name: 'Choc', emoji: '🔥', desc: 'Révélation frappante',
+    prompt: 'shocking, hard-hitting revelation, unexpected twist, visually disruptive' },
+  { id: 'curiosity', name: 'Curiosité', emoji: '❓', desc: 'Question ouverte, mystère',
+    prompt: 'mysterious, teasing visual with unanswered question, something partially hidden' },
+  { id: 'emotion', name: 'Émotion', emoji: '💔', desc: 'Touche le cœur',
+    prompt: 'deeply emotional, touching, human vulnerability, authentic moment' },
+  { id: 'humor', name: 'Humour', emoji: '😂', desc: 'Drôle, décalé',
+    prompt: 'funny, absurd, unexpected comedic moment, playful' },
+  { id: 'authority', name: 'Autorité', emoji: '👑', desc: 'Expert, preuve',
+    prompt: 'authoritative, expert pose, confident powerful stance, expertise on display' },
+  { id: 'urgency', name: 'Urgence', emoji: '⏰', desc: 'FOMO, maintenant',
+    prompt: 'urgent, fast, frantic, limited-time feel, dynamic motion energy' },
+  { id: 'confession', name: 'Confession', emoji: '📖', desc: 'Histoire personnelle',
+    prompt: 'intimate confessional tone, direct address, personal story visual, close framing' },
+  { id: 'contrarian', name: 'Contre-intuitif', emoji: '🔮', desc: 'Casse un mythe',
+    prompt: 'contrarian, surprising opposite, breaking expectations, reverse logic visual' },
+  { id: 'transformation', name: 'Transformation', emoji: '✨', desc: 'Avant / après',
+    prompt: 'dramatic before-after transformation, metamorphosis, evolution, contrast' },
+  { id: 'direct', name: 'Appel direct', emoji: '🎯', desc: 'CTA, adresse directe',
+    prompt: 'direct address to camera, powerful eye contact, call-to-action energy' }
+];
+
+const SUBJECT_SUGGESTIONS = [
+  'Une montre connectée qui analyse la qualité du sommeil',
+  'Un café artisanal torréfié au Brésil en micro-lots',
+  'Une formation en IA pour débutants qui veulent gagner du temps',
+  'Un podcast sur la mythologie nordique et ses dieux',
+  'Une app pour apprendre la guitare en 10 minutes par jour',
+  'Un restaurant de ramen japonais authentique à Paris',
+  'Un sac à dos pour nomades digitaux en cuir vegan',
+  'Une méthode pour arrêter de procrastiner en 3 jours',
+  'Un cours de méditation pour les développeurs stressés',
+  'Un jeu mobile indé sur l\'exploration spatiale'
+];
+
+const MOTION_PRESETS = {
+  dynamic: 'dynamic viral TikTok energy, quick camera push-in, subject moving with energy, punchy framing, fast-paced',
+  product: 'smooth rotating product shot, gliding camera, spotlight on product, sharp details, premium feel',
+  face: 'tight close-up on face, intense eye contact with camera, subtle breathing, dramatic light, intimate framing',
+  scene: 'cinematic wide establishing shot, slow camera drift, immersive atmosphere, environmental storytelling'
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  subject: '',
+  selectedAngles: ['shock', 'curiosity', 'emotion', 'humor', 'authority', 'direct'],
+  hookCount: 5,
+  durationFrames: 121,
+  motion: 'dynamic',
+  tts: 'on',
+  referenceImage: null,
+  isRunning: false,
+  stopRequested: false,
+  phase: 'idle',
+  hooks: [],
+  rawResponse: '',
+  ideationStartTime: 0
+};
+
+let createImageIntervalMs = IMAGE_INTERVAL_SAFE;
+let createVideoIntervalMs = VIDEO_INTERVAL_SAFE;
+let imageAttemptsSinceLastError = 0;
+let videoAttemptsSinceLastError = 0;
+let debugCount = 0;
+let debugEntries = [];
+let debugCollapsed = false;
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function formatEta(seconds) {
+  if (seconds < 60) return Math.round(seconds) + 's';
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return m + 'm' + (s > 0 ? ' ' + s + 's' : '');
+}
+function randomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ══════════════════════════════════════════════════════════════════
+// CONSOLE DEBUG
+// ══════════════════════════════════════════════════════════════════
+function debugLog(level, category, message, data) {
+  const body = document.getElementById('debug-body');
+  if (!body) return;
+  const time = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+  const entry = document.createElement('div');
+  entry.className = 'debug-entry ' + level;
+  let html = '<span class="debug-time">' + time + '</span>';
+  html += '<span class="debug-cat">[' + esc(category) + ']</span>';
+  html += '<span class="debug-msg">' + esc(message) + '</span>';
+  if (data !== undefined && data !== null) {
+    let dataStr;
+    if (typeof data === 'string') dataStr = data;
+    else { try { dataStr = JSON.stringify(data, null, 2); } catch (e) { dataStr = String(data); } }
+    if (dataStr.length > 4000) dataStr = dataStr.slice(0, 4000) + '\n…[tronqué]';
+    html += '<pre class="debug-data">' + esc(dataStr) + '</pre>';
+  }
+  entry.innerHTML = html;
+  body.appendChild(entry);
+  debugEntries.push({ time, level, category, message });
+  if (debugEntries.length > DEBUG_MAX_ENTRIES) debugEntries.shift();
+  while (body.children.length > DEBUG_MAX_ENTRIES) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+  debugCount++;
+  const countEl = document.getElementById('debug-count');
+  if (countEl) countEl.textContent = debugCount;
+}
+function clearDebug() {
+  const body = document.getElementById('debug-body');
+  if (body) body.innerHTML = '';
+  debugEntries = []; debugCount = 0;
+  const countEl = document.getElementById('debug-count');
+  if (countEl) countEl.textContent = '0';
+  debugLog('info', 'SYSTEM', 'Console effacée');
+}
+function copyDebug() {
+  const lines = debugEntries.map(e => e.time + ' [' + e.category + '] ' + e.message).join('\n');
+  const finish = (ok) => showToast(ok ? 'Console copiée' : 'Copie impossible', ok ? 'success' : 'error');
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(lines).then(() => finish(true)).catch(() => legacyCopy(lines, finish));
+      return;
+    }
+  } catch (e) {}
+  legacyCopy(lines, finish);
+}
+function legacyCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:2em;height:2em;padding:0;border:none;outline:none;box-shadow:none;background:transparent;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  cb(ok);
+}
+function toggleDebugCollapse() {
+  const panel = document.getElementById('debug-panel');
+  const btn = document.getElementById('debug-collapse-btn');
+  if (!panel || !btn) return;
+  debugCollapsed = !debugCollapsed;
+  panel.classList.toggle('collapsed', debugCollapsed);
+  btn.textContent = debugCollapsed ? '+' : '−';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MEDIA LOG
+// ══════════════════════════════════════════════════════════════════
+function addMediaLogEntry(kind, url, label) {
+  const log = document.getElementById('media-log');
+  if (!log) return;
+  const empty = log.querySelector('div[style]');
+  if (empty) empty.remove();
+  const time = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+  const el = document.createElement('div');
+  el.className = 'media-log-entry';
+  const displayUrl = url.length > 120 ? url.slice(0, 120) + '…' : url;
+  el.innerHTML =
+    '<span class="ml-tag ' + kind + '">' + kind + '</span>' +
+    '<span class="ml-url"><a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(displayUrl) + '</a></span>' +
+    '<span class="ml-time">' + time + '</span>';
+  log.appendChild(el);
+  const countEl = document.getElementById('medialog-count');
+  if (countEl) countEl.textContent = String(log.querySelectorAll('.media-log-entry').length);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════
+let toastTimeout = null;
+function showToast(message, type = 'success', duration = 2500) {
+  const toast = document.getElementById('toast');
+  const icon = document.getElementById('toast-icon');
+  const text = document.getElementById('toast-text');
+  if (!toast || !icon || !text) return;
+  toast.classList.remove('visible', 'success', 'error', 'warn');
+  void toast.offsetWidth;
+  const icons = { success: '✓', error: '✕', warn: '⚠' };
+  icon.textContent = icons[type] || '✓';
+  text.textContent = message;
+  toast.classList.add(type);
+  requestAnimationFrame(() => toast.classList.add('visible'));
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('visible'), duration);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ANTI-VEILLE
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel = null;
+let wakeLockEnabled = false;
+let canvasStream = null;
+let canvasInterval = null;
+
+function isWakeLockSupported() {
+  return 'wakeLock' in navigator && typeof navigator.wakeLock.request === 'function';
+}
+async function requestWakeLockAPI() {
+  if (!isWakeLockSupported()) return false;
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener('release', () => {
+      wakeLockSentinel = null; updateWakeStatus();
+    });
+    return true;
+  } catch (e) { debugLog('warn', 'WAKELOCK', 'Refusé : ' + e.message); return false; }
+}
+async function releaseWakeLockAPI() {
+  if (wakeLockSentinel) { try { await wakeLockSentinel.release(); } catch (e) {} wakeLockSentinel = null; }
+}
+function startCanvasStream() {
+  if (canvasStream) return true;
+  try {
+    const canvas = document.getElementById('noSleepCanvas');
+    const video = document.getElementById('noSleepVideo');
+    if (!canvas || !video) return false;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return false;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (typeof canvas.captureStream !== 'function') return false;
+    canvasStream = canvas.captureStream(1);
+    let toggle = false;
+    canvasInterval = setInterval(() => {
+      toggle = !toggle;
+      ctx.fillStyle = toggle ? '#000000' : '#010101';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }, 1000);
+    video.srcObject = canvasStream;
+    video.muted = true; video.playsInline = true;
+    const p = video.play(); if (p && p.catch) p.catch(() => {});
+    return true;
+  } catch (e) { debugLog('warn', 'WAKELOCK', 'Canvas fallback échoué : ' + e.message); return false; }
+}
+function stopCanvasStream() {
+  if (canvasInterval) { clearInterval(canvasInterval); canvasInterval = null; }
+  const video = document.getElementById('noSleepVideo');
+  if (video) { try { video.pause(); video.srcObject = null; } catch (e) {} }
+  if (canvasStream) { try { canvasStream.getTracks().forEach(t => t.stop()); } catch (e) {} canvasStream = null; }
+}
+async function activateWakeLock() {
+  let success = false;
+  if (isWakeLockSupported()) success = await requestWakeLockAPI();
+  if (!success) success = startCanvasStream();
+  if (!success && !canvasStream) success = startCanvasStream();
+  return success;
+}
+async function deactivateWakeLock() { await releaseWakeLockAPI(); stopCanvasStream(); }
+
+function updateWakeStatus() {
+  const el = document.getElementById('wake-status');
+  const txt = document.getElementById('wake-status-text');
+  const btn = document.getElementById('wake-toggle-btn');
+  if (!el || !txt || !btn) return;
+  el.classList.remove('active', 'warn');
+  const canvas = document.getElementById('noSleepCanvas');
+  const has = isWakeLockSupported() || (canvas && canvas.captureStream);
+  if (!has) { el.classList.add('warn'); txt.textContent = '⚠️ Non supporté'; btn.style.display = 'none'; return; }
+  btn.style.display = 'inline-block';
+  const isActive = wakeLockSentinel !== null || canvasStream !== null;
+  if (wakeLockEnabled && isActive) {
+    el.classList.add('active'); txt.textContent = '✅ Écran allumé'; btn.textContent = 'Désactiver';
+  } else if (wakeLockEnabled && !isActive) {
+    el.classList.add('warn'); txt.textContent = '⏳ En attente'; btn.textContent = 'Désactiver';
+  } else {
+    txt.textContent = '💤 Veille automatique'; btn.textContent = 'Garder l\'écran allumé';
+  }
+}
+async function toggleWakeLock() {
+  if (wakeLockEnabled) {
+    wakeLockEnabled = false; await deactivateWakeLock();
+    try { localStorage.setItem(WAKE_LOCK_PREF, '0'); } catch (e) {}
+    showToast('Veille automatique', 'warn');
+  } else {
+    wakeLockEnabled = true;
+    const ok = await activateWakeLock();
+    try { localStorage.setItem(WAKE_LOCK_PREF, '1'); } catch (e) {}
+    if (ok) showToast('Écran allumé', 'success');
+    else showToast('Activez manuellement', 'warn');
+  }
+  updateWakeStatus();
+}
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && wakeLockEnabled) {
+    await activateWakeLock(); updateWakeStatus();
+  }
+});
+async function ensureWakeLockActive() {
+  if (!wakeLockEnabled) return;
+  if (wakeLockSentinel === null && canvasStream === null) {
+    await activateWakeLock(); updateWakeStatus();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TIMING CACHE
+// ══════════════════════════════════════════════════════════════════
+function loadTimingCache() {
+  try { return JSON.parse(localStorage.getItem(TIMING_CACHE_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+function saveTimingCache(c) {
+  try { localStorage.setItem(TIMING_CACHE_KEY, JSON.stringify(c)); } catch (e) {}
+}
+function recordGenerationTime(key, ms) {
+  const c = loadTimingCache();
+  if (!c[key]) c[key] = [];
+  c[key].push(ms);
+  if (c[key].length > 10) c[key] = c[key].slice(-10);
+  saveTimingCache(c); updateTimingDisplay();
+  debugLog('info', 'TIMING', key + ' : ' + (ms / 1000).toFixed(1) + 's');
+}
+function estimateGenerationTime(key, fallbackMs) {
+  const c = loadTimingCache();
+  const s = c[key];
+  if (s && s.length > 0) {
+    const sorted = [...s].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0 ? (sorted[mid-1] + sorted[mid]) / 2 : sorted[mid];
+  }
+  return fallbackMs;
+}
+function updateTimingDisplay() {
+  const c = loadTimingCache();
+  const v = c['video'] || [];
+  const s = document.getElementById('stat-speed');
+  const t = document.getElementById('stat-samples');
+  if (!s || !t) return;
+  if (v.length === 0) { s.textContent = 'en attente'; t.textContent = '0 génération'; return; }
+  const avg = v.reduce((a, b) => a + b, 0) / v.length;
+  s.textContent = (avg / 1000).toFixed(1) + ' s en moyenne';
+  t.textContent = v.length + ' génération' + (v.length > 1 ? 's' : '');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CLÉ API
+// ══════════════════════════════════════════════════════════════════
+function getApiKey() {
+  try { return (localStorage.getItem(API_KEY_STORAGE) || '').trim(); }
+  catch (e) { return ''; }
+}
+function saveApiKey() {
+  const input = document.getElementById('api-key-input');
+  if (!input) return;
+  const key = input.value.trim();
+  if (!key) {
+    try { localStorage.removeItem(API_KEY_STORAGE); } catch (e) {}
+    updateApiPanel(); showToast('Clé supprimée', 'warn'); return;
+  }
+  if (!key.startsWith('sk-')) {
+    if (!confirm('La clé ne commence pas par "sk-". Sauvegarder ?')) return;
+  }
+  try {
+    localStorage.setItem(API_KEY_STORAGE, key);
+    updateApiPanel(); showToast('Clé enregistrée ✓', 'success');
+    debugLog('success', 'API', 'Clé : ' + key.slice(0, 8) + '…' + key.slice(-4));
+    input.blur();
+  } catch (e) { showToast('Erreur sauvegarde', 'error'); }
+}
+function updateApiPanel() {
+  const panel = document.getElementById('api-panel');
+  const input = document.getElementById('api-key-input');
+  const statusLine = document.getElementById('api-status-line');
+  const statusText = document.getElementById('api-status-text');
+  const key = getApiKey();
+  if (!panel || !input || !statusLine || !statusText) return;
+  if (key) {
+    panel.classList.add('ok');
+    statusLine.classList.add('ok');
+    statusText.textContent = 'Clé active · ' + key.slice(0, 8) + '…' + key.slice(-4);
+    input.value = key; input.placeholder = '';
+  } else {
+    panel.classList.remove('ok');
+    statusLine.classList.remove('ok');
+    statusText.textContent = 'Aucune clé API enregistrée';
+    input.value = ''; input.placeholder = 'Collez votre clé API ici (sk-...)';
+  }
+  updateGenerateBtn();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════════
+function updateGenerateBtn() {
+  const btn = document.getElementById('generate-btn');
+  if (!btn) return;
+  const hasKey = !!getApiKey();
+  const hasSubject = state.subject.trim().length >= 5;
+  const hasAngles = state.selectedAngles.length > 0;
+  btn.disabled = !hasKey || !hasSubject || !hasAngles || state.isRunning;
+  if (state.isRunning) btn.textContent = 'Création en cours…';
+  else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
+  else if (!hasSubject) btn.textContent = 'Décrivez votre sujet';
+  else if (!hasAngles) btn.textContent = 'Sélectionnez au moins un angle';
+  else {
+    const n = Math.min(state.hookCount, state.selectedAngles.length * 2);
+    btn.textContent = '⚡ Générer ' + n + ' hook' + (n > 1 ? 's' : '') + ' viraux';
+  }
+}
+function setStatus(text) {
+  const bar = document.getElementById('status-bar');
+  const txt = document.getElementById('status-text');
+  if (!bar || !txt) return;
+  if (text) { bar.classList.add('visible'); txt.textContent = text; }
+  else bar.classList.remove('visible');
+}
+function setPhase(phase, detail, eta) {
+  state.phase = phase;
+  const bar = document.getElementById('phase-bar');
+  if (bar) bar.classList.add('visible');
+  document.querySelectorAll('.phase-step').forEach(el => {
+    el.classList.remove('active', 'done');
+    const order = ['ideation', 'images', 'videos', 'done'];
+    const curIdx = order.indexOf(phase);
+    const elIdx = order.indexOf(el.dataset.phase);
+    if (elIdx < curIdx) el.classList.add('done');
+    else if (elIdx === curIdx) el.classList.add('active');
+  });
+  const d = document.getElementById('phase-detail');
+  const e = document.getElementById('phase-eta');
+  if (d) d.innerHTML = detail || '';
+  if (e) e.textContent = eta || '';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDU — Angles
+// ══════════════════════════════════════════════════════════════════
+function renderAngles() {
+  const grid = document.getElementById('angles-grid');
+  if (!grid) return;
+  grid.innerHTML = HOOK_ANGLES.map(a => {
+    const sel = state.selectedAngles.includes(a.id);
+    return '<div class="angle-card' + (sel ? ' selected' : '') + '" data-angle="' + a.id + '">' +
+      '<div class="a-emoji">' + a.emoji + '</div>' +
+      '<div class="a-name">' + esc(a.name) + '</div>' +
+      '<div class="a-desc">' + esc(a.desc) + '</div>' +
+      '</div>';
+  }).join('');
+  grid.querySelectorAll('.angle-card').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.angle;
+      if (state.selectedAngles.includes(id)) {
+        state.selectedAngles = state.selectedAngles.filter(x => x !== id);
+      } else {
+        state.selectedAngles.push(id);
+      }
+      renderAngles();
+      updateGenerateBtn();
+    });
+  });
+  const badge = document.getElementById('angles-count-badge');
+  if (badge) badge.textContent = state.selectedAngles.length + ' angle' + (state.selectedAngles.length > 1 ? 's' : '');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RÉFÉRENCE IMAGE
+// ══════════════════════════════════════════════════════════════════
+async function compressReferenceImage(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      const scale = Math.min(1, REF_MAX_SIDE / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+async function handleReferenceImage(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Fichier non image', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const raw = e.target.result;
+    const compressed = await compressReferenceImage(raw);
+    state.referenceImage = compressed;
+    updateRefPreview();
+    debugLog('success', 'REF', 'Référence chargée (' + Math.round(compressed.length / 1024) + ' Ko)');
+    showToast('Image de référence prête', 'success');
+  };
+  reader.onerror = () => showToast('Erreur lecture image', 'error');
+  reader.readAsDataURL(file);
+}
+function updateRefPreview() {
+  const drop = document.getElementById('ref-drop');
+  if (!drop) return;
+  if (state.referenceImage) {
+    drop.classList.add('has-image');
+    drop.innerHTML =
+      '<div class="ref-preview">' +
+        '<img src="' + state.referenceImage + '" alt="Référence">' +
+        '<div class="ref-label">Référence · sera utilisée dans chaque hook</div>' +
+        '<button type="button" class="ref-remove" id="ref-remove-btn">✕</button>' +
+      '</div>';
+    const btn = document.getElementById('ref-remove-btn');
+    if (btn) btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.referenceImage = null;
+      updateRefPreview();
+      showToast('Référence supprimée', 'warn');
+    });
+  } else {
+    drop.classList.remove('has-image');
+    drop.innerHTML =
+      '<input type="file" accept="image/*" id="ref-image-input">' +
+      '<div class="ref-icon">⚡</div>' +
+      '<div class="ref-text"><strong>Cliquez pour choisir une image</strong><br>Produit, visage, décor…</div>' +
+      '<div class="ref-hint">Cette image sera le point de départ de chaque hook.</div>';
+    bindRefInput();
+  }
+}
+function bindRefInput() {
+  const input = document.getElementById('ref-image-input');
+  if (!input) return;
+  input.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleReferenceImage(file);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API FETCH — backoff
+// ══════════════════════════════════════════════════════════════════
+async function apiFetch(url, options = {}, label = 'API', kind = 'default') {
+  for (let attempt = 0; attempt < 7; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    const method = options.method || 'GET';
+    let bodyPreview = null;
+    if (options.body) {
+      try {
+        const p = JSON.parse(options.body);
+        const c = JSON.parse(JSON.stringify(p));
+        if (c.image && typeof c.image === 'string' && c.image.length > 80)
+          c.image = c.image.slice(0, 80) + '…[b64 ' + c.image.length + ']';
+        if (c.last_frame && typeof c.last_frame === 'string' && c.last_frame.length > 80)
+          c.last_frame = c.last_frame.slice(0, 80) + '…[b64 ' + c.last_frame.length + ']';
+        bodyPreview = c;
+      } catch (e) { bodyPreview = String(options.body).slice(0, 500); }
+    }
+    debugLog('api', 'REQ ' + label, method + ' ' + url + ' (essai ' + (attempt + 1) + ')', bodyPreview);
+    try {
+      const t0 = Date.now();
+      const res = await fetch(url, options);
+      const dt = Date.now() - t0;
+      debugLog('response', 'RÉP ' + label, 'HTTP ' + res.status + ' en ' + dt + 'ms');
+      if (res.status === 429) {
+        if (kind === 'image') {
+          imageAttemptsSinceLastError = 0;
+          if (createImageIntervalMs < IMAGE_INTERVAL_MAX) {
+            createImageIntervalMs = Math.min(createImageIntervalMs + 1500, IMAGE_INTERVAL_MAX);
+          }
+        } else if (kind === 'video') {
+          videoAttemptsSinceLastError = 0;
+          if (createVideoIntervalMs < VIDEO_INTERVAL_MAX) {
+            createVideoIntervalMs = Math.min(createVideoIntervalMs + 8000, VIDEO_INTERVAL_MAX);
+          }
+        }
+        const wait = [10, 20, 35, 50, 75, 100, 150][Math.min(attempt, 6)];
+        debugLog('warn', 'RATELIMIT', '429 — attente ' + wait + 's');
+        setStatus('L\'IA se prépare… (' + wait + 's)');
+        await sleep(wait * 1000); continue;
+      }
+      if (res.status === 503) {
+        const wait = [5, 10, 15, 20, 30, 45][Math.min(attempt, 5)];
+        debugLog('warn', 'SERVICE', '503 — attente ' + wait + 's');
+        setStatus('Le service se prépare… (' + wait + 's)');
+        await sleep(wait * 1000); continue;
+      }
+      if (res.ok) {
+        if (kind === 'image') {
+          imageAttemptsSinceLastError++;
+          if (imageAttemptsSinceLastError >= 5 && createImageIntervalMs > IMAGE_INTERVAL_MIN) {
+            createImageIntervalMs = Math.max(createImageIntervalMs - 200, IMAGE_INTERVAL_MIN);
+            imageAttemptsSinceLastError = 0;
+          }
+        } else if (kind === 'video') {
+          videoAttemptsSinceLastError++;
+          if (videoAttemptsSinceLastError >= 3 && createVideoIntervalMs > VIDEO_INTERVAL_MIN) {
+            createVideoIntervalMs = Math.max(createVideoIntervalMs - 4000, VIDEO_INTERVAL_MIN);
+            videoAttemptsSinceLastError = 0;
+          }
+        }
+      }
+      return res;
+    } catch (e) {
+      if (e.message === 'Arrêt demandé') throw e;
+      const wait = [3, 5, 8, 12, 20, 30][Math.min(attempt, 5)];
+      debugLog('warn', 'NETWORK', e.message + ' — retry ' + wait + 's');
+      setStatus('Connexion… (' + wait + 's)');
+      await sleep(wait * 1000);
+    }
+  }
+  debugLog('error', 'API', 'Tentatives épuisées pour ' + label);
+  return fetch(url, options);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PARSER JSON — 5 stratégies
+// ══════════════════════════════════════════════════════════════════
+function escapeControlCharsInStrings(text) {
+  let result = '';
+  let inString = false;
+  let escape = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { result += ch; escape = false; continue; }
+    if (ch === '\\') { result += ch; escape = true; continue; }
+    if (ch === '"') { inString = !inString; result += ch; continue; }
+    if (inString) {
+      if (ch === '\n') { result += '\\n'; continue; }
+      if (ch === '\r') { result += '\\r'; continue; }
+      if (ch === '\t') { result += '\\t'; continue; }
+      const code = ch.charCodeAt(0);
+      if (code < 32) { result += '\\u' + code.toString(16).padStart(4, '0'); continue; }
+    }
+    result += ch;
+  }
+  return result;
+}
+function balanceJson(text) {
+  let openBraces = 0, openBrackets = 0, inString = false, escape = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { escape = false; continue; }
+    if (ch === '\\') { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') openBraces++;
+    else if (ch === '}') openBraces--;
+    else if (ch === '[') openBrackets++;
+    else if (ch === ']') openBrackets--;
+  }
+  let result = text;
+  if (inString) result += '"';
+  while (openBrackets > 0) { result += ']'; openBrackets--; }
+  while (openBraces > 0) { result += '}'; openBraces--; }
+  return result;
+}
+function salvageHooks(text) {
+  const hooks = [];
+  // Cherche toutes les séquences { ... "hook_number" ... }
+  const regex = /\{[^{}]*?"hook_number"\s*:\s*(\d+)[^{}]*?"angle"\s*:\s*"((?:[^"\\]|\\.)*)"[^{}]*?"voiceover"\s*:\s*"((?:[^"\\]|\\.)*)"[^{}]*?"image_prompt"\s*:\s*"((?:[^"\\]|\\.)*)"[^{}]*?"action_prompt"\s*:\s*"((?:[^"\\]|\\.)*)"[^{}]*?\}/g;
+  let m;
+  while ((m = regex.exec(text)) !== null) {
+    hooks.push({
+      hook_number: parseInt(m[1], 10),
+      angle: m[2].replace(/\\"/g, '"').replace(/\\n/g, ' '),
+      voiceover: m[3].replace(/\\"/g, '"').replace(/\\n/g, ' '),
+      image_prompt: m[4].replace(/\\"/g, '"').replace(/\\n/g, ' '),
+      action_prompt: m[5].replace(/\\"/g, '"').replace(/\\n/g, ' ')
+    });
+  }
+  if (hooks.length === 0) return null;
+  return { hooks };
+}
+function extractJson(text) {
+  if (!text) return null;
+  let c = text.trim();
+  const fm = c.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fm) c = fm[1].trim();
+  const fb = c.indexOf('{');
+  if (fb < 0) { debugLog('error', 'PARSE', 'Aucun { trouvé'); return null; }
+  c = c.slice(fb);
+  try { const r = JSON.parse(c); debugLog('success', 'PARSE', 'S1 directe OK'); return r; }
+  catch (e1) { debugLog('warn', 'PARSE', 'S1 : ' + e1.message.slice(0, 120)); }
+  try {
+    const fixed = escapeControlCharsInStrings(c);
+    const r = JSON.parse(fixed);
+    debugLog('success', 'PARSE', 'S2 échappement OK');
+    return r;
+  } catch (e2) { debugLog('warn', 'PARSE', 'S2 : ' + e2.message.slice(0, 120)); }
+  try {
+    const lb = c.lastIndexOf('}');
+    if (lb > 0) {
+      let trunc = c.slice(0, lb + 1);
+      trunc = escapeControlCharsInStrings(trunc);
+      const r = JSON.parse(trunc);
+      debugLog('success', 'PARSE', 'S3 dernier } OK');
+      return r;
+    }
+  } catch (e3) { debugLog('warn', 'PARSE', 'S3 : ' + e3.message.slice(0, 120)); }
+  try {
+    const balanced = balanceJson(escapeControlCharsInStrings(c));
+    const r = JSON.parse(balanced);
+    debugLog('success', 'PARSE', 'S4 équilibrage OK');
+    return r;
+  } catch (e4) { debugLog('warn', 'PARSE', 'S4 : ' + e4.message.slice(0, 120)); }
+  try {
+    const salvaged = salvageHooks(c);
+    if (salvaged && salvaged.hooks && salvaged.hooks.length > 0) {
+      debugLog('success', 'PARSE', 'S5 regex — ' + salvaged.hooks.length + ' hooks');
+      return salvaged;
+    }
+  } catch (e5) { debugLog('error', 'PARSE', 'S5 : ' + e5.message.slice(0, 120)); }
+  debugLog('error', 'PARSE', 'Aucune stratégie n\'a fonctionné');
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPTS
+// ══════════════════════════════════════════════════════════════════
+function buildIdeationPrompt() {
+  const count = state.hookCount;
+  const anglesList = state.selectedAngles.map(id => {
+    const a = HOOK_ANGLES.find(x => x.id === id);
+    return a ? '- ' + a.name + ' (' + a.prompt + ')' : '';
+  }).filter(Boolean).join('\n');
+  const motion = MOTION_PRESETS[state.motion] || MOTION_PRESETS.dynamic;
+  return [
+    'You are a viral content strategist specialized in TikTok / Instagram Reels / YouTube Shorts hooks.',
+    '',
+    'SUBJECT: ' + state.subject,
+    '',
+    'TASK: Generate exactly ' + count + ' DIFFERENT high-impact hooks for this subject.',
+    '',
+    'AVAILABLE ANGLES (use a variety, cycle through them, each hook must have ONE angle):',
+    anglesList,
+    '',
+    'RULES FOR EACH HOOK:',
+    '- The voiceover text (spoken/shown) must be SHORT: 4 to 8 words MAXIMUM.',
+    '- Must grab attention in under 2 seconds.',
+    '- Must be ORIGINAL (no clichés like "Tu ne vas pas y croire").',
+    '- Must be specific to the subject, not generic.',
+    '- The visual must be strong and dynamic enough to work even without sound.',
+    '',
+    'VISUAL STYLE:',
+    '- ' + motion,
+    '- Portrait 9:16 vertical.',
+    '- No music. No text on screen. Dynamic camera movement.',
+    '- Photorealistic, cinematic, high detail, 35mm film grain.',
+    '',
+    'CRITICAL JSON RULES:',
+    '- All string values on a SINGLE LINE. Never real line breaks inside strings.',
+    '- Escape any double quote inside a string as \\".',
+    '- No trailing commas. No markdown. No commentary.',
+    '',
+    'OUTPUT FORMAT (return ONLY this JSON, exact schema):',
+    '{',
+    '  "hooks": [',
+    '    {',
+    '      "hook_number": 1,',
+    '      "angle": "name of the angle in French (Choc, Curiosité, Émotion, Humour, Autorité, Urgence, Confession, Contre-intuitif, Transformation, Appel direct)",',
+    '      "voiceover": "short punchy French text, 4-8 words maximum, spoken as voiceover",',
+    '      "image_prompt": "detailed English prompt for the opening frame of this hook, describing composition, subject, lighting, camera angle, dynamic pose",',
+    '      "action_prompt": "detailed English prompt describing the motion during the 5 seconds of this hook — one continuous movement, no cuts"',
+    '    }',
+    '    ... exactly ' + count + ' hooks ...',
+    '  ]',
+    '}',
+    '',
+    'Every hook must be visually and emotionally DISTINCT from the others.'
+  ].join('\n');
+}
+
+function buildImagePrompt(hook, index, total) {
+  const motion = MOTION_PRESETS[state.motion] || MOTION_PRESETS.dynamic;
+  return [
+    'TikTok hook opening frame — ' + (index + 1) + ' of ' + total + '.',
+    '',
+    'ANGLE: ' + hook.angle,
+    'SUBJECT: ' + state.subject,
+    '',
+    hook.image_prompt,
+    '',
+    'VISUAL STYLE: ' + motion,
+    'Format: portrait 9:16 vertical, cinematic photography, dynamic composition, high contrast, 35mm film grain.',
+    'No text, no watermark, no logo, no subtitle, no on-screen graphic.'
+  ].join('\n');
+}
+
+function buildVideoPrompt(hook) {
+  const motion = MOTION_PRESETS[state.motion] || MOTION_PRESETS.dynamic;
+  const vo = hook.voiceover || '';
+  return [
+    'CRITICAL: The provided image is the EXACT first frame of this video.',
+    '',
+    'PURPOSE: TikTok hook — the first 5 seconds of a short-form viral video.',
+    '',
+    'ANGLE: ' + hook.angle,
+    'SUBJECT: ' + state.subject,
+    '',
+    'ACTION: ' + hook.action_prompt,
+    '',
+    'VISUAL STYLE: ' + motion,
+    '',
+    'CAMERA: Dynamic viral TikTok cinematography. One continuous motion — push-in, orbit, follow, or reveal. Keep the subject prominent in frame.',
+    '',
+    'AUDIO: ABSOLUTELY NO MUSIC. Only natural ambient sounds. ' +
+      (vo ? 'The narrator softly says the hook line: "' + vo + '" — clear, punchy, confident, one breath.' : 'No dialogue.'),
+    '',
+    'FORMAT: Portrait 9:16 vertical, 24fps, photorealistic, cinematic, high detail.',
+    'No text, no subtitles, no watermarks, no music, no on-screen graphics.'
+  ].join(' ');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// APPELS API
+// ══════════════════════════════════════════════════════════════════
+async function generateIdeation() {
+  setPhase('ideation', '🧠 Génération des hooks viraux…', '');
+  setStatus('L\'IA imagine les hooks…');
+  state.ideationStartTime = Date.now();
+  const prompt = buildIdeationPrompt();
+  debugLog('ai', 'PROMPT IDÉATION', 'Envoyé', prompt.slice(0, 1800));
+  const body = {
+    model: MODEL_TEXT,
+    messages: [
+      { role: 'system', content: 'You are a viral content strategist. You ALWAYS return valid JSON exactly matching the requested schema. All string values on single lines — never real line breaks inside a string. No markdown, no commentary, no trailing commas.' },
+      { role: 'user', content: prompt }
+    ],
+    temperature: TEXT_TEMPERATURE,
+    max_tokens: TEXT_MAX_TOKENS,
+    response_format: { type: 'json_object' }
+  };
+  const res = await apiFetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Idéation', 'text');
+  if (!res.ok) {
+    const err = await res.text();
+    debugLog('error', 'IDÉATION', 'HTTP ' + res.status, err.slice(0, 2000));
+    throw new Error('HTTP ' + res.status);
+  }
+  const data = await res.json();
+  debugLog('response', 'RAW IDÉATION', 'Réponse brute', data);
+  const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  state.rawResponse = content || '';
+  const rawEl = document.getElementById('raw-viewer');
+  if (rawEl) rawEl.textContent = content || '(vide)';
+  const parsed = extractJson(content);
+  if (!parsed || !parsed.hooks || !Array.isArray(parsed.hooks)) {
+    throw new Error('Réponse invalide après 5 stratégies');
+  }
+  // Ajuster au nombre demandé
+  let hooks = parsed.hooks.slice(0, state.hookCount);
+  while (hooks.length < state.hookCount) {
+    const last = hooks[hooks.length - 1];
+    hooks.push({
+      hook_number: hooks.length + 1,
+      angle: last.angle,
+      voiceover: last.voiceover,
+      image_prompt: last.image_prompt,
+      action_prompt: last.action_prompt
+    });
+  }
+  const elapsed = Date.now() - state.ideationStartTime;
+  debugLog('success', 'IDÉATION', hooks.length + ' hooks en ' + (elapsed / 1000).toFixed(1) + 's');
+  return hooks;
+}
+
+async function generateImage(prompt) {
+  const body = {
+    model: MODEL_IMAGE,
+    prompt: prompt,
+    n: 1,
+    size: '1024x1792',
+    response_format: 'url'
+  };
+  const res = await apiFetch(API_BASE + '/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Image', 'image');
+  if (!res.ok) {
+    const err = await res.text();
+    debugLog('error', 'IMAGE', 'HTTP ' + res.status, err.slice(0, 500));
+    throw new Error('HTTP ' + res.status);
+  }
+  const data = await res.json();
+  const item = data.data && data.data[0];
+  if (!item) throw new Error('Pas de donnée image');
+  let url;
+  if (item.url) url = item.url;
+  else if (item.b64_json) url = 'data:image/png;base64,' + item.b64_json;
+  else throw new Error('Format image inconnu');
+  return url;
+}
+
+async function generateVideo(firstFrame, prompt) {
+  const body = {
+    model: MODEL_VIDEO,
+    prompt: prompt,
+    image: firstFrame,
+    num_frames: state.durationFrames,
+    frame_rate: FRAME_RATE
+  };
+  debugLog('ai', 'PROMPT VIDÉO', 'Envoyé', prompt.slice(0, 400) + '…');
+  const res = await apiFetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Vidéo', 'video');
+  if (!res.ok) {
+    const err = await res.text();
+    debugLog('error', 'VIDÉO', 'HTTP ' + res.status, err.slice(0, 500));
+    throw new Error('HTTP ' + res.status);
+  }
+  const data = await res.json();
+  const videoId = data.video_id || data.id || data.task_id;
+  if (!videoId) throw new Error('Pas de video_id');
+  return videoId;
+}
+
+async function pollVideo(videoId, onProgress) {
+  const estimatedMs = estimateGenerationTime('video', 30000 + state.durationFrames * 500);
+  const estimatedSec = estimatedMs / 1000;
+  const minWait = Math.min(VIDEO_FIRST_POLL_DELAY_SEC, Math.max(60, Math.floor(estimatedSec * 0.75)));
+  let remaining = minWait;
+  debugLog('info', 'POLLING', 'Attente initiale ' + remaining + 's avant premier poll');
+  while (remaining > 0) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    onProgress('Préparation — ' + remaining + 's');
+    await sleep(1000); remaining--;
+  }
+  for (let attempt = 0; attempt < VIDEO_MAX_POLL_ATTEMPTS; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    if (attempt > 0) {
+      const idx = Math.min(attempt - 1, VIDEO_POLL_INTERVALS.length - 1);
+      let r = VIDEO_POLL_INTERVALS[idx];
+      while (r > 0) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        onProgress('Le hook prend vie… — ' + r + 's');
+        await sleep(1000); r--;
+      }
+    }
+    const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) +
+                '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+    const res = await apiFetch(url, {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + getApiKey() }
+    }, 'Polling', 'video');
+    const d = await res.json();
+    const status = d.status || 'unknown';
+    const progress = d.progress || 0;
+    onProgress('Création — ' + progress + '%');
+    debugLog('response', 'POLL #' + (attempt + 1), 'Statut : ' + status + ' (' + progress + '%)');
+    if (status === 'completed' || status === 'succeeded' || status === 'done') {
+      const videoUrl = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+      if (!videoUrl) throw new Error('Terminé mais pas d\'URL');
+      debugLog('success', 'POLLING', 'Terminé après ' + (attempt + 1) + ' polls');
+      return videoUrl;
+    }
+    if (status === 'failed' || status === 'error' || status === 'cancelled') {
+      throw new Error('Échec (' + status + ')');
+    }
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// QUEUE RATE-LIMITED (images parallèles)
+// ══════════════════════════════════════════════════════════════════
+function createRateLimitedQueue(maxConcurrent, minIntervalMs) {
+  let running = 0;
+  let lastStart = 0;
+  const queue = [];
+  let resolveIdle = null;
+  function tryNext() {
+    if (running >= maxConcurrent) return;
+    if (queue.length === 0) {
+      if (running === 0 && resolveIdle) { resolveIdle(); resolveIdle = null; }
+      return;
+    }
+    const now = Date.now();
+    const wait = Math.max(0, lastStart + minIntervalMs - now);
+    if (wait > 0) { setTimeout(tryNext, wait); return; }
+    const task = queue.shift();
+    running++;
+    lastStart = Date.now();
+    task().finally(() => { running--; setTimeout(tryNext, 0); });
+  }
+  return {
+    add(fn) {
+      return new Promise((resolve, reject) => {
+        queue.push(() => fn().then(resolve, reject));
+        setTimeout(tryNext, 0);
+      });
+    },
+    idle() {
+      return new Promise(r => {
+        if (running === 0 && queue.length === 0) return r();
+        resolveIdle = r;
+      });
+    }
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDU — Hooks list, images, queue, galerie
+// ══════════════════════════════════════════════════════════════════
+function renderHooksPanel() {
+  const panel = document.getElementById('hooks-panel');
+  const list = document.getElementById('hooks-list');
+  if (!panel || !list) return;
+  if (!state.hooks.length) { panel.classList.remove('visible'); return; }
+  panel.classList.add('visible');
+  list.innerHTML = state.hooks.map((h, i) => {
+    const cls = h.status === 'done' ? 'done'
+      : (h.status === 'failed' ? 'failed'
+      : (h.status === 'processing' || h.status === 'creating' ? 'active' : ''));
+    return '<div class="hook-item ' + cls + '" data-hook="' + i + '">' +
+      '<div class="h-header">' +
+        '<div class="h-num">#' + (i + 1) + '</div>' +
+        '<div class="h-angle">' + esc(h.angle || '—') + '</div>' +
+      '</div>' +
+      '<div class="h-vo">« ' + esc(h.voiceover || '') + ' »</div>' +
+      (h.action_prompt ? '<div class="h-visual">' + esc(h.action_prompt.slice(0, 140)) + '…</div>' : '') +
+    '</div>';
+  }).join('');
+  const progressEl = document.getElementById('hooks-progress');
+  if (progressEl) {
+    const done = state.hooks.filter(h => h.status === 'done').length;
+    progressEl.textContent = done + '/' + state.hooks.length;
+  }
+}
+
+function updateHookCard(index) {
+  const el = document.querySelector('.hook-item[data-hook="' + index + '"]');
+  if (!el) return;
+  const h = state.hooks[index];
+  el.classList.remove('active', 'done', 'failed');
+  if (h.status === 'done') el.classList.add('done');
+  else if (h.status === 'failed') el.classList.add('failed');
+  else if (h.status === 'processing' || h.status === 'creating') el.classList.add('active');
+}
+
+function createPendingCard(index, total) {
+  const grid = document.getElementById('gallery-grid');
+  if (!grid) return;
+  const existing = document.getElementById('pending-video-' + index);
+  if (existing) return;
+  const el = document.createElement('div');
+  el.className = 'pending-video-card measuring';
+  el.id = 'pending-video-' + index;
+  const h = state.hooks[index];
+  el.innerHTML =
+    '<div class="pv-spinner"></div>' +
+    '<div class="pv-label">Hook ' + (index + 1) + ' / ' + total + '</div>' +
+    '<div class="pv-progress" id="pv-progress-' + index + '">' + esc(h.angle || '') + '…</div>' +
+    '<div class="pv-bar"><div class="pv-fill" id="pv-fill-' + index + '"></div></div>';
+  grid.appendChild(el);
+  document.getElementById('gallery').style.display = 'block';
+}
+
+function updatePendingCard(index, label, progress) {
+  const progEl = document.getElementById('pv-progress-' + index);
+  const fillEl = document.getElementById('pv-fill-' + index);
+  if (progEl) progEl.textContent = label;
+  if (fillEl && progress !== undefined) fillEl.style.width = Math.max(0, Math.min(100, progress)) + '%';
+}
+
+function replacePendingWithVideo(index, videoUrl) {
+  const pending = document.getElementById('pending-video-' + index);
+  if (!pending) return;
+  const h = state.hooks[index];
+  const card = document.createElement('div');
+  card.className = 'hook-video-card';
+  card.id = 'video-card-' + index;
+  card.innerHTML =
+    '<video src="' + videoUrl + '" controls playsinline preload="metadata" muted></video>' +
+    '<div class="hv-overlay">' +
+      '<div class="hv-num">Hook ' + (index + 1) + ' · ' + esc(h.angle || '') + '</div>' +
+      '<div class="hv-vo">« ' + esc(h.voiceover || '') + ' »</div>' +
+    '</div>';
+  pending.parentNode.replaceChild(card, pending);
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function markPendingFailed(index, message) {
+  const pending = document.getElementById('pending-video-' + index);
+  if (!pending) return;
+  pending.classList.remove('measuring');
+  pending.classList.add('failed');
+  pending.innerHTML =
+    '<div class="pv-spinner"></div>' +
+    '<div class="pv-label" style="color:var(--error);">Échec</div>' +
+    '<div class="pv-error">' + esc(String(message).slice(0, 100)) + '</div>';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PHASES
+// ══════════════════════════════════════════════════════════════════
+async function runIdeationPhase() {
+  try {
+    const hooks = await generateIdeation();
+    state.hooks = hooks.map(h => ({
+      ...h,
+      status: 'pending',
+      imageUrl: null,
+      videoUrl: null,
+      videoId: null,
+      startTime: null
+    }));
+    renderHooksPanel();
+    debugLog('success', 'PHASE 1', hooks.length + ' hooks générés');
+    return true;
+  } catch (e) {
+    debugLog('error', 'PHASE 1', e.message);
+    showToast('Erreur idéation : ' + e.message.slice(0, 60), 'error', 4000);
+    return false;
+  }
+}
+
+async function runImagesPhase() {
+  const total = state.hooks.length;
+  if (total === 0) return false;
+  setPhase('images', '🎨 Génération des visuels (' + total + ')…', '');
+  debugLog('state', 'PHASE', 'Phase 2 — IMAGES parallèle x' + IMAGE_PARALLEL + ' (' + total + ')');
+  const queue = createRateLimitedQueue(IMAGE_PARALLEL, IMAGE_INTERVAL_MS);
+  let completed = 0;
+  const startTime = Date.now();
+  const tasks = [];
+  for (let i = 0; i < total; i++) {
+    const idx = i;
+    const hook = state.hooks[idx];
+    hook.status = 'image';
+    updateHookCard(idx);
+    const fullPrompt = buildImagePrompt(hook, idx, total);
+    tasks.push(queue.add(async () => {
+      if (state.stopRequested) return;
+      const t0 = Date.now();
+      try {
+        const url = await generateImage(fullPrompt);
+        hook.imageUrl = url;
+        hook.status = 'image-done';
+        addMediaLogEntry('image', url, 'Hook ' + (idx + 1));
+        completed++;
+        const dt = ((Date.now() - t0) / 1000).toFixed(1);
+        debugLog('success', 'IMAGE ' + (idx + 1) + '/' + total, 'OK en ' + dt + 's');
+        setPhase('images', '🎨 Visuels : ' + completed + ' / ' + total,
+          '≈ ' + formatEta(Math.max(0, (total - completed) * 4)) + ' restant');
+      } catch (e) {
+        if (e.message === 'Arrêt demandé') return;
+        debugLog('error', 'IMAGE ' + (idx + 1), e.message);
+        completed++;
+      }
+    }));
+  }
+  await Promise.allSettled(tasks);
+  await queue.idle();
+  const totalElapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  const ok = state.hooks.filter(h => h.imageUrl).length;
+  debugLog(ok === total ? 'success' : 'warn', 'PHASE 2', 'Images : ' + ok + '/' + total + ' en ' + totalElapsed + 's');
+  return ok === total;
+}
+
+async function runVideosPhase() {
+  const total = state.hooks.length;
+  if (total === 0) return;
+  setPhase('videos', '🎬 Génération des hooks vidéo (' + total + ')…', '');
+  debugLog('state', 'PHASE', 'Phase 3 — VIDÉOS (' + total + ')');
+  createVideoIntervalMs = VIDEO_INTERVAL_SAFE;
+  videoAttemptsSinceLastError = 0;
+  const pollingTasks = [];
+  for (let i = 0; i < total; i++) {
+    if (state.stopRequested) break;
+    const hook = state.hooks[i];
+    // Keyframe : référence utilisateur OU image générée
+    const firstFrame = hook.imageUrl || state.referenceImage;
+    if (!firstFrame) {
+      hook.status = 'failed';
+      markPendingFailed(i, 'Image manquante');
+      updateHookCard(i);
+      continue;
+    }
+    hook.status = 'creating';
+    createPendingCard(i, total);
+    updateHookCard(i);
+    setPhase('videos', '🎬 Hook ' + (i + 1) + ' / ' + total + ' — envoi…',
+      '≈ ' + formatEta((total - i) * (createVideoIntervalMs / 1000 + 90)) + ' restant');
+    try {
+      const prompt = buildVideoPrompt(hook);
+      const videoId = await generateVideo(firstFrame, prompt);
+      hook.videoId = videoId;
+      hook.startTime = Date.now();
+      hook.status = 'processing';
+      updateHookCard(i);
+      updatePendingCard(i, 'Génération…', 0);
+      debugLog('success', 'HOOK ' + (i + 1), 'Tâche : ' + videoId);
+      pollingTasks.push((async () => {
+        try {
+          const videoUrl = await pollVideo(videoId, (prog) => {
+            updatePendingCard(i, prog, parseFloat(prog.match(/(\d+)%/)?.[1]) || 0);
+          });
+          const elapsed = Date.now() - hook.startTime;
+          recordGenerationTime('video', elapsed);
+          hook.status = 'done';
+          hook.videoUrl = videoUrl;
+          updateHookCard(i);
+          replacePendingWithVideo(i, videoUrl);
+          addMediaLogEntry('video', videoUrl, 'Hook ' + (i + 1));
+          debugLog('success', 'HOOK ' + (i + 1), 'Terminé en ' + (elapsed / 1000).toFixed(1) + 's');
+          // TTS si activé
+          if (state.tts === 'on' && hook.voiceover) {
+            speakText(hook.voiceover, 'Narrateur');
+          }
+        } catch (e) {
+          if (e.message === 'Arrêt demandé') { hook.status = 'failed'; }
+          else { hook.status = 'failed'; debugLog('error', 'HOOK ' + (i + 1), e.message); }
+          updateHookCard(i);
+          markPendingFailed(i, e.message);
+        }
+      })());
+    } catch (e) {
+      if (e.message === 'Arrêt demandé') break;
+      hook.status = 'failed';
+      updateHookCard(i);
+      markPendingFailed(i, e.message);
+      debugLog('error', 'HOOK ' + (i + 1), e.message);
+    }
+    // Attente obligatoire entre deux créations vidéo
+    if (i < total - 1 && !state.stopRequested) {
+      let waitSec = Math.ceil(createVideoIntervalMs / 1000);
+      for (let r = waitSec; r > 0; r--) {
+        if (state.stopRequested) break;
+        setPhase('videos', '⚡ Respiration — hook ' + (i + 2) + ' dans ' + r + 's',
+          '≈ ' + formatEta((total - i - 1) * (createVideoIntervalMs / 1000 + 90)) + ' restant');
+        await sleep(1000);
+      }
+    }
+  }
+  if (pollingTasks.length > 0) {
+    setPhase('videos', '🎞️ Finalisation…', '');
+    await Promise.allSettled(pollingTasks);
+  }
+  const doneV = state.hooks.filter(h => h.status === 'done').length;
+  debugLog(doneV === total ? 'success' : 'warn', 'PHASE 3', 'Vidéos : ' + doneV + '/' + total);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TTS — voix off pour les hooks
+// ══════════════════════════════════════════════════════════════════
+let speechSynth = null;
+function initSpeech() {
+  if ('speechSynthesis' in window) {
+    speechSynth = window.speechSynthesis;
+    speechSynth.getVoices();
+  }
+}
+function speakText(text) {
+  if (!speechSynth || !text) return;
+  speechSynth.cancel();
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
+    u.rate = 1.02;
+    u.pitch = 1.0;
+    const voices = speechSynth.getVoices();
+    const frVoices = voices.filter(v => v.lang && v.lang.startsWith('fr'));
+    if (frVoices.length > 0) {
+      const preferred = frVoices.find(v => /female|amelie|marie|audrey|julie|denise/i.test(v.name))
+        || frVoices.find(v => /male|thomas|nicolas|henri/i.test(v.name))
+        || frVoices[0];
+      u.voice = preferred;
+    }
+    speechSynth.speak(u);
+  }, 100);
+}
+function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
+
+// ══════════════════════════════════════════════════════════════════
+// DÉMARRAGE
+// ══════════════════════════════════════════════════════════════════
+async function startGeneration() {
+  if (state.isRunning) return;
+  if (!getApiKey()) {
+    showToast('Ajoutez votre clé API', 'error');
+    document.getElementById('api-key-input').focus();
+    return;
+  }
+  if (state.subject.trim().length < 5) {
+    showToast('Décrivez votre sujet', 'error');
+    return;
+  }
+  if (state.selectedAngles.length === 0) {
+    showToast('Sélectionnez au moins un angle', 'error');
+    return;
+  }
+  state.isRunning = true;
+  state.stopRequested = false;
+  state.hooks = [];
+  state.rawResponse = '';
+  // Reset UI
+  document.getElementById('gallery-grid').innerHTML = '';
+  document.getElementById('gallery').style.display = 'none';
+  document.getElementById('hooks-list').innerHTML = '';
+  document.getElementById('hooks-panel').classList.remove('visible');
+  document.getElementById('raw-viewer').textContent = '';
+  document.getElementById('media-log').innerHTML =
+    '<div style="font-size:0.7rem;color:var(--ink-dim);font-family:var(--font-mono);">Les URLs des images et vidéos apparaîtront ici.</div>';
+  document.getElementById('medialog-count').textContent = '0';
+  document.getElementById('stop-btn').classList.add('visible');
+  document.getElementById('generate-btn').disabled = true;
+  document.getElementById('phase-bar').classList.add('visible');
+  await ensureWakeLockActive();
+  const totalStart = Date.now();
+  debugLog('state', 'START', '════════════════════════════════════');
+  debugLog('state', 'START', 'DÉMARRAGE — TikTok Hook Factory');
+  debugLog('state', 'CONFIG', 'Sujet : ' + state.subject);
+  debugLog('state', 'CONFIG', 'Angles : ' + state.selectedAngles.join(', '));
+  debugLog('state', 'CONFIG', 'Hooks : ' + state.hookCount);
+  debugLog('state', 'CONFIG', 'Frames : ' + state.durationFrames + ' (≈ ' + (state.durationFrames / FRAME_RATE).toFixed(1) + 's)');
+  debugLog('state', 'CONFIG', 'Mouvement : ' + state.motion);
+  debugLog('state', 'CONFIG', 'TTS : ' + state.tts);
+  let success = false;
+  try {
+    const okIdeation = await runIdeationPhase();
+    if (!okIdeation || state.stopRequested) throw new Error('Arrêt demandé');
+    const okImages = await runImagesPhase();
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    if (!okImages) showToast('Certaines images manquantes', 'warn', 3000);
+    await runVideosPhase();
+    setPhase('done', '✦ Hooks prêts ✦', '');
+    success = true;
+  } catch (e) {
+    debugLog('error', 'GLOBAL', e.message);
+  }
+  const totalElapsed = (Date.now() - totalStart) / 1000;
+  const doneV = state.hooks.filter(h => h.status === 'done').length;
+  const totalV = state.hooks.length;
+  const summary = state.stopRequested
+    ? 'Arrêté — ' + doneV + '/' + totalV + ' hooks'
+    : '✦ ' + doneV + '/' + totalV + ' hooks en ' + formatEta(totalElapsed) + ' ✦';
+  debugLog('state', 'FIN', summary);
+  debugLog('state', 'FIN', '════════════════════════════════════');
+  setStatus(summary);
+  await sleep(4000);
+  setStatus(null);
+  state.isRunning = false;
+  state.stopRequested = false;
+  document.getElementById('stop-btn').classList.remove('visible');
+  updateGenerateBtn();
+  if (success) showToast(doneV + ' hook' + (doneV > 1 ? 's' : '') + ' prêt' + (doneV > 1 ? 's' : ''), 'success', 4000);
+  else if (doneV > 0) showToast(doneV + ' hook' + (doneV > 1 ? 's' : ''), 'warn', 3500);
+  else showToast('Aucun hook généré', 'error', 3500);
+}
+
+function stopGeneration() {
+  if (!state.isRunning) return;
+  state.stopRequested = true;
+  stopSpeech();
+  debugLog('warn', 'STOP', 'Arrêt demandé');
+  setStatus('Arrêt en cours…');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+  initSpeech();
+
+  const saveBtn = document.getElementById('api-save-btn');
+  if (saveBtn) saveBtn.addEventListener('click', saveApiKey);
+  const stopBtn = document.getElementById('stop-btn');
+  if (stopBtn) stopBtn.addEventListener('click', stopGeneration);
+  const apiInput = document.getElementById('api-key-input');
+  if (apiInput) apiInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); }
+  });
+
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      document.getElementById(header.dataset.toggle).classList.toggle('open');
+    });
+  });
+
+  const subjectInput = document.getElementById('subject-input');
+  if (subjectInput) {
+    subjectInput.addEventListener('input', e => {
+      state.subject = e.target.value;
+      updateGenerateBtn();
+    });
+  }
+  const chipsEl = document.getElementById('subject-chips');
+  if (chipsEl) {
+    chipsEl.innerHTML = SUBJECT_SUGGESTIONS.map(t =>
+      '<button type="button" class="subject-chip" data-subject="' + esc(t) + '">' + esc(t.slice(0, 42)) + '…</button>'
+    ).join('');
+    chipsEl.querySelectorAll('.subject-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const val = chip.dataset.subject;
+        state.subject = val;
+        if (subjectInput) subjectInput.value = val;
+        updateGenerateBtn();
+      });
+    });
+  }
+
+  bindRefInput();
+
+  const hookCountSelect = document.getElementById('hook-count-select');
+  if (hookCountSelect) hookCountSelect.addEventListener('change', e => {
+    state.hookCount = parseInt(e.target.value, 10);
+    updateGenerateBtn();
+  });
+  const durationSelect = document.getElementById('duration-select');
+  if (durationSelect) durationSelect.addEventListener('change', e => {
+    state.durationFrames = parseInt(e.target.value, 10);
+  });
+  const motionSelect = document.getElementById('motion-select');
+  if (motionSelect) motionSelect.addEventListener('change', e => { state.motion = e.target.value; });
+  const ttsSelect = document.getElementById('tts-select');
+  if (ttsSelect) ttsSelect.addEventListener('change', e => { state.tts = e.target.value; });
+
+  const generateBtn = document.getElementById('generate-btn');
+  if (generateBtn) generateBtn.addEventListener('click', startGeneration);
+
+  const wakeBtn = document.getElementById('wake-toggle-btn');
+  if (wakeBtn) wakeBtn.addEventListener('click', toggleWakeLock);
+
+  const debugHeader = document.getElementById('debug-header');
+  if (debugHeader) debugHeader.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    toggleDebugCollapse();
+  });
+  const debugCollapseBtn = document.getElementById('debug-collapse-btn');
+  if (debugCollapseBtn) debugCollapseBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleDebugCollapse(); });
+  const debugClearBtn = document.getElementById('debug-clear-btn');
+  if (debugClearBtn) debugClearBtn.addEventListener('click', (e) => { e.stopPropagation(); clearDebug(); });
+  const debugCopyBtn = document.getElementById('debug-copy-btn');
+  if (debugCopyBtn) debugCopyBtn.addEventListener('click', (e) => { e.stopPropagation(); copyDebug(); });
+
+  const rawToggle = document.getElementById('raw-toggle');
+  if (rawToggle) {
+    rawToggle.addEventListener('click', () => {
+      const el = document.getElementById('raw-viewer');
+      if (!el) return;
+      el.classList.toggle('visible');
+      rawToggle.textContent = el.classList.contains('visible')
+        ? '▾ Masquer la réponse brute'
+        : '▸ Voir la réponse brute (JSON)';
+    });
+  }
+
+  try {
+    const saved = localStorage.getItem(WAKE_LOCK_PREF);
+    wakeLockEnabled = saved === '1';
+  } catch (e) {}
+  if (wakeLockEnabled) activateWakeLock().then(() => updateWakeStatus());
+
+  updateApiPanel();
+  updateTimingDisplay();
+  updateWakeStatus();
+  renderAngles();
+  updateGenerateBtn();
+  updateRefPreview();
+
+  debugLog('success', 'INIT', 'TikTok Hook Factory prêt');
+  debugLog('info', 'INIT', 'Pipeline : IDÉE → ANGLES → VISUELS → VIDÉOS');
+  debugLog('info', 'INIT', 'Modèles : ' + MODEL_TEXT + ' / ' + MODEL_IMAGE + ' / ' + MODEL_VIDEO);
+  debugLog('info', 'INIT', 'Durée : ' + state.durationFrames + ' frames @ ' + FRAME_RATE + ' fps = ' + (state.durationFrames / FRAME_RATE).toFixed(2) + 's');
+  debugLog('info', 'INIT', 'Images parallèle x' + IMAGE_PARALLEL + ' @ ' + IMAGE_INTERVAL_MS + 'ms');
+  debugLog('info', 'INIT', 'Vidéo : 1er poll après ' + VIDEO_FIRST_POLL_DELAY_SEC + 's');
+  debugLog('info', 'INIT', 'Parseur JSON : 5 stratégies actives');
+})();
+</script>
+</body>
+</html>
