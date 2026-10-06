@@ -3,1217 +3,888 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MARX//TOK v3.0 — Symboles & Objets</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<title>Short Drama Studio — Éducatif & Cinématographique</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0a0a0e;--panel:#14141c;--panel2:#1c1c28;--border:#2a2a3a;--ink:#e8e8f0;--dim:#8888a0;--faint:#55556a;--ok:#2d8a4e;--err:#e94560;--warn:#d4a017;--info:#4a6cf7;--gold:#d4a017;--purple:#8b5cf6}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem .8rem 7rem;font-size:15px;line-height:1.5;max-width:900px;margin:0 auto}
-h1{font-size:1.4rem;font-weight:900;letter-spacing:-.02em;margin-bottom:.2rem;background:linear-gradient(135deg,#e94560,#d4a017,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;text-align:center}
-.sub{font-size:.68rem;color:var(--dim);letter-spacing:.15em;text-transform:uppercase;text-align:center;margin-bottom:1rem}
-.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel);color:var(--ink);padding:.75rem 1.2rem;border-radius:10px;font-size:.82rem;font-weight:600;box-shadow:0 4px 30px rgba(0,0,0,.6);border:1px solid var(--border);z-index:9999;opacity:0;transition:.3s;max-width:90vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.ok{border-color:var(--ok)}.toast.err{border-color:var(--err)}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:.7rem;overflow:hidden}
-.ph{padding:.85rem 1.05rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
-.ph:active{background:var(--panel2)}
-.pt{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--info);font-weight:800;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
-.pt .n{background:var(--gold);color:#000;padding:.1rem .45rem;border-radius:8px;font-size:.6rem;letter-spacing:0}
-.ph .ch{color:var(--faint);font-size:.7rem;transition:.2s}
-.panel.open .ch{transform:rotate(180deg)}
-.pb{max-height:0;overflow:hidden;transition:max-height .4s}
-.panel.open .pb{max-height:50000px}
-.pc{padding:0 1.05rem 1.05rem}
-label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:.35rem;font-weight:700;margin-top:.65rem}
-label:first-child{margin-top:0}
-input,textarea,select{width:100%;padding:.7rem .85rem;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.88rem}
-textarea{min-height:70px;resize:vertical;line-height:1.5}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--err)}
-.hint{font-size:.63rem;color:var(--faint);margin-top:.3rem;font-style:italic}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.45rem;margin-top:.5rem}
-.card{padding:.65rem;border-radius:6px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;text-align:center;transition:.15s}
-.card:hover{border-color:var(--err)}
-.card.sel{background:linear-gradient(135deg,var(--err),var(--gold));border-color:var(--err);color:#fff}
-.card .ic{font-size:1.3rem;display:block;margin-bottom:.2rem}
-.card .nm{font-size:.68rem;font-weight:700}
-.card .dc{font-size:.58rem;color:var(--dim);margin-top:.1rem}
-.card.sel .dc,.card.sel .nm{color:rgba(255,255,255,.9)}
-.btn{width:100%;padding:.9rem;border-radius:10px;border:none;background:linear-gradient(135deg,#e94560,#8b5cf6);color:#fff;font-size:.88rem;font-weight:800;font-family:inherit;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem}
-.btn:disabled{opacity:.3;cursor:not-allowed}
-.btn.small{padding:.55rem .8rem;font-size:.68rem;width:auto;margin-bottom:0;letter-spacing:.05em}
-.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--ink)}
-.btn.ok{background:linear-gradient(135deg,#2d8a4e,#1a5a30);color:#fff}
-.btn.err{background:transparent;border:1px solid var(--err);color:var(--err)}
-.btn.warn{background:linear-gradient(135deg,#d4a017,#8a6800);color:#000}
-.btn.purple{background:linear-gradient(135deg,#8b5cf6,#5a2ec7);color:#fff}
-.btn.info{background:linear-gradient(135deg,#4a6cf7,#2a3eaa);color:#fff}
-.btn-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
-.api{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.7rem}
-.api.ok{border-color:var(--ok)}
-.console{background:#000;border:1px solid var(--border);border-radius:8px;padding:.65rem;margin-bottom:.6rem;max-height:200px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:.68rem;line-height:1.55}
-.cl{padding:.08rem 0}
-.ct{color:var(--faint);margin-right:.4rem}
-.ci{color:var(--info)}.co{color:var(--ok)}.ce{color:var(--err)}.cw{color:var(--warn)}.cp{color:var(--purple)}
-.slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.6rem}
-.slot.locked{border-color:var(--faint);opacity:.4}
-.slot.active{border-color:var(--err);box-shadow:0 0 20px rgba(233,69,96,.3)}
-.slot.done{border-color:var(--ok)}
-.slot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem}
-.slot-title{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--info)}
-.slot-num{font-size:.62rem;background:var(--gold);color:#000;padding:.15rem .5rem;border-radius:10px;font-weight:900}
-.slot-body{font-size:.75rem;color:var(--dim);margin-bottom:.5rem;line-height:1.4}
-.slot-img{width:100%;border-radius:6px;margin-bottom:.45rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block}
-.slot-img-ph{width:100%;aspect-ratio:9/16;border-radius:6px;background:var(--bg);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.68rem;margin-bottom:.45rem;flex-direction:column;gap:.5rem;text-align:center;padding:1rem}
-.slot-video{width:100%;border-radius:6px;margin-bottom:.45rem;border:1px solid var(--border);aspect-ratio:9/16;object-fit:cover;display:block;background:#000}
-.slot-status{font-size:.62rem;color:var(--faint);font-family:ui-monospace,monospace;margin-bottom:.45rem}
-.badge-src{display:inline-block;font-size:.55rem;padding:.1rem .4rem;border-radius:6px;margin-left:.3rem;vertical-align:middle;font-weight:700}
-.badge-ai{background:#4a6cf7;color:#fff}
-.badge-up{background:#8b5cf6;color:#fff}
-.bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-bottom:.4rem}
-.bar-fill{height:100%;background:linear-gradient(90deg,var(--err),var(--gold));transition:width .3s;width:0%}
-.video-slot{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:.9rem;margin-bottom:.6rem}
-.video-slot.done{border-color:var(--ok)}
-.video-slot.processing{border-color:var(--warn);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
-.vopts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.4rem 0}
-.vopts select{padding:.5rem .6rem;font-size:.75rem}
-.symbol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.4rem;margin-top:.5rem}
-.sym-card{padding:.5rem;border-radius:6px;border:1px solid var(--border);background:var(--panel2);cursor:pointer;font-size:.62rem;text-align:center;transition:.15s}
-.sym-card.sel{background:var(--purple);color:#fff;border-color:var(--purple)}
-.sym-card .sy-ic{font-size:1rem;display:block;margin-bottom:.15rem}
-.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--err);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.35rem}
-@keyframes spin{to{transform:rotate(360deg)}}
-.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);padding:.65rem 1rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:.3s;z-index:100}
-.status-bar.show{transform:translateY(0)}
-.autosave-dot{position:fixed;top:1rem;right:1rem;width:8px;height:8px;border-radius:50%;background:var(--ok);opacity:0;transition:opacity .3s;z-index:9999;box-shadow:0 0 12px var(--ok)}
-.autosave-dot.show{opacity:1}
-.audio-row{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}
-.audio-row .btn{flex:1;min-width:90px;margin-bottom:0}
-.preview-video{width:100%;border-radius:8px;background:#000;aspect-ratio:9/16;max-height:70vh;object-fit:contain;margin-bottom:.5rem}
-.upload-in{display:none}
-.lib-row{display:flex;gap:.4rem;align-items:center;margin-top:.4rem}
-.lib-row select{flex:1;padding:.5rem;font-size:.75rem}
-.footer-note{text-align:center;font-size:.6rem;color:var(--faint);margin-top:1.5rem;padding-bottom:1rem;letter-spacing:.1em;text-transform:uppercase}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --night: #0a0a12; --night-2: #12121c; --night-3: #1a1a28;
+  --panel: #16161f; --panel-2: #1e1e2b; --border: #2a2a3a; --border-soft: #23232f;
+  --orange: #e87b35; --orange-soft: #f0a060; --orange-deep: #b85a1e;
+  --blue: #4a7bc8; --blue-soft: #6a9be0; --blue-deep: #2c4a80;
+  --yellow: #e5c15a; --yellow-soft: #f0d080; --yellow-deep: #b89a3a;
+  --purple: #8b5fc4; --purple-soft: #a880d8; --purple-deep: #5c3a8a;
+  --mint: #a8d8c8; --lavender: #c8b0e0;
+  --ink: #e8e6e0; --ink-dim: #8a8896; --ink-faint: #4a4858;
+  --success: #4a9d6a; --error: #c85a4a; --warn: #d4a017;
+  --radius: 6px;
+  --font-serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+html, body { background: var(--night); }
+body {
+  font-family: var(--font-sans); background: var(--night);
+  background-image: radial-gradient(circle at 15% 0%, rgba(232,123,53,0.06) 0%, transparent 45%), radial-gradient(circle at 85% 100%, rgba(139,95,196,0.06) 0%, transparent 45%);
+  background-attachment: fixed; color: var(--ink); min-height: 100vh;
+  padding: 1.5rem 1rem 18rem; font-size: 15px; line-height: 1.55;
+  max-width: 900px; margin: 0 auto; letter-spacing: 0.01em;
+}
+header { margin-bottom: 2rem; text-align: center; position: relative; padding: 1rem 0 1.5rem; }
+h1 { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 300; letter-spacing: 0.02em; margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 30%, var(--mint) 50%, var(--lavender) 75%, var(--purple) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.05; }
+.subtitle { font-family: var(--font-serif); font-size: 0.95rem; color: var(--ink-dim); font-style: italic; letter-spacing: 0.05em; }
+
+.toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-120px);
+  background: var(--night-3); color: var(--ink); border: 1px solid var(--border); border-left: 3px solid var(--yellow);
+  padding: 0.85rem 1.4rem; border-radius: var(--radius); font-size: 0.85rem; font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1000; opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1.2), opacity 0.35s ease;
+  max-width: 90vw; text-align: center; display: flex; align-items: center; gap: 0.6rem; }
+.toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--error); }
+.toast.warn { border-left-color: var(--warn); }
+
+.section { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+.section.open { box-shadow: 0 0 0 1px rgba(229,193,90,0.05), 0 4px 20px rgba(0,0,0,0.3); }
+.section-header { padding: 1rem 1.2rem; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+.section-header:active { background: var(--panel-2); }
+.section-title { font-family: var(--font-serif); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink); font-weight: 500; display: flex; align-items: center; gap: 0.6rem; }
+.section-title .badge { display: inline-block; padding: 0.15rem 0.55rem; background: transparent; color: var(--yellow); border: 1px solid var(--yellow-deep); border-radius: 2px; font-size: 0.6rem; letter-spacing: 0.15em; font-family: var(--font-sans); font-weight: 600; }
+.section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.3s; }
+.section.open .section-header .chevron { transform: rotate(180deg); color: var(--yellow); }
+.section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.section.open .section-body { max-height: 8000px; }
+.section-content { padding: 0 1.2rem 1.2rem; }
+
+.api-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+.api-key-input { width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-mono); font-size: 0.82rem; margin-bottom: 0.6rem; }
+.api-key-input:focus { outline: none; border-color: var(--blue); }
+.api-save-btn { width: 100%; padding: 0.85rem 1.2rem; border-radius: var(--radius); border: 1px solid var(--yellow-deep); background: linear-gradient(135deg, rgba(232,123,53,0.15), rgba(229,193,90,0.1)); color: var(--yellow-soft); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 0.7rem; }
+.api-status-line { font-size: 0.75rem; padding: 0.6rem 0.9rem; border-radius: var(--radius); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; background: var(--night-2); color: var(--ink-dim); border: 1px solid var(--border-soft); }
+.api-status-line.ok { background: rgba(74,157,106,0.08); color: var(--success); border-color: rgba(74,157,106,0.3); }
+.api-status-line .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
+.api-status-line.ok .status-dot { background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+/* SAVE SYSTEM UI */
+.save-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.save-bar input { flex: 1; min-width: 140px; padding: 0.7rem 0.9rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.85rem; }
+.save-bar input:focus { outline: none; border-color: var(--lavender); }
+.save-bar button { padding: 0.7rem 0.95rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.save-bar button:hover { background: var(--night-3); border-color: var(--yellow-deep); color: var(--yellow-soft); }
+.save-bar button.primary { background: linear-gradient(135deg, rgba(139,95,196,0.2), rgba(168,216,200,0.1)); border-color: var(--purple-deep); color: var(--purple-soft); }
+.project-list { margin-top: 0.5rem; max-height: 150px; overflow-y: auto; }
+.project-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0.8rem; background: var(--night-2); border: 1px solid var(--border-soft); border-radius: var(--radius); margin-bottom: 0.4rem; cursor: pointer; font-size: 0.8rem; }
+.project-item:hover { border-color: var(--blue-deep); background: rgba(74,123,200,0.05); }
+.project-item .p-name { font-weight: 600; color: var(--ink); }
+.project-item .p-date { font-size: 0.65rem; color: var(--ink-dim); font-family: var(--font-mono); }
+.project-item .p-actions { display: flex; gap: 0.4rem; }
+.project-item .p-actions button { padding: 0.2rem 0.5rem; font-size: 0.65rem; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--ink-dim); cursor: pointer; }
+.project-item .p-actions button:hover { color: var(--error); border-color: var(--error); }
+
+.theme-textarea { width: 100%; min-height: 90px; padding: 0.9rem 1rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.88rem; line-height: 1.5; resize: vertical; }
+.theme-textarea:focus { outline: none; border-color: var(--lavender); }
+
+.control-row { margin-bottom: 1rem; }
+.control-label { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; }
+select { width: 100%; padding: 0.8rem 0.95rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.88rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.95rem center; background-size: 10px; cursor: pointer; }
+select:focus { outline: none; border-color: var(--blue); }
+
+.btn-primary { width: 100%; padding: 1.2rem; border-radius: var(--radius); border: 1px solid var(--yellow-deep); background: linear-gradient(135deg, rgba(232,123,53,0.2) 0%, rgba(229,193,90,0.15) 50%, rgba(139,95,196,0.15) 100%); color: var(--yellow-soft); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; margin-bottom: 1rem; }
+.btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
+.btn-stop { width: 100%; padding: 0.9rem; border-radius: var(--radius); border: 1px solid var(--error); background: transparent; color: var(--error); font-size: 0.82rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 1rem; display: none; }
+.btn-stop.visible { display: block; }
+
+.phase-bar { background: var(--panel); border: 1px solid var(--border); border-left: 2px solid var(--purple); border-radius: var(--radius); padding: 0.9rem 1rem; margin-bottom: 1rem; display: none; }
+.phase-bar.visible { display: block; }
+.phase-steps { display: flex; gap: 0.4rem; margin-bottom: 0.7rem; flex-wrap: wrap; }
+.phase-step { flex: 1; min-width: 70px; padding: 0.5rem 0.6rem; border-radius: var(--radius); background: var(--night-2); border: 1px solid var(--border-soft); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: center; color: var(--ink-faint); font-weight: 600; }
+.phase-step.active { color: var(--yellow); border-color: var(--yellow-deep); background: rgba(229,193,90,0.06); }
+.phase-step.done { color: var(--success); border-color: rgba(74,157,106,0.3); background: rgba(74,157,106,0.05); }
+.phase-info { font-size: 0.75rem; font-family: var(--font-mono); color: var(--ink-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+
+.scenario-panel { display: none; margin-top: 1.5rem; }
+.scenario-panel.visible { display: block; }
+.scenario-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+.scenario-title { font-family: var(--font-serif); font-size: 1.4rem; color: var(--lavender); margin-bottom: 0.5rem; text-align: center; }
+.scene-block { border-left: 2px solid var(--border); padding-left: 0.9rem; margin-bottom: 0.9rem; }
+.scene-block.active { border-left-color: var(--yellow); }
+.scene-block.done { border-left-color: var(--success); }
+.scene-number { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); font-family: var(--font-mono); margin-bottom: 0.2rem; }
+.scene-dialogue { font-family: var(--font-serif); font-size: 1rem; font-style: italic; color: var(--yellow-soft); line-height: 1.5; padding: 0.4rem 0.7rem; background: rgba(229,193,90,0.04); border-left: 2px solid var(--yellow-deep); border-radius: 2px; margin: 0.4rem 0; }
+.scene-dialogue .speaker-name { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--lavender); font-style: normal; font-family: var(--font-sans); font-weight: 600; display: block; margin-bottom: 0.2rem; }
+
+.images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.6rem; margin-top: 1.2rem; }
+.image-card { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--night-2); position: relative; aspect-ratio: 9/16; }
+.image-card.loading { display: flex; align-items: center; justify-content: center; color: var(--ink-faint); font-size: 0.65rem; font-family: var(--font-mono); }
+.image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.image-card .img-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.3rem 0.5rem; background: linear-gradient(transparent, rgba(10,10,18,0.9)); font-size: 0.6rem; font-family: var(--font-mono); color: var(--yellow-soft); letter-spacing: 0.1em; text-transform: uppercase; }
+
+.gallery { margin-top: 1.8rem; }
+.gallery-title { font-family: var(--font-serif); font-size: 1.1rem; color: var(--ink); margin-bottom: 1rem; letter-spacing: 0.15em; text-transform: uppercase; text-align: center; position: relative; padding-bottom: 0.8rem; }
+.gallery-title::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.9rem; }
+.gallery-item { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: #000; }
+.gallery-item video { width: 100%; display: block; aspect-ratio: 9/16; object-fit: cover; }
+.gallery-item .g-caption { padding: 0.6rem 0.7rem; background: var(--panel); display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid var(--border); }
+.gallery-item .g-caption strong { font-family: var(--font-serif); color: var(--yellow-soft); font-size: 0.82rem; font-weight: 500; }
+.gallery-item .g-caption .g-dialogue { font-family: var(--font-serif); font-style: italic; font-size: 0.72rem; color: var(--lavender); line-height: 1.4; }
+
+.status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--night-3); border-top: 1px solid var(--border); color: var(--ink); padding: 0.85rem 1.1rem; font-size: 0.78rem; display: flex; align-items: center; gap: 0.7rem; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1); z-index: 100; font-family: var(--font-mono); box-shadow: 0 -4px 20px rgba(0,0,0,0.4); }
+.status-bar.visible { transform: translateY(0); }
+.status-bar .spinner { width: 12px; height: 12px; border: 2px solid rgba(229,193,90,0.2); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hidden { display: none !important; }
+
+.debug-panel { position: fixed; bottom: 0; left: 0; right: 0; height: 200px; background: #05050a; border-top: 2px solid var(--yellow-deep); z-index: 200; display: flex; flex-direction: column; font-family: var(--font-mono); transition: height 0.3s ease; }
+.debug-panel.collapsed { height: 36px; }
+.debug-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.8rem; background: linear-gradient(90deg, #0f0f18, #1a1a28); border-bottom: 1px solid var(--border); flex-shrink: 0; cursor: pointer; }
+.debug-title { font-size: 0.72rem; color: var(--yellow); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; }
+.debug-body { flex: 1; overflow-y: auto; padding: 0.5rem 0.7rem 1rem; font-size: 0.72rem; line-height: 1.45; color: #c8c8d0; }
+.debug-entry { margin-bottom: 0.3rem; padding: 0.25rem 0.4rem; border-left: 2px solid transparent; border-radius: 2px; word-break: break-word; }
+.debug-entry.info { border-left-color: var(--ink-faint); }
+.debug-entry.success { border-left-color: var(--success); background: rgba(74,157,106,0.04); }
+.debug-entry.error { border-left-color: var(--error); background: rgba(200,90,74,0.06); color: #f0a0a0; }
+.debug-time { color: var(--ink-faint); margin-right: 0.5rem; font-size: 0.65rem; }
+.debug-cat { color: var(--yellow-soft); font-weight: 600; margin-right: 0.4rem; font-size: 0.65rem; }
 </style>
 </head>
 <body>
 
-<h1>Marx//Tok</h1>
-<div class="sub">v3.0 · Symboles · Objets · Graphiques · Sans visage</div>
-<div class="autosave-dot" id="autosave-dot"></div>
+<header>
+  <h1>Short Drama Studio</h1>
+  <p class="subtitle">Générateur de documentaires éducatifs cinématographiques</p>
+ has been updated to reflect the new focus.
+</header>
 
-<div class="api" id="api-box">
-  <label style="margin-top:0">Clé API Agnès</label>
-  <input type="password" id="api-key" placeholder="sk-..." autocomplete="off">
-  <button class="btn small info" id="api-save" style="margin-top:.45rem;width:100%">ENREGISTRER</button>
-  <div style="font-size:.65rem;color:var(--dim);margin-top:.45rem" id="api-status">Non configurée</div>
+<!-- ═══ SYSTÈME DE SAUVEGARDE ═══ -->
+<div class="save-bar">
+  <input type="text" id="project-name-input" placeholder="Nom du projet (ex: Lutte des classes)" value="Mon Projet">
+  <button type="button" class="primary" id="save-btn">💾 Sauvegarder</button>
+  <button type="button" id="new-btn">✨ Nouveau</button>
 </div>
-
-<div class="panel open" id="p-concept">
-  <div class="ph" data-t="p-concept"><div class="pt"><span class="n">1</span> Concept marxiste</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <label>Concept (36 disponibles)</label>
-    <select id="concept-select">
-      <optgroup label="Fondements">
-        <option value="Matérialisme historique">Matérialisme historique</option>
-        <option value="Matérialisme dialectique">Matérialisme dialectique</option>
-        <option value="Forces productives">Forces productives</option>
-        <option value="Rapports de production">Rapports de production</option>
-        <option value="Mode de production">Mode de production</option>
-      </optgroup>
-      <optgroup label="Classes et rapports sociaux">
-        <option value="Lutte des classes">Lutte des classes</option>
-        <option value="Bourgeoisie">Bourgeoisie</option>
-        <option value="Prolétariat">Prolétariat</option>
-        <option value="Conscience de classe">Conscience de classe</option>
-        <option value="Classe en soi / pour soi">Classe en soi / pour soi</option>
-      </optgroup>
-      <optgroup label="Économie politique">
-        <option value="Force de travail">Force de travail</option>
-        <option value="Travail">Travail</option>
-        <option value="Valeur">Valeur</option>
-        <option value="Marchandise" selected>Marchandise</option>
-        <option value="Théorie de la valeur-travail">Valeur-travail</option>
-        <option value="Plus-value">Plus-value</option>
-        <option value="Exploitation">Exploitation</option>
-        <option value="Capital">Capital</option>
-        <option value="Accumulation du capital">Accumulation</option>
-        <option value="Concentration et centralisation du capital">Concentration</option>
-        <option value="Armée industrielle de réserve">Armée de réserve</option>
-        <option value="Crises du capitalisme">Crises</option>
-      </optgroup>
-      <optgroup label="Aliénation et idéologie">
-        <option value="Aliénation">Aliénation</option>
-        <option value="Fétichisme de la marchandise">Fétichisme marchandise</option>
-        <option value="Réification">Réification</option>
-        <option value="Infrastructure et superstructure">Infra/superstructure</option>
-        <option value="Idéologie">Idéologie</option>
-        <option value="Hégémonie">Hégémonie (Gramsci)</option>
-        <option value="Appareils idéologiques d'État">Appareils idéologiques</option>
-        <option value="Reproduction sociale">Reproduction sociale</option>
-      </optgroup>
-      <optgroup label="Développements">
-        <option value="Impérialisme">Impérialisme</option>
-        <option value="Travail productif et improductif">Travail productif</option>
-        <option value="Développement inégal">Développement inégal</option>
-        <option value="Socialisme">Socialisme</option>
-        <option value="Communisme">Communisme</option>
-        <option value="Dictature du prolétariat">Dictature prolétariat</option>
-        <option value="Dépérissement de l'État">Dépérissement État</option>
-      </optgroup>
-    </select>
-    <label>Script voix-off (modifiable)</label>
-    <textarea id="vo-text" style="min-height:120px;font-size:.82rem"></textarea>
-    <label>Phrase chute</label>
-    <input type="text" id="vo-punch">
-  </div></div>
-</div>
-
-<div class="panel" id="p-style">
-  <div class="ph" data-t="p-style"><div class="pt"><span class="n">2</span> Direction artistique</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <div class="grid" id="styles"></div>
-  </div></div>
-</div>
-
-<div class="panel" id="p-symbols">
-  <div class="ph" data-t="p-symbols"><div class="pt"><span class="n">3</span> Symboles visuels</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <div class="hint">Sélectionne les symboles que tu veux voir apparaître dans tes vidéos. Ils seront injectés dans les prompts.</div>
-    <div class="symbol-grid" id="symbols"></div>
-    <label style="margin-top:.7rem">Symboles personnalisés (séparés par virgule)</label>
-    <input type="text" id="custom-symbols" placeholder="Ex: horloge brisée, chaîne rouillée">
-  </div></div>
-</div>
-
-<div class="panel open" id="p-gen">
-  <div class="ph" data-t="p-gen"><div class="pt"><span class="n">4</span> Génération images</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <div class="hint">🔒 NO VISAGES. Aucun humain identifiable. Objets, machines, symboles, graphiques uniquement.</div>
-    <div id="slots"></div>
-  </div></div>
-</div>
-
-<div class="panel open" id="p-video">
-  <div class="ph" data-t="p-video"><div class="pt"><span class="n">5</span> Génération vidéo</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <div class="hint">Effet + durée + prompt override par vidéo.</div>
-    <div id="video-slots"></div>
-    <button class="btn warn" id="batch-videos" style="margin-top:.6rem">⚡ GÉNÉRER LES 3 VIDÉOS</button>
-  </div></div>
-</div>
-
-<div class="panel" id="p-voice">
-  <div class="ph" data-t="p-voice"><div class="pt"><span class="n">6</span> Voix-off (TTS)</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <label>Voix</label><select id="tts-voice"><option value="">Chargement…</option></select>
-    <label>Vitesse</label>
-    <select id="tts-rate"><option value="0.75">Lente</option><option value="0.85" selected>Posée</option><option value="1">Normale</option></select>
-    <label>Hauteur</label>
-    <select id="tts-pitch"><option value="0.6">Très grave</option><option value="0.8" selected>Grave</option><option value="0.95">Médium</option><option value="1.1">Aiguë</option></select>
-    <div class="audio-row">
-      <button class="btn small info" id="tts-play">▶ ÉCOUTER</button>
-      <button class="btn small ghost" id="tts-stop">⏹ STOP</button>
+<div class="section" id="projects-section">
+  <div class="section-header" data-toggle="projects-section">
+    <span class="section-title">📂 Projets enregistrés <span class="badge" id="project-count">0</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="project-list" id="project-list">
+      <div style="font-size:0.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucun projet sauvegardé</div>
     </div>
-    <div id="tts-status" class="hint"></div>
   </div></div>
 </div>
 
-<div class="panel" id="p-music">
-  <div class="ph" data-t="p-music"><div class="pt"><span class="n">7</span> Drone musical</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <label>Style</label>
-    <select id="mus-style">
-      <option value="melancholic" selected>Mélancolique (recommandé)</option>
-      <option value="tense">Tendu</option>
-      <option value="industrial">Industriel</option>
-      <option value="ambient">Ambient froid</option>
-    </select>
-    <label>Volume</label>
-    <select id="mus-vol"><option value="0.05">Très faible</option><option value="0.08" selected>Faible</option><option value="0.15">Moyen</option></select>
-    <div class="audio-row">
-      <button class="btn small info" id="mus-play">▶ JOUER</button>
-      <button class="btn small ghost" id="mus-stop">⏹ STOP</button>
-      <button class="btn small ok" id="mus-record">● ENREGISTRER 30S</button>
+<div class="api-panel" id="api-panel">
+  <input type="password" class="api-key-input" id="api-key-input" placeholder="Clé API Agnès (sk-...)" autocomplete="off" spellcheck="false">
+  <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+  <div class="api-status-line" id="api-status-line">
+    <span class="status-dot"></span>
+    <span id="api-status-text">Aucune clé API enregistrée</span>
+  </div>
+</div>
+
+<div class="section open" id="section-idea">
+  <div class="section-header" data-toggle="section-idea">
+    <span class="section-title">💡 Idée & Concept <span class="badge">obligatoire</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <textarea class="theme-textarea" id="idea-input" placeholder="Ex: Expliquer la lutte des classes à travers l'histoire d'une usine textile, ou les forces productives dans l'agriculture moderne..."></textarea>
+  </div></div>
+</div>
+
+<div class="section open" id="section-settings">
+  <div class="section-header" data-toggle="section-settings">
+    <span class="section-title">⚙️ Paramètres de production</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="control-row">
+      <label class="control-label">Langue de la narration</label>
+      <select id="lang-select">
+        <option value="fr" selected>🇫🇷 Français (Pédagogique)</option>
+        <option value="ar">🇸🇦 Arabe Classique (Fusha)</option>
+        <option value="dz">🇩🇿 Darija Algérienne</option>
+      </a>
     </div>
-    <div id="mus-status" class="hint"></div>
+    <div class="control-row">
+      <label class="control-label">Style visuel (Style Lock)</label>
+      <select id="style-select">
+        <option value="social" selected>🏭 Réalisme Social Cinématographique</option>
+        <option value="docu">📹 Documentaire Historique</option>
+        <option value="conceptual">🧠 Minimalisme Conceptuel</option>
+        <option value="noir">🌑 Cinéma Noir (Contraste élevé)</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Nombre de scènes</label>
+      <select id="scene-count-select">
+        <option value="5">5 scènes (Court ~30s)</option>
+        <option value="6" selected>6 scènes (Recommandé ~40s)</option>
+        <option value="8">8 scènes (Développé ~55s)</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Durée par plan (CORRIGÉ : multiples de 8)</label>
+      <select id="duration-select">
+        <option value="120">5 secondes (120 frames)</option>
+        <option value="240" selected>10 secondes (240 frames)</option>
+        <option value="360">15 secondes (360 frames)</option>
+      </select>
+    </div>
   </div></div>
 </div>
 
-<div class="panel" id="p-export">
-  <div class="ph" data-t="p-export"><div class="pt"><span class="n">8</span> Export</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc">
-    <button class="btn" id="dl-zip">📦 TOUT EXPORTER EN .ZIP</button>
-    <button class="btn ghost" id="dl-all">TÉLÉCHARGER LES IMAGES</button>
-    <button class="btn ghost" id="dl-videos">TÉLÉCHARGER LES VIDÉOS</button>
-    <button class="btn ghost" id="dl-script">SCRIPT (.txt)</button>
-    <button class="btn err" id="reset-all">EFFACER TOUT</button>
-  </div></div>
+<button type="button" class="btn-primary" id="generate-btn" disabled>Ajoutez votre clé API</button>
+<button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+
+<div class="phase-bar" id="phase-bar">
+  <div class="phase-steps">
+    <div class="phase-step" data-phase="scenario">1 · Scénario</div>
+    <div class="phase-step" data-phase="narration">2 · Narration</div>
+    <div class="phase-step" data-phase="images">3 · Images</div>
+    <div class="phase-step" data-phase="videos">4 · Vidéos</div>
+    <div class="phase-step" data-phase="done">5 · Terminé</div>
+    </div>
+  <div class="phase-info">
+    <span id="phase-detail">En attente</span>
+    <span id="phase-eta"></span>
+  </div>
 </div>
 
-<div class="panel" id="p-log">
-  <div class="ph" data-t="p-log"><div class="pt"><span class="n">·</span> Console</div><span class="ch">▼</span></div>
-  <div class="pb"><div class="pc"><div class="console" id="log"></div></div></div>
+<div class="scenario-panel" id="scenario-panel">
+  <div class="scenario-card" id="scenario-card"></div>
+  <div class="images-grid" id="images-grid"></div>
 </div>
 
-<div class="status-bar" id="status"><span class="spinner"></span><span id="status-text">Prêt</span></div>
-<div class="toast" id="toast"></div>
-<div class="footer-note">Marx//Tok v3.0 · Sans visage · Symboles · 36 concepts</div>
+<div class="gallery" id="gallery" style="display:none;">
+  <div class="gallery-title">Plans du film</div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<div class="status-bar" id="status-bar">
+  <div class="spinner"></div>
+  <span id="status-text">Préparation…</span>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toast-text">Message</span>
+</div>
+
+<div class="debug-panel collapsed" id="debug-panel">
+  <div class="debug-header" id="debug-header">
+    <div class="debug-title">🖥️ Console de débogage</div>
+  </div>
+  <div class="debug-body" id="debug-body"></div>
+</div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════════════
-const API_BASE='https://apihub.agnes-ai.com/v1';
-const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
-const MODEL_IMAGE='agnes-image-2.5-flash';
-const MODEL_VIDEO='agnes-video-v2.0';
-const IMG_W=1024,IMG_H=1792,VID_W=576,VID_H=1024;
-const MAX_PROMPT=1800;
-const INITIAL_WAIT=105;
-const POLL_INTERVAL=5;
-const STORAGE_KEY='marxtok_v3';
+// ══════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.5-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+const SAVE_KEY = 'short_drama_projects_v1';
 
-// ═══════════════════════════════════════════════════════════════
-// STYLE BASE — SANS VISAGE / SYMBOLES / OBJETS
-// ═══════════════════════════════════════════════════════════════
-const STYLE_BASE=
-'Ultra photorealistic cinematic still. NO HUMAN FACES. NO identifiable person. NO portraits. NO eyes looking at camera. NO people in focus. ' +
-'Focus exclusively on OBJECTS, MACHINES, TOOLS, PRODUCTS, ARCHITECTURE, MATERIALS, and CONCEPTUAL GRAPHICS. ' +
-'Abstract silhouettes and shadowy figures in soft background only if narratively necessary — never with visible faces. ' +
-'Analogue 35mm film grain, Kodak Vision3 500T texture, organic bloom, cinematic depth of field. ' +
-'Dominant palette: muted industrial grey, steel, rust brown, cold slate-blue, with rare blood-red accents for tension. ' +
-'No warmth, no softness, no beauty. Serious, analytical, pedagogical, detached. ' +
-'No illustration, no CGI, no cartoon, no anime. No text, no watermark, no logo. ';
-
-const NO_HUMANS_LOCK=
-'ABSOLUTE LOCK: NO human faces, NO human portraits, NO human eyes, NO human bodies in focus. ' +
-'Objects, machines, tools, buildings, materials, symbols, and abstract conceptual forms only. ' +
-'If a human presence is needed, it must appear ONLY as a distant blurred silhouette with NO visible features. ';
-
-// ═══════════════════════════════════════════════════════════════
-// 10 STYLES
-// ═══════════════════════════════════════════════════════════════
-const STYLES=[
-{id:'industrial-noir',icon:'🏭',name:'Industriel Noir',desc:'Usines, machines',
-prompt:'Industrial noir aesthetic. Dark factories, rusted machinery, cold steel, coal dust, oil stains, worn tools, industrial architecture. Moody practical lighting from overhead lamps. Grim, oppressive, analytical. NO human faces.'},
-{id:'conceptual-minimal',icon:'⬛',name:'Conceptuel Minimal',desc:'Formes épurées',
-prompt:'Conceptual minimalism. Clean isolated objects on neutral backgrounds. Precise studio lighting. Clear symbolic forms. Reduced visual noise. Pedagogical clarity. Museum object photography style. NO human faces.'},
-{id:'graphic-diagram',icon:'📊',name:'Graphique Pédagogique',desc:'Schémas, flèches',
-prompt:'Educational graphic diagram style. Clean vector-like precision, floating arrows, measurement lines, abstract data forms, conceptual flowcharts materialized as physical objects in space. Analytical, rational, pedagogic. NO human faces.'},
-{id:'symbolic-objects',icon:'🔮',name:'Symbolique Objets',desc:'Métaphores visuelles',
-prompt:'Visual symbolism with objects. Golden coins, broken chains, hourglasses, scales, gears, keys, weights, mechanical parts — each object carrying heavy metaphorical weight. Dramatic side lighting. Poetic but realistic materials. NO human faces.'},
-{id:'archive-historical',icon:'📜',name:'Archive Historique',desc:'Vieilli, sépia',
-prompt:'Historical archive aesthetic. Sepia and desaturated tones, aged photo quality, subtle scratches, dust particles, vignetting. Documentary archive of industrial era, 19th-20th century labor history. Old photographs of machinery, factories, cities without people. NO human faces.'},
-{id:'muted-documentary',icon:'🎞️',name:'Documentaire Muted',desc:'Réaliste sobre',
-prompt:'Muted documentary realism. Natural desaturated colors, realistic everyday objects, worn textures, real locations (empty factories, abandoned warehouses, gray city streets at dawn). Observational, sober, serious. NO human faces.'},
-{id:'industrial-abstract',icon:'⚙️',name:'Industriel Abstrait',desc:'Formes mécaniques',
-prompt:'Industrial abstract aesthetic. Extreme close-ups of mechanical parts, gears, pistons, conveyor belts, pipes, valves, circuits. Textures of metal, rubber, plastic. Abstract compositions from industrial elements. NO human faces.'},
-{id:'data-visual',icon:'📈',name:'Data Visuel',desc:'Courbes, chiffres',
-prompt:'Conceptual data visualization as physical objects. Floating graphs, rising curves, bar charts, financial tickers, pie charts — presented as sculptural forms, holographic displays, glowing projections. Analytical atmosphere. NO human faces.'},
-{id:'shadow-silhouette',icon:'🌑',name:'Ombre Silhouette',desc:'Silhouettes floues',
-prompt:'Cinematic mood with SOFT SILHOUETTES ONLY. Distant human shadows against walls or light, completely out of focus, no distinguishable features. Emphasis on surrounding objects, environments, textures. Poetic, mysterious, melancholic. NO visible faces.'},
-{id:'concrete-brutalist',icon:'🏢',name:'Béton Brutaliste',desc:'Architecture froide',
-prompt:'Brutalist concrete architecture aesthetic. Massive raw concrete walls, sharp geometric forms, cold grey palette, harsh shadows, monumental emptiness. Industrial housing blocks, empty corridors, cold staircases. Oppressive, monumental, analytical. NO human faces.'}
-];
-
-// ═══════════════════════════════════════════════════════════════
-// BIBLIOTHÈQUE DE 60 SYMBOLES
-// ═══════════════════════════════════════════════════════════════
-const SYMBOLS=[
-// Économie politique
-{id:'coin',icon:'🪙',label:'Pièce de monnaie',prompt:'single worn gold coin on dark surface, dramatic lighting, macro detail'},
-{id:'bill',icon:'💵',label:'Billet de banque',prompt:'crumpled banknote with visible worn texture, on industrial surface'},
-{id:'coin-stack',icon:'💰',label:'Pile de pièces',prompt:'tall stack of coins, uneven, dramatic side light'},
-{id:'wallet',icon:'👛',label:'Portefeuille vide',prompt:'open empty leather wallet, worn, on wooden table'},
-{id:'scale',icon:'⚖️',label:'Balance',prompt:'old metal justice scale, unbalanced, dramatic lighting'},
-{id:'gear',icon:'⚙️',label:'Engrenage',prompt:'single rusted iron gear wheel, macro shot, dramatic side light'},
-{id:'gears-mesh',icon:'🔧',label:'Engrenages emboîtés',prompt:'multiple interlocking gears, industrial machinery, precision engineering'},
-{id:'factory',icon:'🏭',label:'Usine',prompt:'dark industrial factory interior, empty, smoke, cold lighting, monumental'},
-{id:'chimney',icon:'🏗️',label:'Cheminée',prompt:'tall industrial chimney stack emitting smoke, silhouetted against grey sky'},
-{id:'machine',icon:'🛠️',label:'Machine-outil',prompt:'heavy industrial machine tool, precision, steel, worn surfaces'},
-{id:'conveyor',icon:'📦',label:'Convoyeur',prompt:'industrial conveyor belt, empty, moving, dark factory'},
-{id:'hammer',icon:'🔨',label:'Marteau',prompt:'heavy blacksmith hammer, worn wooden handle, on iron anvil'},
-{id:'anvil',icon:'⚒️',label:'Enclume',prompt:'heavy iron anvil, worn from use, dramatic lighting'},
-{id:'clock',icon:'🕰️',label:'Horloge',prompt:'antique wall clock, ticking, on brick wall'},
-{id:'hourglass',icon:'⏳',label:'Sablier',prompt:'hourglass with sand flowing, dramatic close-up, dark background'},
-{id:'chain',icon:'⛓️',label:'Chaîne',prompt:'heavy rusted iron chain, coiled on dark surface'},
-{id:'broken-chain',icon:'🔗',label:'Chaîne brisée',prompt:'broken iron chain links separated, on stone surface, symbolic'},
-{id:'lock',icon:'🔒',label:'Cadenas',prompt:'heavy closed padlock, rusted, on dark metal door'},
-{id:'key',icon:'🔑',label:'Clé',prompt:'antique iron key, worn, on dark wood'},
-{id:'door',icon:'🚪',label:'Porte fermée',prompt:'massive closed industrial metal door, riveted, cold light'},
-{id:'staircase',icon:'🪜',label:'Escalier',prompt:'narrow concrete staircase going upward, cold lighting, empty'},
-{id:'building',icon:'🏢',label:'Immeuble brutaliste',prompt:'massive brutalist concrete building, monumental, brutal, cold'},
-{id:'city-towers',icon:'🌃',label:'Tours urbaines',prompt:'cluster of skyscrapers at night, corporate power, cold lighting'},
-{id:'bank',icon:'🏦',label:'Banque',prompt:'massive bank facade with columns, cold neoclassical architecture'},
-{id:'stock-chart',icon:'📈',label:'Graphique boursier',prompt:'rising stock chart on glowing screen, abstract data visualization'},
-{id:'falling-chart',icon:'📉',label:'Courbe en chute',prompt:'falling financial chart on red-glowing screen, collapse'},
-{id:'graph-bars',icon:'📊',label:'Barres graphiques',prompt:'floating holographic bar chart, abstract data form, blue glow'},
-{id:'pie-chart',icon:'🥧',label:'Camembert',prompt:'pie chart glowing on dark screen, abstract, data'},
-{id:'arrow-up',icon:'⬆️',label:'Flèche montante',prompt:'glowing upward arrow on dark background, growth, abstract'},
-{id:'arrow-down',icon:'⬇️',label:'Flèche descendante',prompt:'glowing downward arrow on dark background, decline, abstract'},
-{id:'grid',icon:'🔲',label:'Grille',prompt:'geometric grid structure, conceptual, over dark background'},
-{id:'loop',icon:'🔄',label:'Boucle',prompt:'circular arrow loop, perpetual cycle, glowing on dark'},
-{id:'spiral',icon:'🌀',label:'Spirale',prompt:'spiral form spiraling inward, mathematical, on dark surface'},
-{id:'fracture',icon:'💔',label:'Fracture',prompt:'cracked stone or glass with sharp fractures, symbolic division'},
-{id:'two-blocks',icon:'🧱',label:'Deux blocs opposés',prompt:'two large stone blocks facing each other, tension, opposition'},
-{id:'wall',icon:'🧱',label:'Mur',prompt:'tall concrete wall, weathered, monolithic, division symbol'},
-{id:'bridge',icon:'🌉',label:'Pont',prompt:'narrow bridge over dark abyss, connects two sides'},
-{id:'thread',icon:'🧵',label:'Fil',prompt:'single red thread crossing dark space, fragile connection'},
-{id:'rope',icon:'🪢',label:'Corde tendue',prompt:'taut rope stretched between two anchor points, tension'},
-{id:'plumb-line',icon:'📍',label:'Fil à plomb',prompt:'plumb line hanging, measurement, precision, dark background'},
-{id:'ruler',icon:'📏',label:'Règle',prompt:'steel ruler on dark surface, measurement, precision'},
-{id:'magnifier',icon:'🔍',label:'Loupe',prompt:'magnifying glass over documents, examination, close-up'},
-{id:'book',icon:'📖',label:'Livre ouvert',prompt:'open old book on dark wooden table, wisdom, theory'},
-{id:'manuscript',icon:'📜',label:'Manuscrit',prompt:'old handwritten manuscript, aged paper, ink, close-up'},
-{id:'typewriter',icon:'⌨️',label:'Machine à écrire',prompt:'vintage typewriter, keys visible, dramatic lighting'},
-{id:'lamp',icon:'💡',label:'Lampe',prompt:'single industrial lamp hanging in dark space, beacon of light'},
-{id:'eye-abstract',icon:'👁️',label:'Œil abstrait',prompt:'abstract geometric eye symbol, no realistic eye, conceptual surveillance icon'},
-{id:'camera-cctv',icon:'📹',label:'Caméra surveillance',prompt:'CCTV camera mounted on wall, cold, watching, industrial'},
-{id:'radar',icon:'📡',label:'Radar',prompt:'radar screen with scanning lines, green glow, tracking'},
-{id:'network',icon:'🕸️',label:'Réseau',prompt:'abstract network of connected nodes and lines, data web'},
-{id:'wave',icon:'🌊',label:'Vague',prompt:'dark ocean wave, moody, dramatic, krisis symbol'},
-{id:'storm',icon:'⛈️',label:'Orage',prompt:'storm clouds with lightning strike, dark, tension, crisis'},
-{id:'fire',icon:'🔥',label:'Feu',prompt:'single flame in darkness, revolution, transformation'},
-{id:'ice',icon:'❄️',label:'Glace',prompt:'icicles and frozen structure, cold, rigidity'},
-{id:'crack',icon:'🩹',label:'Fissure',prompt:'deep crack in stone wall, structural break, symbolic'},
-{id:'crown',icon:'👑',label:'Couronne',prompt:'old crown on dark velvet, power symbol, tarnished'},
-{id:'mask',icon:'🎭',label:'Masque',prompt:'theatrical mask on dark surface, duality, appearance'},
-{id:'mask-gold',icon:'👺',label:'Masque doré',prompt:'golden ceremonial mask, wealth and falsehood, dramatic light'},
-{id:'globe',icon:'🌍',label:'Globe',prompt:'antique globe on dark wood, world, expansion'},
-{id:'flag-torn',icon:'🏴',label:'Drapeau déchiré',prompt:'torn dark flag, no visible logo, wind, resistance'},
-{id:'fist-stone',icon:'✊',label:'Poing de pierre',prompt:'stone sculpture of a raised fist, symbolic, monumental, dramatic light'}
-];
-
-// ═══════════════════════════════════════════════════════════════
-// CONCEPTS DB (36)
-// ═══════════════════════════════════════════════════════════════
-const CONCEPTS_DB={
-'Matérialisme historique':{voice:"Selon Marx et Engels, l'histoire n'est pas guidée par les idées ou les grands hommes. Elle est déterminée par les conditions matérielles de production. Ce sont les façons dont les sociétés produisent leurs moyens d'existence qui façonnent les idées, les institutions et les cultures.",punch:"Ce ne sont pas les idées qui changent le monde. Ce sont les conditions matérielles.",s1:'wide industrial landscape at dusk, empty factories, chimneys silent, cold grey sky, monumental architecture of production',s2:'close-up of heavy iron gears turning slowly, mechanical precision, dramatic side light, no humans',s3:'abstract conceptual diagram of infrastructure and superstructure as physical stacked blocks, floating holographic, cold blue light'},
-'Matérialisme dialectique':{voice:"La réalité évolue par des contradictions internes. Chaque système porte en lui les forces qui finiront par le transformer. La dialectique n'est pas un jeu d'idées : c'est le mouvement réel des choses.",punch:"Ce qui se contredit se transforme.",s1:'concrete wall cracking under invisible pressure, sharp fractures growing, dramatic lighting',s2:'two massive opposing blocks pushing against each other, tension, grain texture, no humans',s3:'spiral form spiraling upward, mathematical evolution, glowing abstract, dark background'},
-'Forces productives':{voice:"Les forces productives sont l'ensemble des moyens de production et de la force de travail : outils, machines, techniques, mais aussi le savoir-faire humain.",punch:"Les outils changent le monde. Pas les discours.",s1:'wide shot of heavy industrial machinery in a dark factory, monumental, cold light',s2:'precision close-up of gears and pistons working together, mechanical choreography',s3:'collection of tools arranged in a row on dark surface, symbol of productive capacity'},
-'Rapports de production':{voice:"Les rapports de production sont les relations sociales entre ceux qui possèdent les moyens de production et ceux qui travaillent.",punch:"Qui possède ? Qui travaille ?",s1:'two spaces separated by wall, one with machinery, one with empty desks, division',s2:'heavy closed metal door separating two industrial spaces',s3:'conceptual grid of connected nodes, some dark, some lit, hierarchy'},
-'Mode de production':{voice:"Un mode de production combine des forces productives et des rapports de production. Les grands modes historiques sont l'esclavagisme, le féodalisme, le capitalisme.",punch:"Chaque époque a sa manière de produire. Et ses rapports de force.",s1:'old industrial era factory interior, worn, historic, monumental',s2:'mixed pile of coins from different centuries, ages of money',s3:'conceptual staircase of three stone platforms rising, each with symbols of a mode'},
-'Lutte des classes':{voice:"Pour Marx et Engels, la lutte des classes est le moteur de l'histoire. L'opposition entre classes aux intérêts économiques contradictoires pousse les sociétés à se transformer.",punch:"L'histoire avance par les conflits. Pas par les consensus.",s1:'two massive concrete walls facing each other, tension, cracks forming at their meeting point',s2:'taut steel rope stretched between two anchor points, visible tension, industrial',s3:'two large stone blocks pushing against each other, dramatic shadows, cold lighting'},
-'Bourgeoisie':{voice:"La bourgeoisie est la classe qui possède les moyens de production dans le système capitaliste. Elle tire sa richesse du travail des autres.",punch:"La richesse n'est pas produite. Elle est appropriée.",s1:'massive bank facade with columns, cold neoclassical architecture, monumental',s2:'stack of old leather briefcases, corporate power, dark wood',s3:'golden scales unbalance, one side heavy with coins, one empty'},
-'Prolétariat':{voice:"Le prolétariat est la classe qui ne possède que sa force de travail. Elle est obligée de la vendre contre un salaire pour survivre.",punch:"Ceux qui n'ont que leurs mains. Et qui doivent les vendre.",s1:'row of empty industrial tools hanging on wall, waiting, worn',s2:'single worn work glove on dark surface, used, empty',s3:'empty metal lunchbox on factory floor, symbolic, cold light'},
-'Conscience de classe':{voice:"La conscience de classe, c'est le moment où une classe sociale prend conscience de ses intérêts communs et de sa position dans les rapports de production.",punch:"On peut être exploité sans le savoir. On peut aussi le comprendre.",s1:'dark room with single hanging lamp, objects in shadows slowly emerging',s2:'collection of individual tools placed together, forming one shape',s3:'single lamp illuminating a previously dark workshop, light symbol'},
-'Classe en soi / pour soi':{voice:"Marx distingue la classe « en soi » — qui existe objectivement — de la classe « pour soi » — consciente de son rôle historique.",punch:"Exister comme classe. Se savoir comme classe.",s1:'row of identical machines not yet activated, silent, waiting',s2:'same machines now running together, synchronized, dramatic light',s3:'conceptual transformation from scattered individual parts to unified mechanism'},
-'Force de travail':{voice:"La force de travail est la capacité de travailler. Marx distingue cette capacité du travail lui-même — l'activité réellement exercée.",punch:"Ta capacité à travailler. Et ton travail. Ce n'est pas la même chose.",s1:'human-shaped empty industrial overall hanging on hook, no body, symbolic',s2:'empty chair facing machine in dark workshop, symbolic displacement',s3:'single worn hand tool on empty chair, symbolic presence'},
-'Travail':{voice:"Le travail est l'activité par laquelle les humains transforment la nature pour satisfaire leurs besoins. Marx distingue le travail concret et le travail abstrait.",punch:"Tout travail n'est pas mesuré de la même manière.",s1:'single hammer on metal anvil, dramatic lighting, worn',s2:'extreme close-up of hands-free tools in action, machine operation',s3:'two identical finished products side by side, their abstract equality'},
-'Valeur':{voice:"Selon Marx, la valeur d'une marchandise dépend du temps de travail socialement nécessaire à sa production. C'est la théorie de la valeur-travail.",punch:"Ce que tu paies cache du temps de travail.",s1:'single worn boot on dark surface, used, symbolic of labor embedded',s2:'stack of manufactured goods on industrial shelf, identical, cold light',s3:'visible thread of time connecting raw material to finished product'},
-'Marchandise':{voice:"La marchandise est la forme élémentaire de la richesse dans le capitalisme. Elle a une valeur d'usage et une valeur d'échange — deux dimensions différentes.",punch:"Un objet utile devient une marchandise dès qu'il se vend.",s1:'stack of identical packages on industrial shelf, endless, cold',s2:'single product with price tag, clean studio light, isolated',s3:'abstract hologram of product separating into two forms: use and exchange'},
-'Théorie de la valeur-travail':{voice:"Développée par Marx à partir de Smith et Ricardo, cette théorie explique que la valeur d'échange des marchandises provient du travail socialement nécessaire à leur production.",punch:"La valeur vient du travail. Pas du désir.",s1:'industrial workshop with tools arranged by size, methodical, dark',s2:'abstract measurement of invisible time over a finished product',s3:'conceptual balance: labor on one side, money on the other, unequal'},
-'Plus-value':{voice:"La plus-value est la partie de la valeur créée par le travailleur qui est appropriée par le capitaliste sous forme de profit. C'est le cœur de l'exploitation.",punch:"Ce que ton travail produit ne te revient pas.",s1:'working machine producing finished goods, dramatic lighting, cold',s2:'two unequal piles of coins side by side, one small, one large',s3:'abstract diagram: worker contribution vs wage received, gap highlighted in red'},
-'Exploitation':{voice:"L'exploitation désigne l'appropriation par le capitaliste de la plus-value produite par les travailleurs. C'est une catégorie analytique, pas un jugement moral.",punch:"Ce n'est pas une insulte. C'est une mécanique.",s1:'single rusted gear extracting motion from smaller gears, mechanical tension',s2:'closed safe with one small opening leaking gold dust',s3:'abstract schema of extraction: labor flowing toward capital'},
-'Capital':{voice:"Le capital n'est pas simplement de l'argent. C'est un rapport social de production : de la valeur investie pour produire davantage de valeur.",punch:"L'argent devient capital quand il se met à faire des petits.",s1:'massive bank vault door, closed, cold steel, monumental',s2:'stack of gold coins growing, cold light, warehouse',s3:'abstract spiral of money turning into machines then into more money'},
-'Accumulation du capital':{voice:"L'accumulation est le réinvestissement des profits pour accroître encore le capital. C'est la logique d'expansion permanente du capitalisme.",punch:"Le capital ne s'arrête jamais. Il doit toujours grossir.",s1:'factory growing in size, more machines, more buildings, expansion, cold',s2:'stack of coins multiplying, growing, cold industrial light',s3:'abstract upward spiral of money and machinery, endless growth symbol'},
-'Concentration et centralisation du capital':{voice:"Marx distingue la concentration — accroissement du capital — et la centralisation — absorption des concurrents par les plus grands. Le capital tend vers la géantisation.",punch:"Plus le capital grandit, moins il y a de propriétaires.",s1:'cluster of skyscrapers dominating a city, corporate power, cold night',s2:'several smaller coins absorbed into one massive coin, symbolic',s3:'conceptual schema: many small factories merging into one mega factory'},
-'Armée industrielle de réserve':{voice:"L'armée industrielle de réserve est la masse de chômeurs qui exerce une pression à la baisse sur les salaires. Marx y voit une nécessité structurelle du capitalisme.",punch:"Le chômage n'est pas un accident. C'est un rouage.",s1:'empty warehouse with hanging unused tools, waiting, dark',s2:'row of closed industrial lockers, cold, silent, monumental',s3:'abstract diagram: line of workers with blurred shadows joining at the end'},
-'Crises du capitalisme':{voice:"Les crises de surproduction surviennent quand la production dépasse la capacité d'achat du marché. Marx y voit une tendance structurelle du capitalisme.",punch:"Le capitalisme produit plus que ce qu'il peut vendre.",s1:'empty warehouse filled with unsold goods, cold light, dust',s2:'falling graph on red-glowing screen, collapse symbol, dark',s3:'conceptual storm clouds over industrial city, crisis symbol'},
-'Aliénation':{voice:"L'aliénation, chez Marx, désigne la séparation du travailleur d'avec le produit de son travail, son activité, sa propre humanité et les autres.",punch:"Tu produis. Tu ne possèdes pas.",s1:'single empty industrial overall hanging alone on hook, dark, dramatic',s2:'empty chair facing machine, symbolic distance, cold light',s3:'finished product behind glass barrier, untouchable, symbolic separation'},
-'Fétichisme de la marchandise':{voice:"Chez Marx, le fétichisme de la marchandise désigne le fait que les rapports sociaux entre producteurs apparaissent comme des rapports entre choses.",punch:"Les objets cachent le travail des gens.",s1:'single luxury object on velvet, dramatic lighting, isolated, fetishized',s2:'rows of identical products on shelves, cold, automatic, symbolic',s3:'abstract hologram of product hiding a network of hidden threads'},
-'Réification':{voice:"Développé par Lukács à partir de Marx, le concept de réification désigne la transformation des rapports humains en rapports entre choses.",punch:"Les gens deviennent des choses.",s1:'abstract grid of identical concrete blocks, no individuality, cold light',s2:'clocking-in machines side by side, waiting, cold industrial light',s3:'scale weighing two abstract human silhouettes as objects'},
-'Infrastructure et superstructure':{voice:"Chez Marx, la métaphore infrastructure/superstructure distingue la base économique — forces et rapports de production — et les institutions politiques, juridiques et culturelles qui reposent sur elle.",punch:"Les idées ne flottent pas. Elles reposent sur du solide.",s1:'massive concrete foundation structure, architectural, no upper floors yet',s2:'building with heavy base and lighter upper floors, sharp contrast, cold',s3:'abstract hologram: infrastructure below, superstructure above, cold light'},
-'Idéologie':{voice:"L'idéologie, chez Marx et Engels, est l'ensemble des idées qui légitiment et reproduisent les rapports de domination. Elle est liée à la classe dominante.",punch:"Ce qu'on croit être neutre sert toujours quelqu'un.",s1:'stone wall with faint inscriptions and symbols, cold, monumental',s2:'abstract floating grid of symbols, invisible structure, holographic',s3:'curtain of light concealing a dark mechanism behind it, symbolic'},
-'Hégémonie':{voice:"Développé par Gramsci, le concept d'hégémonie désigne la domination culturelle par le consentement plutôt que par la force. Une classe dirige aussi par ses idées.",punch:"On ne t'oblige pas à obéir. On t'apprend à vouloir obéir.",s1:'soft curtain covering industrial machinery behind, gentle, symbolic',s2:'abstract glowing web covering a dark mechanism, cold light',s3:'lighthouse lighting the entire cityscape, invisible guiding force'},
-'Appareils idéologiques d\'État':{voice:"Élaboré par Althusser, ce concept désigne les institutions — école, famille, médias, religion — qui diffusent l'idéologie dominante et reproduisent les rapports de production.",punch:"L'école, l'église, la télévision. Même travail.",s1:'row of institutional facades side by side, cold, monumental, no humans',s2:'collection of institutional symbols: microphone, blackboard, altar, television, arranged together',s3:'abstract network diagram of institutions connected, cold light'},
-'Reproduction sociale':{voice:"La reproduction sociale désigne les mécanismes par lesquels les rapports de production et les classes se reproduisent d'une génération à l'autre.",punch:"Les murs que tu construis enferment aussi tes enfants.",s1:'concrete building being rebuilt exactly like before, cyclical, cold',s2:'identical tools passing from one empty space to another, transmission',s3:'abstract spiral of generations shown as identical concrete blocks'},
-'Impérialisme':{voice:"Développé par Lénine à partir de Marx, l'impérialisme est le stade du capitalisme caractérisé par l'exportation des capitaux, la domination économique et politique, et la concurrence entre grandes puissances.",punch:"Le capital ne conquiert plus des terres. Il conquiert des marchés.",s1:'global map with routes of capital between continents, holographic, cold',s2:'cargo ship loaded with containers, monumental scale, industrial',s3:'abstract web of world with unequal connections, glowing nodes'},
-'Travail productif et improductif':{voice:"Marx distingue le travail productif — qui crée de la plus-value dans le cadre capitaliste — du travail improductif. La distinction est relative au mode de production.",punch:"Tout travail utile n'est pas productif pour le capital.",s1:'one machine producing goods, one machine idle, side by side, cold light',s2:'two industrial pipelines, one flowing, one empty, dramatic contrast',s3:'abstract diagram: productive circuit vs non-productive circuit'},
-'Développement inégal':{voice:"Développé par Trotsky à partir de Marx, la loi du développement inégal et combiné analyse les sauts, les retards et les coexistences entre formations sociales.",punch:"Les sociétés ne marchent pas au même rythme. Elles se mélangent.",s1:'city with ancient walls and modern skyscrapers side by side, cold',s2:'industrial machinery next to pre-industrial tool, sharp contrast',s3:'abstract diagram of two timelines at different speeds converging'},
-'Socialisme':{voice:"Chez Marx et Engels, le socialisme désigne une phase de transition entre le capitalisme et le communisme. La distinction rigoureuse socialisme/communisme est surtout due à Lénine.",punch:"Une étape. Pas un terminus.",s1:'workshop with tools arranged in collective order, methodical, cold',s2:'construction site with foundations being laid, ongoing work, cold',s3:'abstract staircase rising, one step highlighted, cold light'},
-'Communisme':{voice:"Selon Marx, le communisme est une société sans classes sociales, sans propriété privée des moyens de production et, selon la théorie, sans État.",punch:"Une société sans classe. Pas un parti.",s1:'wide empty landscape, no fences, no walls, common land, cold light',s2:'large table with shared tools arranged equally, cold monumental light',s3:'abstract circular form, balanced, no hierarchy, cold blue light'},
-'Dictature du prolétariat':{voice:"Chez Marx et Engels, la dictature du prolétariat désigne la période de transition où la classe ouvrière exerce le pouvoir politique après la révolution. Le terme est analytique, pas péjoratif.",punch:"Le mot fait peur. Le concept est précis.",s1:'empty throne replaced by a worker\'s tool, symbolic, dramatic light',s2:'heavy industrial hammer placed on official desk, cold light, monumental',s3:'abstract icon of state dismantling itself, holographic'},
-'Dépérissement de l\'État':{voice:"Développé par Engels puis Lénine, le dépérissement de l'État désigne la disparition progressive de l'État une fois les classes abolies. Il ne s'agit pas d'une destruction, mais d'un effacement structurel.",punch:"L'État ne s'effondre pas. Il s'efface.",s1:'massive institutional building slowly disappearing into fog, symbolic, cold',s2:'old official seal dissolving, symbolic, dramatic lighting',s3:'abstract diagram: state structure gradually fading into common organization'}
+const STYLE_PRESETS = {
+  social: 'cinematic social realism, muted gray and steel tones, subtle warm industrial lighting, authentic contemporary clothing, realistic human proportions, subtle 35mm film grain, serious educational atmosphere',
+  docu: 'historical documentary reconstruction, period-accurate costumes and architecture, natural lighting, observational camera, muted earth tones, subtle film grain, educational tone',
+  conceptual: 'conceptual minimalism, clean compositions, reduced visual noise, clear symbolic objects, neutral backgrounds, precise lighting, visual clarity, studio-quality matte texture',
+  noir: 'classic film noir aesthetic, high contrast black and white, chiaroscuro lighting, deep shadows, venetian blind patterns, 1940s style, 35mm film grain'
 };
 
-// ═══════════════════════════════════════════════════════════════
-// EFFETS VIDÉO
-// ═══════════════════════════════════════════════════════════════
-const EFFECTS=[
-{id:'static',icon:'🔒',name:'Statique verrouillé',desc:'Aucun ajout',prompt:'Completely STATIC shot. NO camera movement. NO new elements. NO people added. NO faces. The image stays EXACTLY as is, only subtle atmospheric motion: dust, smoke, gentle light flicker.'},
-{id:'slow-dolly',icon:'🎬',name:'Dolly in lent',desc:'Avancée douce',prompt:'Slow cinematic dolly in, camera pushing forward, one direction only, no return. No new elements added.'},
-{id:'slow-zoom',icon:'🔍',name:'Zoom lent',desc:'Rapprochement',prompt:'Slow continuous zoom in on the main object, one direction only, no return. No new elements.'},
-{id:'track-right',icon:'➡️',name:'Tracking droit',desc:'Balayage latéral',prompt:'Very slow tracking shot moving laterally to the right, no new elements.'},
-{id:'atmospheric',icon:'💨',name:'Atmosphérique',desc:'Fumée, lumière',prompt:'Static camera, only atmospheric motion: dust particles floating, smoke drifting slowly, neon or light flickering gently, no new elements, no people.'},
-{id:'gear-turn',icon:'⚙️',name:'Mouvement mécanique',desc:'Objets qui tournent',prompt:'Static camera. Only mechanical motion within existing objects: gears turning slowly, machinery parts moving, conveyor running gently. NO new elements, NO people.'},
-{id:'data-flow',icon:'📊',name:'Flux de données',desc:'Graphiques animés',prompt:'Static camera. Only existing graphic elements animate: floating data visualization, graph lines drawing themselves, glowing bars shifting slowly. NO new elements, NO people.'},
-{id:'emerge',icon:'🌑',name:'Émergence',desc:'Révélation lente',prompt:'Slow reveal from darkness to light, object gradually emerging from shadow. NO camera movement, NO new elements, NO people.'}
+const VISUAL_PROGRESSION_HINTS = [
+  "Établir l'environnement et les positions sociales (Plan large + Travelling)",
+  "Montrer le travail et l'action concrète (Plan moyen + Steadicam)",
+  "Révéler le contrôle, la propriété ou la structure de pouvoir (Plan rapproché + Zoom lent)",
+  "Illustrer les intérêts divergents ou la tension (Plan large + Panoramique)",
+  "Montrer le conflit collectif ou la conséquence (Plan moyen + Mouvement dynamique)",
+  "Offrir une vision globale du système ou de l'environnement (Plan aérien ou très large + Grue)"
 ];
 
-// ═══════════════════════════════════════════════════════════════
-// ÉTAT
-// ═══════════════════════════════════════════════════════════════
-const state={
-concept:'Marchandise',
-artStyle:STYLES[0],
-selectedSymbols:['coin','gear','factory','chain'],
-customSymbols:'',
-apiKey:'',
-slots:[
-{idx:0,img:null,imgBase64:null,source:null,status:'idle',prompt:'',uploadDesc:''},
-{idx:1,img:null,imgBase64:null,source:null,status:'idle',prompt:'',uploadDesc:''},
-{idx:2,img:null,imgBase64:null,source:null,status:'idle',prompt:'',uploadDesc:''}
-],
-videos:[
-{idx:0,url:null,status:'idle',videoId:null,progress:0,effect:'atmospheric',duration:169,progressText:'',promptOverride:''},
-{idx:1,url:null,status:'idle',videoId:null,progress:0,effect:'slow-dolly',duration:169,progressText:'',promptOverride:''},
-{idx:2,url:null,status:'idle',videoId:null,progress:0,effect:'slow-zoom',duration:169,progressText:'',promptOverride:''}
-],
-isBusy:false,
-audioCtx:null
+const NEGATIVE_PROMPT = 'no text, no subtitles, no watermark, no logo, no distorted anatomy, no extra fingers, no caricature, no propaganda aesthetics, no heroic worker poster, no evil stereotype, no exaggerated wealth, no political symbols, no flags, no slogans';
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT GLOBAL
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  projectId: null,
+  projectName: 'Mon Projet',
+  idea: '',
+  lang: 'fr',
+  style: 'social',
+  sceneCount: 6,
+  durationFrames: 240,
+  isRunning: false,
+  stopRequested: false,
+  phase: 'idle',
+  scenario: null,
+  images: [],
+  videos: []
 };
 
-// ═══════════════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════════════
-const $=id=>document.getElementById(id);
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let debugCount = 0;
 
-function log(msg,type='i'){
-const el=$('log');if(!el)return;
-const t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-const d=document.createElement('div');d.className='cl';
-d.innerHTML=`<span class="ct">${t}</span><span class="c${type}">${esc(msg)}</span>`;
-el.appendChild(d);el.scrollTop=el.scrollHeight;
-}
-let toastT=null;
-function toast(msg,type='ok',dur=2500){
-const el=$('toast');el.textContent=msg;el.className='toast show '+type;
-if(toastT)clearTimeout(toastT);
-toastT=setTimeout(()=>el.classList.remove('show'),dur);
-}
-function setStatus(t){
-const b=$('status');
-if(t){b.classList.add('show');$('status-text').textContent=t;}
-else b.classList.remove('show');
-}
-let asT=null;
-function flashAS(){
-const d=$('autosave-dot');d.classList.add('show');
-if(asT)clearTimeout(asT);
-asT=setTimeout(()=>d.classList.remove('show'),600);
-}
-function fileToBase64(file){
-return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('err'));r.readAsDataURL(file);});
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRES & DEBUG
+// ══════════════════════════════════════════════════════════════════
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function debugLog(level, category, message) {
+  const body = document.getElementById('debug-body');
+  if (!body) return;
+  const time = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+  const entry = document.createElement('div');
+  entry.className = 'debug-entry ' + level;
+  entry.innerHTML = '<span class="debug-time">' + time + '</span><span class="debug-cat">[' + esc(category) + ']</span><span>' + esc(message) + '</span>';
+  body.appendChild(entry);
+  debugCount++;
+  body.scrollTop = body.scrollHeight;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// API KEY
-// ═══════════════════════════════════════════════════════════════
-function loadKey(){try{state.apiKey=localStorage.getItem('marxtok_key')||'';}catch(e){state.apiKey='';}$('api-key').value=state.apiKey;updateApiUI();}
-function saveKey(){
-const k=$('api-key').value.trim();
-if(!k){try{localStorage.removeItem('marxtok_key');}catch(e){}state.apiKey='';updateApiUI();toast('Clé effacée','err');return;}
-try{localStorage.setItem('marxtok_key',k);}catch(e){}
-state.apiKey=k;updateApiUI();toast('Clé enregistrée','ok');
-}
-function updateApiUI(){
-const box=$('api-box'),st=$('api-status');
-if(state.apiKey){box.classList.add('ok');st.textContent='Active · '+state.apiKey.slice(0,8)+'…'+state.apiKey.slice(-4);}
-else{box.classList.remove('ok');st.textContent='Non configurée';}
-renderSlots();renderVideos();
+function showToast(message, type = 'success', duration = 3000) {
+  const toast = document.getElementById('toast');
+  const text = document.getElementById('toast-text');
+  toast.className = 'toast visible ' + type;
+  text.textContent = message;
+  setTimeout(() => toast.classList.remove('visible'), duration);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// STYLE + SYMBOLES
-// ═══════════════════════════════════════════════════════════════
-function buildSymbolsBlock(){
-const selected=state.selectedSymbols.map(id=>{
-const s=SYMBOLS.find(x=>x.id===id);
-return s?`${s.label}: ${s.prompt}`:'';
-}).filter(Boolean);
-const custom=state.customSymbols.trim();
-if(custom)selected.push(custom);
-if(selected.length===0)return '';
-return `\nSYMBOLIC OBJECTS to feature (use 1 or 2 per scene maximum): ${selected.join(' | ')}.\n`;
+function setStatus(text) {
+  const bar = document.getElementById('status-bar');
+  const txt = document.getElementById('status-text');
+  if (text) { bar.classList.add('visible'); txt.textContent = text; }
+  else bar.classList.remove('visible');
 }
 
-function buildImagePrompt(slot){
-const c=CONCEPTS_DB[state.concept]||CONCEPTS_DB['Marchandise'];
-const sceneDesc=c['s'+(slot.idx+1)]||'';
-const symbolsBlock=buildSymbolsBlock();
-let p='';
-p+='════ FRAMING LOCK ════ ';
-p+=sceneDesc+' ';
-p+='════ REPEAT ════ ';
-p+=sceneDesc+' ';
-p+='════ STYLE ════ ';
-p+=state.artStyle.prompt+' ';
-p+=STYLE_BASE+' ';
-p+=NO_HUMANS_LOCK+' ';
-p+=symbolsBlock+' ';
-p+='Vertical 9:16 composition. ';
-if(p.length>MAX_PROMPT)p=p.slice(0,MAX_PROMPT);
-return p;
+function setPhase(phase, detail, eta) {
+  state.phase = phase;
+  document.getElementById('phase-bar').classList.add('visible');
+  document.querySelectorAll('.phase-step').forEach(el => {
+    const order = ['scenario', 'narration', 'images', 'videos', 'done'];
+    const curIdx = order.indexOf(phase);
+    const elIdx = order.indexOf(el.dataset.phase);
+    el.classList.remove('active', 'done');
+    if (elIdx < curIdx) el.classList.add('done');
+    else if (elIdx === curIdx) el.classList.add('active');
+  });
+  document.getElementById('phase-detail').textContent = detail || '';
+  document.getElementById('phase-eta').textContent = eta || '';
 }
 
-function buildVideoPrompt(idx){
-const v=state.videos[idx];
-if(v.promptOverride&&v.promptOverride.trim().length>15)return v.promptOverride.trim();
-const eff=EFFECTS.find(e=>e.id===v.effect)||EFFECTS[0];
-const c=CONCEPTS_DB[state.concept]||CONCEPTS_DB['Marchandise'];
-const sceneDesc=c['s'+(idx+1)]||'';
-let p='Cinematic educational shot. ';
-p+='MOTION: '+eff.prompt+' ';
-p+='SCENE TO ANIMATE: '+sceneDesc+' ';
-p+='STRICT CONTENT LOCK: reproduce the input image EXACTLY. Do NOT add any new character, human figure, silhouette, person, face, or animal. ';
-p+='Do NOT add eyes. Do NOT add faces. Do NOT add people. ';
-p+='If the input has zero humans, the output must have zero humans. ';
-p+='NO new elements, NO new objects, NO new architecture. ';
-p+='ONLY animate what is already visible: existing objects, machines, graphics, atmospheric elements. ';
-p+='SUBTLE MOTION ONLY: dust, smoke, gear rotation, data flow, light flicker, object emergence. ';
-p+='No cuts, no scene changes, no morphing.';
-if(p.length>MAX_PROMPT)p=p.slice(0,MAX_PROMPT);
-return p;
+// ══════════════════════════════════════════════════════════════════
+// SYSTÈME DE SAUVEGARDE
+// ══════════════════════════════════════════════════════════════════
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem(SAVE_KEY) || '{}'); }
+  catch (e) { return {}; }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════════════════════
-function renderStyles(){
-const g=$('styles');g.innerHTML='';
-STYLES.forEach(s=>{
-const el=document.createElement('div');
-el.className='card'+(state.artStyle.id===s.id?' sel':'');
-el.innerHTML=`<span class="ic">${s.icon}</span><span class="nm">${esc(s.name)}</span><span class="dc">${esc(s.desc)}</span>`;
-el.addEventListener('click',()=>{state.artStyle=s;renderStyles();saveState();log('Style : '+s.name,'i');});
-g.appendChild(el);
-});
+function saveProject() {
+  const name = document.getElementById('project-name-input').value.trim() || 'Sans nom';
+  state.projectName = name;
+  const projects = getProjects();
+  const id = state.projectId || 'proj_' + Date.now().toString(36);
+  state.projectId = id;
+  
+  projects[id] = {
+    id, name,
+    savedAt: Date.now(),
+    idea: state.idea, lang: state.lang, style: state.style,
+    sceneCount: state.sceneCount, durationFrames: state.durationFrames,
+    scenario: state.scenario, images: state.images, videos: state.videos
+  };
+  
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(projects));
+    renderProjectList();
+    showToast('Projet « ' + name + ' » sauvegardé', 'success');
+    debugLog('success', 'SAVE', 'Projet sauvegardé : ' + name);
+  } catch (e) {
+    showToast('Erreur de sauvegarde (quota ?)', 'error');
+  }
 }
 
-function renderSymbols(){
-const g=$('symbols');g.innerHTML='';
-SYMBOLS.forEach(s=>{
-const el=document.createElement('div');
-el.className='sym-card'+(state.selectedSymbols.includes(s.id)?' sel':'');
-el.innerHTML=`<span class="sy-ic">${s.icon}</span>${esc(s.label)}`;
-el.addEventListener('click',()=>{
-const i=state.selectedSymbols.indexOf(s.id);
-if(i>=0)state.selectedSymbols.splice(i,1);
-else state.selectedSymbols.push(s.id);
-renderSymbols();saveState();
-});
-g.appendChild(el);
-});
+function loadProject(id) {
+  const projects = getProjects();
+  const p = projects[id];
+  if (!p) return;
+  
+  state.projectId = p.id;
+  state.projectName = p.name;
+  state.idea = p.idea || '';
+  state.lang = p.lang || 'fr';
+  state.style = p.style || 'social';
+  state.sceneCount = p.sceneCount || 6;
+  state.durationFrames = p.durationFrames || 240;
+  state.scenario = p.scenario || null;
+  state.images = p.images || [];
+  state.videos = p.videos || [];
+  
+  // Update UI
+  document.getElementById('project-name-input').value = state.projectName;
+  document.getElementById('idea-input').value = state.idea;
+  document.getElementById('lang-select').value = state.lang;
+  document.getElementById('style-select').value = state.style;
+  document.getElementById('scene-count-select').value = state.sceneCount;
+  document.getElementById('duration-select').value = state.durationFrames;
+  
+  if (state.scenario) {
+    renderScenario();
+    renderImagesGrid();
+    renderGallery();
+  }
+  
+  updateGenerateBtn();
+  showToast('Projet « ' + state.projectName + ' » chargé', 'success');
+  debugLog('success', 'LOAD', 'Projet chargé : ' + state.projectName);
 }
 
-function renderSlots(){
-const c=$('slots');c.innerHTML='';
-state.slots.forEach((slot,i)=>{
-const prev=i>0?state.slots[i-1]:null;
-const locked=prev&&prev.status!=='done';
-const done=slot.status==='done';
-let cls='slot';
-if(locked)cls+=' locked';else if(!done)cls+=' active';
-if(done)cls+=' done';
-const el=document.createElement('div');el.className=cls;
-let badge='';
-if(slot.source==='ai')badge='<span class="badge-src badge-ai">IA</span>';
-else if(slot.source==='upload')badge='<span class="badge-src badge-up">UPLOAD</span>';
-let html=`<div class="slot-header"><div class="slot-title">Scène ${i+1}${badge}</div><span class="slot-num">${i+1}/3</span></div>`;
-html+=`<div class="slot-body">${esc((CONCEPTS_DB[state.concept]||{}).voice?('Scène '+(i+1)):'')}</div>`;
-if(slot.img)html+=`<img class="slot-img" src="${slot.img}">`;
-else html+=`<div class="slot-img-ph">Non généré</div>`;
-html+=`<div class="slot-status">${slot.status==='idle'?'○ en attente':slot.status==='gen'?'◐ génération…':slot.status==='done'?'● terminé':'✕ erreur'}</div>`;
-html+=`<div class="bar"><div class="bar-fill" style="width:${slot.status==='gen'?60:slot.status==='done'?100:0}%"></div></div>`;
-if(locked){html+=`<div class="hint">Termine scène ${i} d'abord.</div>`;}
-else{
-html+=`<div class="btn-row">`;
-html+=`<button class="btn small info" data-gen="${i}" style="flex:1" ${state.isBusy||!state.apiKey?'disabled':''}>🤖 IA</button>`;
-html+=`<button class="btn small purple" data-up="${i}" style="flex:1">📤 UPLOAD</button>`;
-html+=`</div>`;
-if(slot.img){
-html+=`<div class="btn-row">`;
-html+=`<button class="btn small ok" data-next="${i}" style="flex:1">${i<2?'✓ VALIDER → SCÈNE '+(i+2):'✓ VALIDER'}</button>`;
-html+=`<button class="btn small ghost" data-regen="${i}" style="flex:1">↻</button>`;
-html+=`</div>`;
-}
-if(slot.source==='upload'){
-html+=`<label style="margin-top:.5rem;font-size:.6rem;">Description de l'image (pour la vidéo)</label>`;
-html+=`<textarea data-ud="${i}" placeholder="Décris ce que l'image montre..." style="min-height:60px;font-size:.72rem">${esc(slot.uploadDesc||'')}</textarea>`;
-}
-html+=`<input type="file" accept="image/*" class="upload-in" id="up-${i}">`;
-}
-el.innerHTML=html;c.appendChild(el);
-});
-c.querySelectorAll('[data-gen]').forEach(b=>b.addEventListener('click',()=>genSlot(+b.dataset.gen)));
-c.querySelectorAll('[data-up]').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.up;const inp=c.querySelector('#up-'+i);if(inp)inp.click();}));
-c.querySelectorAll('.upload-in').forEach(inp=>{
-const i=parseInt(inp.id.replace('up-',''));
-inp.addEventListener('change',async e=>{const f=e.target.files[0];if(f){await handleUpload(i,f);inp.value='';}});
-});
-c.querySelectorAll('[data-ud]').forEach(ta=>ta.addEventListener('input',()=>{state.slots[+ta.dataset.ud].uploadDesc=ta.value;scheduleSave();}));
-c.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>validateSlot(+b.dataset.next)));
-c.querySelectorAll('[data-regen]').forEach(b=>b.addEventListener('click',()=>regenSlot(+b.dataset.regen)));
+function deleteProject(id, event) {
+  event.stopPropagation();
+  if (!confirm('Supprimer ce projet définitivement ?')) return;
+  const projects = getProjects();
+  delete projects[id];
+  localStorage.setItem(SAVE_KEY, JSON.stringify(projects));
+  if (state.projectId === id) {
+    state.projectId = null;
+    state.scenario = null; state.images = []; state.videos = [];
+    document.getElementById('scenario-panel').classList.remove('visible');
+    document.getElementById('gallery').style.display = 'none';
+  }
+  renderProjectList();
+  updateGenerateBtn();
+  showToast('Projet supprimé', 'warn');
 }
 
-async function handleUpload(i,file){
-if(!file.type.startsWith('image/')){toast('Non image','err');return;}
-setStatus('Upload scène '+(i+1)+'…');
-try{
-const b64=await fileToBase64(file);
-const slot=state.slots[i];
-slot.img=b64;slot.imgBase64=b64;slot.source='upload';slot.status='done';
-log('📤 Scène '+(i+1)+' uploadée','o');
-toast('Scène '+(i+1)+' importée — remplis la description','ok',3000);
-}catch(e){toast('Erreur','err');}
-setStatus(null);renderSlots();renderVideos();saveState();
+function renderProjectList() {
+  const projects = getProjects();
+  const list = document.getElementById('project-list');
+  const count = document.getElementById('project-count');
+  const ids = Object.keys(projects).sort((a, b) => projects[b].savedAt - projects[a].savedAt);
+  
+  count.textContent = ids.length;
+  if (ids.length === 0) {
+    list.innerHTML = '<div style="font-size:0.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucun projet sauvegardé</div>';
+    return;
+  }
+  
+  list.innerHTML = ids.map(id => {
+    const p = projects[id];
+    const date = new Date(p.savedAt).toLocaleDateString('fr-FR');
+    const isActive = state.projectId === id ? 'style="border-color:var(--yellow);background:rgba(229,193,90,0.05);"' : '';
+    return `<div class="project-item" ${isActive} onclick="loadProject('${id}')">
+      <div>
+        <div class="p-name">${esc(p.name)}</div>
+        <div class="p-date">${date} · ${p.sceneCount} scènes</div>
+      </div>
+      <div class="p-actions">
+        <button onclick="deleteProject('${id}', event)">🗑</button>
+     .
+</div>
+    </div>`;
+  }).join('');
 }
 
-function validateSlot(i){
-if(i<2){
-state.slots[i+1].status='idle';
-renderSlots();renderVideos();saveState();
-toast('Scène '+(i+2)+' débloquée','ok',1500);
-const slots=document.querySelectorAll('.slot');
-if(slots[i+1])slots[i+1].scrollIntoView({behavior:'smooth',block:'center'});
-}else{
-toast('Images complètes ✓','ok',2500);
-const pv=$('p-video');
-if(pv){pv.classList.add('open');pv.scrollIntoView({behavior:'smooth'});}
-renderVideos();
-}
-}
-
-function renderVideos(){
-const c=$('video-slots');if(!c)return;
-c.innerHTML='';
-const allReady=state.slots.every(s=>s.status==='done');
-if(!allReady){c.innerHTML='<div class="hint" style="text-align:center;padding:1rem;">Génère ou upload les 3 images d\'abord.</div>';$('batch-videos').disabled=true;return;}
-$('batch-videos').disabled=false;
-state.videos.forEach((v,i)=>{
-const el=document.createElement('div');
-el.className='video-slot'+(v.status==='done'?' done':v.status==='gen'?' processing':'');
-let html=`<div class="slot-header"><div class="slot-title">Vidéo Scène ${i+1}</div><span class="slot-num">${v.status==='done'?'● PRÊT':v.status==='gen'?'◐ EN COURS':'○ À GÉNÉRER'}</span></div>`;
-if(v.url)html+=`<video class="slot-video" src="${v.url}" controls playsinline preload="metadata"></video>`;
-else if(v.status==='gen')html+=`<div class="slot-img-ph"><div class="spinner" style="width:40px;height:40px;border-width:3px;margin-bottom:.8rem;"></div><div style="color:var(--warn);">Génération…</div></div>`;
-else html+=`<div class="slot-img-ph">Vidéo à générer</div>`;
-html+=`<label style="margin-top:.4rem">Effet</label>`;
-html+=`<select data-veffect="${i}" ${v.status==='gen'?'disabled':''}>`;
-EFFECTS.forEach(e=>{html+=`<option value="${e.id}" ${v.effect===e.id?'selected':''}>${e.icon} ${esc(e.name)}</option>`;});
-html+=`</select>`;
-html+=`<div class="vopts">`;
-html+=`<select data-vdur="${i}" ${v.status==='gen'?'disabled':''}>`;
-html+=`<option value="121" ${v.duration===121?'selected':''}>5 sec</option>`;
-html+=`<option value="169" ${v.duration===169?'selected':''}>7 sec</option>`;
-html+=`<option value="241" ${v.duration===241?'selected':''}>10 sec</option>`;
-html+=`</select>`;
-html+=`<span class="hint" style="align-self:center">Durée</span>`;
-html+=`</div>`;
-html+=`<label style="margin-top:.4rem">✏️ Prompt override (optionnel)</label>`;
-html+=`<textarea data-vov="${i}" placeholder="Vide = prompt auto. Sinon écris ici un prompt personnalisé." style="min-height:60px;font-size:.7rem;font-family:ui-monospace">${esc(v.promptOverride||'')}</textarea>`;
-if(v.status==='gen'){
-html+=`<div class="slot-status" id="vp-${i}">${v.progressText||''}</div>`;
-html+=`<div class="bar"><div class="bar-fill" id="vbar-${i}" style="width:${v.progress||0}%"></div></div>`;
-}else if(v.url){
-html+=`<div class="btn-row">`;
-html+=`<button class="btn small ghost" data-vdl="${i}" style="flex:1">💾 DL</button>`;
-html+=`<button class="btn small err" data-vregen="${i}" style="flex:1">↻ RÉGÉNÉRER</button>`;
-html+=`</div>`;
-}else{
-html+=`<button class="btn small warn" data-vgen="${i}" style="width:100%" ${state.isBusy||!state.apiKey?'disabled':''}>🎬 GÉNÉRER VIDÉO ${i+1}</button>`;
-}
-el.innerHTML=html;c.appendChild(el);
-});
-c.querySelectorAll('[data-vgen]').forEach(b=>b.addEventListener('click',()=>genVideo(+b.dataset.vgen,false)));
-c.querySelectorAll('[data-vregen]').forEach(b=>b.addEventListener('click',()=>{
-const i=+b.dataset.vregen;
-state.videos[i].url=null;state.videos[i].status='idle';state.videos[i].videoId=null;state.videos[i].progress=0;
-renderVideos();saveState();genVideo(i,false);
-}));
-c.querySelectorAll('[data-vdl]').forEach(b=>b.addEventListener('click',()=>{
-const v=state.videos[+b.dataset.vdl];
-if(v.url)downloadFile(v.url,'marxtok_video'+(+b.dataset.vdl+1)+'.mp4');
-}));
-c.querySelectorAll('[data-veffect]').forEach(s=>s.addEventListener('change',()=>{state.videos[+s.dataset.veffect].effect=s.value;saveState();}));
-c.querySelectorAll('[data-vdur]').forEach(s=>s.addEventListener('change',()=>{state.videos[+s.dataset.vdur].duration=parseInt(s.value);saveState();}));
-c.querySelectorAll('[data-vov]').forEach(ta=>ta.addEventListener('input',()=>{state.videos[+ta.dataset.vov].promptOverride=ta.value;scheduleSave();}));
+function newProject() {
+  if (state.isRunning) return;
+  state.projectId = null;
+  state.projectName = 'Nouveau Projet';
+  state.idea = ''; state.scenario = null; state.images = []; state.videos = [];
+  document.getElementById('project-name-input').value = state.projectName;
+  document.getElementById('idea-input').value = '';
+  document.getElementById('scenario-panel').classList.remove('visible');
+  document.getElementById('gallery').style.display = 'none';
+  renderProjectList();
+  updateGenerateBtn();
+  showToast('Nouveau projet créé', 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// API CALLS
-// ═══════════════════════════════════════════════════════════════
-async function fetchRetry(url,opts,maxR,label){
-for(let i=0;i<=maxR;i++){
-try{
-const ctrl=new AbortController();
-const t=setTimeout(()=>ctrl.abort(),90000);
-const res=await fetch(url,{...opts,signal:ctrl.signal});
-clearTimeout(t);
-if((res.status===500||res.status===502||res.status===503)&&i<maxR){const w=Math.pow(2,i)*3000;log(label+' HTTP '+res.status,'w');await sleep(w);continue;}
-if(res.status===429&&i<maxR){log(label+' 429','w');await sleep(15000);continue;}
-return res;
-}catch(e){
-if(i<maxR)await sleep(Math.pow(2,i)*2000);
-else throw new Error(label+' : '+e.message);
-}
-}
-throw new Error(label+' échec');
+// ══════════════════════════════════════════════════════════════════
+// API & GÉNÉRATION
+// ══════════════════════════════════════════════════════════════════
+function getApiKey() { try { return (localStorage.getItem('agnes_api_key') || '').trim(); } catch (e) { return ''; } }
+
+function buildScenarioPrompt() {
+  const styleDesc = STYLE_PRESETS[state.style];
+  const langInstruction = state.lang === 'ar' ? 'Écris TOUTE la narration en arabe classique simple (فصحى مبسطة).' : 
+                          state.lang === 'dz' ? 'Écris TOUTE la narration en darija algérienne simple et familière.' : 
+                          'Écris TOUTE la narration en français simple et pédagogique.';
+  
+  let progressionText = VISUAL_PROGRESSION_HINTS.slice(0, state.sceneCount).map((h, i) => `Scène ${i+1} : ${h}`).join('\n');
+
+  return `Tu es un réalisateur de documentaires éducatifs cinématographiques.
+IDÉE : ${state.idea}
+STYLE VISUEL (LOCK) : ${styleDesc}
+LANGUE : ${langInstruction}
+
+RÈGLES ABSOLUES :
+1. Pas de caricature, pas de propagande, pas de stéréotypes (ni "méchant patron", ni "ouvrier héroïque"). Représentation réaliste et neutre.
+2. Progression visuelle obligatoire pour éviter la répétition :
+${progressionText}
+3. Chaque scène doit apporter une nouvelle information visuelle.
+4. Réponds UNIQUEMENT en JSON valide, sans markdown, sans commentaires.
+
+FORMAT JSON EXACT :
+{
+  "title": "Titre du documentaire",
+  "characters": [{"name": "Nom", "description": "Description physique précise en anglais pour la cohérence des images"}],
+  "scenes": [
+    {
+      "scene_number": 1,
+      "concept": "Concept expliqué dans cette scène",
+      "narration": "Texte de narration court (1-2 phrases) dans la langue demandée",
+      "speaker": "Nom du personnage ou 'Narrateur'",
+      "image_prompt": "Prompt en ANGLAIS pour l'image clé de cette scène. Doit inclure le style visuel, la composition, les personnages décrits ci-dessus.",
+      "action": "Description du mouvement ou de l'action pour la vidéo"
+    }
+  ]
+}`;
 }
 
-async function callImageAPI(prompt){
-if(!state.apiKey)throw new Error('Clé manquante');
-const sizes=[`${IMG_W}x${IMG_H}`,'1024x1792','1024x1024','768x1024','512x512'];
-let lastErr=null;
-for(const size of sizes){
-const variants=[
-{model:MODEL_IMAGE,prompt,size,response_format:'url'},
-{model:MODEL_IMAGE,prompt,size,extra_body:{response_format:'url'}},
-{model:MODEL_IMAGE,prompt,size}
-];
-for(const body of variants){
-try{
-const res=await fetchRetry(API_BASE+'/images/generations',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},1,'Image');
-if(res.ok){
-const d=await res.json();
-const url=d.data?.[0]?.url||d.data?.[0]?.b64_json;
-if(url){log('Image OK — '+size,'o');return url;}
-}else{
-const txt=await res.text();
-lastErr='HTTP '+res.status+' : '+txt.slice(0,150);
-log('Échec '+size+' — '+lastErr,'w');
-}
-}catch(e){lastErr=e.message;}
-}
-}
-throw new Error('Image : '+lastErr);
-}
-
-async function createVideoTask(startRef,endRef,prompt,numFrames){
-if(!state.apiKey)throw new Error('Clé manquante');
-const isUrl1=typeof startRef==='string'&&startRef.startsWith('http');
-const isUrl2=typeof endRef==='string'&&endRef.startsWith('http');
-let body;
-if(isUrl1&&isUrl2){
-body={model:MODEL_VIDEO,prompt,extra_body:{image:[startRef,endRef],mode:'keyframes'},num_frames:numFrames,frame_rate:24,height:VID_H,width:VID_W};
-}else{
-body={model:MODEL_VIDEO,prompt,image:startRef,num_frames:numFrames,frame_rate:24};
-}
-const res=await fetchRetry(API_BASE+'/videos',{method:'POST',headers:{'Authorization':'Bearer '+state.apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)},2,'Vidéo');
-if(!res.ok){const txt=await res.text();throw new Error('HTTP '+res.status+' : '+txt.slice(0,200));}
-const d=await res.json();
-const id=d.video_id||d.id||d.data?.video_id;
-if(!id)throw new Error('Pas de video_id');
-return id;
+async function generateScenario() {
+  setPhase('scenario', '✍️ Écriture du scénario et du style visuel…', '');
+  setStatus('L\'IA conçoit la direction artistique…');
+  
+  const body = {
+    model: MODEL_TEXT,
+    messages: [{ role: 'user', content: buildScenarioPrompt() }],
+    temperature: 0.7,
+    max_tokens: 4000,
+    response_format: { type: 'json_object' }
+  };
+  
+  const res = await fetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  
+  if (!res.ok) throw new Error('Erreur API Scénario: ' + res.status);
+  const data = await res.json();
+  const content = data.choices[0].message.content;
+  
+  // Nettoyage robuste du JSON
+  let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+  const first = cleaned.indexOf('{');
+  const last = cleaned.lastIndexOf('}');
+  if (first !== -1 && last !== -1) cleaned = cleaned.substring(first, last + 1);
+  
+  state.scenario = JSON.parse(cleaned);
+  
+  // Ajustement du nombre de scènes
+  if (state.scenario.scenes.length > state.sceneCount) {
+    state.scenario.scenes = state.scenario.scenes.slice(0, state.sceneCount);
+  }
+  
+  renderScenario();
+  debugLog('success', 'SCENARIO', state.scenario.scenes.length + ' scènes générées avec Style Lock');
 }
 
-async function pollVideo(videoId,onProgress){
-const start=Date.now();
-for(let r=Math.round(INITIAL_WAIT);r>0;r--){
-const e=Math.round((Date.now()-start)/1000);
-const p=Math.min(Math.round((e/INITIAL_WAIT)*90),85);
-onProgress('Préparation…',p,e);await sleep(1000);
-}
-for(let a=0;a<400;a++){
-const url=POLL_BASE+'?video_id='+encodeURIComponent(videoId)+'&model_name='+encodeURIComponent(MODEL_VIDEO);
-try{
-const res=await fetch(url,{headers:{'Authorization':'Bearer '+state.apiKey}});
-if(res.status===429){await sleep(20000);continue;}
-if(res.status===404){await sleep(POLL_INTERVAL*1000);continue;}
-if(!res.ok){await sleep(POLL_INTERVAL*1000);continue;}
-const d=await res.json();
-const st=(d.status||'').toLowerCase();
-const apiPr=d.progress||0;
-const e=Math.round((Date.now()-start)/1000);
-const tp=Math.min(Math.round((e/INITIAL_WAIT)*90),92);
-const p=Math.max(apiPr,tp);
-if(st==='completed'||st==='succeeded'||st==='done'){
-const u=d.metadata?.url||d.url||d.output?.url||d.data?.url;
-if(!u)throw new Error('Pas d\'URL');
-return u;
-}
-if(st==='failed'||st==='error'||st==='cancelled')throw new Error('Échec : '+(d.error||st));
-onProgress('Génération…',p,e);
-}catch(e){if(e.message.startsWith('Échec'))throw e;}
-await sleep(POLL_INTERVAL*1000);
-}
-throw new Error('Timeout');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// IMAGE GEN
-// ═══════════════════════════════════════════════════════════════
-async function genSlot(i){
-if(state.isBusy)return;
-if(!state.apiKey){toast('Ajoute ta clé','err');return;}
-state.isBusy=true;
-const slot=state.slots[i];
-slot.status='gen';slot.img=null;slot.imgBase64=null;slot.source=null;
-renderSlots();
-const prompt=buildImagePrompt(slot);
-slot.prompt=prompt;
-log('▶ Image scène '+(i+1)+' ('+prompt.length+' car.)','i');
-setStatus('Génération image '+(i+1)+'…');
-try{
-const url=await callImageAPI(prompt);
-slot.img=url;slot.source='ai';slot.status='done';
-log('✅ Image '+(i+1)+' OK','o');
-toast('Image '+(i+1)+' prête','ok');
-}catch(e){
-slot.status='idle';
-log('❌ Image '+(i+1)+' : '+e.message,'e');
-toast('Erreur','err');
-}
-state.isBusy=false;setStatus(null);
-renderSlots();renderVideos();saveState();
+async function generateImages() {
+  setPhase('images', '🎨 Génération des images clés…', '');
+  setStatus('L\'IA dessine les plans…');
+  
+  state.images = [];
+  const styleBase = STYLE_PRESETS[state.style];
+  
+  for (let i = 0; i < state.scenario.scenes.length; i++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    const scene = state.scenario.scenes[i];
+    const prompt = `${scene.image_prompt}. Style: ${styleBase}. Format: vertical 9:16, cinematic, highly detailed. Negative: ${NEGATIVE_PROMPT}`;
+    
+    setStatus(`Image ${i + 1}/${state.scenario.scenes.length}…`);
+    debugLog('info', 'IMAGE', `Génération scène ${i + 1}`);
+    
+    const res = await fetch(API_BASE + '/images/generations', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: MODEL_IMAGE, prompt, size: '576x1024', extra_body: { response_format: 'url' } })
+    });
+    
+    if (!res.ok) throw new Error('Erreur API Image: ' + res.status);
+    const data = await res.json();
+    const url = data.data[0].url || `data:image/png;base64,${data.data[0].b64_json}`;
+    
+    state.images.push({ sceneIndex: i, url, prompt });
+    renderImagesGrid();
+    await sleep(1500); // Respect des limites API
+  }
+  debugLog('success', 'IMAGES', 'Toutes les images clés sont prêtes');
 }
 
-async function regenSlot(i){
-state.slots[i].status='idle';
-state.slots[i].img=null;state.slots[i].imgBase64=null;state.slots[i].source=null;
-state.videos[i]={idx:i,url:null,status:'idle',videoId:null,progress:0,effect:state.videos[i].effect,duration:state.videos[i].duration,progressText:'',promptOverride:state.videos[i].promptOverride};
-renderSlots();renderVideos();saveState();
-await genSlot(i);
+async function generateVideos() {
+  setPhase('videos', '🎬 Animation des plans vidéo…', '');
+  setStatus('L\'IA anime les scènes…');
+  
+  state.videos = [];
+  const total = state.images.length;
+  
+  for (let i = 0; i < total; i++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    const img = state.images[i];
+    const scene = state.scenario.scenes[i];
+    
+    // Pour la vidéo, on utilise la même image comme début et fin pour un plan stable, 
+    // ou on pourrait générer une 2ème image. Ici, on utilise l'astuce du "motion prompt" sur une image.
+    const videoPrompt = `${scene.action}. Camera movement: slow and elegant cinematic motion. Style: ${STYLE_PRESETS[state.style]}. No text, no watermark, continuous shot.`;
+    
+    setStatus(`Vidéo ${i + 1}/${total} (En file d'attente)`);
+    debugLog('info', 'VIDEO', `Création tâche scène ${i + 1}`);
+    
+    // Correction définitive : num_frames est un multiple de 8 (120, 240, 360)
+    const body = {
+      model: MODEL_VIDEO,
+      prompt: videoPrompt,
+      extra_body: { image: [img.url, img.url], mode: 'keyframes' }, // Début et fin identiques pour un plan stable, l'IA anime entre les deux
+      num_frames: state.durationFrames,
+      frame_rate: FRAME_RATE,
+      height: 1024,
+      width: 576
+    };
+    
+    const res = await fetch(API_BASE + '/videos', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error('Erreur API Vidéo: ' + res.status + ' - ' + err.slice(0, 100));
+    }
+    
+    const data = await res.json();
+    const videoId = data.video_id;
+    if (!videoId) throw new Error('Pas de video_id retourné');
+    
+    // Polling
+    let attempts = 0;
+    let videoUrl = null;
+    while (attempts < 150 && !state.stopRequested) {
+      await sleep(5000);
+      attempts++;
+      setStatus(`Vidéo ${i + 1}/${total} — Génération en cours… (${attempts * 5}s)`);
+      
+      const pRes = await fetch(POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO), {
+        headers: { 'Authorization': 'Bearer ' + getApiKey() }
+      });
+      
+      if (pRes.ok) {
+        const pData = await pRes.json();
+        if (pData.status === 'completed' || pData.status === 'succeeded' || pData.status === 'done') {
+          videoUrl = pData.url || (pData.metadata && pData.metadata.url);
+          break;
+        }
+        if (pData.status === 'failed' || pData.status === 'error') {
+          throw new Error('Échec de la génération vidéo (Statut: ' + pData.status + ')');
+        }
+      }
+    }
+    
+    if (!videoUrl) throw new Error('Délai d\'attente vidéo dépassé');
+    
+    state.videos.push({ sceneIndex: i, url: videoUrl, narration: scene.narration, speaker: scene.speaker });
+    renderGallery();
+    debugLog('success', 'VIDEO', `Scène ${i + 1} terminée`);
+    
+    // Pause entre les vidéos pour respecter le RPM
+    if (i < total - 1) {
+      for (let r = 62; r > 0; r--) {
+        if (state.stopRequested) break;
+        setStatus(`Prochaine vidéo dans ${r}s…`);
+        await sleep(1000);
+      }
+    }
+  }
+  debugLog('success', 'VIDEOS', 'Tous les clips sont générés');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// VIDEO GEN
-// ═══════════════════════════════════════════════════════════════
-async function genVideo(i,silent=false){
-if(state.isBusy&&!silent)return;
-if(!state.apiKey){toast('Ajoute ta clé','err');return;}
-const startSlot=state.slots[i];
-const endSlot=state.slots[i+1]||startSlot;
-const startRef=startSlot.source==='upload'?startSlot.imgBase64:startSlot.img;
-const endRef=endSlot.source==='upload'?endSlot.imgBase64:endSlot.img;
-if(!startRef){toast('Image manquante','err');return;}
-const v=state.videos[i];
-v.status='gen';v.url=null;v.progress=0;v.progressText='Création…';
-renderVideos();
-const prompt=buildVideoPrompt(i);
-log('▶ Vidéo scène '+(i+1)+' — '+(v.duration/24).toFixed(1)+'s','i');
-if(v.promptOverride&&v.promptOverride.trim().length>15)log('  ✏️ Prompt override','i');
-if(!silent)setStatus('Création vidéo '+(i+1)+'…');
-try{
-const vid=await createVideoTask(startRef,endRef,prompt,v.duration);
-v.videoId=vid;log('  Task : '+vid,'i');saveState();
-const finalUrl=await pollVideo(vid,(label,p,e)=>{
-v.progress=p;v.progressText=label+' '+p+'% · '+e+'s';
-const el=$('vp-'+i);if(el)el.textContent=v.progressText;
-const bar=$('vbar-'+i);if(bar)bar.style.width=p+'%';
-if(!silent)setStatus('Vidéo '+(i+1)+' — '+p+'%');
-});
-v.url=finalUrl;v.status='done';v.progress=100;
-log('✅ Vidéo '+(i+1)+' OK','o');
-if(!silent)toast('Vidéo '+(i+1)+' prête ✓','ok',3000);
-return true;
-}catch(e){
-v.status='idle';v.url=null;
-log('❌ Vidéo '+(i+1)+' : '+e.message,'e');
-if(!silent)toast('Erreur vidéo','err');
-return false;
-}finally{
-renderVideos();saveState();
-if(!silent)setStatus(null);
-}
+// ══════════════════════════════════════════════════════════════════
+// RENDU UI
+// ══════════════════════════════════════════════════════════════════
+function renderScenario() {
+  const panel = document.getElementById('scenario-panel');
+  const card = document.getElementById('scenario-card');
+  if (!state.scenario) return;
+  
+  let html = `<div class="scenario-title">${esc(state.scenario.title)}</div>`;
+  if (state.scenario.characters && state.scenario.characters.length > 0) {
+    html += `<div style="font-size:0.75rem;color:var(--ink-dim);margin-bottom:1rem;text-align:center;">
+      Personnages : ${state.scenario.characters.map(c => `<strong style="color:var(--yellow-soft)">${esc(c.name)}</strong>`).join(', ')}
+    </div>`;
+  }
+  
+  state.scenario.scenes.forEach((sc, i) => {
+    html += `<div class="scene-block" data-scene="${i}">
+      <div class="scene-number">SCÈNE ${sc.scene_number} — ${esc(sc.concept)}</div>
+      <div class="scene-dialogue">
+        <span class="speaker-name">${esc(sc.speaker || 'Narrateur')}</span>
+        « ${esc(sc.narration)} »
+      </div>
+      <div style="font-size:0.7rem;color:var(--ink-dim);margin-top:0.3rem;">${esc(sc.action)}</div>
+    </div>`;
+  });
+  
+  card.innerHTML = html;
+  panel.classList.add('visible');
 }
 
-async function batchVideos(){
-if(state.isBusy){toast('En cours','warn');return;}
-if(!state.slots.every(s=>s.status==='done')){toast('Génère les 3 images','err');return;}
-if(!confirm('Générer les 3 vidéos ? (~15-20 min)'))return;
-state.isBusy=true;log('⚡ Batch','o');
-for(let i=0;i<3;i++){
-if(state.videos[i].url&&state.videos[i].url.startsWith('http'))continue;
-setStatus('Vidéo '+(i+1)+'/3');
-await genVideo(i,true);
-if(i<2){log('Pause 60s','i');await sleep(62000);}
-}
-state.isBusy=false;setStatus(null);log('⚡ Batch terminé','o');
-toast('Batch terminé','ok',4000);
+function renderImagesGrid() {
+  const grid = document.getElementById('images-grid');
+  if (!state.images.length) return;
+  
+  grid.innerHTML = state.images.map((img, i) => `
+    <div class="image-card">
+      <img src="${img.url}" alt="Scène ${i+1}">
+      <div class="img-label">Scène ${i + 1}</div>
+    </div>
+  `).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TTS
-// ═══════════════════════════════════════════════════════════════
-function loadVoices(){
-if(!('speechSynthesis' in window)){$('tts-voice').innerHTML='<option>Aucune</option>';return;}
-const voices=speechSynthesis.getVoices();
-const sel=$('tts-voice');sel.innerHTML='';
-const fr=voices.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('fr'));
-if(fr.length===0)sel.innerHTML='<option value="">Défaut</option>';
-else fr.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent='🇫🇷 '+v.name;sel.appendChild(o);});
-}
-function speakText(text){
-return new Promise(resolve=>{
-if(!('speechSynthesis' in window)){resolve();return;}
-speechSynthesis.cancel();
-setTimeout(()=>{
-const u=new SpeechSynthesisUtterance(text);
-u.lang='fr-FR';
-u.rate=parseFloat($('tts-rate').value)||0.85;
-u.pitch=parseFloat($('tts-pitch').value)||0.8;
-const name=$('tts-voice').value;
-if(name){const v=speechSynthesis.getVoices().find(x=>x.name===name);if(v){u.voice=v;u.lang=v.lang;}}
-u.onend=resolve;u.onerror=resolve;
-speechSynthesis.speak(u);
-},150);
-});
-}
-function stopSpeech(){if('speechSynthesis' in window)speechSynthesis.cancel();}
-function ttsPlay(){
-const txt=$('vo-text').value.trim();
-if(!txt){toast('Script vide','err');return;}
-$('tts-status').textContent='Lecture…';
-speakText(txt).then(()=>{$('tts-status').textContent='';});
-}
-function ttsStop(){stopSpeech();$('tts-status').textContent='Arrêté';setTimeout(()=>$('tts-status').textContent='',1500);}
-
-// ═══════════════════════════════════════════════════════════════
-// DRONE
-// ═══════════════════════════════════════════════════════════════
-let droneNodes=null;
-function startDrone(){
-stopDrone();
-try{
-const ctx=state.audioCtx||new (window.AudioContext||window.webkitAudioContext)();
-state.audioCtx=ctx;if(ctx.state==='suspended')ctx.resume();
-const style=$('mus-style').value;
-const vol=parseFloat($('mus-vol').value)||0.08;
-const master=ctx.createGain();master.gain.value=vol;master.connect(ctx.destination);
-const filter=ctx.createBiquadFilter();filter.type='lowpass';
-filter.frequency.value=style==='industrial'?900:style==='tense'?700:style==='melancholic'?400:500;
-filter.Q.value=2;filter.connect(master);
-const freqs=style==='tense'?[55,82.5,110]:style==='ambient'?[73.4,146.8]:style==='melancholic'?[55,82.5,110,138.6]:[55,65.4,82.5,98];
-const oscs=[];
-freqs.forEach((f,i)=>{
-const osc=ctx.createOscillator();osc.type=i===0?'sawtooth':'sine';
-osc.frequency.value=f;
-const g=ctx.createGain();g.gain.value=0.28/freqs.length;
-osc.connect(g);g.connect(filter);osc.start();oscs.push(osc);
-});
-const pulseFreq=style==='tense'?2.5:style==='industrial'?1.8:0.12;
-const lfo=ctx.createOscillator();lfo.type='sine';lfo.frequency.value=pulseFreq;
-const lfoG=ctx.createGain();lfoG.gain.value=style==='industrial'?15:25;
-lfo.connect(lfoG);lfoG.connect(filter.frequency);lfo.start();oscs.push(lfo);
-droneNodes={ctx,master,filter,oscs};
-$('mus-status').textContent='▶ '+style;
-}catch(e){log('Erreur drone','e');}
-}
-function stopDrone(){
-if(!droneNodes)return;
-try{droneNodes.oscs.forEach(o=>{try{o.stop();}catch(e){}});droneNodes.master.disconnect();droneNodes=null;$('mus-status').textContent='⏹';}catch(e){}
-}
-async function recordDrone(){
-startDrone();if(!droneNodes)return;
-try{
-const dest=droneNodes.ctx.createMediaStreamDestination();
-droneNodes.master.connect(dest);
-const mr=new MediaRecorder(dest.stream);const chunks=[];
-mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
-mr.onstop=()=>{
-const blob=new Blob(chunks,{type:'audio/webm'});
-const url=URL.createObjectURL(blob);
-const a=document.createElement('a');
-a.href=url;a.download='marxtok_drone.webm';
-document.body.appendChild(a);a.click();document.body.removeChild(a);
-setTimeout(()=>URL.revokeObjectURL(url),3000);
-$('mus-status').textContent='✓ exporté';
-};
-mr.start();$('mus-status').textContent='● Enregistrement 30s…';
-setTimeout(()=>{mr.stop();stopDrone();},30000);
-}catch(e){log('Erreur enreg','e');}
+function renderGallery() {
+  const gallery = document.getElementById('gallery');
+  const grid = document.getElementById('gallery-grid');
+  if (!state.videos.length) return;
+  
+  gallery.style.display = 'block';
+  grid.innerHTML = state.videos.map((v, i) => `
+    <div class="gallery-item">
+      <video src="${v.url}" controls playsinline preload="metadata"></video>
+      <div class="g-caption">
+        <strong>Plan ${v.sceneIndex + 1}</strong>
+        <div class="g-dialogue"><span class="speaker-name">${esc(v.speaker || 'Narrateur')}</span>« ${esc(v.narration)} »</div>
+      </div>
+    </div>
+  `).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// AUTOSAVE
-// ═══════════════════════════════════════════════════════════════
-let saveT=null;
-function scheduleSave(){if(saveT)clearTimeout(saveT);saveT=setTimeout(saveState,800);}
-function saveState(){
-try{
-const data={
-concept:state.concept,
-artStyleId:state.artStyle.id,
-selectedSymbols:state.selectedSymbols,
-customSymbols:state.customSymbols,
-voText:$('vo-text').value,voPunch:$('vo-punch').value,
-slots:state.slots.map(s=>({img:s.img,imgBase64:s.imgBase64,source:s.source,status:s.status,prompt:s.prompt,uploadDesc:s.uploadDesc})),
-videos:state.videos.map(v=>({url:v.url,videoId:v.videoId,effect:v.effect,duration:v.duration,promptOverride:v.promptOverride})),
-savedAt:Date.now()
-};
-localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
-flashAS();
-}catch(e){}
-}
-function loadState(){
-try{
-const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return false;
-const d=JSON.parse(raw);
-if(d.concept)state.concept=d.concept;
-if(d.artStyleId){const s=STYLES.find(x=>x.id===d.artStyleId);if(s)state.artStyle=s;}
-if(d.selectedSymbols)state.selectedSymbols=d.selectedSymbols;
-if(d.customSymbols!=null)state.customSymbols=d.customSymbols;
-if(d.voText!=null)$('vo-text').value=d.voText;
-if(d.voPunch!=null)$('vo-punch').value=d.voPunch;
-if(d.slots)d.slots.forEach((s,i)=>{if(state.slots[i]){Object.assign(state.slots[i],s);}});
-if(d.videos)d.videos.forEach((v,i)=>{if(state.videos[i]){Object.assign(state.videos[i],v);state.videos[i].status=v.url?'done':'idle';}});
-log('💾 Session restaurée','o');
-return true;
-}catch(e){return false;}
+function updateGenerateBtn() {
+  const btn = document.getElementById('generate-btn');
+  const hasKey = !!getApiKey();
+  const hasIdea = state.idea.trim().length >= 10;
+  btn.disabled = !hasKey || !hasIdea || state.isRunning;
+  
+  if (state.isRunning) btn.textContent = 'Création en cours…';
+  else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
+  else if (!hasIdea) btn.textContent = 'Décrivez votre idée (10 caractères min)';
+  else btn.textContent = `🎬 Créer le film (${state.sceneCount} plans)`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// EXPORT
-// ═══════════════════════════════════════════════════════════════
-async function downloadFile(url,filename){
-try{
-const res=await fetch(url);const blob=await res.blob();
-const obj=URL.createObjectURL(blob);
-const a=document.createElement('a');a.href=obj;a.download=filename;
-document.body.appendChild(a);a.click();document.body.removeChild(a);
-setTimeout(()=>URL.revokeObjectURL(obj),3000);
-return blob;
-}catch(e){window.open(url,'_blank');return null;}
-}
-async function downloadAllImages(){
-const ready=state.slots.filter(s=>s.img);
-if(!ready.length){toast('Aucune image','err');return;}
-for(const s of ready){
-if(s.source==='upload'&&s.imgBase64){
-const a=document.createElement('a');a.href=s.imgBase64;a.download='marxtok_scene'+(s.idx+1)+'_upload.png';
-document.body.appendChild(a);a.click();document.body.removeChild(a);
-}else if(s.img&&s.img.startsWith('http')){
-await downloadFile(s.img,'marxtok_scene'+(s.idx+1)+'.png');
-}
-await sleep(400);
-}
-toast('Images téléchargées','ok');
-}
-async function downloadAllVideos(){
-const ready=state.videos.filter(v=>v.url);
-if(!ready.length){toast('Aucune vidéo','err');return;}
-for(const v of ready){await downloadFile(v.url,'marxtok_video'+(v.idx+1)+'.mp4');await sleep(600);}
-toast('Vidéos téléchargées','ok');
-}
-function downloadScript(){
-const c=CONCEPTS_DB[state.concept]||{};
-let txt='═══════════════════════════════════════════\n';
-txt+='MARX//TOK v3.0 — '+state.concept+'\n';
-txt+='═══════════════════════════════════════════\n\n';
-txt+='Style : '+state.artStyle.name+'\n';
-txt+='Symboles : '+state.selectedSymbols.join(', ')+'\n\n';
-txt+='── VOIX-OFF ──\n'+(c.voice||$('vo-text').value)+'\n\n';
-txt+='── CHUTE ──\n'+(c.punch||$('vo-punch').value)+'\n\n';
-txt+='── SCÈNES ──\n';
-for(let i=0;i<3;i++){
-txt+='Scène '+(i+1)+' : '+(c['s'+(i+1)]||'')+'\n\n';
-}
-const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
-const url=URL.createObjectURL(blob);
-const a=document.createElement('a');a.href=url;a.download='marxtok_'+state.concept.replace(/\s+/g,'_')+'.txt';
-document.body.appendChild(a);a.click();document.body.removeChild(a);
-URL.revokeObjectURL(url);
-toast('Script téléchargé','ok');
-}
-async function downloadZip(){
-if(typeof JSZip==='undefined'){toast('JSZip manquant','err');return;}
-const zip=new JSZip();
-const folder=zip.folder('marxtok_'+state.concept.replace(/\s+/g,'_'));
-toast('Construction ZIP…','ok',3000);
-for(const s of state.slots){
-if(!s.img)continue;
-try{
-if(s.source==='upload'&&s.imgBase64){
-const res=await fetch(s.imgBase64);const b=await res.blob();
-folder.file('scene'+(s.idx+1)+'_upload.png',b);
-}else if(s.img.startsWith('http')){
-const res=await fetch(s.img);const b=await res.blob();
-folder.file('scene'+(s.idx+1)+'.png',b);
-}
-}catch(e){}
-}
-for(const v of state.videos){
-if(v.url){try{const res=await fetch(v.url);const b=await res.blob();folder.file('video'+(v.idx+1)+'.mp4',b);}catch(e){}}
-}
-const c=CONCEPTS_DB[state.concept]||{};
-let txt='MARX//TOK v3.0 — '+state.concept+'\nStyle : '+state.artStyle.name+'\n\nVOIX-OFF :\n'+(c.voice||'')+'\n\nCHUTE :\n'+(c.punch||'')+'\n\n';
-folder.file('script.txt',txt);
-folder.file('README.txt','Marx//Tok v3.0\nConcept : '+state.concept+'\nStyle : '+state.artStyle.name+'\nSymboles : '+state.selectedSymbols.join(', ')+'\nGénéré : '+new Date().toLocaleString('fr-FR'));
-const blob=await zip.generateAsync({type:'blob'});
-const url=URL.createObjectURL(blob);
-const a=document.createElement('a');a.href=url;a.download='marxtok_'+state.concept.replace(/\s+/g,'_')+'_'+Date.now()+'.zip';
-document.body.appendChild(a);a.click();document.body.removeChild(a);
-URL.revokeObjectURL(url);
-toast('ZIP téléchargé ✓','ok',4000);
-}
-function resetAll(){
-if(!confirm('Tout effacer ?'))return;
-state.slots.forEach(s=>{s.img=null;s.imgBase64=null;s.source=null;s.status='idle';s.prompt='';s.uploadDesc='';});
-state.videos.forEach((v,i)=>{v.url=null;v.status='idle';v.videoId=null;v.progress=0;v.promptOverride='';});
-state.slots[0].status='idle';
-try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
-renderSlots();renderVideos();
-toast('Réinitialisé','ok');
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE PRINCIPAL
+// ══════════════════════════════════════════════════════════════════
+async function startGeneration() {
+  if (state.isRunning) return;
+  if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
+  if (state.idea.trim().length < 10) { showToast('Idée trop courte', 'error'); return; }
+  
+  state.isRunning = true;
+  state.stopRequested = false;
+  state.images = [];
+  state.videos = [];
+  
+  document.getElementById('generate-btn').disabled = true;
+  document.getElementById('stop-btn').classList.add('visible');
+  document.getElementById('gallery').style.display = 'none';
+  document.getElementById('gallery-grid').innerHTML = '';
+  document.getElementById('images-grid').innerHTML = '';
+  
+  try {
+    await generateScenario();
+    if (state.stopRequested) throw new Error('Arrêté par l\'utilisateur');
+    
+    await generateImages();
+    if (state.stopRequested) throw new Error('Arrêté par l\'utilisateur');
+    
+    await generateVideos();
+    
+    setPhase('done', '✦ Film terminé avec succès ✦', '');
+    setStatus('Génération terminée');
+    showToast('Film généré avec succès !', 'success', 4000);
+    saveProject(); // Auto-save à la fin
+    
+  } catch (e) {
+    if (e.message === 'Arrêté par l\'utilisateur' || e.message === 'Arrêt demandé') {
+      showToast('Génération arrêtée', 'warn');
+      setPhase('done', '⏹ Génération arrêtée', '');
+    } else {
+      debugLog('error', 'GLOBAL', e.message);
+      showToast('Erreur : ' + e.message.slice(0, 80), 'error', 5000);
+      setStatus('Erreur');
+    }
+  } finally {
+    state.isRunning = false;
+    state.stopRequested = false;
+    document.getElementById('stop-btn').classList.remove('visible');
+    updateGenerateBtn();
+  }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ACCORDÉON
-// ═══════════════════════════════════════════════════════════════
-document.querySelectorAll('[data-t]').forEach(h=>{
-h.addEventListener('click',()=>document.getElementById(h.dataset.t).classList.toggle('open'));
-});
-
-// ═══════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════
-function loadConcept(){
-const c=CONCEPTS_DB[state.concept];
-if(c){
-$('vo-text').value=c.voice||'';
-$('vo-punch').value=c.punch||'';
-}
-}
-
-function init(){
-loadKey();
-loadState();
-renderStyles();
-renderSymbols();
-loadConcept();
-renderSlots();
-renderVideos();
-$('custom-symbols').value=state.customSymbols||'';
-
-$('concept-select').value=state.concept;
-$('concept-select').addEventListener('change',()=>{
-state.concept=$('concept-select').value;
-loadConcept();
-scheduleSave();
-log('Concept : '+state.concept,'i');
-});
-
-$('custom-symbols').addEventListener('input',()=>{state.customSymbols=$('custom-symbols').value;scheduleSave();});
-$('api-save').addEventListener('click',saveKey);
-$('batch-videos').addEventListener('click',batchVideos);
-$('dl-all').addEventListener('click',downloadAllImages);
-$('dl-videos').addEventListener('click',downloadAllVideos);
-$('dl-zip').addEventListener('click',downloadZip);
-$('dl-script').addEventListener('click',downloadScript);
-$('reset-all').addEventListener('click',resetAll);
-
-loadVoices();
-if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=loadVoices;
-$('tts-play').addEventListener('click',ttsPlay);
-$('tts-stop').addEventListener('click',ttsStop);
-$('mus-play').addEventListener('click',startDrone);
-$('mus-stop').addEventListener('click',stopDrone);
-$('mus-record').addEventListener('click',recordDrone);
-
-['vo-text','vo-punch'].forEach(id=>{const el=$(id);if(el)el.addEventListener('input',scheduleSave);});
-
-setInterval(()=>{if(!state.isBusy)saveState();},5000);
-window.addEventListener('beforeunload',saveState);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)saveState();});
-
-log('MARX//TOK v3.0 prêt','o');
-log('🔒 Mode SANS VISAGE actif · 60 symboles · 36 concepts','cp');
-}
-
-init();
+// ══════════════════════════════════════════════════════════════════
+// INITIALISATION
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+  // API Key
+  const savedKey = getApiKey();
+  if (savedKey) {
+    document.getElementById('api-key-input').value = savedKey;
+    document.getElementById('api-status-line').classList.add('ok');
+    document.getElementById('api-status-text').textContent = 'Clé active · ' + savedKey.slice(0, 8) + '…';
+  }
+  
+  document.getElementById('api-save-btn').addEventListener('click', () => {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (key) {
+      localStorage.setItem('agnes_api_key', key);
+      document.getElementById('api-status-line').classList.add('ok');
+      document.getElementById('api-status-text').textContent = 'Clé active · ' + key.slice(0, 8) + '…';
+      showToast('Clé API enregistrée', 'success');
+    } else {
+      localStorage.removeItem('agnes_api_key');
+      document.getElementById('api-status-line').classList.remove('ok');
+      document.getElementById('api-status-text').textContent = 'Aucune clé API enregistrée';
+      showToast('Clé supprimée', 'warn');
+    }
+    updateGenerateBtn();
+  });
+  
+  // Inputs
+  document.getElementById('idea-input').addEventListener('input', e => { state.idea = e.target.value; updateGenerateBtn(); });
+  document.getElementById('lang-select').addEventListener('change', e => { state.lang = e.target.value; });
+  document.getElementById('style-select').addEventListener('change', e => { state.style = e.target.value; });
+  document.getElementById('scene-count-select').addEventListener('change', e => { state.sceneCount = parseInt(e.target.value); updateGenerateBtn(); });
+  document.getElementById('duration-select').addEventListener('change', e => { state.durationFrames = parseInt(e.target.value); updateGenerateBtn(); });
+  
+  // Actions
+  document.getElementById('generate-btn').addEventListener('click', startGeneration);
+  document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; setStatus('Arrêt en cours…'); });
+  document.getElementById('save-btn').addEventListener('click', saveProject);
+  document.getElementById('new-btn').addEventListener('click', newProject);
+  
+  // Debug toggle
+  document.getElementById('debug-header').addEventListener('click', () => {
+    document.getElementById('debug-panel').classList.toggle('collapsed');
+  });
+  
+  // Accordéons
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      document.getElementById(header.dataset.toggle).classList.toggle('open');
+    });
+  });
+  
+  renderProjectList();
+  updateGenerateBtn();
+  debugLog('info', 'SYSTEM', 'Studio initialisé. Prêt à créer.');
+})();
 </script>
 </body>
 </html>
