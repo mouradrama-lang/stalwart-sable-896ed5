@@ -67,7 +67,6 @@ h1 { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 300; letter
 .api-status-line .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
 .api-status-line.ok .status-dot { background: var(--success); box-shadow: 0 0 8px var(--success); }
 
-/* SAVE SYSTEM UI */
 .save-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
 .save-bar input { flex: 1; min-width: 140px; padding: 0.7rem 0.9rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.85rem; }
 .save-bar input:focus { outline: none; border-color: var(--lavender); }
@@ -137,15 +136,16 @@ select:focus { outline: none; border-color: var(--blue); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hidden { display: none !important; }
 
-.debug-panel { position: fixed; bottom: 0; left: 0; right: 0; height: 200px; background: #05050a; border-top: 2px solid var(--yellow-deep); z-index: 200; display: flex; flex-direction: column; font-family: var(--font-mono); transition: height 0.3s ease; }
+.debug-panel { position: fixed; bottom: 0; left: 0; right: 0; height: 250px; background: #05050a; border-top: 2px solid var(--error); z-index: 200; display: flex; flex-direction: column; font-family: var(--font-mono); transition: height 0.3s ease; }
 .debug-panel.collapsed { height: 36px; }
-.debug-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.8rem; background: linear-gradient(90deg, #0f0f18, #1a1a28); border-bottom: 1px solid var(--border); flex-shrink: 0; cursor: pointer; }
-.debug-title { font-size: 0.72rem; color: var(--yellow); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; }
+.debug-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.8rem; background: linear-gradient(90deg, #1a0a0a, #2a1a1a); border-bottom: 1px solid var(--border); flex-shrink: 0; cursor: pointer; }
+.debug-title { font-size: 0.72rem; color: var(--error); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; }
 .debug-body { flex: 1; overflow-y: auto; padding: 0.5rem 0.7rem 1rem; font-size: 0.72rem; line-height: 1.45; color: #c8c8d0; }
 .debug-entry { margin-bottom: 0.3rem; padding: 0.25rem 0.4rem; border-left: 2px solid transparent; border-radius: 2px; word-break: break-word; }
 .debug-entry.info { border-left-color: var(--ink-faint); }
 .debug-entry.success { border-left-color: var(--success); background: rgba(74,157,106,0.04); }
-.debug-entry.error { border-left-color: var(--error); background: rgba(200,90,74,0.06); color: #f0a0a0; }
+.debug-entry.error { border-left-color: var(--error); background: rgba(200,90,74,0.1); color: #f0a0a0; }
+.debug-entry.warn { border-left-color: var(--warn); background: rgba(212,160,23,0.04); }
 .debug-time { color: var(--ink-faint); margin-right: 0.5rem; font-size: 0.65rem; }
 .debug-cat { color: var(--yellow-soft); font-weight: 600; margin-right: 0.4rem; font-size: 0.65rem; }
 </style>
@@ -155,16 +155,14 @@ select:focus { outline: none; border-color: var(--blue); }
 <header>
   <h1>Short Drama Studio</h1>
   <p class="subtitle">Générateur de documentaires éducatifs cinématographiques</p>
- has been updated to reflect the new focus.
 </header>
 
-<!-- ═══ SYSTÈME DE SAUVEGARDE ═══ -->
 <div class="save-bar">
-  <input type="text" id="project-name-input" placeholder="Nom du projet (ex: Lutte des classes)" value="Mon Projet">
+  <input type="text" id="project-name-input" placeholder="Nom du projet" value="Mon Projet">
   <button type="button" class="primary" id="save-btn">💾 Sauvegarder</button>
   <button type="button" id="new-btn">✨ Nouveau</button>
 </div>
-<div class="section" id="projects-section">
+<div class="section open" id="projects-section">
   <div class="section-header" data-toggle="projects-section">
     <span class="section-title">📂 Projets enregistrés <span class="badge" id="project-count">0</span></span>
     <span class="chevron">▼</span>
@@ -207,7 +205,7 @@ select:focus { outline: none; border-color: var(--blue); }
         <option value="fr" selected>🇫🇷 Français (Pédagogique)</option>
         <option value="ar">🇸🇦 Arabe Classique (Fusha)</option>
         <option value="dz">🇩🇿 Darija Algérienne</option>
-      </a>
+      </select>
     </div>
     <div class="control-row">
       <label class="control-label">Style visuel (Style Lock)</label>
@@ -226,14 +224,6 @@ select:focus { outline: none; border-color: var(--blue); }
         <option value="8">8 scènes (Développé ~55s)</option>
       </select>
     </div>
-    <div class="control-row">
-      <label class="control-label">Durée par plan (CORRIGÉ : multiples de 8)</label>
-      <select id="duration-select">
-        <option value="120">5 secondes (120 frames)</option>
-        <option value="240" selected>10 secondes (240 frames)</option>
-        <option value="360">15 secondes (360 frames)</option>
-      </select>
-    </div>
   </div></div>
 </div>
 
@@ -243,11 +233,10 @@ select:focus { outline: none; border-color: var(--blue); }
 <div class="phase-bar" id="phase-bar">
   <div class="phase-steps">
     <div class="phase-step" data-phase="scenario">1 · Scénario</div>
-    <div class="phase-step" data-phase="narration">2 · Narration</div>
-    <div class="phase-step" data-phase="images">3 · Images</div>
-    <div class="phase-step" data-phase="videos">4 · Vidéos</div>
-    <div class="phase-step" data-phase="done">5 · Terminé</div>
-    </div>
+    <div class="phase-step" data-phase="images">2 · Images</div>
+    <div class="phase-step" data-phase="videos">3 · Vidéos</div>
+    <div class="phase-step" data-phase="done">4 · Terminé</div>
+  </div>
   <div class="phase-info">
     <span id="phase-detail">En attente</span>
     <span id="phase-eta"></span>
@@ -275,7 +264,7 @@ select:focus { outline: none; border-color: var(--blue); }
 
 <div class="debug-panel collapsed" id="debug-panel">
   <div class="debug-header" id="debug-header">
-    <div class="debug-title">🖥️ Console de débogage</div>
+    <div class="debug-title">🖥️ Console de débogage (s'ouvre automatiquement en cas d'erreur)</div>
   </div>
   <div class="debug-body" id="debug-body"></div>
 </div>
@@ -289,7 +278,6 @@ const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
 const MODEL_TEXT = 'agnes-2.5-flash';
 const MODEL_IMAGE = 'agnes-image-2.5-flash';
 const MODEL_VIDEO = 'agnes-video-v2.0';
-const FRAME_RATE = 24;
 const SAVE_KEY = 'short_drama_projects_v1';
 
 const STYLE_PRESETS = {
@@ -320,7 +308,6 @@ const state = {
   lang: 'fr',
   style: 'social',
   sceneCount: 6,
-  durationFrames: 240,
   isRunning: false,
   stopRequested: false,
   phase: 'idle',
@@ -347,9 +334,14 @@ function debugLog(level, category, message) {
   body.appendChild(entry);
   debugCount++;
   body.scrollTop = body.scrollHeight;
+  
+  // Ouvrir automatiquement la console en cas d'erreur
+  if (level === 'error') {
+    document.getElementById('debug-panel').classList.remove('collapsed');
+  }
 }
 
-function showToast(message, type = 'success', duration = 3000) {
+function showToast(message, type = 'success', duration = 4000) {
   const toast = document.getElementById('toast');
   const text = document.getElementById('toast-text');
   toast.className = 'toast visible ' + type;
@@ -368,7 +360,7 @@ function setPhase(phase, detail, eta) {
   state.phase = phase;
   document.getElementById('phase-bar').classList.add('visible');
   document.querySelectorAll('.phase-step').forEach(el => {
-    const order = ['scenario', 'narration', 'images', 'videos', 'done'];
+    const order = ['scenario', 'images', 'videos', 'done'];
     const curIdx = order.indexOf(phase);
     const elIdx = order.indexOf(el.dataset.phase);
     el.classList.remove('active', 'done');
@@ -398,7 +390,7 @@ function saveProject() {
     id, name,
     savedAt: Date.now(),
     idea: state.idea, lang: state.lang, style: state.style,
-    sceneCount: state.sceneCount, durationFrames: state.durationFrames,
+    sceneCount: state.sceneCount,
     scenario: state.scenario, images: state.images, videos: state.videos
   };
   
@@ -408,7 +400,7 @@ function saveProject() {
     showToast('Projet « ' + name + ' » sauvegardé', 'success');
     debugLog('success', 'SAVE', 'Projet sauvegardé : ' + name);
   } catch (e) {
-    showToast('Erreur de sauvegarde (quota ?)', 'error');
+    showToast('Erreur de sauvegarde (quota localStorage ?)', 'error');
   }
 }
 
@@ -423,18 +415,15 @@ function loadProject(id) {
   state.lang = p.lang || 'fr';
   state.style = p.style || 'social';
   state.sceneCount = p.sceneCount || 6;
-  state.durationFrames = p.durationFrames || 240;
   state.scenario = p.scenario || null;
   state.images = p.images || [];
   state.videos = p.videos || [];
   
-  // Update UI
   document.getElementById('project-name-input').value = state.projectName;
   document.getElementById('idea-input').value = state.idea;
   document.getElementById('lang-select').value = state.lang;
   document.getElementById('style-select').value = state.style;
   document.getElementById('scene-count-select').value = state.sceneCount;
-  document.getElementById('duration-select').value = state.durationFrames;
   
   if (state.scenario) {
     renderScenario();
@@ -444,7 +433,6 @@ function loadProject(id) {
   
   updateGenerateBtn();
   showToast('Projet « ' + state.projectName + ' » chargé', 'success');
-  debugLog('success', 'LOAD', 'Projet chargé : ' + state.projectName);
 }
 
 function deleteProject(id, event) {
@@ -487,8 +475,7 @@ function renderProjectList() {
       </div>
       <div class="p-actions">
         <button onclick="deleteProject('${id}', event)">🗑</button>
-     .
-</div>
+      </div>
     </div>`;
   }).join('');
 }
@@ -526,7 +513,7 @@ STYLE VISUEL (LOCK) : ${styleDesc}
 LANGUE : ${langInstruction}
 
 RÈGLES ABSOLUES :
-1. Pas de caricature, pas de propagande, pas de stéréotypes (ni "méchant patron", ni "ouvrier héroïque"). Représentation réaliste et neutre.
+1. Pas de caricature, pas de propagande, pas de stéréotypes. Représentation réaliste et neutre.
 2. Progression visuelle obligatoire pour éviter la répétition :
 ${progressionText}
 3. Chaque scène doit apporter une nouvelle information visuelle.
@@ -557,29 +544,41 @@ async function generateScenario() {
     model: MODEL_TEXT,
     messages: [{ role: 'user', content: buildScenarioPrompt() }],
     temperature: 0.7,
-    max_tokens: 4000,
-    response_format: { type: 'json_object' }
+    max_tokens: 4000
   };
   
+  debugLog('info', 'API', 'Envoi de la requête Scénario...');
   const res = await fetch(API_BASE + '/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   
-  if (!res.ok) throw new Error('Erreur API Scénario: ' + res.status);
-  const data = await res.json();
-  const content = data.choices[0].message.content;
+  const responseText = await res.text();
+  if (!res.ok) {
+    debugLog('error', 'API SCÉNARIO', `HTTP ${res.status}: ${responseText.slice(0, 300)}`);
+    throw new Error(`Erreur API Scénario (${res.status}) : ${responseText.slice(0, 150)}`);
+  }
   
-  // Nettoyage robuste du JSON
-  let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-  const first = cleaned.indexOf('{');
-  const last = cleaned.lastIndexOf('}');
-  if (first !== -1 && last !== -1) cleaned = cleaned.substring(first, last + 1);
+  debugLog('success', 'API', 'Réponse Scénario reçue');
   
-  state.scenario = JSON.parse(cleaned);
+  try {
+    let data = JSON.parse(responseText);
+    let content = data.choices[0].message.content;
+    
+    // Nettoyage robuste du JSON
+    let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    const first = cleaned.indexOf('{');
+    const last = cleaned.lastIndexOf('}');
+    if (first !== -1 && last !== -1) cleaned = cleaned.substring(first, last + 1);
+    
+    state.scenario = JSON.parse(cleaned);
+  } catch (e) {
+    debugLog('error', 'PARSE', `Échec du parsing JSON: ${e.message}`);
+    debugLog('error', 'RAW', responseText.slice(0, 500));
+    throw new Error('L\'IA n\'a pas renvoyé un JSON valide. Vérifie la console en bas.');
+  }
   
-  // Ajustement du nombre de scènes
   if (state.scenario.scenes.length > state.sceneCount) {
     state.scenario.scenes = state.scenario.scenes.slice(0, state.sceneCount);
   }
@@ -609,12 +608,23 @@ async function generateImages() {
       body: JSON.stringify({ model: MODEL_IMAGE, prompt, size: '576x1024', extra_body: { response_format: 'url' } })
     });
     
-    if (!res.ok) throw new Error('Erreur API Image: ' + res.status);
-    const data = await res.json();
-    const url = data.data[0].url || `data:image/png;base64,${data.data[0].b64_json}`;
+    const responseText = await res.text();
+    if (!res.ok) {
+      debugLog('error', 'API IMAGE', `HTTP ${res.status}: ${responseText.slice(0, 300)}`);
+      throw new Error(`Erreur API Image (${res.status})`);
+    }
     
-    state.images.push({ sceneIndex: i, url, prompt });
-    renderImagesGrid();
+    try {
+      const data = JSON.parse(responseText);
+      const url = data.data[0].url || `data:image/png;base64,${data.data[0].b64_json}`;
+      state.images.push({ sceneIndex: i, url, prompt });
+      renderImagesGrid();
+      debugLog('success', 'IMAGE', `Scène ${i + 1} générée`);
+    } catch (e) {
+      debugLog('error', 'PARSE IMAGE', responseText.slice(0, 300));
+      throw new Error('Erreur de format de réponse image');
+    }
+    
     await sleep(1500); // Respect des limites API
   }
   debugLog('success', 'IMAGES', 'Toutes les images clés sont prêtes');
@@ -632,20 +642,16 @@ async function generateVideos() {
     const img = state.images[i];
     const scene = state.scenario.scenes[i];
     
-    // Pour la vidéo, on utilise la même image comme début et fin pour un plan stable, 
-    // ou on pourrait générer une 2ème image. Ici, on utilise l'astuce du "motion prompt" sur une image.
     const videoPrompt = `${scene.action}. Camera movement: slow and elegant cinematic motion. Style: ${STYLE_PRESETS[state.style]}. No text, no watermark, continuous shot.`;
     
     setStatus(`Vidéo ${i + 1}/${total} (En file d'attente)`);
     debugLog('info', 'VIDEO', `Création tâche scène ${i + 1}`);
     
-    // Correction définitive : num_frames est un multiple de 8 (120, 240, 360)
+    // CORRECTION DÉFINITIVE : Suppression de num_frames pour laisser l'API utiliser sa valeur par défaut sécurisée
     const body = {
       model: MODEL_VIDEO,
       prompt: videoPrompt,
-      extra_body: { image: [img.url, img.url], mode: 'keyframes' }, // Début et fin identiques pour un plan stable, l'IA anime entre les deux
-      num_frames: state.durationFrames,
-      frame_rate: FRAME_RATE,
+      extra_body: { image: [img.url, img.url], mode: 'keyframes' },
       height: 1024,
       width: 576
     };
@@ -656,14 +662,18 @@ async function generateVideos() {
       body: JSON.stringify(body)
     });
     
+    const responseText = await res.text();
     if (!res.ok) {
-      const err = await res.text();
-      throw new Error('Erreur API Vidéo: ' + res.status + ' - ' + err.slice(0, 100));
+      debugLog('error', 'API VIDEO', `HTTP ${res.status}: ${responseText.slice(0, 300)}`);
+      throw new Error(`Erreur API Vidéo (${res.status})`);
     }
     
-    const data = await res.json();
+    let data;
+    try { data = JSON.parse(responseText); } 
+    catch (e) { throw new Error('Réponse vidéo non JSON: ' + responseText.slice(0, 100)); }
+    
     const videoId = data.video_id;
-    if (!videoId) throw new Error('Pas de video_id retourné');
+    if (!videoId) throw new Error('Pas de video_id retourné par l\'API');
     
     // Polling
     let attempts = 0;
@@ -796,6 +806,7 @@ async function startGeneration() {
   document.getElementById('gallery').style.display = 'none';
   document.getElementById('gallery-grid').innerHTML = '';
   document.getElementById('images-grid').innerHTML = '';
+  document.getElementById('debug-panel').classList.add('collapsed'); // Reset debug panel
   
   try {
     await generateScenario();
@@ -817,8 +828,8 @@ async function startGeneration() {
       setPhase('done', '⏹ Génération arrêtée', '');
     } else {
       debugLog('error', 'GLOBAL', e.message);
-      showToast('Erreur : ' + e.message.slice(0, 80), 'error', 5000);
-      setStatus('Erreur');
+      showToast('Erreur : ' + e.message.slice(0, 100), 'error', 6000);
+      setStatus('Erreur - Vérifiez la console en bas');
     }
   } finally {
     state.isRunning = false;
@@ -832,7 +843,6 @@ async function startGeneration() {
 // INITIALISATION
 // ══════════════════════════════════════════════════════════════════
 (function init() {
-  // API Key
   const savedKey = getApiKey();
   if (savedKey) {
     document.getElementById('api-key-input').value = savedKey;
@@ -856,25 +866,20 @@ async function startGeneration() {
     updateGenerateBtn();
   });
   
-  // Inputs
   document.getElementById('idea-input').addEventListener('input', e => { state.idea = e.target.value; updateGenerateBtn(); });
   document.getElementById('lang-select').addEventListener('change', e => { state.lang = e.target.value; });
   document.getElementById('style-select').addEventListener('change', e => { state.style = e.target.value; });
   document.getElementById('scene-count-select').addEventListener('change', e => { state.sceneCount = parseInt(e.target.value); updateGenerateBtn(); });
-  document.getElementById('duration-select').addEventListener('change', e => { state.durationFrames = parseInt(e.target.value); updateGenerateBtn(); });
   
-  // Actions
   document.getElementById('generate-btn').addEventListener('click', startGeneration);
   document.getElementById('stop-btn').addEventListener('click', () => { state.stopRequested = true; setStatus('Arrêt en cours…'); });
   document.getElementById('save-btn').addEventListener('click', saveProject);
   document.getElementById('new-btn').addEventListener('click', newProject);
   
-  // Debug toggle
   document.getElementById('debug-header').addEventListener('click', () => {
     document.getElementById('debug-panel').classList.toggle('collapsed');
   });
   
-  // Accordéons
   document.querySelectorAll('[data-toggle]').forEach(header => {
     header.addEventListener('click', () => {
       document.getElementById(header.dataset.toggle).classList.toggle('open');
