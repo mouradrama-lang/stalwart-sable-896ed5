@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fable Interactive — Choisis ta destinée</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #0a0612; --bg-2: #12102a; --panel: #1a1530; --panel-2: #252040;
+  --border: #2e2650; --border-soft: #241e3a;
+  --gold: #d4af37; --gold-soft: #e8c468; --gold-deep: #8a6f1e;
+  --violet: #8b5cf6; --violet-soft: #a880ff; --violet-deep: #4a2a8a;
+  --rose: #e05f8c; --rose-soft: #ff8aae;
+  --mint: #5ecba8; --mint-soft: #7ee0c0;
+  --ink: #ede4d4; --ink-dim: #9a8a70; --ink-faint: #5a4f3e;
+  --success: #7a9d5a; --error: #b85540; --warn: #c9954a;
+  --radius: 4px;
+  --font-serif: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+html, body { background: var(--bg); overscroll-behavior: none; }
+body {
+  font-family: var(--font-sans); background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(139,92,246,0.1) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 100%, rgba(212,175,55,0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(224,95,140,0.03) 0%, transparent 60%);
+  background-attachment: fixed; color: var(--ink); min-height: 100vh;
+  padding: 1.3rem 1rem 22rem; font-size: 15px; line-height: 1.55;
+  max-width: 900px; margin: 0 auto; letter-spacing: 0.01em;
+}
+header { margin-bottom: 1.6rem; text-align: center; position: relative; padding: 1.3rem 0 1.5rem; }
+header::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 70px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+header::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 160px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--violet), var(--gold), var(--rose), transparent);
+  opacity: 0.5; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.45em;
+  color: var(--gold); text-transform: uppercase; margin-bottom: 0.8rem; opacity: 0.75; }
+h1 { font-family: var(--font-display); font-size: 2.3rem; font-weight: 700;
+  letter-spacing: 0.04em; margin-bottom: 0.5rem; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 30%, var(--violet-soft) 70%, var(--rose-soft) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; line-height: 1.05;
+  filter: drop-shadow(0 0 20px rgba(212,175,55,0.2)); }
+.subtitle { font-family: var(--font-serif); font-size: 1rem;
+  color: var(--ink-dim); font-style: italic; letter-spacing: 0.06em; }
+.ornament { font-family: var(--font-serif); font-size: 0.85rem;
+  color: var(--gold); letter-spacing: 0.5em; margin-top: 0.7rem; opacity: 0.55; }
+
+.toast {
+  position: fixed; top: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  background: var(--panel); color: var(--ink);
+  border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  padding: 0.85rem 1.4rem; border-radius: var(--radius);
+  font-size: 0.85rem; font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  z-index: 1000; opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1.2), opacity 0.35s ease;
+  max-width: 90vw; text-align: center;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--error); }
+.toast.warn { border-left-color: var(--warn); }
+.toast .toast-icon { font-size: 1rem; color: var(--gold); }
+
+.info-banner {
+  background: linear-gradient(135deg, rgba(212,175,55,0.05), rgba(139,92,246,0.05));
+  border: 1px solid var(--border); border-left: 2px solid var(--gold);
+  padding: 1rem 1.15rem; border-radius: var(--radius);
+  font-size: 0.79rem; color: var(--ink-dim);
+  margin-bottom: 1rem; line-height: 1.6; position: relative;
+}
+.info-banner::before { content: '✧'; position: absolute; top: 0.5rem; right: 0.9rem;
+  font-size: 1.4rem; color: var(--gold); opacity: 0.3; }
+.info-banner strong { color: var(--ink); font-weight: 600; }
+.info-banner strong.hl-gold { color: var(--gold-soft); }
+.info-banner strong.hl-violet { color: var(--violet-soft); }
+.info-banner strong.hl-rose { color: var(--rose-soft); }
+.info-banner strong.hl-mint { color: var(--mint-soft); }
+
+.section {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 0.9rem; overflow: hidden;
+}
+.section.open { box-shadow: 0 0 0 1px rgba(212,175,55,0.08), 0 4px 20px rgba(0,0,0,0.35); }
+.section-header {
+  padding: 0.95rem 1.1rem; cursor: pointer; user-select: none;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-header:active { background: var(--panel-2); }
+.section-title {
+  font-family: var(--font-display); font-size: 0.8rem;
+  text-transform: uppercase; letter-spacing: 0.18em;
+  color: var(--ink); font-weight: 500;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.section-title .badge {
+  display: inline-block; padding: 0.12rem 0.5rem;
+  background: transparent; color: var(--gold);
+  border: 1px solid var(--gold-deep); border-radius: 2px;
+  font-size: 0.56rem; letter-spacing: 0.15em;
+  font-family: var(--font-sans); font-weight: 700;
+}
+.section-title .badge.violet { color: var(--violet-soft); border-color: var(--violet-deep); }
+.section-title .badge.success { color: var(--gold-soft); border-color: var(--gold-deep); }
+.section-title .badge.err { color: var(--error); border-color: #6a3020; }
+.section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.3s; }
+.section.open .section-header .chevron { transform: rotate(180deg); color: var(--gold); }
+.section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.section.open .section-body { max-height: 8000px; }
+.section-content { padding: 0 1.1rem 1.1rem; }
+
+.api-panel {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.1rem 1.2rem; margin-bottom: 1rem;
+}
+.api-panel.ok { box-shadow: inset 3px 0 0 var(--success); }
+.api-key-input {
+  width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-2);
+  color: var(--ink); font-family: var(--font-mono); font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+}
+.api-key-input:focus { outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.12); }
+.api-save-btn {
+  width: 100%; padding: 0.85rem 1.2rem; border-radius: var(--radius);
+  border: 1px solid var(--gold-deep);
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(232,196,104,0.1));
+  color: var(--gold-soft); font-family: var(--font-display);
+  font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  cursor: pointer; margin-bottom: 0.6rem;
+}
+.api-status-line {
+  font-size: 0.74rem; padding: 0.55rem 0.85rem; border-radius: var(--radius);
+  display: flex; align-items: center; gap: 0.55rem;
+  background: var(--bg-2); color: var(--ink-dim);
+  border: 1px solid var(--border-soft);
+}
+.api-status-line.ok {
+  background: rgba(122,157,90,0.08); color: var(--success);
+  border-color: rgba(122,157,90,0.3); font-weight: 600;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink-faint); flex-shrink: 0; }
+.api-status-line.ok .status-dot { background: var(--success);
+  box-shadow: 0 0 8px var(--success); }
+.api-hint { font-size: 0.7rem; color: var(--ink-dim); margin-top: 0.5rem; }
+.api-hint a { color: var(--gold-soft); text-decoration: none;
+  border-bottom: 1px dotted var(--gold-deep); }
+.stat-line { font-size: 0.7rem; color: var(--ink-dim); margin-top: 0.5rem;
+  padding: 0.45rem 0.7rem; background: var(--bg-2); border-radius: var(--radius);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem;
+  border: 1px solid var(--border-soft); font-family: var(--font-mono); }
+.wake-status { font-size: 0.7rem; padding: 0.55rem 0.75rem;
+  border-radius: var(--radius); margin-top: 0.45rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(139,92,246,0.08); color: var(--violet-soft);
+  border: 1px solid var(--violet-deep); flex-wrap: wrap; gap: 0.5rem; }
+.wake-status.active { background: rgba(122,157,90,0.08);
+  color: var(--success); border-color: rgba(122,157,90,0.3); }
+.wake-status.warn { background: rgba(212,175,55,0.08);
+  color: var(--warn); border-color: var(--gold-deep); }
+.wake-status button { background: transparent; border: 1px solid currentColor;
+  color: inherit; padding: 0.3rem 0.65rem; border-radius: var(--radius);
+  font-size: 0.66rem; cursor: pointer; letter-spacing: 0.05em; font-weight: 600; }
+
+/* SETUP SCREEN */
+.setup-screen { display: block; }
+.setup-screen.hidden { display: none; }
+.premise-textarea {
+  width: 100%; min-height: 100px; padding: 0.9rem 1rem;
+  border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--bg-2); color: var(--ink);
+  font-family: var(--font-serif); font-size: 0.95rem; line-height: 1.55;
+  resize: vertical; font-style: italic;
+}
+.premise-textarea:focus { outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.12); }
+.premise-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+.premise-chip {
+  padding: 0.4rem 0.75rem; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg-2);
+  color: var(--ink-dim); font-size: 0.7rem; cursor: pointer;
+  transition: all 0.15s; font-family: var(--font-serif); font-style: italic;
+}
+.premise-chip:hover { color: var(--gold-soft); border-color: var(--gold-deep);
+  background: rgba(212,175,55,0.05); }
+
+.universes-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem; margin-top: 0.6rem;
+}
+.universe-card {
+  padding: 0.7rem 0.8rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-2);
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.universe-card:hover { border-color: var(--border); background: var(--panel-2); }
+.universe-card.selected {
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(139,92,246,0.06));
+  border-color: var(--gold); color: var(--gold-soft);
+  box-shadow: 0 0 16px rgba(212,175,55,0.12);
+}
+.universe-card .u-emoji { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+.universe-card .u-name { font-family: var(--font-serif); font-size: 0.82rem; font-weight: 500; }
+
+/* GAME SCREEN */
+.game-screen { display: none; }
+.game-screen.visible { display: block; }
+
+.scene-player {
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); background: #000;
+  position: relative; margin-bottom: 1rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,175,55,0.1);
+}
+.scene-player video {
+  width: 100%; display: block; aspect-ratio: 9/16;
+  object-fit: cover; background: #000;
+}
+.scene-player .sp-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  justify-content: flex-end; pointer-events: none;
+  padding: 1.5rem 1.2rem;
+  background: linear-gradient(transparent 40%, rgba(0,0,0,0.85));
+}
+.scene-player .sp-chapter {
+  font-family: var(--font-mono); font-size: 0.62rem;
+  letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase;
+  margin-bottom: 0.4rem; opacity: 0.85;
+}
+.scene-player .sp-title {
+  font-family: var(--font-display); font-size: 1.3rem;
+  font-weight: 700; color: var(--ink); text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 0.5rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+}
+.scene-player .sp-narration {
+  font-family: var(--font-serif); font-size: 1rem;
+  font-style: italic; color: var(--ink); line-height: 1.5;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.9);
+}
+
+/* SCENE PENDING */
+.scene-pending {
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border); background: var(--bg-2);
+  aspect-ratio: 9/16; position: relative;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1.5rem; margin-bottom: 1rem; text-align: center;
+}
+.scene-pending .sp-spinner {
+  width: 52px; height: 52px;
+  border: 3px solid var(--border-soft);
+  border-top-color: var(--gold);
+  border-radius: 50%; animation: spin 1.1s linear infinite;
+  margin-bottom: 1rem;
+}
+.scene-pending .sp-pending-title {
+  font-family: var(--font-display); font-size: 1.1rem;
+  color: var(--gold-soft); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 0.5rem;
+}
+.scene-pending .sp-pending-step {
+  font-size: 0.75rem; color: var(--ink-dim);
+  font-family: var(--font-serif); font-style: italic;
+  margin-bottom: 0.9rem; max-width: 260px;
+}
+.scene-pending .sp-pending-bar {
+  width: 60%; max-width: 260px; height: 3px;
+  background: var(--bg); border-radius: 2px; overflow: hidden;
+  margin-bottom: 0.7rem;
+}
+.scene-pending .sp-pending-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--violet));
+  border-radius: 2px; transition: width 0.5s ease;
+}
+.scene-pending .sp-pending-eta {
+  font-size: 0.68rem; color: var(--ink-faint);
+  font-family: var(--font-mono);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* CHOICES */
+.choices-title {
+  font-family: var(--font-display); font-size: 0.85rem;
+  text-transform: uppercase; letter-spacing: 0.2em;
+  color: var(--gold); text-align: center;
+  margin-bottom: 0.9rem; padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border-soft);
+  position: relative;
+}
+.choices-title::before, .choices-title::after {
+  content: '❦'; color: var(--gold); opacity: 0.5;
+  margin: 0 0.5rem; font-size: 0.7rem;
+}
+.choices-list {
+  display: flex; flex-direction: column; gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+.choice-btn {
+  padding: 1rem 1.1rem;
+  background: linear-gradient(135deg, rgba(212,175,55,0.06), rgba(139,92,246,0.04));
+  border: 1px solid var(--border); border-left: 3px solid var(--violet);
+  border-radius: var(--radius); color: var(--ink);
+  font-family: var(--font-serif); font-size: 0.98rem;
+  text-align: left; cursor: pointer; transition: all 0.2s;
+  line-height: 1.45; font-style: italic;
+  position: relative;
+}
+.choice-btn:hover {
+  border-color: var(--gold);
+  border-left-color: var(--gold);
+  background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(139,92,246,0.06));
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(212,175,55,0.12);
+}
+.choice-btn:active { transform: scale(0.99); }
+.choice-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.choice-btn .cb-num {
+  font-family: var(--font-mono); font-size: 0.68rem;
+  letter-spacing: 0.2em; color: var(--gold);
+  text-transform: uppercase; display: block; margin-bottom: 0.25rem;
+}
+.choice-btn .cb-text { color: var(--ink); display: block; }
+.choice-btn .cb-hint {
+  font-size: 0.68rem; color: var(--ink-faint);
+  font-style: normal; font-family: var(--font-sans);
+  margin-top: 0.35rem; display: block;
+}
+
+/* ENDING */
+.ending-card {
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(139,92,246,0.08));
+  border: 1px solid var(--gold-deep);
+  border-radius: var(--radius); padding: 1.4rem 1.3rem;
+  margin-bottom: 1rem; text-align: center;
+}
+.ending-card .ec-mark {
+  font-size: 2rem; color: var(--gold); opacity: 0.7;
+  margin-bottom: 0.5rem; line-height: 1;
+}
+.ending-card .ec-title {
+  font-family: var(--font-display); font-size: 1.3rem;
+  color: var(--gold-soft); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 0.6rem;
+}
+.ending-card .ec-narration {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 1rem; color: var(--ink); line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.ending-actions {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem; margin-top: 1rem;
+}
+.ending-btn {
+  padding: 0.75rem 0.8rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-2);
+  color: var(--ink); font-family: var(--font-display);
+  font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; letter-spacing: 0.1em;
+  text-transform: uppercase; transition: all 0.15s;
+}
+.ending-btn:hover { border-color: var(--gold); color: var(--gold-soft); }
+.ending-btn.primary {
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(139,92,246,0.1));
+  border-color: var(--gold-deep); color: var(--gold-soft);
+}
+
+/* HISTORY / TREE */
+.tree-panel {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem 1.1rem;
+  margin-top: 1rem;
+}
+.tree-title {
+  font-family: var(--font-display); font-size: 0.8rem;
+  text-transform: uppercase; letter-spacing: 0.2em;
+  color: var(--gold); margin-bottom: 0.8rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.tree-title::before { content: '✧'; font-size: 0.9rem; }
+.tree-path {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  max-height: 280px; overflow-y: auto;
+  padding-right: 0.3rem;
+}
+.tree-node {
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-2); border: 1px solid var(--border-soft);
+  border-left: 2px solid var(--violet);
+  border-radius: var(--radius); font-size: 0.78rem;
+  transition: all 0.2s;
+}
+.tree-node.current {
+  border-left-color: var(--gold);
+  background: linear-gradient(90deg, rgba(212,175,55,0.08), var(--bg-2));
+}
+.tree-node .tn-head {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 0.25rem;
+}
+.tree-node .tn-num {
+  font-family: var(--font-mono); font-size: 0.6rem;
+  letter-spacing: 0.15em; color: var(--gold);
+  text-transform: uppercase;
+}
+.tree-node .tn-title {
+  font-family: var(--font-serif); font-size: 0.88rem;
+  color: var(--ink); font-weight: 500;
+}
+.tree-node .tn-narration {
+  font-family: var(--font-serif); font-style: italic;
+  color: var(--ink-dim); font-size: 0.75rem;
+  line-height: 1.4; margin-top: 0.2rem;
+}
+.tree-node .tn-choice {
+  margin-top: 0.4rem; padding-left: 0.6rem;
+  border-left: 1px solid var(--border);
+  font-size: 0.7rem; color: var(--violet-soft);
+  font-style: italic; font-family: var(--font-serif);
+}
+.tree-node .tn-choice::before {
+  content: '↳ '; color: var(--gold); font-style: normal;
+}
+
+/* SAVE BAR */
+.save-bar {
+  background: var(--panel); border: 1px solid var(--border);
+  border-left: 2px solid var(--violet); border-radius: var(--radius);
+  padding: 1rem 1.1rem; margin-top: 1rem;
+}
+.save-bar .sb-title {
+  font-family: var(--font-display); font-size: 0.8rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 0.7rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.save-bar .sb-title::before { content: '💾'; font-size: 1rem; }
+.save-bar .sb-actions {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+.save-btn {
+  padding: 0.7rem 0.8rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-2);
+  color: var(--ink); font-family: var(--font-display);
+  font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.4rem; text-align: center;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.save-btn:hover { border-color: var(--gold); color: var(--gold-soft); }
+.save-btn:active { transform: scale(0.98); }
+.save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.save-btn.primary {
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(139,92,246,0.1));
+  border-color: var(--gold-deep); color: var(--gold-soft);
+}
+.save-info {
+  font-size: 0.68rem; color: var(--ink-dim);
+  font-family: var(--font-mono); margin-top: 0.7rem;
+  padding: 0.4rem 0.6rem; background: var(--bg-2);
+  border-radius: var(--radius); text-align: center;
+}
+.save-info.ok { color: var(--success); background: rgba(122,157,90,0.08); }
+
+.download-btn {
+  position: absolute; top: 0.6rem; right: 0.6rem;
+  background: rgba(10,6,18,0.85); color: var(--gold-soft);
+  border: 1px solid var(--gold-deep);
+  width: 38px; height: 38px; border-radius: 50%;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; z-index: 5;
+  transition: all 0.2s; backdrop-filter: blur(4px);
+}
+.download-btn:hover {
+  background: var(--gold); color: #000;
+  border-color: var(--gold-soft);
+}
+.download-btn:active { transform: scale(0.92); }
+.download-btn.done {
+  background: var(--success); color: #fff; border-color: var(--success);
+}
+
+/* DOWNLOAD PROGRESS */
+.download-progress {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--panel); border-top: 2px solid var(--gold);
+  padding: 0.85rem 1.1rem; z-index: 150;
+  transform: translateY(100%); transition: transform 0.35s ease;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+}
+.download-progress.visible { transform: translateY(0); }
+.download-progress .dp-text {
+  font-size: 0.78rem; color: var(--ink);
+  font-family: var(--font-mono); margin-bottom: 0.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.download-progress .dp-label { display: flex; align-items: center; gap: 0.5rem; }
+.download-progress .dp-label::before {
+  content: '⬇️'; animation: bounceDown 1s ease infinite;
+}
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+.download-progress .dp-bar {
+  height: 4px; background: var(--bg-2); border-radius: 2px; overflow: hidden;
+}
+.download-progress .dp-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--violet));
+  transition: width 0.3s ease;
+}
+
+/* STATUS BAR */
+.status-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--panel); border-top: 1px solid var(--border);
+  color: var(--ink); padding: 0.85rem 1.1rem;
+  font-size: 0.78rem; display: flex; align-items: center; gap: 0.65rem;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1);
+  z-index: 100; font-family: var(--font-mono);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+}
+.status-bar.visible { transform: translateY(0); }
+.status-bar .spinner {
+  width: 12px; height: 12px;
+  border: 2px solid rgba(212,175,55,0.2); border-top-color: var(--gold);
+  border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0;
+}
+.hidden { display: none !important; }
+
+/* DEBUG PANEL */
+.debug-panel {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 250px; background: #050410;
+  border-top: 2px solid var(--gold-deep); z-index: 200;
+  display: flex; flex-direction: column;
+  font-family: var(--font-mono);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.7);
+  transition: height 0.3s ease;
+}
+.debug-panel.collapsed { height: 34px; }
+.debug-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.45rem 0.75rem;
+  background: linear-gradient(90deg, #0a0612, #14102a);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; cursor: pointer; user-select: none;
+}
+.debug-title {
+  font-size: 0.68rem; color: var(--gold);
+  letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700;
+  display: flex; align-items: center; gap: 0.45rem;
+}
+.debug-title .debug-badge {
+  font-size: 0.58rem; padding: 0.1rem 0.35rem;
+  background: var(--gold); color: #000; border-radius: 2px; font-weight: 800;
+}
+.debug-actions { display: flex; gap: 0.3rem; }
+.debug-actions button {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--ink-dim); font-size: 0.6rem; padding: 0.22rem 0.5rem;
+  border-radius: 2px; cursor: pointer; letter-spacing: 0.05em;
+  font-family: inherit; font-weight: 600;
+}
+.debug-actions button:hover { color: var(--gold); border-color: var(--gold-deep); }
+.debug-body {
+  flex: 1; overflow-y: auto; padding: 0.45rem 0.65rem 1rem;
+  font-size: 0.68rem; line-height: 1.45; color: #c8c0b0;
+}
+.debug-entry {
+  margin-bottom: 0.28rem; padding: 0.22rem 0.38rem;
+  border-left: 2px solid transparent; border-radius: 2px;
+  word-break: break-word;
+}
+.debug-entry.info { border-left-color: var(--ink-faint); }
+.debug-entry.success { border-left-color: var(--success); background: rgba(122,157,90,0.04); }
+.debug-entry.warn { border-left-color: var(--warn); background: rgba(201,149,74,0.04); }
+.debug-entry.error { border-left-color: var(--error); background: rgba(184,85,64,0.06); color: #e0a090; }
+.debug-entry.api { border-left-color: #6a8ab8; background: rgba(90,122,154,0.04); }
+.debug-entry.response { border-left-color: #8a6aa8; background: rgba(138,106,168,0.04); }
+.debug-entry.state { border-left-color: var(--gold); background: rgba(212,175,55,0.04); }
+.debug-entry.ai { border-left-color: var(--violet-soft); background: rgba(139,92,246,0.05); }
+.debug-time { color: var(--ink-faint); margin-right: 0.45rem; font-size: 0.62rem; }
+.debug-cat { color: var(--gold-soft); font-weight: 700;
+  margin-right: 0.4rem; font-size: 0.62rem; }
+.debug-msg { color: #d8d0c0; }
+.debug-data {
+  margin-top: 0.3rem; padding: 0.4rem 0.5rem;
+  background: #08060f; border: 1px solid var(--border-soft);
+  border-radius: 2px; font-size: 0.64rem; color: #b8c8a8;
+  max-height: 170px; overflow: auto;
+  white-space: pre-wrap; word-break: break-all; line-height: 1.4;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+#noSleepCanvas { position: fixed; top: 0; left: 0; width: 1px; height: 1px;
+  opacity: 0.01; pointer-events: none; z-index: -1; }
+#noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px;
+  opacity: 0.01; pointer-events: none; z-index: -1; }
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.75rem; }
+  body { padding: 1rem 0.85rem 22rem; }
+  .universes-grid { grid-template-columns: repeat(2, 1fr); }
+  .debug-panel { height: 220px; }
+  .scene-player .sp-title { font-size: 1.1rem; }
+  .scene-player .sp-narration { font-size: 0.9rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Contes dont vous êtes le héros</div>
+  <h1>Fable Interactive</h1>
+  <p class="subtitle">Chaque choix dessine une histoire</p>
+  <div class="ornament">✦ ❦ ✦</div>
+</header>
+
+<div class="info-banner">
+  <strong>Comment ça marche :</strong> tu écris <strong class="hl-gold">une prémisse</strong>, l'IA génère la première scène
+  (image + vidéo + narration) puis te propose <strong class="hl-violet">2 ou 3 choix</strong>. Chaque choix ouvre une nouvelle branche —
+  l'histoire s'écrit en direct, en images et en voix. <strong class="hl-rose">Chaque partie est unique.</strong>
+</div>
+
+<div class="api-panel" id="api-panel">
+  <input type="password" class="api-key-input" id="api-key-input"
+    placeholder="Collez votre clé API ici (sk-...)" autocomplete="off" spellcheck="false">
+  <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+  <div class="api-status-line" id="api-status-line">
+    <span class="status-dot"></span>
+    <span id="api-status-text">Aucune clé API enregistrée</span>
+  </div>
+  <div class="api-hint">
+    Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> → Settings → API Keys
+  </div>
+  <div class="stat-line">
+    <span>📊 Vitesse vidéo : <span id="stat-speed">en attente</span></span>
+    <span id="stat-samples">0 génération</span>
+  </div>
+  <div class="wake-status" id="wake-status">
+    <span id="wake-status-text">💤 Veille automatique</span>
+    <button type="button" id="wake-toggle-btn">Garder l'écran allumé</button>
+  </div>
+</div>
+
+<!-- ═══════════ SETUP SCREEN ═══════════ -->
+<div class="setup-screen" id="setup-screen">
+  <div class="section open" id="section-premise">
+    <div class="section-header" data-toggle="section-premise">
+      <span class="section-title">📖 Votre prémisse <span class="badge">obligatoire</span></span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+      <textarea class="premise-textarea" id="premise-input"
+        placeholder="Ex : Une horlogère découvre que chaque pendule de sa boutique ouvre une porte vers un souvenir oublié…"></textarea>
+      <div class="premise-chips" id="premise-chips"></div>
+    </div></div>
+  </div>
+
+  <div class="section open" id="section-universe">
+    <div class="section-header" data-toggle="section-universe">
+      <span class="section-title">🌌 Univers <span class="badge violet">choisissez-en un</span></span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+      <div class="universes-grid" id="universes-grid"></div>
+    </div></div>
+  </div>
+
+  <div class="section" id="section-settings">
+    <div class="section-header" data-toggle="section-settings">
+      <span class="section-title">⚙️ Paramètres</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body"><div class="section-content">
+      <div class="control-row">
+        <label class="control-label">Longueur maximale de l'histoire</label>
+        <select id="max-nodes-select">
+          <option value="5">5 chapitres — court</option>
+          <option value="8" selected>8 chapitres — recommandé</option>
+          <option value="12">12 chapitres — long</option>
+          <option value="20">20 chapitres — épique</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label class="control-label">Durée de chaque scène vidéo</label>
+        <select id="duration-select">
+          <option value="121" selected>5 secondes — punchy</option>
+          <option value="161">6,5 secondes — narratif</option>
+          <option value="241">10 secondes — contemplatif</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label class="control-label">Mode de génération</label>
+        <select id="mode-select">
+          <option value="full" selected>🎬 Complet — image + vidéo + voix off</option>
+          <option value="fast">⚡ Rapide — image + texte uniquement</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label class="control-label">Narration vocale</label>
+        <select id="tts-select">
+          <option value="on" selected>🎙️ Activée</option>
+          <option value="off">🔇 Désactivée</option>
+        </select>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════ GAME SCREEN ═══════════ -->
+<div class="game-screen" id="game-screen">
+  <div id="scene-container"></div>
+  <div id="choices-container"></div>
+  <div class="tree-panel" id="tree-panel" style="display:none;">
+    <div class="tree-title">Le chemin parcouru</div>
+    <div class="tree-path" id="tree-path"></div>
+  </div>
+</div>
+
+<button type="button" class="btn-primary" id="start-btn" disabled style="width:100%;padding:1.2rem;border-radius:var(--radius);border:1px solid var(--gold-deep);background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(139,92,246,0.15));color:var(--gold-soft);font-family:var(--font-display);font-size:0.95rem;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;margin-bottom:1rem;">Ajoutez votre clé API</button>
+<button type="button" class="btn-stop" id="stop-btn" style="width:100%;padding:0.85rem;border-radius:var(--radius);border:1px solid var(--error);background:transparent;color:var(--error);font-size:0.8rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;margin-bottom:0.9rem;display:none;">⏹ Arrêter la génération</button>
+
+<!-- ═══════════ SAVE BAR ═══════════ -->
+<div class="save-bar">
+  <div class="sb-title">Sauvegarde de l'aventure</div>
+  <div class="sb-actions">
+    <button type="button" class="save-btn primary" id="download-all-btn">📦 Tout télécharger</button>
+    <button type="button" class="save-btn" id="copy-urls-btn">📋 Copier URLs</button>
+    <button type="button" class="save-btn" id="export-json-btn">📤 Exporter JSON</button>
+    <button type="button" class="save-btn" id="import-json-btn">📥 Importer JSON</button>
+  </div>
+  <input type="file" id="import-json-input" accept=".json,application/json" style="display:none;">
+  <div class="save-info" id="save-info">Aucune session sauvegardée pour l'instant.</div>
+</div>
+
+<div class="status-bar" id="status-bar">
+  <div class="spinner"></div>
+  <span id="status-text">Préparation…</span>
+</div>
+
+<div class="download-progress" id="download-progress">
+  <div class="dp-text">
+    <span class="dp-label" id="dp-label">Téléchargement…</span>
+    <span id="dp-count">0 / 0</span>
+  </div>
+  <div class="dp-bar"><div class="dp-fill" id="dp-fill"></div></div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✓</span>
+  <span id="toast-text">Message</span>
+</div>
+
+<div class="debug-panel" id="debug-panel">
+  <div class="debug-header" id="debug-header">
+    <div class="debug-title">✧ Console · Fable <span class="debug-badge" id="debug-count">0</span></div>
+    <div class="debug-actions">
+      <button type="button" id="debug-copy-btn">Copier</button>
+      <button type="button" id="debug-clear-btn">Effacer</button>
+      <button type="button" id="debug-collapse-btn">−</button>
+    </div>
+  </div>
+  <div class="debug-body" id="debug-body"></div>
+</div>
+
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG AGNES — identique à tes codes sources validés
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+
+const TEXT_MAX_TOKENS = 6000;
+const TEXT_TEMPERATURE = 0.9;
+
+const IMAGE_INTERVAL_MS = 5000;
+const IMAGE_INTERVAL_MIN = 4500;
+const IMAGE_INTERVAL_MAX = 12000;
+const IMAGE_INTERVAL_SAFE = 5500;
+
+const VIDEO_INTERVAL_MIN = 62000;
+const VIDEO_INTERVAL_MAX = 90000;
+const VIDEO_INTERVAL_SAFE = 75000;
+const VIDEO_FIRST_POLL_DELAY_SEC = 80;
+const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
+const VIDEO_MAX_POLL_ATTEMPTS = 100;
+
+const DEBUG_MAX_ENTRIES = 800;
+const TIMING_CACHE_KEY = 'fable_timing_v1';
+const SESSION_STORAGE_KEY = 'fable_session_v1';
+const API_KEY_STORAGE = 'agnes_api_key';
+const WAKE_LOCK_PREF = 'agnes_wakelock_enabled';
+
+// ══════════════════════════════════════════════════════════════════
+// UNIVERS
+// ══════════════════════════════════════════════════════════════════
+const UNIVERSES = [
+  { id: 'fantasy', name: 'Fantasy', emoji: '🧝',
+    prompt: 'high fantasy medieval universe, enchanted forests, ancient magic, kingdoms and dragons, painterly epic illustration' },
+  { id: 'scifi', name: 'Science-Fiction', emoji: '🚀',
+    prompt: 'science fiction universe, futuristic cities, space travel, cyberpunk and neon, advanced technology, cinematic sci-fi' },
+  { id: 'noir', name: 'Polar Noir', emoji: '🕵️',
+    prompt: 'film noir universe, rainy cities of the 1940s-50s, smoky jazz clubs, cynical detective mood, high-contrast black and white' },
+  { id: 'conte', name: 'Conte', emoji: '🧚',
+    prompt: 'fairy tale universe, watercolor illustration aesthetic, whimsical characters, soft pastel palette, storybook magic' },
+  { id: 'mystere', name: 'Mystère', emoji: '🔮',
+    prompt: 'mystery and supernatural universe, atmospheric fog, candlelight and shadows, subtle horror and wonder, gothic undertones' },
+  { id: 'aventure', name: 'Aventure', emoji: '⚔️',
+    prompt: 'pulp adventure universe, lost temples and ancient ruins, exotic locations, dynamic action, warm golden light' },
+  { id: 'romance', name: 'Romance', emoji: '💕',
+    prompt: 'romantic literary universe, warm soft light, intimate close-ups, quiet emotional moments, painterly elegance' },
+  { id: 'poesie', name: 'Poétique', emoji: '🌙',
+    prompt: 'poetic cinematic universe, dreamlike atmosphere, water and earth elements, contemplative slow movement, Terrence Malick aesthetic' }
+];
+
+const PREMISE_SUGGESTIONS = [
+  'Une horlogère découvre que chaque pendule de sa boutique ouvre une porte vers un souvenir oublié',
+  'Un phare abandonné sur une île où les vagues parlent la nuit à ceux qui savent écouter',
+  'Un libraire trouve un livre qui réécrit sa vie à mesure qu\'il le lit',
+  'Une cartographe explore un territoire qui n\'apparaît sur aucune carte',
+  'Un musicien joue du violon dans le métro et fait apparaître des créatures invisibles',
+  'Un pêcheur attrape une étoile tombée dans son filet',
+  'Une adolescente hérite d\'une maison où chaque pièce mène à un siècle différent',
+  'Un peintre réalise que tout ce qu\'il peint sur sa toile advient dans le monde réel'
+];
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT GLOBAL
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  premise: '',
+  universe: 'conte',
+  maxNodes: 8,
+  durationFrames: 121,
+  mode: 'full',
+  tts: 'on',
+  isRunning: false,
+  stopRequested: false,
+  // Arbre de l'histoire
+  nodes: [], // { id, parentId, title, narration, imagePrompt, imageUrl, videoUrl, choices: [{text, hint}], chosenIndex, chosenText, isEnding }
+  currentNodeId: null,
+  rootPremise: ''
+};
+
+let createImageIntervalMs = IMAGE_INTERVAL_SAFE;
+let createVideoIntervalMs = VIDEO_INTERVAL_SAFE;
+let imageAttemptsSinceLastError = 0;
+let videoAttemptsSinceLastError = 0;
+let debugCount = 0;
+let debugEntries = [];
+let debugCollapsed = false;
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function formatEta(seconds) {
+  if (seconds < 60) return Math.round(seconds) + 's';
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return m + 'm' + (s > 0 ? ' ' + s + 's' : '');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CONSOLE DEBUG
+// ══════════════════════════════════════════════════════════════════
+function debugLog(level, category, message, data) {
+  const body = document.getElementById('debug-body');
+  if (!body) return;
+  const time = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+  const entry = document.createElement('div');
+  entry.className = 'debug-entry ' + level;
+  let html = '<span class="debug-time">' + time + '</span>';
+  html += '<span class="debug-cat">[' + esc(category) + ']</span>';
+  html += '<span class="debug-msg">' + esc(message) + '</span>';
+  if (data !== undefined && data !== null) {
+    let dataStr;
+    if (typeof data === 'string') dataStr = data;
+    else { try { dataStr = JSON.stringify(data, null, 2); } catch (e) { dataStr = String(data); } }
+    if (dataStr.length > 4000) dataStr = dataStr.slice(0, 4000) + '\n…[tronqué]';
+    html += '<pre class="debug-data">' + esc(dataStr) + '</pre>';
+  }
+  entry.innerHTML = html;
+  body.appendChild(entry);
+  debugEntries.push({ time, level, category, message });
+  if (debugEntries.length > DEBUG_MAX_ENTRIES) debugEntries.shift();
+  while (body.children.length > DEBUG_MAX_ENTRIES) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+  debugCount++;
+  const countEl = document.getElementById('debug-count');
+  if (countEl) countEl.textContent = debugCount;
+}
+function clearDebug() {
+  const body = document.getElementById('debug-body');
+  if (body) body.innerHTML = '';
+  debugEntries = []; debugCount = 0;
+  const countEl = document.getElementById('debug-count');
+  if (countEl) countEl.textContent = '0';
+  debugLog('info', 'SYSTEM', 'Console effacée');
+}
+function copyDebug() {
+  const lines = debugEntries.map(e => e.time + ' [' + e.category + '] ' + e.message).join('\n');
+  const finish = (ok) => showToast(ok ? 'Console copiée' : 'Copie impossible', ok ? 'success' : 'error');
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(lines).then(() => finish(true)).catch(() => legacyCopy(lines, finish));
+      return;
+    }
+  } catch (e) {}
+  legacyCopy(lines, finish);
+}
+function legacyCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:2em;height:2em;padding:0;border:none;outline:none;box-shadow:none;background:transparent;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  cb(ok);
+}
+function toggleDebugCollapse() {
+  const panel = document.getElementById('debug-panel');
+  const btn = document.getElementById('debug-collapse-btn');
+  if (!panel || !btn) return;
+  debugCollapsed = !debugCollapsed;
+  panel.classList.toggle('collapsed', debugCollapsed);
+  btn.textContent = debugCollapsed ? '+' : '−';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════
+let toastTimeout = null;
+function showToast(message, type = 'success', duration = 2500) {
+  const toast = document.getElementById('toast');
+  const icon = document.getElementById('toast-icon');
+  const text = document.getElementById('toast-text');
+  if (!toast || !icon || !text) return;
+  toast.classList.remove('visible', 'success', 'error', 'warn');
+  void toast.offsetWidth;
+  const icons = { success: '✓', error: '✕', warn: '⚠' };
+  icon.textContent = icons[type] || '✓';
+  text.textContent = message;
+  toast.classList.add(type);
+  requestAnimationFrame(() => toast.classList.add('visible'));
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('visible'), duration);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ANTI-VEILLE
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel = null;
+let wakeLockEnabled = false;
+let canvasStream = null;
+let canvasInterval = null;
+
+function isWakeLockSupported() {
+  return 'wakeLock' in navigator && typeof navigator.wakeLock.request === 'function';
+}
+async function requestWakeLockAPI() {
+  if (!isWakeLockSupported()) return false;
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener('release', () => {
+      wakeLockSentinel = null; updateWakeStatus();
+    });
+    return true;
+  } catch (e) { return false; }
+}
+async function releaseWakeLockAPI() {
+  if (wakeLockSentinel) { try { await wakeLockSentinel.release(); } catch (e) {} wakeLockSentinel = null; }
+}
+function startCanvasStream() {
+  if (canvasStream) return true;
+  try {
+    const canvas = document.getElementById('noSleepCanvas');
+    const video = document.getElementById('noSleepVideo');
+    if (!canvas || !video) return false;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return false;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (typeof canvas.captureStream !== 'function') return false;
+    canvasStream = canvas.captureStream(1);
+    let toggle = false;
+    canvasInterval = setInterval(() => {
+      toggle = !toggle;
+      ctx.fillStyle = toggle ? '#000000' : '#010101';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }, 1000);
+    video.srcObject = canvasStream;
+    video.muted = true; video.playsInline = true;
+    const p = video.play(); if (p && p.catch) p.catch(() => {});
+    return true;
+  } catch (e) { return false; }
+}
+function stopCanvasStream() {
+  if (canvasInterval) { clearInterval(canvasInterval); canvasInterval = null; }
+  const video = document.getElementById('noSleepVideo');
+  if (video) { try { video.pause(); video.srcObject = null; } catch (e) {} }
+  if (canvasStream) { try { canvasStream.getTracks().forEach(t => t.stop()); } catch (e) {} canvasStream = null; }
+}
+async function activateWakeLock() {
+  let success = false;
+  if (isWakeLockSupported()) success = await requestWakeLockAPI();
+  if (!success) success = startCanvasStream();
+  if (!success && !canvasStream) success = startCanvasStream();
+  return success;
+}
+async function deactivateWakeLock() { await releaseWakeLockAPI(); stopCanvasStream(); }
+function updateWakeStatus() {
+  const el = document.getElementById('wake-status');
+  const txt = document.getElementById('wake-status-text');
+  const btn = document.getElementById('wake-toggle-btn');
+  if (!el || !txt || !btn) return;
+  el.classList.remove('active', 'warn');
+  const canvas = document.getElementById('noSleepCanvas');
+  const has = isWakeLockSupported() || (canvas && canvas.captureStream);
+  if (!has) { el.classList.add('warn'); txt.textContent = '⚠️ Non supporté'; btn.style.display = 'none'; return; }
+  btn.style.display = 'inline-block';
+  const isActive = wakeLockSentinel !== null || canvasStream !== null;
+  if (wakeLockEnabled && isActive) {
+    el.classList.add('active'); txt.textContent = '✅ Écran allumé'; btn.textContent = 'Désactiver';
+  } else if (wakeLockEnabled && !isActive) {
+    el.classList.add('warn'); txt.textContent = '⏳ En attente'; btn.textContent = 'Désactiver';
+  } else {
+    txt.textContent = '💤 Veille automatique'; btn.textContent = 'Garder l\'écran allumé';
+  }
+}
+async function toggleWakeLock() {
+  if (wakeLockEnabled) {
+    wakeLockEnabled = false; await deactivateWakeLock();
+    try { localStorage.setItem(WAKE_LOCK_PREF, '0'); } catch (e) {}
+    showToast('Veille automatique', 'warn');
+  } else {
+    wakeLockEnabled = true;
+    const ok = await activateWakeLock();
+    try { localStorage.setItem(WAKE_LOCK_PREF, '1'); } catch (e) {}
+    if (ok) showToast('Écran allumé', 'success');
+    else showToast('Activez manuellement', 'warn');
+  }
+  updateWakeStatus();
+}
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && wakeLockEnabled) {
+    await activateWakeLock(); updateWakeStatus();
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════
+// TIMING CACHE
+// ══════════════════════════════════════════════════════════════════
+function loadTimingCache() {
+  try { return JSON.parse(localStorage.getItem(TIMING_CACHE_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+function saveTimingCache(c) {
+  try { localStorage.setItem(TIMING_CACHE_KEY, JSON.stringify(c)); } catch (e) {}
+}
+function recordGenerationTime(key, ms) {
+  const c = loadTimingCache();
+  if (!c[key]) c[key] = [];
+  c[key].push(ms);
+  if (c[key].length > 10) c[key] = c[key].slice(-10);
+  saveTimingCache(c); updateTimingDisplay();
+}
+function estimateGenerationTime(key, fallbackMs) {
+  const c = loadTimingCache();
+  const s = c[key];
+  if (s && s.length > 0) {
+    const sorted = [...s].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0 ? (sorted[mid-1] + sorted[mid]) / 2 : sorted[mid];
+  }
+  return fallbackMs;
+}
+function updateTimingDisplay() {
+  const c = loadTimingCache();
+  const v = c['video'] || [];
+  const s = document.getElementById('stat-speed');
+  const t = document.getElementById('stat-samples');
+  if (!s || !t) return;
+  if (v.length === 0) { s.textContent = 'en attente'; t.textContent = '0 génération'; return; }
+  const avg = v.reduce((a, b) => a + b, 0) / v.length;
+  s.textContent = (avg / 1000).toFixed(1) + ' s en moyenne';
+  t.textContent = v.length + ' génération' + (v.length > 1 ? 's' : '');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CLÉ API
+// ══════════════════════════════════════════════════════════════════
+function getApiKey() {
+  try { return (localStorage.getItem(API_KEY_STORAGE) || '').trim(); }
+  catch (e) { return ''; }
+}
+function saveApiKey() {
+  const input = document.getElementById('api-key-input');
+  if (!input) return;
+  const key = input.value.trim();
+  if (!key) {
+    try { localStorage.removeItem(API_KEY_STORAGE); } catch (e) {}
+    updateApiPanel(); showToast('Clé supprimée', 'warn'); return;
+  }
+  if (!key.startsWith('sk-')) {
+    if (!confirm('La clé ne commence pas par "sk-". Sauvegarder ?')) return;
+  }
+  try {
+    localStorage.setItem(API_KEY_STORAGE, key);
+    updateApiPanel(); showToast('Clé enregistrée ✓', 'success');
+    input.blur();
+  } catch (e) { showToast('Erreur sauvegarde', 'error'); }
+}
+function updateApiPanel() {
+  const panel = document.getElementById('api-panel');
+  const input = document.getElementById('api-key-input');
+  const statusLine = document.getElementById('api-status-line');
+  const statusText = document.getElementById('api-status-text');
+  const key = getApiKey();
+  if (!panel || !input || !statusLine || !statusText) return;
+  if (key) {
+    panel.classList.add('ok');
+    statusLine.classList.add('ok');
+    statusText.textContent = 'Clé active · ' + key.slice(0, 8) + '…' + key.slice(-4);
+    input.value = key; input.placeholder = '';
+  } else {
+    panel.classList.remove('ok');
+    statusLine.classList.remove('ok');
+    statusText.textContent = 'Aucune clé API enregistrée';
+    input.value = ''; input.placeholder = 'Collez votre clé API ici (sk-...)';
+  }
+  updateStartBtn();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════════
+function updateStartBtn() {
+  const btn = document.getElementById('start-btn');
+  if (!btn) return;
+  const hasKey = !!getApiKey();
+  const hasPremise = state.premise.trim().length >= 10;
+  btn.disabled = !hasKey || !hasPremise || state.isRunning;
+  if (state.isRunning) btn.textContent = 'Génération en cours…';
+  else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
+  else if (!hasPremise) btn.textContent = 'Écrivez votre prémisse (10 caractères min)';
+  else btn.textContent = '✦ Commencer l\'aventure ✦';
+}
+function setStatus(text) {
+  const bar = document.getElementById('status-bar');
+  const txt = document.getElementById('status-text');
+  if (!bar || !txt) return;
+  if (text) { bar.classList.add('visible'); txt.textContent = text; }
+  else bar.classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDU — Univers
+// ══════════════════════════════════════════════════════════════════
+function renderUniverses() {
+  const grid = document.getElementById('universes-grid');
+  if (!grid) return;
+  grid.innerHTML = UNIVERSES.map(u =>
+    '<div class="universe-card' + (state.universe === u.id ? ' selected' : '') + '" data-universe="' + u.id + '">' +
+      '<div class="u-emoji">' + u.emoji + '</div>' +
+      '<div class="u-name">' + esc(u.name) + '</div>' +
+    '</div>'
+  ).join('');
+  grid.querySelectorAll('.universe-card').forEach(el => {
+    el.addEventListener('click', () => {
+      state.universe = el.dataset.universe;
+      renderUniverses();
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API FETCH
+// ══════════════════════════════════════════════════════════════════
+async function apiFetch(url, options = {}, label = 'API', kind = 'default') {
+  for (let attempt = 0; attempt < 7; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    debugLog('api', 'REQ ' + label, (options.method || 'GET') + ' ' + url + ' (essai ' + (attempt + 1) + ')');
+    try {
+      const res = await fetch(url, options);
+      debugLog('response', 'RÉP ' + label, 'HTTP ' + res.status);
+      if (res.status === 429) {
+        if (kind === 'video') {
+          videoAttemptsSinceLastError = 0;
+          if (createVideoIntervalMs < VIDEO_INTERVAL_MAX) {
+            createVideoIntervalMs = Math.min(createVideoIntervalMs + 8000, VIDEO_INTERVAL_MAX);
+          }
+        }
+        const wait = [10, 20, 35, 50, 75, 100, 150][Math.min(attempt, 6)];
+        debugLog('warn', 'RATELIMIT', '429 — attente ' + wait + 's');
+        setStatus('L\'IA se prépare… (' + wait + 's)');
+        await sleep(wait * 1000); continue;
+      }
+      if (res.status === 503) {
+        const wait = [5, 10, 15, 20, 30, 45][Math.min(attempt, 5)];
+        debugLog('warn', 'SERVICE', '503 — attente ' + wait + 's');
+        setStatus('Le service se prépare… (' + wait + 's)');
+        await sleep(wait * 1000); continue;
+      }
+      if (res.ok && kind === 'video') {
+        videoAttemptsSinceLastError++;
+        if (videoAttemptsSinceLastError >= 3 && createVideoIntervalMs > VIDEO_INTERVAL_MIN) {
+          createVideoIntervalMs = Math.max(createVideoIntervalMs - 4000, VIDEO_INTERVAL_MIN);
+          videoAttemptsSinceLastError = 0;
+        }
+      }
+      return res;
+    } catch (e) {
+      if (e.message === 'Arrêt demandé') throw e;
+      const wait = [3, 5, 8, 12, 20, 30][Math.min(attempt, 5)];
+      debugLog('warn', 'NETWORK', e.message + ' — retry ' + wait + 's');
+      setStatus('Connexion… (' + wait + 's)');
+      await sleep(wait * 1000);
+    }
+  }
+  return fetch(url, options);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PARSER JSON — 5 stratégies
+// ══════════════════════════════════════════════════════════════════
+function escapeControlCharsInStrings(text) {
+  let result = '';
+  let inString = false;
+  let escape = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { result += ch; escape = false; continue; }
+    if (ch === '\\') { result += ch; escape = true; continue; }
+    if (ch === '"') { inString = !inString; result += ch; continue; }
+    if (inString) {
+      if (ch === '\n') { result += '\\n'; continue; }
+      if (ch === '\r') { result += '\\r'; continue; }
+      if (ch === '\t') { result += '\\t'; continue; }
+      const code = ch.charCodeAt(0);
+      if (code < 32) { result += '\\u' + code.toString(16).padStart(4, '0'); continue; }
+    }
+    result += ch;
+  }
+  return result;
+}
+function balanceJson(text) {
+  let openBraces = 0, openBrackets = 0, inString = false, escape = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { escape = false; continue; }
+    if (ch === '\\') { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') openBraces++;
+    else if (ch === '}') openBraces--;
+    else if (ch === '[') openBrackets++;
+    else if (ch === ']') openBrackets--;
+  }
+  let result = text;
+  if (inString) result += '"';
+  while (openBrackets > 0) { result += ']'; openBrackets--; }
+  while (openBraces > 0) { result += '}'; openBraces--; }
+  return result;
+}
+function salvageNode(text) {
+  const getStr = (key) => {
+    const m = text.match(new RegExp('"' + key + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));
+    return m ? m[1].replace(/\\"/g, '"').replace(/\\n/g, ' ') : '';
+  };
+  const title = getStr('title');
+  const narration = getStr('narration');
+  const image_prompt = getStr('image_prompt');
+  const action_prompt = getStr('action_prompt');
+  const isEnding = /"is_ending"\s*:\s*true/i.test(text);
+  // Choix : recherche de tous les { "text": "..." , "hint": "..." }
+  const choices = [];
+  const choiceRegex = /\{\s*"text"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"hint"\s*:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+  let m;
+  while ((m = choiceRegex.exec(text)) !== null) {
+    choices.push({
+      text: m[1].replace(/\\"/g, '"'),
+      hint: m[2].replace(/\\"/g, '"')
+    });
+  }
+  if (!title && !narration) return null;
+  return { title, narration, image_prompt, action_prompt, choices, is_ending: isEnding };
+}
+function extractJson(text) {
+  if (!text) return null;
+  let c = text.trim();
+  const fm = c.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fm) c = fm[1].trim();
+  const fb = c.indexOf('{');
+  if (fb < 0) return null;
+  c = c.slice(fb);
+  try { const r = JSON.parse(c); debugLog('success', 'PARSE', 'S1 directe OK'); return r; }
+  catch (e1) { debugLog('warn', 'PARSE', 'S1 : ' + e1.message.slice(0, 100)); }
+  try {
+    const fixed = escapeControlCharsInStrings(c);
+    const r = JSON.parse(fixed);
+    debugLog('success', 'PARSE', 'S2 échappement OK'); return r;
+  } catch (e2) { debugLog('warn', 'PARSE', 'S2 : ' + e2.message.slice(0, 100)); }
+  try {
+    const lb = c.lastIndexOf('}');
+    if (lb > 0) {
+      let trunc = c.slice(0, lb + 1);
+      trunc = escapeControlCharsInStrings(trunc);
+      const r = JSON.parse(trunc);
+      debugLog('success', 'PARSE', 'S3 dernier } OK'); return r;
+    }
+  } catch (e3) { debugLog('warn', 'PARSE', 'S3 : ' + e3.message.slice(0, 100)); }
+  try {
+    const balanced = balanceJson(escapeControlCharsInStrings(c));
+    const r = JSON.parse(balanced);
+    debugLog('success', 'PARSE', 'S4 équilibrage OK'); return r;
+  } catch (e4) { debugLog('warn', 'PARSE', 'S4 : ' + e4.message.slice(0, 100)); }
+  try {
+    const salvaged = salvageNode(c);
+    if (salvaged) {
+      debugLog('success', 'PARSE', 'S5 regex OK');
+      return salvaged;
+    }
+  } catch (e5) { debugLog('error', 'PARSE', 'S5 : ' + e5.message.slice(0, 100)); }
+  debugLog('error', 'PARSE', 'Aucune stratégie n\'a fonctionné');
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPTS
+// ══════════════════════════════════════════════════════════════════
+function buildNodeGenerationPrompt(parentNode, chosenChoice, isFirst) {
+  const universe = UNIVERSES.find(u => u.id === state.universe) || UNIVERSES[0];
+  const parts = [];
+  parts.push('You are the narrator of an interactive storybook — a "choose your own adventure" tale.');
+  parts.push('');
+  parts.push('UNIVERSE: ' + universe.name + ' — ' + universe.prompt);
+  parts.push('');
+  parts.push('ORIGINAL PREMISE: ' + state.rootPremise);
+  parts.push('');
+  if (isFirst) {
+    parts.push('YOUR TASK: Write the OPENING chapter of this story.');
+    parts.push('The opening must:');
+    parts.push('- Introduce a vivid scene with clear atmosphere and sensory details.');
+    parts.push('- Establish a protagonist (nameless or named).');
+    parts.push('- Set the tone of the universe.');
+    parts.push('- NOT resolve anything yet — it must create 2-3 branching possibilities.');
+  } else {
+    parts.push('PATH SO FAR (chronological summary):');
+    let node = parentNode;
+    const pathNodes = [];
+    while (node) {
+      pathNodes.unshift(node);
+      if (node.parentId === null) break;
+      node = state.nodes.find(n => n.id === node.parentId);
+    }
+    pathNodes.forEach((n, i) => {
+      parts.push('  Chapter ' + (i + 1) + ': ' + n.title);
+      if (n.chosenText) parts.push('    → Reader chose: "' + n.chosenText + '"');
+    });
+    parts.push('');
+    parts.push('CURRENT CHAPTER: ' + parentNode.title);
+    parts.push('NARRATION: ' + parentNode.narration);
+    parts.push('');
+    parts.push('THE READER HAS CHOSEN: "' + chosenChoice.text + '"');
+    parts.push('Direction hint for this choice: ' + (chosenChoice.hint || '(none)'));
+    parts.push('');
+    parts.push('YOUR TASK: Write the NEXT chapter that directly follows from this choice.');
+    parts.push('The next chapter must:');
+    parts.push('- Show the immediate consequences of the reader\'s choice.');
+    parts.push('- Advance the story meaningfully — no stalling.');
+    parts.push('- Escalate tension, deepen mystery, or reveal something new.');
+    parts.push('- End with a powerful hook that naturally leads to new branching choices.');
+  }
+  parts.push('');
+  parts.push('RULES FOR NARRATION:');
+  parts.push('- In FRENCH. Poetic, cinematic, literary. 2 to 4 sentences maximum.');
+  parts.push('- Present tense, sensory details (sight, sound, smell, touch).');
+  parts.push('- NO dialogue tags, NO "il dit", NO quotes.');
+  parts.push('');
+  parts.push('RULES FOR CHOICES:');
+  if (isFirst) {
+    parts.push('- 2 or 3 choices.');
+    parts.push('- Each choice is a short action or decision (5-12 words), in French, first person or imperative.');
+    parts.push('- Each choice must lead to a CLEARLY DIFFERENT narrative direction.');
+    parts.push('- No choice should be obviously better or worse.');
+  } else {
+    parts.push('- 2 or 3 choices.');
+    parts.push('- Each choice is a short action or decision (5-12 words), in French, first person or imperative.');
+    parts.push('- Each choice must lead to a CLEARLY DIFFERENT narrative direction.');
+    const remaining = state.maxNodes - state.nodes.length;
+    if (remaining <= 2) {
+      parts.push('- IMPORTANT: This is one of the FINAL chapters. You MUST conclude the story. Set "is_ending": true and leave "choices" as an empty array [].');
+      parts.push('- The narration must provide a satisfying, poetic resolution.');
+    } else {
+      parts.push('- "is_ending" must be false.');
+    }
+  }
+  parts.push('');
+  parts.push('JSON RULES:');
+  parts.push('- All strings on a SINGLE LINE. Escape any double quote as \\".');
+  parts.push('- No trailing commas. No markdown. No commentary.');
+  parts.push('');
+  parts.push('OUTPUT (exact schema, ONLY this JSON):');
+  parts.push('{');
+  parts.push('  "title": "short poetic French chapter title (2-5 words)",');
+  parts.push('  "narration": "2-4 poetic sentences in French",');
+  parts.push('  "image_prompt": "detailed English prompt for the opening frame of this scene — composition, subject, environment, lighting, mood, cinematography. Must be specific and visual.",');
+  parts.push('  "action_prompt": "detailed English prompt describing the motion in this 5-second scene — one continuous movement, camera move, character motion. No cuts.",');
+  parts.push('  "choices": [');
+  parts.push('    { "text": "action courte en français", "hint": "English hint for what this leads to" },');
+  parts.push('    { "text": "autre action en français", "hint": "English hint for what this leads to" }');
+  parts.push('  ],');
+  parts.push('  "is_ending": false');
+  parts.push('}');
+  if (isFirst) {
+    parts.push('');
+    parts.push('REMINDER: The opening must NOT resolve. It must open possibilities.');
+  }
+  return parts.join('\n');
+}
+
+function buildImagePrompt(node) {
+  const universe = UNIVERSES.find(u => u.id === state.universe) || UNIVERSES[0];
+  return [
+    'STYLE: ' + universe.prompt,
+    '',
+    'SCENE: ' + node.imagePrompt,
+    '',
+    'FORMAT: portrait 9:16 vertical, cinematic, photorealistic film still, high detail, dramatic lighting, 35mm film grain.',
+    'No text, no watermark, no logo, no subtitle, no on-screen graphic.'
+  ].join('\n');
+}
+
+function buildVideoPrompt(node) {
+  const universe = UNIVERSES.find(u => u.id === state.universe) || UNIVERSES[0];
+  const narration = node.narration || '';
+  return [
+    'CRITICAL: The provided image is the EXACT first frame of this video.',
+    '',
+    'STYLE: ' + universe.prompt,
+    '',
+    'SCENE ACTION: ' + node.actionPrompt,
+    '',
+    'CAMERA: One continuous movement, no cuts, cinematic and deliberate.',
+    '',
+    'AUDIO: ABSOLUTELY NO MUSIC. Only natural ambient sounds matching the universe (wind, distant bells, footsteps, breath).',
+    narration ? 'A poetic narrator whispers in French: "' + narration.slice(0, 200) + '" — soft, calm, intimate voice-over, not lip-synced, one continuous breath.' : '',
+    '',
+    'FORMAT: Portrait 9:16 vertical, 24fps, cinematic film look.',
+    'No text, no subtitles, no watermarks, no music.'
+  ].filter(Boolean).join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// APPELS API
+// ══════════════════════════════════════════════════════════════════
+async function generateNodeText(parentNode, chosenChoice, isFirst) {
+  const prompt = buildNodeGenerationPrompt(parentNode, chosenChoice, isFirst);
+  debugLog('ai', 'PROMPT CHAPITRE', 'Envoyé', prompt.slice(0, 1500));
+  const body = {
+    model: MODEL_TEXT,
+    messages: [
+      { role: 'system', content: 'You are a poetic French narrator of interactive tales. You ALWAYS return valid JSON exactly matching the requested schema. All string values on single lines — never real line breaks inside a string. No markdown, no commentary, no trailing commas.' },
+      { role: 'user', content: prompt }
+    ],
+    temperature: TEXT_TEMPERATURE,
+    max_tokens: TEXT_MAX_TOKENS,
+    response_format: { type: 'json_object' }
+  };
+  const res = await apiFetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Chapitre', 'text');
+  if (!res.ok) {
+    const err = await res.text();
+    debugLog('error', 'CHAPITRE', 'HTTP ' + res.status, err.slice(0, 1000));
+    throw new Error('HTTP ' + res.status);
+  }
+  const data = await res.json();
+  const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  const parsed = extractJson(content);
+  if (!parsed) throw new Error('Réponse texte invalide');
+  // Normalisation
+  return {
+    title: parsed.title || 'Chapitre',
+    narration: parsed.narration || '',
+    imagePrompt: parsed.image_prompt || parsed.imagePrompt || '',
+    actionPrompt: parsed.action_prompt || parsed.actionPrompt || '',
+    choices: Array.isArray(parsed.choices) ? parsed.choices.map(c => ({
+      text: c.text || 'Continuer',
+      hint: c.hint || ''
+    })) : [],
+    isEnding: parsed.is_ending === true || parsed.isEnding === true
+  };
+}
+
+async function generateImage(prompt) {
+  const body = {
+    model: MODEL_IMAGE,
+    prompt: prompt,
+    n: 1,
+    size: '1024x1792',
+    response_format: 'url'
+  };
+  const res = await apiFetch(API_BASE + '/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Image', 'image');
+  if (!res.ok) {
+    const err = await res.text();
+    debugLog('error', 'IMAGE', 'HTTP ' + res.status, err.slice(0, 400));
+    throw new Error('HTTP ' + res.status);
+  }
+  const data = await res.json();
+  const item = data.data && data.data[0];
+  if (!item) throw new Error('Pas de donnée image');
+  if (item.url) return item.url;
+  if (item.b64_json) return 'data:image/png;base64,' + item.b64_json;
+  throw new Error('Format image inconnu');
+}
+
+async function generateVideo(firstFrame, prompt) {
+  const body = {
+    model: MODEL_VIDEO,
+    prompt: prompt,
+    image: firstFrame,
+    num_frames: state.durationFrames,
+    frame_rate: FRAME_RATE
+  };
+  const res = await apiFetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Vidéo', 'video');
+  if (!res.ok) {
+    const err = await res.text();
+    debugLog('error', 'VIDÉO', 'HTTP ' + res.status, err.slice(0, 400));
+    throw new Error('HTTP ' + res.status);
+  }
+  const data = await res.json();
+  const videoId = data.video_id || data.id || data.task_id;
+  if (!videoId) throw new Error('Pas de video_id');
+  return videoId;
+}
+
+async function pollVideo(videoId, onProgress) {
+  const estimatedMs = estimateGenerationTime('video', 30000 + state.durationFrames * 500);
+  const estimatedSec = estimatedMs / 1000;
+  const minWait = Math.min(VIDEO_FIRST_POLL_DELAY_SEC, Math.max(60, Math.floor(estimatedSec * 0.75)));
+  let remaining = minWait;
+  while (remaining > 0) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    onProgress('Préparation — ' + remaining + 's', 5);
+    await sleep(1000); remaining--;
+  }
+  for (let attempt = 0; attempt < VIDEO_MAX_POLL_ATTEMPTS; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    if (attempt > 0) {
+      const idx = Math.min(attempt - 1, VIDEO_POLL_INTERVALS.length - 1);
+      let r = VIDEO_POLL_INTERVALS[idx];
+      while (r > 0) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        onProgress('L\'image prend vie… — ' + r + 's', 50);
+        await sleep(1000); r--;
+      }
+    }
+    const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) +
+                '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+    const res = await apiFetch(url, {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + getApiKey() }
+    }, 'Polling', 'video');
+    const d = await res.json();
+    const status = d.status || 'unknown';
+    const progress = d.progress || 0;
+    onProgress('Création — ' + progress + '%', Math.max(50, progress));
+    if (status === 'completed' || status === 'succeeded' || status === 'done') {
+      const videoUrl = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+      if (!videoUrl) throw new Error('Terminé mais pas d\'URL');
+      return videoUrl;
+    }
+    if (status === 'failed' || status === 'error' || status === 'cancelled') {
+      throw new Error('Échec (' + status + ')');
+    }
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TTS
+// ══════════════════════════════════════════════════════════════════
+let speechSynth = null;
+function initSpeech() {
+  if ('speechSynthesis' in window) {
+    speechSynth = window.speechSynthesis;
+    speechSynth.getVoices();
+  }
+}
+function speakText(text) {
+  if (!speechSynth || !text || state.tts !== 'on') return;
+  speechSynth.cancel();
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
+    u.rate = 0.92;
+    u.pitch = 1.0;
+    const voices = speechSynth.getVoices();
+    const frVoices = voices.filter(v => v.lang && v.lang.startsWith('fr'));
+    if (frVoices.length > 0) u.voice = frVoices[0];
+    speechSynth.speak(u);
+  }, 100);
+}
+function stopSpeech() { if (speechSynth) speechSynth.cancel(); }
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE D'UN CHAPITRE
+// ══════════════════════════════════════════════════════════════════
+function showScenePending(title, step, progress) {
+  const container = document.getElementById('scene-container');
+  container.innerHTML =
+    '<div class="scene-pending">' +
+      '<div class="sp-spinner"></div>' +
+      '<div class="sp-pending-title">' + esc(title) + '</div>' +
+      '<div class="sp-pending-step" id="sp-step">' + esc(step) + '</div>' +
+      '<div class="sp-pending-bar"><div class="sp-pending-fill" id="sp-fill" style="width:' + (progress || 0) + '%"></div></div>' +
+      '<div class="sp-pending-eta" id="sp-eta">Veuillez patienter…</div>' +
+    '</div>';
+}
+function updateScenePending(step, progress) {
+  const stepEl = document.getElementById('sp-step');
+  const fillEl = document.getElementById('sp-fill');
+  if (stepEl) stepEl.textContent = step;
+  if (fillEl && progress !== undefined) fillEl.style.width = Math.max(0, Math.min(100, progress)) + '%';
+}
+function hideChoices() {
+  document.getElementById('choices-container').innerHTML = '';
+}
+
+async function generateChapter(parentNode, chosenChoice, isFirst) {
+  // 1) Texte
+  showScenePending(isFirst ? 'Prologue' : 'Chapitre suivant', 'L\'IA tisse l\'histoire…', 10);
+  setStatus('L\'IA écrit le chapitre…');
+  const nodeData = await generateNodeText(parentNode, chosenChoice, isFirst);
+  updateScenePending('Chapitre écrit : ' + nodeData.title, 20);
+  debugLog('success', 'TEXTE', 'Chapitre : ' + nodeData.title);
+
+  // Créer l'objet node
+  const nodeId = state.nodes.length;
+  const node = {
+    id: nodeId,
+    parentId: parentNode ? parentNode.id : null,
+    title: nodeData.title,
+    narration: nodeData.narration,
+    imagePrompt: nodeData.imagePrompt,
+    actionPrompt: nodeData.actionPrompt,
+    imageUrl: null,
+    videoUrl: null,
+    choices: nodeData.choices,
+    chosenIndex: null,
+    chosenText: null,
+    isEnding: nodeData.isEnding,
+    createdAt: new Date().toISOString()
+  };
+  state.nodes.push(node);
+
+  // 2) Image
+  if (state.mode !== 'fast' || true) {
+    updateScenePending('Peinture de la scène…', 30);
+    setStatus('Génération de l\'image…');
+    try {
+      const imagePrompt = buildImagePrompt(node);
+      node.imageUrl = await generateImage(imagePrompt);
+      debugLog('success', 'IMAGE', 'Chapitre ' + nodeId);
+    } catch (e) {
+      debugLog('error', 'IMAGE', e.message);
+      node.imageUrl = null;
+    }
+  }
+
+  // 3) Vidéo (si mode complet)
+  if (state.mode === 'full' && node.imageUrl) {
+    updateScenePending('Création de la vidéo…', 50);
+    setStatus('Création de la vidéo…');
+    try {
+      const videoPrompt = buildVideoPrompt(node);
+      const videoId = await generateVideo(node.imageUrl, videoPrompt);
+      node.videoId = videoId;
+      const videoUrl = await pollVideo(videoId, (step, pct) => {
+        updateScenePending(step, 50 + (pct * 0.5));
+      });
+      node.videoUrl = videoUrl;
+      debugLog('success', 'VIDÉO', 'Chapitre ' + nodeId + ' prête');
+    } catch (e) {
+      debugLog('error', 'VIDÉO', e.message);
+      node.videoUrl = null;
+    }
+  } else if (state.mode === 'fast') {
+    // En mode fast, pas de vidéo
+    debugLog('info', 'MODE', 'Mode rapide — pas de vidéo');
+  }
+
+  // Rate limiting : pause entre deux vidéos
+  if (node.videoUrl && state.nodes.length > 1) {
+    // Déjà respecté car une seule vidéo par chapitre
+  }
+
+  return node;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDU D'UN CHAPITRE
+// ══════════════════════════════════════════════════════════════════
+function renderChapter(node, isEnding) {
+  const container = document.getElementById('scene-container');
+  const choicesContainer = document.getElementById('choices-container');
+
+  // Vidéo ou image
+  let mediaHtml = '';
+  if (node.videoUrl) {
+    mediaHtml =
+      '<div class="scene-player">' +
+        '<video src="' + node.videoUrl + '" controls autoplay playsinline preload="metadata" muted></video>' +
+        '<button class="download-btn" data-node="' + node.id + '" title="Télécharger ce chapitre">⬇</button>' +
+        '<div class="sp-overlay">' +
+          '<div class="sp-chapter">✦ Chapitre ' + (node.id + 1) + ' ✦</div>' +
+          '<div class="sp-title">' + esc(node.title) + '</div>' +
+        '</div>' +
+      '</div>';
+  } else if (node.imageUrl) {
+    mediaHtml =
+      '<div class="scene-player">' +
+        '<img src="' + node.imageUrl + '" style="width:100%;display:block;aspect-ratio:9/16;object-fit:cover;" alt="">' +
+        '<button class="download-btn" data-node="' + node.id + '" title="Télécharger cette image">⬇</button>' +
+        '<div class="sp-overlay">' +
+          '<div class="sp-chapter">✦ Chapitre ' + (node.id + 1) + ' ✦</div>' +
+          '<div class="sp-title">' + esc(node.title) + '</div>' +
+        '</div>' +
+      '</div>';
+  } else {
+    mediaHtml =
+      '<div class="scene-player" style="aspect-ratio:9/16;padding:2rem;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(160deg,rgba(139,92,246,0.15),rgba(212,175,55,0.1));">' +
+        '<div class="sp-chapter">✦ Chapitre ' + (node.id + 1) + ' ✦</div>' +
+        '<div class="sp-title">' + esc(node.title) + '</div>' +
+      '</div>';
+  }
+
+  // Narration séparée sous la vidéo
+  const narrationHtml = node.narration
+    ? '<div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:var(--radius);padding:1rem 1.15rem;margin-bottom:1rem;">' +
+        '<div style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:0.5rem;">📜 Narration</div>' +
+        '<div style="font-family:var(--font-serif);font-size:1.05rem;font-style:italic;line-height:1.6;color:var(--ink);">' +
+          esc(node.narration) +
+        '</div>' +
+      '</div>'
+    : '';
+
+  container.innerHTML = mediaHtml + narrationHtml;
+
+  // TTS
+  if (node.narration && state.tts === 'on') {
+    speakText(node.narration);
+  }
+
+  // Choix OU fin
+  if (isEnding || node.isEnding || node.choices.length === 0) {
+    choicesContainer.innerHTML =
+      '<div class="ending-card">' +
+        '<div class="ec-mark">❦</div>' +
+        '<div class="ec-title">Fin du récit</div>' +
+        '<div class="ec-narration">' + esc(node.narration) + '</div>' +
+        '<div class="ending-actions">' +
+          '<button type="button" class="ending-btn primary" id="new-story-btn">✦ Nouvelle histoire</button>' +
+          '<button type="button" class="ending-btn" id="restart-from-here-btn">↺ Rejouer ce chapitre</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('new-story-btn').addEventListener('click', () => {
+      if (confirm('Commencer une nouvelle histoire ? L\'histoire actuelle sera perdue.')) {
+        resetStory();
+      }
+    });
+    document.getElementById('restart-from-here-btn').addEventListener('click', () => {
+      // Rembobine à ce chapitre en le regénérant
+      if (node.parentId !== null) {
+        const parent = state.nodes.find(n => n.id === node.parentId);
+        if (parent) {
+          state.nodes = state.nodes.filter(n => n.id <= parent.id);
+          state.currentNodeId = parent.id;
+          renderChapter(parent, parent.isEnding);
+        }
+      }
+    });
+  } else {
+    const choicesHtml = node.choices.map((c, i) =>
+      '<button type="button" class="choice-btn" data-choice="' + i + '">' +
+        '<span class="cb-num">Choix ' + (i + 1) + '</span>' +
+        '<span class="cb-text">« ' + esc(c.text) + ' »</span>' +
+      '</button>'
+    ).join('');
+    choicesContainer.innerHTML =
+      '<div class="choices-title">Que faites-vous ?</div>' +
+      '<div class="choices-list">' + choicesHtml + '</div>';
+
+    choicesContainer.querySelectorAll('.choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.choice, 10);
+        onChoiceSelected(node, idx);
+      });
+    });
+  }
+
+  // Bind download
+  document.querySelectorAll('.download-btn[data-node]').forEach(btn => {
+    if (btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const nodeId = parseInt(btn.dataset.node, 10);
+      downloadSingleNode(nodeId);
+    });
+  });
+
+  // Tree update
+  renderTree();
+  saveSessionToStorage();
+
+  // Scroll
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CHOIX
+// ══════════════════════════════════════════════════════════════════
+async function onChoiceSelected(node, choiceIndex) {
+  if (state.isRunning) return;
+  const choice = node.choices[choiceIndex];
+  if (!choice) return;
+  node.chosenIndex = choiceIndex;
+  node.chosenText = choice.text;
+  // Désactiver les boutons
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  hideChoices();
+
+  state.isRunning = true;
+  document.getElementById('stop-btn').style.display = 'block';
+  updateStartBtn();
+
+  try {
+    await ensureWakeLockActive?.();
+    const newNode = await generateChapter(node, choice, false);
+    state.currentNodeId = newNode.id;
+    renderChapter(newNode, newNode.isEnding);
+    showToast('Chapitre ' + (newNode.id + 1) + ' prêt ✦', 'success', 2000);
+  } catch (e) {
+    if (e.message === 'Arrêt demandé') {
+      showToast('Arrêté', 'warn');
+    } else {
+      debugLog('error', 'CHOIX', e.message);
+      showToast('Erreur : ' + e.message.slice(0, 60), 'error', 4000);
+    }
+    // Re-proposer les choix
+    renderChapter(node, node.isEnding);
+  }
+
+  state.isRunning = false;
+  document.getElementById('stop-btn').style.display = 'none';
+  updateStartBtn();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DÉMARRAGE — premier chapitre
+// ══════════════════════════════════════════════════════════════════
+async function startStory() {
+  if (state.isRunning) return;
+  if (!getApiKey()) { showToast('Ajoutez votre clé API', 'error'); return; }
+  if (state.premise.trim().length < 10) { showToast('Écrivez votre prémisse', 'error'); return; }
+
+  state.isRunning = true;
+  state.rootPremise = state.premise.trim();
+  state.nodes = [];
+  state.currentNodeId = null;
+
+  // Basculer vers game screen
+  document.getElementById('setup-screen').classList.add('hidden');
+  document.getElementById('game-screen').classList.add('visible');
+  document.getElementById('start-btn').classList.add('hidden');
+  document.getElementById('stop-btn').style.display = 'block';
+  document.getElementById('tree-panel').style.display = 'block';
+
+  debugLog('state', 'START', 'Nouvelle histoire : ' + state.rootPremise);
+
+  try {
+    await activateWakeLock();
+    const firstNode = await generateChapter(null, null, true);
+    state.currentNodeId = firstNode.id;
+    renderChapter(firstNode, false);
+    showToast('Prologue prêt ✦', 'success', 2500);
+  } catch (e) {
+    debugLog('error', 'START', e.message);
+    showToast('Erreur : ' + e.message.slice(0, 60), 'error', 4000);
+    document.getElementById('scene-container').innerHTML =
+      '<div style="padding:2rem;text-align:center;color:var(--error);">Erreur au démarrage : ' +
+      esc(e.message) + '</div>';
+  }
+
+  state.isRunning = false;
+  document.getElementById('stop-btn').style.display = 'none';
+  updateStartBtn();
+  saveSessionToStorage();
+}
+
+function resetStory() {
+  stopSpeech();
+  state.nodes = [];
+  state.currentNodeId = null;
+  state.rootPremise = '';
+  state.premise = '';
+  document.getElementById('premise-input').value = '';
+  document.getElementById('setup-screen').classList.remove('hidden');
+  document.getElementById('game-screen').classList.remove('visible');
+  document.getElementById('start-btn').classList.remove('hidden');
+  document.getElementById('tree-panel').style.display = 'none';
+  document.getElementById('scene-container').innerHTML = '';
+  document.getElementById('choices-container').innerHTML = '';
+  clearSessionStorage();
+  updateStartBtn();
+}
+
+function stopStory() {
+  state.stopRequested = true;
+  stopSpeech();
+  debugLog('warn', 'STOP', 'Arrêt demandé');
+  setStatus('Arrêt en cours…');
+  setTimeout(() => { state.stopRequested = false; }, 5000);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ARBRE
+// ══════════════════════════════════════════════════════════════════
+function renderTree() {
+  const treeEl = document.getElementById('tree-path');
+  if (!treeEl) return;
+  treeEl.innerHTML = state.nodes.map(n => {
+    const current = n.id === state.currentNodeId;
+    return '<div class="tree-node' + (current ? ' current' : '') + '">' +
+      '<div class="tn-head">' +
+        '<span class="tn-num">Chapitre ' + (n.id + 1) + (current ? ' · actuel' : '') + '</span>' +
+      '</div>' +
+      '<div class="tn-title">' + esc(n.title) + '</div>' +
+      (n.narration ? '<div class="tn-narration">' + esc(n.narration.slice(0, 180)) + (n.narration.length > 180 ? '…' : '') + '</div>' : '') +
+      (n.chosenText ? '<div class="tn-choice">' + esc(n.chosenText) + '</div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SAUVEGARDE
+// ══════════════════════════════════════════════════════════════════
+function saveSessionToStorage() {
+  try {
+    const session = {
+      version: 1,
+      app: 'Fable Interactive',
+      savedAt: new Date().toISOString(),
+      rootPremise: state.rootPremise,
+      universe: state.universe,
+      maxNodes: state.maxNodes,
+      nodes: state.nodes.map(n => ({
+        id: n.id, parentId: n.parentId, title: n.title, narration: n.narration,
+        imagePrompt: n.imagePrompt, actionPrompt: n.actionPrompt,
+        imageUrl: n.imageUrl, videoUrl: n.videoUrl,
+        choices: n.choices, chosenIndex: n.chosenIndex, chosenText: n.chosenText,
+        isEnding: n.isEnding
+      })),
+      currentNodeId: state.currentNodeId
+    };
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+    updateSaveInfo();
+  } catch (e) {
+    debugLog('warn', 'SAVE', 'Erreur sauvegarde : ' + e.message);
+  }
+}
+function loadSessionFromStorage() {
+  try {
+    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+function clearSessionStorage() {
+  try {
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+    updateSaveInfo();
+  } catch (e) {}
+}
+function updateSaveInfo() {
+  const el = document.getElementById('save-info');
+  if (!el) return;
+  const session = loadSessionFromStorage();
+  if (!session || !session.nodes || session.nodes.length === 0) {
+    el.textContent = 'Aucune session sauvegardée pour l\'instant.';
+    el.classList.remove('ok');
+    return;
+  }
+  const total = session.nodes.length;
+  const withVideo = session.nodes.filter(n => n.videoUrl).length;
+  const withImage = session.nodes.filter(n => n.imageUrl).length;
+  const date = new Date(session.savedAt);
+  const dateStr = date.toLocaleString('fr-FR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+  el.innerHTML = '💾 Session du <strong>' + dateStr + '</strong> · ' +
+    '<strong>' + total + '</strong> chapitre' + (total > 1 ? 's' : '') +
+    ' · ' + withImage + ' images · ' + withVideo + ' vidéos';
+  el.classList.add('ok');
+}
+
+function buildFilename(node, ext) {
+  const num = String(node.id + 1).padStart(2, '0');
+  const safe = (node.title || 'chapitre').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+  return 'Fable-Chapitre-' + num + '-' + safe + '.' + ext;
+}
+
+async function downloadUrl(url, filename) {
+  try {
+    const res = await fetch(url, { mode: 'cors' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl; a.download = filename; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => {
+      document.body.removeChild(a); URL.revokeObjectURL(objectUrl);
+    }, 1000);
+    return true;
+  } catch (e) {
+    try {
+      window.open(url, '_blank', 'noopener');
+      showToast('Ouverture dans un onglet — clic droit → Enregistrer', 'warn', 5000);
+      return true;
+    } catch (e2) { return false; }
+  }
+}
+
+async function downloadSingleNode(nodeId) {
+  const node = state.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  if (node.videoUrl) {
+    showToast('Téléchargement vidéo…', 'success', 1500);
+    await downloadUrl(node.videoUrl, buildFilename(node, 'mp4'));
+  } else if (node.imageUrl) {
+    showToast('Téléchargement image…', 'success', 1500);
+    await downloadUrl(node.imageUrl, buildFilename(node, 'jpg'));
+  } else {
+    showToast('Rien à télécharger pour ce chapitre', 'warn');
+  }
+}
+
+async function downloadAllNodes() {
+  if (state.nodes.length === 0) {
+    showToast('Aucun chapitre à télécharger', 'warn');
+    return;
+  }
+  const btn = document.getElementById('download-all-btn');
+  if (btn) btn.disabled = true;
+  const progressEl = document.getElementById('download-progress');
+  const labelEl = document.getElementById('dp-label');
+  const countEl = document.getElementById('dp-count');
+  const fillEl = document.getElementById('dp-fill');
+  if (progressEl) progressEl.classList.add('visible');
+  let done = 0;
+  const total = state.nodes.length;
+  for (const node of state.nodes) {
+    if (labelEl) labelEl.textContent = 'Chapitre ' + (node.id + 1) + ' · ' + node.title;
+    if (countEl) countEl.textContent = (done + 1) + ' / ' + total;
+    if (fillEl) fillEl.style.width = ((done / total) * 100) + '%';
+    if (node.videoUrl) await downloadUrl(node.videoUrl, buildFilename(node, 'mp4'));
+    if (node.imageUrl) {
+      await sleep(400);
+      await downloadUrl(node.imageUrl, buildFilename(node, 'jpg'));
+    }
+    done++;
+    if (fillEl) fillEl.style.width = ((done / total) * 100) + '%';
+    if (done < total) await sleep(1200);
+  }
+  if (fillEl) fillEl.style.width = '100%';
+  if (labelEl) labelEl.textContent = '✦ Téléchargement terminé ✦';
+  await sleep(2500);
+  if (progressEl) progressEl.classList.remove('visible');
+  if (btn) btn.disabled = false;
+  showToast(total + ' chapitre' + (total > 1 ? 's' : '') + ' téléchargé' + (total > 1 ? 's' : ''), 'success', 3500);
+}
+
+async function copyAllUrls() {
+  const lines = state.nodes.map(n =>
+    'Chapitre ' + (n.id + 1) + ' — ' + n.title + '\n' +
+    (n.videoUrl ? '  Vidéo : ' + n.videoUrl + '\n' : '') +
+    (n.imageUrl ? '  Image : ' + n.imageUrl : '')
+  ).join('\n\n');
+  if (!lines) { showToast('Aucune URL à copier', 'warn'); return; }
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(lines);
+      showToast('URLs copiées', 'success');
+    } else {
+      legacyCopy(lines, (ok) => showToast(ok ? 'URLs copiées' : 'Copie impossible', ok ? 'success' : 'error'));
+    }
+  } catch (e) { showToast('Erreur copie', 'error'); }
+}
+
+function exportSessionJson() {
+  const session = {
+    version: 1,
+    app: 'Fable Interactive',
+    exportedAt: new Date().toISOString(),
+    rootPremise: state.rootPremise,
+    universe: state.universe,
+    maxNodes: state.maxNodes,
+    nodes: state.nodes.map(n => ({
+      id: n.id, parentId: n.parentId, title: n.title, narration: n.narration,
+      imagePrompt: n.imagePrompt, actionPrompt: n.actionPrompt,
+      imageUrl: n.imageUrl, videoUrl: n.videoUrl,
+      choices: n.choices, chosenIndex: n.chosenIndex, chosenText: n.chosenText,
+      isEnding: n.isEnding
+    })),
+    currentNodeId: state.currentNodeId
+  };
+  const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'fable-session-' + Date.now() + '.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+  showToast('Aventure exportée', 'success');
+}
+
+function handleImportJson(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const session = JSON.parse(e.target.result);
+      if (!session.nodes || !Array.isArray(session.nodes)) throw new Error('Format invalide');
+      state.nodes = session.nodes.map(n => ({ ...n }));
+      state.currentNodeId = session.currentNodeId != null ? session.currentNodeId : (state.nodes.length - 1);
+      state.rootPremise = session.rootPremise || '';
+      state.universe = session.universe || 'conte';
+      state.maxNodes = session.maxNodes || 8;
+      // Afficher le dernier chapitre
+      const current = state.nodes.find(n => n.id === state.currentNodeId) || state.nodes[state.nodes.length - 1];
+      if (current) {
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.add('visible');
+        document.getElementById('start-btn').classList.add('hidden');
+        document.getElementById('tree-panel').style.display = 'block';
+        renderChapter(current, current.isEnding);
+      }
+      saveSessionToStorage();
+      showToast('Aventure restaurée ✦', 'success', 3000);
+    } catch (err) {
+      showToast('Fichier JSON invalide', 'error');
+      debugLog('error', 'IMPORT', err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+  initSpeech();
+
+  // API + boutons
+  const saveBtn = document.getElementById('api-save-btn');
+  if (saveBtn) saveBtn.addEventListener('click', saveApiKey);
+  const apiInput = document.getElementById('api-key-input');
+  if (apiInput) apiInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); }
+  });
+  const startBtn = document.getElementById('start-btn');
+  if (startBtn) startBtn.addEventListener('click', startStory);
+  const stopBtn = document.getElementById('stop-btn');
+  if (stopBtn) stopBtn.addEventListener('click', stopStory);
+
+  // Sections
+  document.querySelectorAll('[data-toggle]').forEach(header => {
+    header.addEventListener('click', () => {
+      document.getElementById(header.dataset.toggle).classList.toggle('open');
+    });
+  });
+
+  // Prémisse
+  const premiseInput = document.getElementById('premise-input');
+  if (premiseInput) {
+    premiseInput.addEventListener('input', e => {
+      state.premise = e.target.value;
+      updateStartBtn();
+    });
+  }
+  const chipsEl = document.getElementById('premise-chips');
+  if (chipsEl) {
+    chipsEl.innerHTML = PREMISE_SUGGESTIONS.map(t =>
+      '<button type="button" class="premise-chip" data-premise="' + esc(t) + '">' +
+        esc(t.slice(0, 55)) + (t.length > 55 ? '…' : '') +
+      '</button>'
+    ).join('');
+    chipsEl.querySelectorAll('.premise-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const val = chip.dataset.premise;
+        state.premise = val;
+        if (premiseInput) premiseInput.value = val;
+        updateStartBtn();
+      });
+    });
+  }
+
+  // Sélecteurs
+  const maxSelect = document.getElementById('max-nodes-select');
+  if (maxSelect) maxSelect.addEventListener('change', e => { state.maxNodes = parseInt(e.target.value, 10); });
+  const durationSelect = document.getElementById('duration-select');
+  if (durationSelect) durationSelect.addEventListener('change', e => { state.durationFrames = parseInt(e.target.value, 10); });
+  const modeSelect = document.getElementById('mode-select');
+  if (modeSelect) modeSelect.addEventListener('change', e => { state.mode = e.target.value; });
+  const ttsSelect = document.getElementById('tts-select');
+  if (ttsSelect) ttsSelect.addEventListener('change', e => { state.tts = e.target.value; });
+
+  // Wake lock
+  const wakeBtn = document.getElementById('wake-toggle-btn');
+  if (wakeBtn) wakeBtn.addEventListener('click', toggleWakeLock);
+  try {
+    const saved = localStorage.getItem(WAKE_LOCK_PREF);
+    wakeLockEnabled = saved === '1';
+  } catch (e) {}
+  if (wakeLockEnabled) activateWakeLock().then(() => updateWakeStatus());
+
+  // Debug
+  const debugHeader = document.getElementById('debug-header');
+  if (debugHeader) debugHeader.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    toggleDebugCollapse();
+  });
+  const debugCollapseBtn = document.getElementById('debug-collapse-btn');
+  if (debugCollapseBtn) debugCollapseBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleDebugCollapse(); });
+  const debugClearBtn = document.getElementById('debug-clear-btn');
+  if (debugClearBtn) debugClearBtn.addEventListener('click', (e) => { e.stopPropagation(); clearDebug(); });
+  const debugCopyBtn = document.getElementById('debug-copy-btn');
+  if (debugCopyBtn) debugCopyBtn.addEventListener('click', (e) => { e.stopPropagation(); copyDebug(); });
+
+  // Save
+  const downloadAllBtn = document.getElementById('download-all-btn');
+  if (downloadAllBtn) downloadAllBtn.addEventListener('click', downloadAllNodes);
+  const copyUrlsBtn = document.getElementById('copy-urls-btn');
+  if (copyUrlsBtn) copyUrlsBtn.addEventListener('click', copyAllUrls);
+  const exportBtn = document.getElementById('export-json-btn');
+  if (exportBtn) exportBtn.addEventListener('click', exportSessionJson);
+  const importBtn = document.getElementById('import-json-btn');
+  if (importBtn) importBtn.addEventListener('click', () => document.getElementById('import-json-input').click());
+  const importInput = document.getElementById('import-json-input');
+  if (importInput) importInput.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleImportJson(file);
+    e.target.value = '';
+  });
+
+  // Restauration session
+  const session = loadSessionFromStorage();
+  if (session && session.nodes && session.nodes.length > 0) {
+    debugLog('info', 'INIT', 'Session précédente détectée (' + session.nodes.length + ' chapitres)');
+    // Ne restaure pas automatiquement, laisse l'utilisateur utiliser Import
+    // Mais on met à jour l'affichage de la barre save
+  }
+  updateSaveInfo();
+
+  // Rendus initiaux
+  updateApiPanel();
+  updateTimingDisplay();
+  updateWakeStatus();
+  renderUniverses();
+  updateStartBtn();
+
+  debugLog('success', 'INIT', 'Fable Interactive prête');
+  debugLog('info', 'INIT', 'Pipeline : PRÉMISSE → CHAPITRE TEXTE → IMAGE → VIDÉO → CHOIX → …');
+  debugLog('info', 'INIT', 'Modèles : ' + MODEL_TEXT + ' / ' + MODEL_IMAGE + ' / ' + MODEL_VIDEO);
+  debugLog('info', 'INIT', 'Parser JSON : 5 stratégies actives');
+})();
+</script>
+</body>
+</html>
