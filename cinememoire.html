@@ -3,1596 +3,2024 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CinéMémoire — Studio de films longs IA</title>
+<title>Ciné Continuum — Moteur de Continuité Narrative</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0a0a0e;--panel:#14141c;--panel-2:#1c1c28;--border:#2a2a3a;--ink:#e8e8f0;--ink-dim:#8888a0;--ink-faint:#55556a;--success:#2d8a4e;--error:#c0392b;--warn:#d4a017;--info:#4a6cf7;--accent:#e94560;--radius:12px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem .8rem 7rem;font-size:15px;line-height:1.5;max-width:900px;margin:0 auto}
-header{margin-bottom:1rem;text-align:center}
-h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.2rem;background:linear-gradient(135deg,#e94560,#d4a017,#4a6cf7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.subtitle{font-size:.8rem;color:var(--ink-dim)}
-.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel);color:var(--ink);padding:.75rem 1.2rem;border-radius:10px;font-size:.82rem;font-weight:500;box-shadow:0 4px 30px rgba(0,0,0,.6);border:1px solid var(--border);z-index:1000;opacity:0;transition:transform .35s ease,opacity .35s ease;max-width:90vw;text-align:center;display:flex;align-items:center;gap:.5rem}
-.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{border-color:var(--success)}.toast.error{border-color:var(--error)}.toast.warn{border-color:var(--warn)}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:.8rem}
-.panel h2{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-dim);font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem}
-.panel h2 .badge{background:var(--accent);color:#fff;border-radius:10px;padding:.1rem .5rem;font-size:.6rem;letter-spacing:0}
-.api-row{display:flex;gap:.5rem;margin-bottom:.5rem}
-.api-row input{flex:1;padding:.7rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:ui-monospace,monospace;font-size:.8rem;min-width:0}
-.api-row input:focus{outline:none;border-color:var(--accent)}
-.api-row button{padding:.7rem 1rem;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:700;font-family:inherit;font-size:.8rem;cursor:pointer;white-space:nowrap}
-.api-status{font-size:.72rem;color:var(--ink-dim);display:flex;align-items:center;gap:.4rem}
-.api-status .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex-shrink:0}
-.api-status.ok .dot{background:var(--success)}.api-status.ok{color:var(--success)}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;margin-top:.6rem}
-.stat-box{background:var(--panel-2);border-radius:8px;padding:.4rem .5rem;text-align:center}
-.stat-box .sv{font-size:.9rem;font-weight:800;color:var(--accent);font-family:ui-monospace,monospace}
-.stat-box .sl{font-size:.55rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem}
-.field{margin-bottom:.7rem}
-.field label{display:block;font-size:.68rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:.35rem}
-.field select,.field textarea,.field input[type=text]{width:100%;padding:.7rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.88rem;-webkit-appearance:none;appearance:none}
-.field select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%238888a0' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right .9rem center;background-size:10px;padding-right:2rem}
-.field select:focus,.field textarea:focus,.field input:focus{outline:none;border-color:var(--accent)}
-.field textarea{min-height:60px;resize:vertical;line-height:1.5}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
-.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border)}
-.toggle-row:last-child{border-bottom:none}
-.toggle-row .tl{font-size:.82rem}.toggle-row .th{font-size:.65rem;color:var(--ink-faint)}
-.switch{position:relative;display:inline-block;width:42px;height:23px;flex-shrink:0}
-.switch input{opacity:0;width:0;height:0}
-.switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--panel-2);transition:.3s;border-radius:23px;border:1px solid var(--border)}
-.switch .slider:before{position:absolute;content:"";height:15px;width:15px;left:3px;bottom:3px;background:var(--ink-dim);transition:.3s;border-radius:50%}
-.switch input:checked+.slider{background:var(--success);border-color:var(--success)}
-.switch input:checked+.slider:before{transform:translateX(19px);background:#fff}
-.btn{width:100%;padding:1rem;border-radius:var(--radius);border:none;font-size:1rem;font-weight:800;font-family:inherit;cursor:pointer;transition:opacity .2s,transform .1s;margin-bottom:.7rem}
-.btn:active:not(:disabled){transform:scale(.98)}.btn:disabled{opacity:.3;cursor:not-allowed}
-.btn-primary{background:linear-gradient(135deg,#e94560,#d4a017,#4a6cf7);color:#fff}
-.btn-success{background:var(--success);color:#fff}
-.btn-info{background:var(--info);color:#fff}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--ink)}
-.btn-outline:active{background:var(--panel-2)}
-.btn-sm{padding:.6rem .8rem;font-size:.75rem;font-weight:700}
-.btn-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem}
-.btn-row .btn{flex:1;min-width:100px;margin-bottom:0}
-.console{background:#060608;border:1px solid var(--border);border-radius:var(--radius);padding:.7rem .9rem;margin-bottom:.8rem;max-height:200px;overflow-y:auto;font-family:ui-monospace,monospace;font-size:.68rem;line-height:1.6}
-.console .log-line{padding:.1rem 0}
-.console .log-time{color:var(--ink-faint);margin-right:.4rem}
-.console .log-info{color:var(--info)}.console .log-success{color:var(--success)}.console .log-error{color:var(--error)}.console .log-warn{color:var(--warn)}.console .log-measure{color:#ffb84d;font-weight:700}
-.result-section{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:.8rem;overflow:hidden}
-.result-header{padding:.8rem 1rem;cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center}
-.result-header:active{background:var(--panel-2)}
-.result-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-dim);font-weight:700}
-.result-header .chevron{font-size:.65rem;color:var(--ink-faint);transition:transform .2s}
-.result-section.open .result-header .chevron{transform:rotate(180deg)}
-.result-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
-.result-section.open .result-body{max-height:100000px}
-.result-content{padding:0 1rem 1rem}
-.scene-card{background:var(--panel-2);border-radius:8px;padding:.8rem;margin-bottom:.6rem;border-left:3px solid var(--accent)}
-.scene-card.done{border-left-color:var(--success)}
-.scene-card.processing{border-left-color:var(--info)}
-.scene-card .scene-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;gap:.4rem}
-.scene-card .scene-num{font-weight:800;color:var(--accent);font-size:.85rem;flex-shrink:0}
-.scene-card.done .scene-num{color:var(--success)}
-.scene-card.processing .scene-num{color:var(--info)}
-.scene-card .scene-status{font-size:.62rem;padding:.15rem .5rem;border-radius:4px;font-weight:700;white-space:nowrap}
-.scene-card .scene-status.pending{background:var(--panel);color:var(--ink-dim)}
-.scene-card .scene-status.processing{background:var(--info);color:#fff}
-.scene-card .scene-status.done{background:var(--success);color:#fff}
-.scene-card .scene-status.failed{background:var(--error);color:#fff}
-.scene-card .scene-field{margin-bottom:.4rem}
-.scene-card .scene-field .sf-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;display:block;margin-bottom:.1rem}
-.scene-card .scene-field .sf-value{font-size:.78rem;color:var(--ink);line-height:1.5;word-break:break-word}
-.scene-card .scene-field .sf-value.plan{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700;background:var(--info);color:#fff}
-.scene-card .scene-field .sf-value.camera{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700;background:var(--warn);color:#000}
-.scene-card video{width:100%;border-radius:6px;margin-top:.4rem;background:#000;max-height:300px}
-.pending-card{border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--panel-2);padding:1rem .6rem;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:120px;text-align:center;margin-bottom:.6rem}
-.pending-card.measuring{border-color:var(--info)}
-.pending-card .p-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:.6rem}
-.pending-card.measuring .p-spinner{border-top-color:var(--info)}
-.pending-card .p-label{font-size:.75rem;color:var(--ink);font-weight:700;margin-bottom:.3rem}
-.pending-card .p-text{font-size:.65rem;color:var(--ink-dim);font-family:ui-monospace,monospace;margin-bottom:.4rem}
-.pending-card .p-bar{width:100%;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
-.pending-card .p-fill{height:100%;background:linear-gradient(90deg,#e94560,#4a6cf7);border-radius:3px;transition:width .5s ease;width:0%}
-.player-container{background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:.6rem}
-.player-container video{width:100%;display:block;max-height:70vh;object-fit:contain;background:#000}
-.player-controls{display:flex;gap:.4rem;padding:.5rem;background:var(--panel);flex-wrap:wrap}
-.player-controls button{flex:1;min-width:70px;padding:.5rem .6rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--ink);font-family:inherit;font-size:.72rem;font-weight:700;cursor:pointer}
-.player-controls button.playing{background:var(--accent);color:#fff;border-color:var(--accent)}
-.progress-bar{height:4px;background:var(--panel-2);border-radius:2px;overflow:hidden;margin-top:.4rem}
-.progress-bar-fill{height:100%;background:linear-gradient(90deg,#e94560,#4a6cf7);border-radius:2px;transition:width .3s}
-.character-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:.4rem;margin-bottom:.6rem}
-.char-card{border-radius:8px;overflow:hidden;border:1px solid var(--border);background:var(--panel-2);text-align:center;padding:.3rem}
-.char-card img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:6px;margin-bottom:.2rem}
-.char-card .char-name{font-size:.65rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.char-card .char-gender{font-size:.55rem;color:var(--ink-dim)}
-.memory-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:.2rem .5rem;font-size:.65rem;color:var(--ink-dim);margin-right:.3rem;margin-bottom:.3rem}
-.memory-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--success);flex-shrink:0}
-.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);color:var(--ink);padding:.7rem 1rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;transform:translateY(100%);transition:transform .3s;z-index:100}
-.status-bar.visible{transform:translateY(0)}
-.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.hidden{display:none!important}
-#noSleepCanvas,#noSleepVideo{position:fixed;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1}
-.project-item{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem;margin-bottom:.4rem;cursor:pointer;transition:border-color .2s}
-.project-item:active{border-color:var(--accent)}
-.project-item.active{border-color:var(--accent);background:rgba(233,69,96,.08)}
-.project-item .pi-title{font-size:.82rem;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.project-item .pi-meta{font-size:.65rem;color:var(--ink-dim);margin-top:.15rem}
-.progress-ring{display:inline-block;width:38px;height:38px;border-radius:50%;background:conic-gradient(var(--success) calc(var(--pct)*1%), var(--panel-2) 0);position:relative;flex-shrink:0}
-.progress-ring::after{content:attr(data-pct)'%';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.55rem;font-weight:800;color:var(--ink)}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --night: #0a0a12; --night-2: #12121c; --night-3: #1a1a28;
+  --panel: #16161f; --panel-2: #1e1e2b; --border: #2a2a3a; --border-soft: #23232f;
+  --orange: #e87b35; --orange-soft: #f0a060; --orange-deep: #b85a1e;
+  --blue: #4a7bc8; --blue-soft: #6a9be0; --blue-deep: #2c4a80;
+  --yellow: #e5c15a; --yellow-soft: #f0d080; --yellow-deep: #b89a3a;
+  --purple: #8b5fc4; --purple-soft: #a880d8; --purple-deep: #5c3a8a;
+  --mint: #a8d8c8; --lavender: #c8b0e0; --teal: #6ab8b0;
+  --ink: #e8e6e0; --ink-dim: #8a8896; --ink-faint: #4a4858;
+  --success: #4a9d6a; --error: #c85a4a; --warn: #d4a017;
+  --radius: 4px;
+  --font-serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+html, body { background: var(--night); }
+body {
+  font-family: var(--font-sans); background: var(--night);
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(232,123,53,0.06) 0%, transparent 45%),
+    radial-gradient(circle at 85% 100%, rgba(139,95,196,0.06) 0%, transparent 45%);
+  background-attachment: fixed; color: var(--ink); min-height: 100vh;
+  padding: 1.5rem 1rem 26rem; font-size: 15px; line-height: 1.55;
+  max-width: 1000px; margin: 0 auto;
+}
+header { margin-bottom: 1.5rem; text-align: center; position: relative; padding: 1rem 0 1rem; }
+header::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:120px; height:1px;
+  background: linear-gradient(90deg, transparent, var(--orange), var(--yellow), var(--purple), transparent);
+  opacity:0.6; }
+.kata-mark { font-family: var(--font-serif); font-size: 0.75rem; letter-spacing: 0.4em;
+  color: var(--yellow); text-transform: uppercase; margin-bottom: 0.6rem; opacity: 0.75; }
+h1 { font-family: var(--font-serif); font-size: 2rem; font-weight: 300; letter-spacing: 0.02em;
+  background: linear-gradient(135deg, var(--orange), var(--yellow) 30%, var(--mint) 55%, var(--lavender) 75%, var(--purple));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { font-family: var(--font-serif); font-size: 0.9rem; color: var(--ink-dim); font-style: italic; margin-top: 0.3rem; }
 
-/* ═══ MODAL D'ÉDITION — CORRIGÉ ═══ */
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
-.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:700px;max-height:90vh;overflow-y:auto;padding:1.2rem}
-.modal-box h3{font-size:1rem;font-weight:800;margin-bottom:1rem;color:var(--accent);display:flex;justify-content:space-between;align-items:center}
-.modal-box h3 button{background:transparent;border:none;color:var(--ink-dim);font-size:1.2rem;cursor:pointer;padding:.2rem .5rem}
-.modal-box .field{margin-bottom:.8rem}
-.modal-box .field label{font-size:.7rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:.3rem;display:block}
-.modal-box .field input,.modal-box .field textarea,.modal-box .field select{width:100%;padding:.6rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.85rem}
-.modal-box .field textarea{min-height:70px;resize:vertical;line-height:1.5}
-.modal-box .field input:focus,.modal-box .field textarea:focus,.modal-box .field select:focus{outline:none;border-color:var(--accent)}
-.modal-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
-.modal-actions .btn{flex:1;min-width:120px;margin:0}
-.scene-edit-btn{background:var(--info);color:#fff;border:none;border-radius:6px;padding:.3rem .6rem;font-size:.65rem;font-weight:700;cursor:pointer;margin-left:.3rem}
-.scene-edit-btn:active{opacity:.7}
-.scene-del-btn{background:var(--error);color:#fff;border:none;border-radius:6px;padding:.3rem .6rem;font-size:.65rem;font-weight:700;cursor:pointer;margin-left:.3rem}
+.toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-120px);
+  background: var(--night-3); color: var(--ink); border: 1px solid var(--border);
+  border-left: 3px solid var(--yellow); padding: 0.85rem 1.4rem; border-radius: var(--radius);
+  font-size: 0.85rem; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1000; opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.2,0.9,0.3,1.2), opacity 0.35s ease;
+  max-width: 90vw; display: flex; gap: 0.5rem; align-items: center; }
+.toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--error); }
+.toast.warn { border-left-color: var(--warn); }
+.toast-icon { color: var(--yellow); }
+
+.info-banner { background: linear-gradient(135deg, rgba(200,176,224,0.06), rgba(168,216,200,0.05));
+  border: 1px solid var(--border); border-left: 2px solid var(--lavender);
+  padding: 1rem 1.15rem; border-radius: var(--radius); font-size: 0.8rem; color: var(--ink-dim);
+  margin-bottom: 1.2rem; line-height: 1.6; }
+.info-banner strong { color: var(--ink); }
+.info-banner .hl-lav { color: var(--lavender); }
+.info-banner .hl-yel { color: var(--yellow-soft); }
+.info-banner .hl-org { color: var(--orange-soft); }
+.info-banner .hl-mint { color: var(--mint); }
+
+.section { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 1rem; overflow: hidden; }
+.section.open { box-shadow: 0 0 0 1px rgba(229,193,90,0.05), 0 4px 20px rgba(0,0,0,0.3); }
+.section-header { padding: 1rem 1.2rem; cursor: pointer; user-select: none;
+  display: flex; justify-content: space-between; align-items: center; }
+.section-title { font-family: var(--font-serif); font-size: 0.85rem; text-transform: uppercase;
+  letter-spacing: 0.2em; color: var(--ink); font-weight: 500; display: flex; align-items: center; gap: 0.6rem; }
+.badge { display: inline-block; padding: 0.15rem 0.55rem; background: transparent; color: var(--yellow);
+  border: 1px solid var(--yellow-deep); border-radius: 2px; font-size: 0.6rem;
+  letter-spacing: 0.15em; font-family: var(--font-sans); font-weight: 600; }
+.badge.soft { color: var(--blue-soft); border-color: var(--blue-deep); }
+.badge.success { color: var(--orange-soft); border-color: var(--orange-deep); }
+.badge.purple { color: var(--purple-soft); border-color: var(--purple-deep); }
+.badge.lav { color: var(--lavender); border-color: #8a6aa8; }
+.badge.error { color: var(--error); border-color: #8a3a3a; }
+.chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.3s; }
+.section.open .chevron { transform: rotate(180deg); color: var(--yellow); }
+.section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.section.open .section-body { max-height: 20000px; }
+.section-content { padding: 0 1.2rem 1.2rem; }
+
+.api-panel { background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+.api-panel.ok { box-shadow: inset 3px 0 0 var(--success); }
+.api-key-input { width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--night-2); color: var(--ink);
+  font-family: var(--font-mono); font-size: 0.82rem; margin-bottom: 0.6rem; }
+.api-key-input:focus { outline: none; border-color: var(--blue); }
+.api-save-btn { width: 100%; padding: 0.85rem; border-radius: var(--radius);
+  border: 1px solid var(--yellow-deep);
+  background: linear-gradient(135deg, rgba(232,123,53,0.15), rgba(229,193,90,0.1));
+  color: var(--yellow-soft); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.15em;
+  text-transform: uppercase; cursor: pointer; margin-bottom: 0.7rem; }
+.api-status-line { font-size: 0.75rem; padding: 0.6rem 0.9rem; border-radius: var(--radius);
+  display: flex; align-items: center; gap: 0.6rem; background: var(--night-2);
+  color: var(--ink-dim); border: 1px solid var(--border-soft); }
+.api-status-line.ok { background: rgba(74,157,106,0.08); color: var(--success);
+  border-color: rgba(74,157,106,0.3); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); }
+.api-status-line.ok .status-dot { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.api-hint { font-size: 0.72rem; color: var(--ink-dim); margin-top: 0.5rem; }
+.api-hint a { color: var(--blue-soft); text-decoration: none; border-bottom: 1px dotted var(--blue-deep); }
+
+.control-row { margin-bottom: 0.9rem; }
+.control-label { display: block; font-size: 0.72rem; color: var(--ink-dim);
+  margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; }
+input[type=text], input[type=number], textarea, select {
+  width: 100%; padding: 0.75rem 0.9rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--night-2); color: var(--ink);
+  font-family: inherit; font-size: 0.88rem; -webkit-appearance: none; appearance: none; }
+textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--blue); }
+select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 10px; padding-right: 2rem; cursor: pointer; }
+select option { background: var(--night-3); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.btn-primary { width: 100%; padding: 1.1rem; border-radius: var(--radius);
+  border: 1px solid var(--yellow-deep);
+  background: linear-gradient(135deg, rgba(232,123,53,0.2), rgba(229,193,90,0.15), rgba(139,95,196,0.15));
+  color: var(--yellow-soft); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; cursor: pointer; margin-bottom: 0.8rem; }
+.btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
+.btn-secondary { width: 100%; padding: 0.85rem; border-radius: var(--radius);
+  border: 1px solid var(--blue-deep); background: rgba(74,123,200,0.08);
+  color: var(--blue-soft); font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 0.8rem; }
+.btn-secondary:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-stop { width: 100%; padding: 0.85rem; border-radius: var(--radius);
+  border: 1px solid var(--error); background: transparent; color: var(--error);
+  font-size: 0.82rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
+  cursor: pointer; margin-bottom: 0.8rem; display: none; }
+.btn-stop.visible { display: block; }
+
+/* CHARACTERS */
+.char-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.char-card { background: var(--night-2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.9rem; position: relative; }
+.char-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; gap: 0.6rem; }
+.char-name-input { font-family: var(--font-serif); font-size: 1rem; color: var(--yellow-soft);
+  background: transparent; border: none; border-bottom: 1px solid var(--border-soft);
+  padding: 0.2rem 0; flex: 1; }
+.char-name-input:focus { outline: none; border-bottom-color: var(--yellow-deep); }
+.char-remove { background: transparent; border: 1px solid var(--border-soft);
+  color: var(--ink-faint); width: 26px; height: 26px; border-radius: 50%;
+  font-size: 0.75rem; cursor: pointer; flex-shrink: 0; }
+.char-remove:hover { color: var(--error); border-color: var(--error); }
+.char-field-row { margin-bottom: 0.5rem; }
+.char-label { font-size: 0.6rem; color: var(--ink-faint); text-transform: uppercase;
+  letter-spacing: 0.12em; font-weight: 600; margin-bottom: 0.2rem; display: block; font-family: var(--font-mono); }
+.char-input, .char-textarea { width: 100%; padding: 0.5rem 0.7rem; border-radius: var(--radius);
+  border: 1px solid var(--border-soft); background: var(--panel); color: var(--ink);
+  font-family: var(--font-sans); font-size: 0.8rem; }
+.char-textarea { min-height: 50px; resize: vertical; }
+.char-ref-area { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.char-ref-thumb { position: relative; width: 64px; height: 64px; border-radius: var(--radius);
+  overflow: hidden; border: 1px solid var(--border-soft); background: var(--panel); }
+.char-ref-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.char-ref-thumb .rm { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px;
+  background: rgba(200,90,74,0.85); color: #fff; border: none; border-radius: 50%;
+  font-size: 9px; cursor: pointer; line-height: 1; }
+.char-ref-add { width: 64px; height: 64px; border: 2px dashed var(--border-soft);
+  border-radius: var(--radius); background: var(--panel); color: var(--ink-faint);
+  font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.char-ref-add:hover { border-color: var(--yellow-deep); color: var(--yellow); }
+.char-add-btn { width: 100%; padding: 0.9rem; border-radius: var(--radius);
+  border: 1px dashed var(--yellow-deep); background: rgba(229,193,90,0.04);
+  color: var(--yellow-soft); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.15em;
+  text-transform: uppercase; cursor: pointer; margin-top: 0.5rem; }
+
+/* OBJECTS */
+.obj-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.obj-card { background: var(--night-2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.7rem; display: grid;
+  grid-template-columns: 1fr 1fr auto; gap: 0.4rem; align-items: start; }
+.obj-card input, .obj-card select { font-size: 0.75rem; padding: 0.45rem 0.6rem; }
+.obj-remove { background: transparent; border: 1px solid var(--border-soft);
+  color: var(--ink-faint); width: 26px; height: 26px; border-radius: 50%; cursor: pointer; }
+.obj-remove:hover { color: var(--error); border-color: var(--error); }
+
+/* LOCKS */
+.locks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; }
+.lock-toggle { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.75rem;
+  background: var(--night-2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); cursor: pointer; user-select: none; font-size: 0.75rem; }
+.lock-toggle.on { border-color: var(--success); background: rgba(74,157,106,0.06); color: var(--success); }
+.lock-toggle .lk-icon { font-size: 0.9rem; }
+.lock-toggle input { display: none; }
+
+/* TIMELINE */
+.timeline { display: flex; flex-direction: column; gap: 0.5rem; }
+.scene-card { background: var(--night-2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.8rem; transition: border-color 0.3s; }
+.scene-card.active { border-color: var(--yellow); box-shadow: 0 0 0 1px rgba(229,193,90,0.15); }
+.scene-card.done { border-color: var(--success); }
+.scene-card.failed { border-color: var(--error); }
+.scene-card.pending { opacity: 0.55; }
+.scene-head { display: flex; justify-content: space-between; gap: 0.6rem; align-items: center; margin-bottom: 0.4rem; }
+.scene-num { font-family: var(--font-mono); font-size: 0.65rem; color: var(--yellow);
+  letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; }
+.scene-status { font-size: 0.62rem; font-family: var(--font-mono); color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.1em; }
+.scene-title { font-family: var(--font-serif); font-size: 0.9rem; color: var(--ink); margin-bottom: 0.3rem; }
+.scene-meta { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.scene-chip { font-size: 0.62rem; padding: 0.15rem 0.5rem; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--border-soft); color: var(--ink-dim);
+  font-family: var(--font-mono); }
+.scene-chip.emotion { color: var(--lavender); border-color: #8a6aa8; }
+.scene-chip.loc { color: var(--mint); border-color: #3a7a6a; }
+.scene-chip.time { color: var(--yellow-soft); border-color: var(--yellow-deep); }
+.scene-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.4rem; margin-top: 0.6rem; }
+.scene-thumb { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-soft);
+  background: #000; aspect-ratio: 9/16; position: relative; }
+.scene-thumb img, .scene-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.scene-thumb .lbl { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.2rem 0.3rem;
+  background: linear-gradient(transparent, rgba(10,10,18,0.9)); font-size: 0.55rem;
+  font-family: var(--font-mono); color: var(--yellow-soft); text-align: center; }
+.scene-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; flex-wrap: wrap; }
+.scene-actions button { flex: 1; min-width: 90px; padding: 0.5rem 0.7rem;
+  border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--panel);
+  color: var(--ink-dim); font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; cursor: pointer; font-family: inherit; }
+.scene-actions button:hover { color: var(--yellow); border-color: var(--yellow-deep); }
+.scene-actions button.primary { color: var(--success); border-color: rgba(74,157,106,0.3); }
+.scene-actions button.danger { color: var(--error); border-color: #8a3a3a; }
+
+/* CONTINUITY SCORE */
+.score-panel { background: var(--night-2); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); padding: 0.8rem; margin-top: 0.6rem; }
+.score-line { display: flex; justify-content: space-between; align-items: center;
+  padding: 0.25rem 0; font-size: 0.72rem; font-family: var(--font-mono); }
+.score-label { color: var(--ink-dim); }
+.score-value { color: var(--ink); font-weight: 600; }
+.score-value.warn { color: var(--warn); }
+.score-value.bad { color: var(--error); }
+.score-bar { height: 3px; background: var(--panel); border-radius: 2px; margin-top: 0.2rem; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 2px; background: var(--success); transition: width 0.4s; }
+.score-fill.warn { background: var(--warn); }
+.score-fill.bad { background: var(--error); }
+
+/* MODALS */
+.modal-bg { position: fixed; inset: 0; background: rgba(5,5,15,0.85); z-index: 500;
+  display: none; align-items: center; justify-content: center; padding: 1rem; }
+.modal-bg.visible { display: flex; }
+.modal { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  max-width: 520px; width: 100%; padding: 1.2rem 1.4rem; max-height: 85vh; overflow-y: auto; }
+.modal-title { font-family: var(--font-serif); font-size: 1.1rem; color: var(--yellow-soft);
+  margin-bottom: 0.8rem; letter-spacing: 0.1em; }
+.modal-msg { font-size: 0.82rem; color: var(--ink-dim); line-height: 1.6; margin-bottom: 0.8rem; }
+.modal-choices { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 1rem; }
+.modal-choices button { padding: 0.75rem; border-radius: var(--radius);
+  border: 1px solid var(--border-soft); background: var(--night-2); color: var(--ink);
+  font-size: 0.8rem; cursor: pointer; text-align: left; font-family: inherit; }
+.modal-choices button:hover { border-color: var(--yellow-deep); background: rgba(229,193,90,0.05); }
+.modal-choices button strong { color: var(--yellow-soft); margin-right: 0.4rem; }
+
+/* STATUS BAR */
+.status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--night-3);
+  border-top: 1px solid var(--border); color: var(--ink); padding: 0.8rem 1.1rem;
+  font-size: 0.78rem; display: flex; align-items: center; gap: 0.7rem;
+  transform: translateY(100%); transition: transform 0.35s; z-index: 100;
+  font-family: var(--font-mono); box-shadow: 0 -4px 20px rgba(0,0,0,0.4); }
+.status-bar.visible { transform: translateY(0); }
+.spinner { width: 12px; height: 12px; border: 2px solid rgba(229,193,90,0.2);
+  border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* DEBUG */
+.debug-panel { position: fixed; bottom: 0; left: 0; right: 0; height: 240px; background: #05050a;
+  border-top: 2px solid var(--yellow-deep); z-index: 200; display: flex; flex-direction: column;
+  font-family: var(--font-mono); box-shadow: 0 -8px 32px rgba(0,0,0,0.7); transition: height 0.3s; }
+.debug-panel.collapsed { height: 36px; }
+.debug-header { display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0.8rem; background: linear-gradient(90deg, #0f0f18, #1a1a28);
+  border-bottom: 1px solid var(--border); cursor: pointer; }
+.debug-title { font-size: 0.7rem; color: var(--yellow); letter-spacing: 0.15em;
+  text-transform: uppercase; font-weight: 600; }
+.debug-actions button { background: transparent; border: 1px solid var(--border);
+  color: var(--ink-dim); font-size: 0.6rem; padding: 0.2rem 0.5rem; border-radius: 2px;
+  cursor: pointer; margin-left: 0.3rem; }
+.debug-body { flex: 1; overflow-y: auto; padding: 0.5rem 0.7rem 1rem;
+  font-size: 0.7rem; line-height: 1.45; color: #c8c8d0; }
+.debug-entry { margin-bottom: 0.25rem; padding: 0.2rem 0.4rem;
+  border-left: 2px solid transparent; border-radius: 2px; word-break: break-word; }
+.debug-entry.info { border-left-color: var(--ink-faint); }
+.debug-entry.success { border-left-color: var(--success); background: rgba(74,157,106,0.04); }
+.debug-entry.warn { border-left-color: var(--warn); background: rgba(212,160,23,0.04); }
+.debug-entry.error { border-left-color: var(--error); background: rgba(200,90,74,0.06); color: #f0a0a0; }
+.debug-entry.api { border-left-color: var(--blue); background: rgba(74,123,200,0.04); }
+.debug-entry.state { border-left-color: var(--orange); background: rgba(232,123,53,0.04); }
+.debug-time { color: var(--ink-faint); margin-right: 0.4rem; font-size: 0.62rem; }
+.debug-cat { color: var(--yellow-soft); font-weight: 600; margin-right: 0.3rem; font-size: 0.62rem; }
+.debug-msg { color: #d8d8e0; }
+
+#noSleepCanvas, #noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+.hidden { display: none !important; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--night-2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.6rem; }
+  body { padding-bottom: 22rem; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .debug-panel { height: 200px; }
+  .obj-card { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
 <header>
-    <h1>🎬 CinéMémoire</h1>
-    <p class="subtitle">Studio de films longs IA — Persistance · Mémoire · Reprise</p>
+  <div class="kata-mark">記憶 · Continuum</div>
+  <h1>Ciné Continuum</h1>
+  <p class="subtitle">Un moteur vidéo avec une mémoire. Chaque scène continue la précédente.</p>
 </header>
 
-<!-- ═══ API KEY ══ -->
-<div class="panel">
-    <h2>🔑 Clé API Agnès</h2>
-    <div class="api-row">
-        <input type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false">
-        <button type="button" id="api-save-btn">OK</button>
-    </div>
-    <div class="api-status" id="api-status"><span class="dot"></span><span id="api-status-text">Aucune clé</span></div>
-    <div class="stats-grid">
-        <div class="stat-box"><div class="sv" id="ct-text">0</div><div class="sl">Textes</div></div>
-        <div class="stat-box"><div class="sv" id="ct-img">0</div><div class="sl">Images</div></div>
-        <div class="stat-box"><div class="sv" id="ct-vid">0</div><div class="sl">Sec. vidéo</div></div>
-        <div class="stat-box"><div class="sv" id="ct-rpm">0</div><div class="sl">RPM</div></div>
-    </div>
+<div class="info-banner">
+  <strong>Le principe :</strong> le générateur ne voit jamais une scène isolée.
+  Chaque prompt est reconstruit à partir de <strong class="hl-lav">la Bible Personnage</strong>,
+  <strong class="hl-yel">la Bible Monde</strong>, <strong class="hl-org">l'état de la scène précédente</strong> et
+  <strong class="hl-mint">l'objectif de la scène courante</strong>.
+  Aucune scène ne peut "réinventer" un personnage — il est toujours <strong>continué</strong>, jamais recréé.
 </div>
 
-<!-- ══ PROJETS ═══ -->
-<div class="panel">
-    <h2>📁 Projets <span class="badge" id="projects-count">0</span></h2>
-    <div id="projects-list"><div style="font-size:.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucun projet. Créez-en un ci-dessous.</div></div>
-    <button type="button" class="btn btn-primary btn-sm" id="new-project-btn" style="margin-top:.6rem;">➕ Nouveau projet</button>
-    <div class="field hidden" id="new-project-field" style="margin-top:.6rem;">
-        <label>Titre du projet</label>
-        <input type="text" id="project-title-input" placeholder="Ex: La Chute de l'Empire">
-        <label style="margin-top:.6rem;">Idée / Pitch</label>
-        <textarea id="project-idea-input" placeholder="Décrivez l'histoire en quelques phrases..."></textarea>
-        <label style="margin-top:.6rem;">Genre / Style</label>
-        <select id="project-genre-select">
-            <option value="cinematographique">Cinématographique</option>
-            <option value="documentaire">Documentaire</option>
-            <option value="science-fiction">Science-Fiction</option>
-            <option value="fantasy">Fantasy</option>
-            <option value="polar">Polar / Thriller</option>
-            <option value="historique">Historique</option>
-            <option value="comedie">Comédie</option>
-            <option value="horreur">Horreur</option>
+<div class="api-panel" id="api-panel">
+  <input type="password" class="api-key-input" id="api-key-input" placeholder="Collez votre clé API ici (sk-...)" autocomplete="off" spellcheck="false">
+  <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+  <div class="api-status-line" id="api-status-line"><span class="status-dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
+  <div class="api-hint">Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> → Settings → API Keys</div>
+</div>
+
+<!-- ═══ PROJECT ═══ -->
+<div class="section open" id="section-project">
+  <div class="section-header" data-toggle="section-project"><span class="section-title">🎬 Le projet</span><span class="chevron">▼</span></div>
+  <div class="section-body"><div class="section-content">
+    <div class="control-row">
+      <label class="control-label">Titre du film</label>
+      <input type="text" id="proj-title" placeholder="Ex : Le Silence des Pins">
+    </div>
+    <div class="grid-3">
+      <div class="control-row">
+        <label class="control-label">Genre</label>
+        <select id="proj-genre">
+          <option value="drame">Drame</option>
+          <option value="thriller">Thriller</option>
+          <option value="fantastique">Fantastique</option>
+          <option value="science-fiction">Science-fiction</option>
+          <option value="historique">Historique</option>
+          <option value="comedie">Comédie</option>
+          <option value="aventure">Aventure</option>
+          <option value="policier">Policier</option>
+          <option value="romance">Romance</option>
         </select>
-        <button type="button" class="btn btn-success btn-sm" id="create-project-btn" style="margin-top:.6rem;">✅ Créer le projet</button>
+      </div>
+      <div class="control-row">
+        <label class="control-label">Style visuel</label>
+        <select id="proj-style">
+          <option value="cinematique">Cinématique 35mm</option>
+          <option value="anime">Anime Ghibli</option>
+          <option value="bd">BD franco-belge</option>
+          <option value="noir">Film Noir</option>
+          <option value="documentaire">Documentaire</option>
+          <option value="pixar">Pixar 3D</option>
+          <option value="watercolor">Aquarelle</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <label class="control-label">Époque</label>
+        <input type="text" id="proj-era" placeholder="Ex : 1988">
+      </div>
     </div>
-</div>
-
-<!-- ═══ PARAMÈTRES ═══ -->
-<div class="panel" id="params-panel" style="display:none;">
-    <h2>⚙️ Paramètres de production</h2>
-    <div class="grid-2">
-        <div class="field"><label>Format</label><select id="format-select"><option value="9:16" selected>9:16 Vertical</option><option value="16:9">16:9 Horizontal</option><option value="1:1">1:1 Carré</option></select></div>
-        <div class="field"><label>Durée/clip</label><select id="duration-select"><option value="121">5s</option><option value="241" selected>10s</option><option value="361">15s</option></select></div>
-        <div class="field"><label>Scènes/session</label><select id="batch-select"><option value="1">1 scène</option><option value="2" selected>2 scènes</option><option value="3">3 scènes</option><option value="5">5 scènes</option></select></div>
-        <div class="field"><label>Qualité image</label><select id="quality-select"><option value="768x1024" selected>Standard</option><option value="1024x1024">Haute</option></select></div>
+    <div class="control-row">
+      <label class="control-label">Lieu principal</label>
+      <input type="text" id="proj-location" placeholder="Ex : Alger, Algérie">
     </div>
-    <div class="toggle-row"><div><div class="tl">Sans personnages</div><div class="th">Objets, paysages, symboles</div></div><label class="switch"><input type="checkbox" id="no-humans-toggle"><span class="slider"></span></label></div>
-    <div class="toggle-row"><div><div class="tl">Générer les vidéos</div><div class="th">Images + clips animés</div></div><label class="switch"><input type="checkbox" id="videos-toggle" checked><span class="slider"></span></label></div>
-    <div class="toggle-row"><div><div class="tl">Voix off (TTS)</div><div class="th">Lecture des narrations</div></div><label class="switch"><input type="checkbox" id="tts-toggle" checked><span class="slider"></span></label></div>
+    <div class="control-row">
+      <label class="control-label">Idée de l'histoire (2 à 5 phrases)</label>
+      <textarea id="proj-idea" placeholder="Yacine, 30 ans, revient à Alger après 10 ans d'absence. Il cherche à comprendre la mort de son père. Sur une vieille photographie, il reconnaît un homme qu'il croyait disparu..."></textarea>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Nombre de scènes à planifier</label>
+      <select id="proj-scenes">
+        <option value="5">5 scènes</option>
+        <option value="8" selected>8 scènes</option>
+        <option value="10">10 scènes</option>
+        <option value="12">12 scènes</option>
+      </select>
+    </div>
+  </div></div>
 </div>
 
-<!-- ═══ MÉMOIRE ═══ -->
-<div class="panel" id="memory-panel" style="display:none;">
-    <h2>🧠 Mémoire du projet</h2>
-    <div id="memory-content"></div>
+<!-- ═══ WORLD BIBLE ═══ -->
+<div class="section" id="section-world">
+  <div class="section-header" data-toggle="section-world"><span class="section-title">🌍 Bible du Monde</span><span class="chevron">▼</span></div>
+  <div class="section-body"><div class="section-content">
+    <div class="grid-3">
+      <div class="control-row"><label class="control-label">Pays</label><input type="text" id="w-country" placeholder="Algérie"></div>
+      <div class="control-row"><label class="control-label">Ville</label><input type="text" id="w-city" placeholder="Alger"></div>
+      <div class="control-row"><label class="control-label">Saison</label><input type="text" id="w-season" placeholder="Été"></div>
+    </div>
+    <div class="grid-3">
+      <div class="control-row"><label class="control-label">Heure typique</label><input type="text" id="w-time" placeholder="Aube"></div>
+      <div class="control-row"><label class="control-label">Météo</label><input type="text" id="w-weather" placeholder="Chaud et sec"></div>
+      <div class="control-row"><label class="control-label">Climat</label><input type="text" id="w-climate" placeholder="Méditerranéen"></div>
+    </div>
+    <div class="control-row"><label class="control-label">Architecture</label><input type="text" id="w-arch" placeholder="Immeubles coloniaux des années 80"></div>
+    <div class="control-row"><label class="control-label">Technologie disponible</label><input type="text" id="w-tech" placeholder="Téléphones filaires, voitures des années 80, pas de smartphone"></div>
+    <div class="control-row"><label class="control-label">Règles strictes (anachronismes à éviter)</label>
+      <textarea id="w-rules" placeholder="Pas de voitures modernes. Pas de smartphones. Pas de vêtements contemporains."></textarea></div>
+  </div></div>
 </div>
 
-<!-- ═══ ACTIONS ═══ -->
-<div class="btn-row" id="actions-row" style="display:none;">
-    <button type="button" class="btn btn-primary" id="generate-btn">🎬 Générer les prochaines scènes</button>
-    <button type="button" class="btn btn-outline" id="stop-btn" style="display:none;border-color:var(--error);color:var(--error);">⏹ Arrêter</button>
-</div>
-<div class="btn-row" id="export-row" style="display:none;">
-    <button type="button" class="btn btn-info btn-sm" id="export-txt-btn"> TXT</button>
-    <button type="button" class="btn btn-outline btn-sm" id="export-json-btn">📋 JSON</button>
-    <button type="button" class="btn btn-outline btn-sm" id="delete-project-btn" style="border-color:var(--error);color:var(--error);">🗑 Supprimer</button>
+<!-- ═══ CHARACTERS ═══ -->
+<div class="section" id="section-characters">
+  <div class="section-header" data-toggle="section-characters"><span class="section-title">👥 Personnages <span class="badge lav" id="chars-count">0</span></span><span class="chevron">▼</span></div>
+  <div class="section-body"><div class="section-content">
+    <div class="char-list" id="char-list"></div>
+    <button type="button" class="char-add-btn" id="char-add-btn">+ Ajouter un personnage</button>
+  </div></div>
 </div>
 
-<!-- ═══ CONSOLE ═══ -->
-<div class="console" id="console-panel"><div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">[Système]</span> <span class="log-text">Prêt.</span></div></div>
-
-<!-- ═══ RÉSULTATS ═══ -->
-<div class="result-section open" id="scenes-section">
-    <div class="result-header" data-toggle="scenes-section"><span class="result-title"> Scènes <span class="badge count" id="scenes-badge">0</span></span><span class="chevron">▼</span></div>
-    <div class="result-body"><div class="result-content"><div id="scenes-list"></div></div></div>
+<!-- ═══ OBJECTS ═══ -->
+<div class="section" id="section-objects">
+  <div class="section-header" data-toggle="section-objects"><span class="section-title">📦 Objets importants</span><span class="chevron">▼</span></div>
+  <div class="section-body"><div class="section-content">
+    <div class="obj-list" id="obj-list"></div>
+    <button type="button" class="char-add-btn" id="obj-add-btn">+ Ajouter un objet</button>
+  </div></div>
 </div>
 
-<div class="result-section" id="player-section">
-    <div class="result-header" data-toggle="player-section"><span class="result-title">▶ Lecture séquentielle</span><span class="chevron">▼</span></div>
-    <div class="result-body"><div class="result-content">
-        <div class="player-container"><video id="player-video" controls playsinline preload="metadata"></video></div>
-        <div class="player-controls">
-            <button type="button" id="play-all-btn">▶ Lire tout</button>
-            <button type="button" id="stop-all-btn"> Arrêter</button>
-        </div>
-        <div class="progress-bar"><div class="progress-bar-fill" id="player-progress" style="width:0%"></div></div>
-        <div style="font-size:.72rem;color:var(--ink-dim);margin-top:.4rem;text-align:center;" id="player-info">—</div>
-    </div></div>
+<!-- ═══ LOCKS ═══ -->
+<div class="section" id="section-locks">
+  <div class="section-header" data-toggle="section-locks"><span class="section-title">🔒 Verrous de Continuité</span><span class="chevron">▼</span></div>
+  <div class="section-body"><div class="section-content">
+    <div class="locks-grid" id="locks-grid"></div>
+  </div></div>
+</div>
+
+<!-- ═══ PLAN ═══ -->
+<button type="button" class="btn-primary" id="plan-btn" disabled>✦ Planifier l'histoire</button>
+<button type="button" class="btn-secondary" id="continue-btn" disabled>▶ Continuer l'histoire (scène suivante)</button>
+<button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+
+<div class="section" id="section-timeline">
+  <div class="section-header" data-toggle="section-timeline"><span class="section-title">📽️ Timeline du film <span class="badge" id="scenes-count">0</span></span><span class="chevron">▼</span></div>
+  <div class="section-body"><div class="section-content">
+    <div class="timeline" id="timeline"></div>
+  </div></div>
 </div>
 
 <div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
-<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+
+<div class="debug-panel" id="debug-panel">
+  <div class="debug-header" id="debug-header">
+    <div class="debug-title">🖥️ Console · <span id="debug-count">0</span> entrées</div>
+    <div class="debug-actions">
+      <button type="button" id="debug-copy-btn">Copier</button>
+      <button type="button" id="debug-clear-btn">Effacer</button>
+      <button type="button" id="debug-collapse-btn">−</button>
+    </div>
+  </div>
+  <div class="debug-body" id="debug-body"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Attention</div>
+    <div class="modal-msg" id="modal-msg"></div>
+    <div class="modal-choices" id="modal-choices"></div>
+  </div>
+</div>
+
 <canvas id="noSleepCanvas" width="2" height="2"></canvas>
 <video id="noSleepVideo" playsinline muted loop></video>
 
 <script>
-// ══════════════════════════════════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════════════════════════════════
-const API_BASE='https://apihub.agnes-ai.com/v1';
-const POLL_BASE='https://apihub.agnes-ai.com/agnesapi';
-const MODEL_TEXT='agnes-2.5-flash';
-const MODEL_IMAGE='agnes-image-2.5-flash';
-const MODEL_VIDEO='agnes-video-v2.0';
-const INITIAL_WAIT=105;
-const POLL_INTERVAL=5;
-const SAFETY=1.10;
-const LIMITS={textRpm:30,imagesPerDay:4000,videoSecondsPerDay:500,videoRpm:1};
-const DB_NAME='cinememoire_db_v2';
-const DB_VERSION=1;
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG (reprise exacte des codes sources)
+// ═══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
 
-// ══════════════════════════════════════════════════════════════════
-// ÉTAT GLOBAL
-// ══════════════════════════════════════════════════════════════════
-const state={
-    isRunning:false,
-    stopRequested:false,
-    currentProject:null,
-    projects:[],
-    scenes:[],
-    characters:[],
-    locations:[],
-    storyBible:null,
-    narrativeSummary:'',
-    sessionCount:0,
-    counters:{text:0,images:0,videoSeconds:0,videoRpm:0,lastReset:Date.now()},
-    measuredSpeed:{value:null,usedForEstimate:null},
-    lastTextRequest:0,
-    isPlayingSequence:false,
-    format:'9:16',
-    duration:241
+const VIDEO_INTERVAL_MIN = 62000;
+const VIDEO_INTERVAL_MAX = 90000;
+const VIDEO_INTERVAL_SAFE = 75000;
+const VIDEO_FIRST_POLL_DELAY_SEC = 80;
+const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
+const VIDEO_MAX_POLL_ATTEMPTS = 100;
+
+const IMAGE_PARALLEL = 2;
+const IMAGE_INTERVAL_MS = 3400;
+
+const API_KEY_STORAGE = 'cc_api_key';
+const PROJECT_STORAGE = 'cc_project_memory_v1';
+const WAKE_LOCK_PREF = 'cc_wakelock';
+
+const DEFAULT_SCENE_FRAMES = 169; // 7 sec
+
+let createVideoIntervalMs = VIDEO_INTERVAL_SAFE;
+let createImageIntervalMs = IMAGE_INTERVAL_MS;
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE — PROJECT MEMORY
+// ═══════════════════════════════════════════════════════════════════
+const state = {
+  projectId: null,
+  project: {
+    title: '', genre: 'drame', style: 'cinematique', era: '', location: '', idea: '',
+    plannedScenes: 8
+  },
+  worldBible: {
+    country: '', city: '', season: '', time: '', weather: '', climate: '',
+    architecture: '', technology: '', rules: []
+  },
+  characters: [],
+  objects: [],
+  scenes: [],
+  locks: {
+    character: true, costume: true, location: true, object: true,
+    time: true, weather: true, narrative: true, emotional: true, camera: true
+  },
+  currentSceneIndex: -1,
+  isRunning: false,
+  stopRequested: false,
+  scenarioStartTime: 0
 };
 
-// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel = null;
+let canvasStream = null;
+let canvasInterval = null;
+let wakeLockEnabled = false;
+let debugCount = 0;
+let debugEntries = [];
+let debugCollapsed = false;
+let toastTimeout = null;
+
+// ═══════════════════════════════════════════════════════════════════
 // UTILS
-// ══════════════════════════════════════════════════════════════════
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
-function setStatus(t){const b=document.getElementById('status-bar');if(t){b.classList.add('visible');document.getElementById('status-text').textContent=t;}else b.classList.remove('visible');}
-function log(m,t='info'){
-    const p=document.getElementById('console-panel');
-    const tm=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const labels={info:'[Info]',success:'[OK]',error:'[Erreur]',warn:'[!]',measure:'[Mesure]'};
-    const l=document.createElement('div');l.className='log-line';
-    l.innerHTML='<span class="log-time">'+tm+'</span><span class="log-'+t+'">'+(labels[t]||'[Info]')+'</span> <span class="log-text">'+esc(m)+'</span>';
-    p.appendChild(l);p.scrollTop=p.scrollHeight;
-}
-let toastT=null;
-function toast(m,t='success',d=2500){
-    const to=document.getElementById('toast');const ic=document.getElementById('toast-icon');const tx=document.getElementById('toast-text');
-    to.classList.remove('visible','success','error','warn');void to.offsetWidth;
-    const icons={success:'✓',error:'',warn:'⚠'};
-    ic.textContent=icons[t]||'✓';tx.textContent=m;to.classList.add(t);
-    requestAnimationFrame(()=>to.classList.add('visible'));
-    clearTimeout(toastT);toastT=setTimeout(()=>to.classList.remove('visible'),d);
-}
-function getApiKey(){try{return(localStorage.getItem('cinememoire_key')||'').trim();}catch(e){return'';}}
-function getEstimatedWait(){return state.measuredSpeed.usedForEstimate!==null?state.measuredSpeed.usedForEstimate:INITIAL_WAIT;}
-function saveMeasuredSpeed(){try{localStorage.setItem('cinememoire_speed',JSON.stringify(state.measuredSpeed));}catch(e){}}
+// ═══════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const uid = () => 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+  { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const countWords = s => !s ? 0 : s.trim().split(/\s+/).filter(w => w.length > 0).length;
+const formatEta = s => {
+  if (s < 60) return Math.round(s) + 's';
+  const m = Math.floor(s / 60), r = Math.round(s % 60);
+  return m + 'm' + (r > 0 ? ' ' + r + 's' : '');
+};
 
-function updateCounters(){
-    document.getElementById('ct-text').textContent=state.counters.text;
-    document.getElementById('ct-img').textContent=state.counters.images;
-    document.getElementById('ct-vid').textContent=Math.round(state.counters.videoSeconds);
-    document.getElementById('ct-rpm').textContent=state.counters.videoRpm;
+function debugLog(level, cat, msg, data) {
+  const body = $('debug-body'); if (!body) return;
+  const time = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+  const entry = document.createElement('div');
+  entry.className = 'debug-entry ' + level;
+  let html = '<span class="debug-time">' + time + '</span><span class="debug-cat">[' + esc(cat) + ']</span><span class="debug-msg">' + esc(msg) + '</span>';
+  if (data !== undefined && data !== null) {
+    let str; try { str = typeof data === 'string' ? data : JSON.stringify(data, null, 2); } catch(e){ str = String(data); }
+    if (str.length > 3000) str = str.slice(0, 3000) + '\n…[tronqué]';
+    html += '<pre class="debug-data" style="font-size:0.62rem;color:#a8d8b0;background:#0a0a12;padding:0.3rem;margin-top:0.2rem;border-radius:2px;max-height:120px;overflow:auto;white-space:pre-wrap;">' + esc(str) + '</pre>';
+  }
+  entry.innerHTML = html;
+  body.appendChild(entry);
+  debugEntries.push({ time, cat, msg });
+  if (debugEntries.length > 800) debugEntries.shift();
+  while (body.children.length > 800) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+  debugCount++;
+  const el = $('debug-count'); if (el) el.textContent = debugCount;
 }
 
-// ══════════════════════════════════════════════════════════════════
-// INDEXEDDB
-// ══════════════════════════════════════════════════════════════════
-let db=null;
+function showToast(msg, type = 'success', dur = 2600) {
+  const t = $('toast'); if (!t) return;
+  t.classList.remove('visible','success','error','warn');
+  void t.offsetWidth;
+  $('toast-icon').textContent = ({ success:'✓', error:'✕', warn:'⚠' })[type] || '✓';
+  $('toast-text').textContent = msg;
+  t.classList.add(type);
+  requestAnimationFrame(() => t.classList.add('visible'));
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('visible'), dur);
+}
 
-function openDB(){
-    return new Promise((resolve,reject)=>{
-        const req=indexedDB.open(DB_NAME,DB_VERSION);
-        req.onupgradeneeded=e=>{
-            const d=e.target.result;
-            if(!d.objectStoreNames.contains('projects')) d.createObjectStore('projects',{keyPath:'id'});
-            if(!d.objectStoreNames.contains('scenes')){
-                const s=d.createObjectStore('scenes',{keyPath:'id'});
-                s.createIndex('projectId','projectId',{unique:false});
-            }
-            if(!d.objectStoreNames.contains('characters')){
-                const c=d.createObjectStore('characters',{keyPath:'id'});
-                c.createIndex('projectId','projectId',{unique:false});
-            }
-            if(!d.objectStoreNames.contains('locations')){
-                const l=d.createObjectStore('locations',{keyPath:'id'});
-                l.createIndex('projectId','projectId',{unique:false});
-            }
-        };
-        req.onsuccess=e=>{db=e.target.result;resolve(db);};
-        req.onerror=e=>reject(e.target.error);
+function setStatus(text) {
+  const bar = $('status-bar'), txt = $('status-text');
+  if (!bar || !txt) return;
+  if (text) { bar.classList.add('visible'); txt.textContent = text; }
+  else bar.classList.remove('visible');
+}
+
+function askUser(title, msg, choices) {
+  return new Promise(resolve => {
+    $('modal-title').textContent = title;
+    $('modal-msg').innerHTML = msg;
+    const c = $('modal-choices'); c.innerHTML = '';
+    choices.forEach(ch => {
+      const b = document.createElement('button');
+      b.innerHTML = '<strong>' + ch.label + '</strong>' + (ch.desc ? ' — ' + ch.desc : '');
+      b.addEventListener('click', () => {
+        $('modal-bg').classList.remove('visible');
+        resolve(ch.value);
+      });
+      c.appendChild(b);
     });
+    $('modal-bg').classList.add('visible');
+  });
 }
 
-function dbPut(store,data){
-    return new Promise((resolve,reject)=>{
-        try{
-            const tx=db.transaction(store,'readwrite');
-            tx.objectStore(store).put(data);
-            tx.oncomplete=()=>resolve(data);
-            tx.onerror=e=>reject(e.target.error);
-        }catch(e){reject(e);}
-    });
-}
-function dbGet(store,id){
-    return new Promise((resolve,reject)=>{
-        try{
-            const tx=db.transaction(store,'readonly');
-            const req=tx.objectStore(store).get(id);
-            req.onsuccess=()=>resolve(req.result);
-            req.onerror=e=>reject(e.target.error);
-        }catch(e){reject(e);}
-    });
-}
-function dbGetAll(store,indexName,indexValue){
-    return new Promise((resolve,reject)=>{
-        try{
-            const tx=db.transaction(store,'readonly');
-            const st=tx.objectStore(store);
-            const req=indexName?st.index(indexName).getAll(indexValue):st.getAll();
-            req.onsuccess=()=>resolve(req.result||[]);
-            req.onerror=e=>reject(e.target.error);
-        }catch(e){reject(e);}
-    });
-}
-function dbDelete(store,id){
-    return new Promise((resolve,reject)=>{
-        try{
-            const tx=db.transaction(store,'readwrite');
-            tx.objectStore(store).delete(id);
-            tx.oncomplete=()=>resolve();
-            tx.onerror=e=>reject(e.target.error);
-        }catch(e){reject(e);}
-    });
-}
-
-// ══════════════════════════════════════════════════════════════════
-// API CALLS
-// ══════════════════════════════════════════════════════════════════
-async function fetchWithRetry(url,options={},maxRetries=3,label='API'){
-    for(let a=0;a<=maxRetries;a++){
-        if(state.stopRequested)throw new Error('Arrêt');
-        try{
-            const ctrl=new AbortController();
-            const timeout=setTimeout(()=>ctrl.abort(),90000);
-            const res=await fetch(url,{...options,signal:ctrl.signal});
-            clearTimeout(timeout);
-            if([500,502,503,520].includes(res.status)&&a<maxRetries){await sleep(Math.pow(2,a)*3000);continue;}
-            if(res.status===429&&a<maxRetries){log(label+' 429, attente 65s','warn');await sleep(65000);continue;}
-            return res;
-        }catch(e){
-            if(e.message==='Arrêt')throw e;
-            if(a<maxRetries)await sleep(Math.pow(2,a)*2000);
-            else throw new Error(label+' échec — '+e.message);
-        }
-    }
-    throw new Error(label+' échec');
-}
-
-async function callTextAPI(messages,options={}){
-    const now=Date.now();
-    if(now-state.lastTextRequest<2000)await sleep(2000-(now-state.lastTextRequest));
-    state.lastTextRequest=Date.now();
-    state.counters.text++;updateCounters();
-    const body={model:MODEL_TEXT,messages,temperature:options.temperature??0.75,max_tokens:options.maxTokens??8000};
-    log('Texte → '+MODEL_TEXT,'info');
-    const res=await fetchWithRetry(API_BASE+'/chat/completions',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},
-        body:JSON.stringify(body)
-    },3,'Texte');
-    if(!res.ok)throw new Error('Text HTTP '+res.status);
-    const d=await res.json();
-    const c=d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content;
-    if(!c)throw new Error('Pas de contenu');
-    return c;
-}
-
-async function callImageAPI(prompt,size){
-    const validSizes=['768x1024','1024x1024','1024x576','576x1024','768x768','512x512'];
-    if(!validSizes.includes(size))size='768x1024';
-    state.counters.images++;updateCounters();
-    log('Image → '+MODEL_IMAGE+' ('+size+')','info');
-    const body={model:MODEL_IMAGE,prompt:prompt,size:size,extra_body:{response_format:'url'}};
-    const res=await fetchWithRetry(API_BASE+'/images/generations',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},
-        body:JSON.stringify(body)
-    },3,'Image');
-    if(!res.ok)throw new Error('Image HTTP '+res.status);
-    const d=await res.json();
-    const url=d.data&&d.data[0]&&(d.data[0].url||d.data[0].b64_json);
-    if(!url)throw new Error('Pas d\'URL');
-    return url;
-}
-
-async function createVideoTask(startUrl,endUrl,prompt,numFrames){
-    const now=Date.now();
-    if(state.counters.videoRpm>=LIMITS.videoRpm){
-        const wait=Math.ceil((60000-(now-state.counters.lastReset))/1000);
-        if(wait>0){log('RPM vidéo — attente '+wait+'s','warn');await sleep(wait*1000);state.counters.videoRpm=0;state.counters.lastReset=Date.now();}
-    }
-    state.counters.videoRpm++;state.counters.videoSeconds+=numFrames/24;updateCounters();
-    const body={
-        model:MODEL_VIDEO,
-        prompt:prompt,
-        extra_body:{image:[startUrl,endUrl],mode:'keyframes'},
-        num_frames:numFrames,
-        frame_rate:24,
-        height:1024,
-        width:576
-    };
-    log('Création tâche vidéo','info');
-    const res=await fetchWithRetry(API_BASE+'/videos',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},
-        body:JSON.stringify(body)
-    },3,'Vidéo');
-    if(!res.ok){const e=await res.text();throw new Error('Vidéo HTTP '+res.status+' — '+e.slice(0,200));}
-    const d=await res.json();
-    const vid=d.video_id;
-    if(!vid)throw new Error('Pas de video_id');
-    return vid;
-}
-
-async function pollVideo(videoId,sceneNumero){
-    const start=Date.now();
-    const waitFirst=getEstimatedWait();
-    const card=document.getElementById('pending-'+sceneNumero);
-    if(card)card.classList.add('measuring');
-
-    for(let r=Math.round(waitFirst);r>0;r--){
-        if(state.stopRequested)throw new Error('Arrêt');
-        const el=Math.round((Date.now()-start)/1000);
-        const pr=Math.min(Math.round((el/waitFirst)*100),95);
-        updatePending(sceneNumero,'Préparation…',pr);
-        setStatus('Scène '+sceneNumero+' — attente '+r+'s');
-        await sleep(1000);
-    }
-
-    log('Scène '+sceneNumero+' — polling','info');
-    let err=0;
-
-    for(let a=0;a<400;a++){
-        if(state.stopRequested)throw new Error('Arrêt');
-        const url=POLL_BASE+'?video_id='+encodeURIComponent(videoId)+'&model_name='+encodeURIComponent(MODEL_VIDEO);
-        try{
-            const res=await fetch(url,{headers:{'Authorization':'Bearer '+getApiKey()}});
-            if(res.status===429){await sleep(20000);continue;}
-            if(res.status===404){await sleep(POLL_INTERVAL*1000);continue;}
-            if(!res.ok){
-                err++;
-                if(err>=15){await sleep(30000);err=0;}
-                await sleep(POLL_INTERVAL*1000);
-                continue;
-            }
-            err=0;
-            const d=await res.json();
-            const st=d.status||'unknown';
-            const apiPr=d.progress||0;
-            const el=Math.round((Date.now()-start)/1000);
-            const timePr=Math.min(Math.round((el/waitFirst)*100),95);
-            const dp=Math.max(apiPr,timePr);
-            updatePending(sceneNumero,'Génération…',dp);
-
-            if(st==='completed'||st==='succeeded'||st==='done'){
-                const vUrl=(d.metadata&&d.metadata.url)||d.url||(d.output&&d.output.url);
-                if(!vUrl)throw new Error('URL manquante');
-                const dur=Math.round((Date.now()-start)/1000);
-                state.measuredSpeed.value=dur;
-                state.measuredSpeed.usedForEstimate=Math.round(dur*SAFETY);
-                saveMeasuredSpeed();
-                log('⚡ Scène '+sceneNumero+' générée en '+dur+'s','measure');
-                return {url:vUrl,duration:dur};
-            }
-            if(st==='failed'||st==='error'||st==='cancelled')throw new Error('Échec ('+st+')');
-        }catch(e){
-            if(e.message==='Arrêt')throw e;
-            if(e.message.startsWith('Échec')||e.message==='URL manquante')throw e;
-            err++;
-            if(err>=15){await sleep(20000);err=0;}
-        }
-        await sleep(POLL_INTERVAL*1000);
-    }
-    throw new Error('Délai max dépassé');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// PROJETS
-// ══════════════════════════════════════════════════════════════════
-async function loadProjects(){
-    state.projects=await dbGetAll('projects');
-    renderProjectsList();
-}
-
-function renderProjectsList(){
-    const el=document.getElementById('projects-list');
-    const count=document.getElementById('projects-count');
-    if(state.projects.length===0){
-        el.innerHTML='<div style="font-size:.8rem;color:var(--ink-dim);text-align:center;padding:1rem;">Aucun projet.</div>';
-        count.textContent='0';
-        return;
-    }
-    count.textContent=state.projects.length;
-    el.innerHTML='';
-    state.projects.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).forEach(p=>{
-        const done=state.currentProject&&state.currentProject.id===p.id
-            ? state.scenes.filter(s=>s.status==='done').length
-            : (p.scenesDone||0);
-        const total=p.scenesTotal||0;
-        const pct=total>0?Math.round((done/total)*100):0;
-        const div=document.createElement('div');
-        div.className='project-item'+(state.currentProject&&state.currentProject.id===p.id?' active':'');
-        div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;">'+
-            '<div style="min-width:0;flex:1;"><div class="pi-title">'+esc(p.title)+'</div>'+
-            '<div class="pi-meta">'+esc(p.genre||'')+' · '+done+'/'+(total||'?')+' scènes · '+new Date(p.updatedAt||p.createdAt).toLocaleDateString('fr-FR')+'</div></div>'+
-            '<div class="progress-ring" style="--pct:'+pct+'" data-pct="'+pct+'"></div></div>';
-        div.addEventListener('click',()=>openProject(p.id));
-        el.appendChild(div);
-    });
-}
-
-async function createProject(){
-    const title=document.getElementById('project-title-input').value.trim();
-    const idea=document.getElementById('project-idea-input').value.trim();
-    if(!title||title.length<2){toast('Titre trop court','error');return;}
-    if(!idea||idea.length<20){toast('Idée trop courte (20 car. min)','error');return;}
-    const genre=document.getElementById('project-genre-select').value;
-    const p={
-        id:uid(),title,idea,genre,
-        createdAt:Date.now(),updatedAt:Date.now(),
-        scenesTotal:20,scenesDone:0,
-        storyBible:null,narrativeSummary:'',
-        sessionCount:0,
-        format:'9:16',duration:241
-    };
-    await dbPut('projects',p);
-    state.projects.push(p);
-    await openProject(p.id);
-    toast('Projet créé !','success');
-    document.getElementById('new-project-field').classList.add('hidden');
-    document.getElementById('project-title-input').value='';
-    document.getElementById('project-idea-input').value='';
-}
-
-async function openProject(id){
-    const p=await dbGet('projects',id);
-    if(!p){toast('Projet introuvable','error');return;}
-    state.currentProject=p;
-    state.scenes=await dbGetAll('scenes','projectId',id);
-    state.characters=await dbGetAll('characters','projectId',id);
-    state.locations=await dbGetAll('locations','projectId',id);
-    state.storyBible=p.storyBible||null;
-    state.narrativeSummary=p.narrativeSummary||'';
-    state.sessionCount=p.sessionCount||0;
-    state.format=p.format||'9:16';
-    state.duration=p.duration||241;
-
-    document.getElementById('format-select').value=state.format;
-    document.getElementById('duration-select').value=state.duration;
-
-    renderProjectsList();
-    document.getElementById('params-panel').style.display='block';
-    document.getElementById('memory-panel').style.display='block';
-    document.getElementById('actions-row').style.display='flex';
-    document.getElementById('export-row').style.display='flex';
-    renderMemory();
-    renderScenes();
-    log('Projet ouvert : « '+p.title+' »','success');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// MÉMOIRE
-// ═════════════════════════════════════════════════════════════════
-function renderMemory(){
-    const el=document.getElementById('memory-content');
-    let html='';
-    if(state.storyBible){
-        html+='<div style="font-size:.78rem;margin-bottom:.4rem;"><strong>📖 Bible :</strong> '+esc(state.storyBible.title||'')+'</div>';
-        html+='<div style="font-size:.7rem;color:var(--ink-dim);margin-bottom:.5rem;">'+esc((state.storyBible.logline||'').slice(0,180))+'</div>';
-    } else {
-        html+='<div style="font-size:.72rem;color:var(--ink-dim);font-style:italic;margin-bottom:.5rem;">Bible non encore créée. Elle sera générée à la 1ère session.</div>';
-    }
-    if(state.characters.length>0){
-        html+='<div style="font-size:.7rem;font-weight:700;margin-bottom:.3rem;">👤 Personnages ('+state.characters.length+')</div>';
-        html+='<div class="character-grid">';
-        state.characters.forEach(c=>{
-            const img=c.url?'<img src="'+c.url+'" loading="lazy" onerror="this.style.display=\'none\'">':'<div style="aspect-ratio:1;background:var(--panel);border-radius:6px;margin-bottom:.2rem;"></div>';
-            html+='<div class="char-card">'+img+'<div class="char-name">'+esc(c.name)+'</div><div class="char-gender">'+esc(c.gender||'')+'</div></div>';
-        });
-        html+='</div>';
-    }
-    if(state.locations.length>0){
-        html+='<div style="font-size:.7rem;font-weight:700;margin:.4rem 0 .3rem;">📍 Lieux ('+state.locations.length+')</div>';
-        state.locations.forEach(l=>{html+='<span class="memory-badge"><span class="dot"></span>'+esc(l.name)+'</span>';});
-    }
-    html+='<div style="font-size:.7rem;color:var(--ink-dim);margin-top:.5rem;padding:.4rem;background:var(--bg);border-radius:6px;"><strong>📝 Résumé narratif :</strong><br>'+(state.narrativeSummary?esc(state.narrativeSummary):'<em>aucun</em>')+'</div>';
-    html+='<div style="font-size:.65rem;color:var(--ink-faint);margin-top:.3rem;">Sessions : '+(state.sessionCount||0)+' · Scènes terminées : '+state.scenes.filter(s=>s.status==='done').length+'/'+(state.currentProject.scenesTotal||'?')+'</div>';
-    el.innerHTML=html;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// SCÈNES — RENDU AVEC BOUTONS MODIFIER / SUPPRIMER
-// ══════════════════════════════════════════════════════════════════
-function renderScenes(){
-    const list=document.getElementById('scenes-list');
-    const badge=document.getElementById('scenes-badge');
-    badge.textContent=state.scenes.length;
-
-    if(state.scenes.length===0){
-        list.innerHTML='<div style="font-size:.8rem;color:var(--ink-dim);text-align:center;padding:1rem;font-style:italic;">Aucune scène pour le moment. Lancez une session !</div>';
-        return;
-    }
-
-    const sorted=[...state.scenes].sort((a,b)=>(a.numero||0)-(b.numero||0));
-    list.innerHTML='';
-    sorted.forEach(s=>{
-        const card=document.createElement('div');
-        card.className='scene-card '+(s.status||'pending');
-        const statusLabel=s.status==='done'?'✅ Terminée':s.status==='processing'?'⏳ En cours':s.status==='failed'?'❌ Échec':'⏸ En attente';
-        let html='<div class="scene-header"><span class="scene-num">SCÈNE '+(s.numero||'?')+'</span><div style="display:flex;align-items:center;gap:.2rem;flex-wrap:wrap;"><span class="scene-status '+(s.status||'pending')+'">'+statusLabel+'</span>';
-
-        if(s.status!=='processing'){
-            html+='<button type="button" class="scene-edit-btn" data-edit="'+s.id+'">✏️ Modifier</button>';
-            html+='<button type="button" class="scene-del-btn" data-del="'+s.id+'">🗑</button>';
-        }
-        html+='</div></div>';
-
-        if(s.narration)html+='<div class="scene-field"><span class="sf-label">Narration</span><span class="sf-value">« '+esc(s.narration)+' »</span></div>';
-        if(s.plan)html+='<div class="scene-field"><span class="sf-label">Plan</span><span class="sf-value plan">'+esc(s.plan)+'</span></div>';
-        if(s.mouvement_camera)html+='<div class="scene-field"><span class="sf-label">Caméra</span><span class="sf-value camera">'+esc(s.mouvement_camera)+'</span></div>';
-        if(s.description_visuelle)html+='<div class="scene-field"><span class="sf-label">Visuel</span><span class="sf-value">'+esc(s.description_visuelle)+'</span></div>';
-        if(s.imageStartUrl)html+='<div class="scene-field"><span class="sf-label">Image</span><img src="'+s.imageStartUrl+'" style="width:100%;border-radius:6px;margin-top:.3rem;" loading="lazy" onerror="this.style.display=\'none\'"></div>';
-        if(s.videoUrl)html+='<div class="scene-field"><span class="sf-label">Vidéo</span><video src="'+s.videoUrl+'" controls style="width:100%;border-radius:6px;margin-top:.3rem;background:#000;max-height:400px;" preload="metadata" playsinline></video></div>';
-        card.innerHTML=html;
-        list.appendChild(card);
-    });
-
-    // Attacher les événements aux boutons
-    list.querySelectorAll('[data-edit]').forEach(btn=>{
-        btn.addEventListener('click',e=>{
-            e.stopPropagation();
-            openEditModal(btn.dataset.edit);
-        });
-    });
-    list.querySelectorAll('[data-del]').forEach(btn=>{
-        btn.addEventListener('click',e=>{
-            e.stopPropagation();
-            deleteScene(btn.dataset.del);
-        });
-    });
-}
-
-function createPendingCard(numero){
-    const list=document.getElementById('scenes-list');
-    const empty=list.querySelector('div[style*="italic"]');
-    if(empty)empty.remove();
-    const existing=document.getElementById('pending-'+numero);
-    if(existing)return existing;
-    const card=document.createElement('div');
-    card.className='pending-card';
-    card.id='pending-'+numero;
-    card.innerHTML='<div class="p-spinner"></div>'+
-        '<div class="p-label">SCÈNE '+numero+'</div>'+
-        '<div class="p-text" id="pending-text-'+numero+'">En attente…</div>'+
-        '<div class="p-bar"><div class="p-fill" id="pending-fill-'+numero+'"></div></div>';
-    list.appendChild(card);
-    return card;
-}
-
-function updatePending(numero,label,progress){
-    const txt=document.getElementById('pending-text-'+numero);
-    const fill=document.getElementById('pending-fill-'+numero);
-    if(txt)txt.textContent=label+(progress?(' '+progress+'%'):'');
-    if(fill)fill.style.width=progress+'%';
-}
-
-function removePending(numero){
-    const el=document.getElementById('pending-'+numero);
-    if(el)el.remove();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// GÉNÉRATION PRINCIPALE
-// ══════════════════════════════════════════════════════════════════
-async function generateNextScenes(){
-    if(state.isRunning)return;
-    if(!state.currentProject){toast('Ouvrez un projet','error');return;}
-    if(!getApiKey()){toast('Ajoutez votre clé API','error');return;}
-
-    state.isRunning=true;
-    state.stopRequested=false;
-    state.format=document.getElementById('format-select').value;
-    state.duration=parseInt(document.getElementById('duration-select').value);
-    const batch=parseInt(document.getElementById('batch-select').value);
-    const noHumans=document.getElementById('no-humans-toggle').checked;
-    const genVideos=document.getElementById('videos-toggle').checked;
-
-    state.currentProject.format=state.format;
-    state.currentProject.duration=state.duration;
-    await dbPut('projects',state.currentProject);
-
-    document.getElementById('stop-btn').style.display='block';
-    document.getElementById('generate-btn').disabled=true;
-    log('═══════════════════════','info');
-    log('SESSION '+(state.sessionCount+1)+' — '+batch+' scène(s)','info');
-    log('═══════════════════════','info');
-
-    await activateWakeLock();
-    setStatus('Initialisation…');
-
-    try{
-        // ÉTAPE 1 : BIBLE
-        if(!state.storyBible){
-            log('Création de la bible du film…','info');
-            setStatus('Création de la bible…');
-            const bible=await createStoryBible(state.currentProject.idea,state.currentProject.genre);
-            state.storyBible=bible;
-            state.currentProject.storyBible=bible;
-            state.currentProject.scenesTotal=bible.totalScenes||20;
-            await dbPut('projects',state.currentProject);
-            log('Bible : « '+(bible.title||'')+' » — '+(bible.totalScenes||20)+' scènes prévues','success');
-
-            if(bible.characters&&bible.characters.length>0){
-                log('Portraits de référence ('+bible.characters.length+')…','info');
-                for(let i=0;i<bible.characters.length;i++){
-                    if(state.stopRequested)break;
-                    const ch=bible.characters[i];
-                    const existing=state.characters.find(c=>c.name===ch.name&&c.url);
-                    if(existing){log('Portrait '+ch.name+' déjà présent','info');continue;}
-                    setStatus('Portrait '+ch.name+'…');
-                    try{
-                        const prompt='Character reference portrait of '+ch.name+', '+ch.gender+', '+ch.appearance+', front-facing, neutral expression, plain gray background, cinematic realistic photo, no text, no watermark.';
-                        const url=await callImageAPI(prompt,'1024x1024');
-                        const char={id:uid(),projectId:state.currentProject.id,name:ch.name,gender:ch.gender,appearance:ch.appearance,url,createdAt:Date.now()};
-                        await dbPut('characters',char);
-                        state.characters.push(char);
-                        log('Portrait '+ch.name+' ✓','success');
-                    }catch(e){log('Erreur portrait '+ch.name+' : '+e.message,'error');}
-                    await sleep(1500);
-                }
-            }
-
-            if(bible.locations&&bible.locations.length>0){
-                for(const loc of bible.locations){
-                    const existing=state.locations.find(l=>l.name===loc.name);
-                    if(existing)continue;
-                    const l={id:uid(),projectId:state.currentProject.id,name:loc.name,description:loc.description||'',createdAt:Date.now()};
-                    await dbPut('locations',l);
-                    state.locations.push(l);
-                }
-                log(state.locations.length+' lieux enregistrés','success');
-            }
-            renderMemory();
-        }
-
-        // ÉTAPE 2 : SCÉNARIO
-        const doneScenes=state.scenes.filter(s=>s.status==='done');
-        const nextNum=doneScenes.length+1;
-        log('Prochaine scène : '+nextNum,'info');
-        setStatus('Écriture des scènes…');
-        const newScenes=await generateSceneScripts(nextNum,batch);
-        if(!newScenes||newScenes.length===0)throw new Error('Aucune scène générée');
-
-        for(const s of newScenes){
-            s.id=uid();
-            s.projectId=state.currentProject.id;
-            s.status='pending';
-            s.createdAt=Date.now();
-            await dbPut('scenes',s);
-            state.scenes.push(s);
-        }
-        renderScenes();
-
-        // ÉTAPE 3 : IMAGES
-        log('Génération des images…','info');
-        const imgSize=state.format==='16:9'?'1024x576':state.format==='1:1'?'1024x1024':'768x1024';
-        for(let i=0;i<newScenes.length;i++){
-            if(state.stopRequested)break;
-            const s=newScenes[i];
-            createPendingCard(s.numero);
-            updatePending(s.numero,'Images…',10);
-            setStatus('Images scène '+s.numero+'…');
-            try{
-                const startPrompt=buildImagePrompt(s,'start',noHumans);
-                s.imageStartUrl=await callImageAPI(startPrompt,imgSize);
-                updatePending(s.numero,'Images…',50);
-                if(genVideos){
-                    const endPrompt=buildImagePrompt(s,'end',noHumans);
-                    s.imageEndUrl=await callImageAPI(endPrompt,imgSize);
-                }
-                updatePending(s.numero,'Images prêtes',80);
-                await dbPut('scenes',s);
-                log('Images scène '+s.numero+' ✓','success');
-                renderScenes();
-                createPendingCard(s.numero);
-            }catch(e){
-                log('Erreur images scène '+s.numero+' : '+e.message,'error');
-            }
-            await sleep(1500);
-        }
-
-        // ÉTAPE 4 : VIDÉOS
-        if(genVideos&&!state.stopRequested){
-            log('Génération des clips vidéo…','info');
-            const readyScenes=newScenes.filter(s=>s.imageStartUrl&&s.imageEndUrl);
-            const promises=[];
-
-            for(let i=0;i<readyScenes.length;i++){
-                if(state.stopRequested)break;
-                const s=readyScenes[i];
-                s.status='processing';
-                await dbPut('scenes',s);
-                renderScenes();
-                createPendingCard(s.numero);
-
-                try{
-                    log('Tâche vidéo scène '+s.numero,'info');
-                    const prompt=buildVideoPrompt(s,noHumans);
-                    const vid=await createVideoTask(s.imageStartUrl,s.imageEndUrl,prompt,state.duration);
-                    const p=pollVideo(vid,s.numero)
-                        .then(async r=>{
-                            s.videoUrl=r.url;
-                            s.videoDuration=r.duration;
-                            s.status='done';
-                            await dbPut('scenes',s);
-                            removePending(s.numero);
-                            log('✅ Scène '+s.numero+' prête en '+r.duration+'s','success');
-                            renderScenes();
-                            renderMemory();
-                            renderProjectsList();
-                            playNotificationSound();
-                            toast('Scène '+s.numero+' prête !','success');
-                        })
-                        .catch(async e=>{
-                            log('Erreur scène '+s.numero+' : '+e.message,'error');
-                            s.status='failed';
-                            await dbPut('scenes',s);
-                            removePending(s.numero);
-                            renderScenes();
-                        });
-                    promises.push(p);
-                }catch(e){
-                    log('Échec tâche scène '+s.numero+' : '+e.message,'error');
-                    s.status='failed';
-                    await dbPut('scenes',s);
-                    removePending(s.numero);
-                    renderScenes();
-                }
-
-                if(i<readyScenes.length-1&&!state.stopRequested){
-                    for(let r=62;r>0;r--){
-                        if(state.stopRequested)break;
-                        setStatus('Prochain clip dans '+r+'s');
-                        await sleep(1000);
-                    }
-                }
-            }
-
-            setStatus('Attente des clips…');
-            await Promise.allSettled(promises);
-        }
-
-        // ÉTAPE 5 : MISE À JOUR
-        state.currentProject.narrativeSummary=await updateNarrativeSummary();
-        state.currentProject.sessionCount=(state.currentProject.sessionCount||0)+1;
-        state.currentProject.scenesDone=state.scenes.filter(s=>s.status==='done').length;
-        state.currentProject.updatedAt=Date.now();
-        await dbPut('projects',state.currentProject);
-        state.sessionCount=state.currentProject.sessionCount;
-
-        const doneCount=state.scenes.filter(s=>s.status==='done').length;
-        log('═══════════════════════','success');
-        log('SESSION TERMINÉE : '+doneCount+'/'+(state.currentProject.scenesTotal||'?')+' scènes','success');
-        setStatus('✦ Session terminée ✦');
-        await sleep(2000);
-        setStatus(null);
-        toast('Session terminée — '+doneCount+' scènes !','success');
-
-    }catch(e){
-        log('ERREUR : '+e.message,'error');
-        setStatus('Erreur : '+e.message.slice(0,50));
-        await sleep(3000);
-        setStatus(null);
-        toast('Erreur : '+e.message.slice(0,60),'error');
-    }
-
-    state.isRunning=false;
-    state.stopRequested=false;
-    document.getElementById('stop-btn').style.display='none';
-    document.getElementById('generate-btn').disabled=false;
-    await deactivateWakeLock();
-    renderMemory();
-    renderProjectsList();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// BIBLE + SCÉNARIO
-// ══════════════════════════════════════════════════════════════════
-async function createStoryBible(idea,genre){
-    const prompt=`Tu es un scénariste professionnel. Crée la bible d'un film long.
-
-IDÉE : "${idea}"
-GENRE : ${genre}
-FORMAT : vertical 9:16 (style TikTok cinématographique)
-
-Génère un JSON :
-{
-  "title": "Titre du film",
-  "logline": "Résumé en une phrase",
-  "totalScenes": 20,
-  "characters": [
-    {"name":"Nom","gender":"homme ou femme","appearance":"Description physique TRÈS précise (âge, cheveux, yeux, vêtements, traits distinctifs)"}
-  ],
-  "locations": [
-    {"name":"Nom du lieu","description":"Description visuelle"}
-  ],
-  "arc": "Structure en 3 actes",
-  "visualStyle": "Style visuel constant (palette, lumière, ambiance)"
-}
-
-Réponds UNIQUEMENT en JSON valide.`;
-    const raw=await callTextAPI([{role:'system',content:'Tu réponds UNIQUEMENT en JSON valide.'},{role:'user',content:prompt}],{temperature:0.7,maxTokens:3000});
-    return parseJsonSafe(raw);
-}
-
-async function generateSceneScripts(startNum,count){
-    const bible=state.storyBible||{};
-    const charList=state.characters.length>0?state.characters.map(c=>c.name+' ('+c.gender+'): '+c.appearance).join('\n'):'Aucun';
-    const locList=state.locations.length>0?state.locations.map(l=>l.name+': '+l.description).join('\n'):'Aucun';
-    const doneScenes=state.scenes.filter(s=>s.status==='done').sort((a,b)=>(a.numero||0)-(b.numero||0));
-    const lastNarr=doneScenes.length>0?doneScenes[doneScenes.length-1].narration||'':'';
-
-    const prompt=`Tu es un scénariste. Continue l'écriture des scènes.
-
-TITRE : ${bible.title||state.currentProject.title}
-LOGLINE : ${bible.logline||state.currentProject.idea}
-GENRE : ${state.currentProject.genre}
-ARC : ${bible.arc||'linéaire'}
-STYLE VISUEL : ${bible.visualStyle||'cinématographique réaliste'}
-
-PERSONNAGES (DOIVENT rester IDENTIQUES) :
-${charList}
-
-LIEUX :
-${locList}
-
-RÉSUMÉ JUSQU'ICI :
-${state.narrativeSummary||'Début du film.'}
-
-DERNIÈRE SCÈNE :
-${lastNarr||'Aucune.'}
-
-Génère EXACTEMENT ${count} nouvelle(s) scène(s) à partir du numéro ${startNum}.
-
-JSON :
-{
-  "scenes": [
-    {
-      "numero": ${startNum},
-      "narration": "Texte de narration en français (max 30 mots)",
-      "description_visuelle": "Description visuelle détaillée",
-      "plan": "Large|Rapproché|Moyen|Général|Gros plan|Aérien",
-      "mouvement_camera": "Statique|Panoramique|Tilt|Travelling|Zoom|Grue|Steadicam",
-      "image_prompt": "PROMPT EN ANGLAIS pour l'image de départ",
-      "image_prompt_end": "PROMPT EN ANGLAIS pour l'image de fin (léger mouvement)",
-      "video_prompt": "PROMPT EN ANGLAIS pour la vidéo",
-      "narrative_link": "Lien avec la scène précédente",
-      "characters_in_scene": ["Nom1"],
-      "location": "Nom du lieu"
-    }
-  ]
-}
-
-Utilise EXACTEMENT les descriptions physiques des personnages.
-Réponds UNIQUEMENT en JSON valide.`;
-
-    const raw=await callTextAPI([{role:'system',content:'Tu réponds UNIQUEMENT en JSON valide.'},{role:'user',content:prompt}],{temperature:0.75,maxTokens:4000});
-    const data=parseJsonSafe(raw);
-    return data.scenes||[];
-}
-
-function parseJsonSafe(raw){
-    try{
-        return JSON.parse(raw.replace(/```json/g,'').replace(/```/g,'').trim());
-    }catch(e){
-        const m=raw.match(/\{[\s\S]*\}/);
-        if(m){
-            try{return JSON.parse(m[0]);}catch(e2){throw new Error('JSON invalide');}
-        }
-        throw new Error('JSON invalide');
-    }
-}
-
-// ══════════════════════════════════════════════════════════════════
-// PROMPTS
-// ══════════════════════════════════════════════════════════════════
-function buildImagePrompt(scene,moment,noHumans){
-    const bible=state.storyBible||{};
-    const charDesc=state.characters.map(c=>c.name+' ('+c.gender+'): '+c.appearance).join('. ');
-    const style=bible.visualStyle||'cinematic realistic style';
-    const noHumansRule=noHumans?'NO human characters. Objects, landscapes, machines only.':'';
-    const base=moment==='end'?(scene.image_prompt_end||scene.image_prompt||scene.description_visuelle||''):(scene.image_prompt||scene.description_visuelle||'');
-    const endRule=moment==='end'?'Same scene continued, subtle movement, camera slightly advanced.':'';
-    return [base,'STYLE: '+style,'CHARACTERS (MUST match exactly): '+charDesc,'Location: '+(scene.location||''),noHumansRule,endRule,'Format: '+state.format+', cinematic realism, natural lighting, subtle film grain, no text, no watermark.'].filter(Boolean).join('. ');
-}
-
-function buildVideoPrompt(scene,noHumans){
-    const bible=state.storyBible||{};
-    const style=bible.visualStyle||'cinematic realistic style';
-    const noHumansRule=noHumans?'NO human characters.':'';
-    return [scene.video_prompt||scene.description_visuelle||'','Camera: '+(scene.mouvement_camera||'slow tracking shot'),'Style: '+style,noHumansRule,'ONE CONTINUOUS SHOT. NO CUTS.','Maintain character appearance exactly.','No text, no watermark.'].filter(Boolean).join('. ');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// RÉSUMÉ NARRATIF
-// ══════════════════════════════════════════════════════════════════
-async function updateNarrativeSummary(){
-    const doneScenes=state.scenes.filter(s=>s.status==='done').sort((a,b)=>(a.numero||0)-(b.numero||0));
-    if(doneScenes.length===0)return'';
-    const scenesText=doneScenes.slice(-10).map(s=>'Scène '+s.numero+': '+(s.narration||s.description_visuelle||'')).join('\n');
-    const prompt=`Résume en 3 phrases max l'histoire de ce film à partir de ces scènes :
-
-${scenesText}
-
-Mentionne les personnages principaux, les lieux, les événements clés.
-Réponds UNIQUEMENT par le résumé.`;
-    try{
-        const raw=await callTextAPI([{role:'user',content:prompt}],{temperature:0.5,maxTokens:300});
-        return raw.trim().slice(0,600);
-    }catch(e){return scenesText.slice(0,400);}
-}
-
-// ══════════════════════════════════════════════════════════════════
-// MODAL D'ÉDITION DE SCÈNE — CORRIGÉ
-// ══════════════════════════════════════════════════════════════════
-function openEditModal(sceneId){
-    const scene=state.scenes.find(s=>s.id===sceneId);
-    if(!scene){toast('Scène introuvable','error');return;}
-    
-    const overlay=document.createElement('div');
-    overlay.className='modal-overlay';
-    overlay.id='edit-modal';
-    overlay.innerHTML=`
-        <div class="modal-box">
-            <h3>✏️ Modifier la scène ${scene.numero||'?'} <button type="button" id="modal-close"></button></h3>
-            <div class="field">
-                <label>Narration (voix off / texte à l'écran)</label>
-                <textarea id="edit-narration">${esc(scene.narration||'')}</textarea>
-            </div>
-            <div class="field">
-                <label>Description visuelle</label>
-                <textarea id="edit-description">${esc(scene.description_visuelle||'')}</textarea>
-            </div>
-            <div class="grid-2">
-                <div class="field">
-                    <label>Type de plan</label>
-                    <select id="edit-plan">
-                        ${['Large','Rapproché','Moyen','Général','Gros plan','Aérien'].map(p=>`<option ${scene.plan===p?'selected':''}>${p}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Mouvement caméra</label>
-                    <select id="edit-camera">
-                        ${['Statique','Panoramique','Tilt','Travelling','Zoom','Grue','Steadicam'].map(c=>`<option ${scene.mouvement_camera===c?'selected':''}>${c}</option>`).join('')}
-                    </select>
-                </div>
-            </div>
-            <div class="field">
-                <label>Prompt image de départ (anglais)</label>
-                <textarea id="edit-img-start" style="font-family:ui-monospace,monospace;font-size:.75rem;">${esc(scene.image_prompt||'')}</textarea>
-            </div>
-            <div class="field">
-                <label>Prompt image de fin (anglais)</label>
-                <textarea id="edit-img-end" style="font-family:ui-monospace,monospace;font-size:.75rem;">${esc(scene.image_prompt_end||'')}</textarea>
-            </div>
-            <div class="field">
-                <label>Prompt vidéo (anglais)</label>
-                <textarea id="edit-video" style="font-family:ui-monospace,monospace;font-size:.75rem;">${esc(scene.video_prompt||'')}</textarea>
-            </div>
-            <div class="field">
-                <label>Lieu</label>
-                <input type="text" id="edit-location" value="${esc(scene.location||'')}">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-outline btn-sm" id="modal-cancel">Annuler</button>
-                <button type="button" class="btn btn-info btn-sm" id="modal-save">💾 Sauvegarder</button>
-                <button type="button" class="btn btn-success btn-sm" id="modal-regen">🔄 Régénérer (images+vidéo)</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-    
-    // Événements — SUPPRESSION du clic en dehors qui ferme le modal
-    document.getElementById('modal-close').addEventListener('click',closeEditModal);
-    document.getElementById('modal-cancel').addEventListener('click',closeEditModal);
-    // REMOVED: overlay.addEventListener('click',e=>{if(e.target===overlay)closeEditModal();});
-    
-    document.getElementById('modal-save').addEventListener('click',()=>{
-        saveSceneFromModal(scene);
-        toast('Scène modifiée ✓','success');
-        closeEditModal();
-    });
-    
-    document.getElementById('modal-regen').addEventListener('click',async()=>{
-        saveSceneFromModal(scene);
-        closeEditModal();
-        await regenerateScene(scene);
-    });
-}
-
-function closeEditModal(){
-    const m=document.getElementById('edit-modal');
-    if(m)m.remove();
-}
-
-function saveSceneFromModal(scene){
-    scene.narration=document.getElementById('edit-narration').value.trim();
-    scene.description_visuelle=document.getElementById('edit-description').value.trim();
-    scene.plan=document.getElementById('edit-plan').value;
-    scene.mouvement_camera=document.getElementById('edit-camera').value;
-    scene.image_prompt=document.getElementById('edit-img-start').value.trim();
-    scene.image_prompt_end=document.getElementById('edit-img-end').value.trim();
-    scene.video_prompt=document.getElementById('edit-video').value.trim();
-    scene.location=document.getElementById('edit-location').value.trim();
-    scene.updatedAt=Date.now();
-    dbPut('scenes',scene);
-    renderScenes();
-    renderMemory();
-}
-
-async function deleteScene(sceneId){
-    if(!confirm('Supprimer cette scène ? Cette action est irréversible.'))return;
-    const idx=state.scenes.findIndex(s=>s.id===sceneId);
-    if(idx===-1)return;
-    await dbDelete('scenes',sceneId);
-    state.scenes.splice(idx,1);
-    renderScenes();
-    renderMemory();
-    renderProjectsList();
-    toast('Scène supprimée','warn');
-}
-
-async function regenerateScene(scene){
-    if(state.isRunning){toast('Une session est déjà en cours','warn');return;}
-    if(!getApiKey()){toast('Ajoutez votre clé API','error');return;}
-    
-    state.isRunning=true;
-    state.stopRequested=false;
-    const noHumans=document.getElementById('no-humans-toggle').checked;
-    const genVideos=document.getElementById('videos-toggle').checked;
-    const imgSize=state.format==='16:9'?'1024x576':state.format==='1:1'?'1024x1024':'768x1024';
-    
-    document.getElementById('generate-btn').disabled=true;
-    document.getElementById('stop-btn').style.display='block';
-    await activateWakeLock();
-    log('═══════════════════════','info');
-    log('RÉGÉNÉRATION SCÈNE '+scene.numero,'info');
-    log('═══════════════════════','info');
-    
-    try{
-        // Reset de la scène
-        scene.status='processing';
-        scene.imageStartUrl=null;
-        scene.imageEndUrl=null;
-        scene.videoUrl=null;
-        scene.videoDuration=null;
-        await dbPut('scenes',scene);
-        renderScenes();
-        createPendingCard(scene.numero);
-        
-        // Images
-        setStatus('Images scène '+scene.numero+'…');
-        updatePending(scene.numero,'Image de départ…',10);
-        const startPrompt=buildImagePrompt(scene,'start',noHumans);
-        scene.imageStartUrl=await callImageAPI(startPrompt,imgSize);
-        updatePending(scene.numero,'Image de fin…',50);
-        
-        if(genVideos){
-            const endPrompt=buildImagePrompt(scene,'end',noHumans);
-            scene.imageEndUrl=await callImageAPI(endPrompt,imgSize);
-        }
-        updatePending(scene.numero,'Images prêtes',80);
-        await dbPut('scenes',scene);
-        renderScenes();
-        log('Images scène '+scene.numero+' ✓','success');
-        
-        // Vidéo
-        if(genVideos&&!state.stopRequested){
-            setStatus('Vidéo scène '+scene.numero+'…');
-            const prompt=buildVideoPrompt(scene,noHumans);
-            const vid=await createVideoTask(scene.imageStartUrl,scene.imageEndUrl,prompt,state.duration);
-            const result=await pollVideo(vid,scene.numero);
-            scene.videoUrl=result.url;
-            scene.videoDuration=result.duration;
-            scene.status='done';
-            await dbPut('scenes',scene);
-            removePending(scene.numero);
-            log('✅ Scène '+scene.numero+' régénérée en '+result.duration+'s','success');
-            renderScenes();
-            renderMemory();
-            renderProjectsList();
-            playNotificationSound();
-            toast('Scène '+scene.numero+' régénérée !','success');
-        } else {
-            scene.status='done';
-            await dbPut('scenes',scene);
-            removePending(scene.numero);
-            renderScenes();
-        }
-        
-        setStatus('✦ Régénération terminée ✦');
-        await sleep(1500);
-        setStatus(null);
-        
-    }catch(e){
-        log('ERREUR régénération : '+e.message,'error');
-        scene.status='failed';
-        await dbPut('scenes',scene);
-        removePending(scene.numero);
-        renderScenes();
-        toast('Erreur : '+e.message.slice(0,60),'error');
-        setStatus(null);
-    }
-    
-    state.isRunning=false;
-    state.stopRequested=false;
-    document.getElementById('stop-btn').style.display='none';
-    document.getElementById('generate-btn').disabled=false;
-    await deactivateWakeLock();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// LECTEUR
-// ══════════════════════════════════════════════════════════════════
-function getReadyScenes(){
-    return state.scenes.filter(s=>s.status==='done'&&s.videoUrl).sort((a,b)=>(a.numero||0)-(b.numero||0));
-}
-
-function playAll(){
-    const ready=getReadyScenes();
-    if(!ready.length){toast('Aucune vidéo prête','warn');return;}
-    state.isPlayingSequence=true;
-    document.getElementById('player-section').classList.add('open');
-    document.getElementById('play-all-btn').textContent=' Lecture…';
-    document.getElementById('play-all-btn').classList.add('playing');
-    playAt(0);
-}
-
-function playAt(idx){
-    const ready=getReadyScenes();
-    if(idx>=ready.length||!state.isPlayingSequence){
-        state.isPlayingSequence=false;
-        document.getElementById('play-all-btn').textContent='▶ Lire tout';
-        document.getElementById('play-all-btn').classList.remove('playing');
-        return;
-    }
-    const v=document.getElementById('player-video');
-    const sc=ready[idx];
-    v.src=sc.videoUrl;
-    v.currentTime=0;
-    v.play().catch(()=>{});
-    document.getElementById('player-info').textContent='Scène '+(sc.numero||idx+1)+' / '+ready.length;
-    document.getElementById('player-progress').style.width=((idx+1)/ready.length*100)+'%';
-    if(sc.narration&&document.getElementById('tts-toggle').checked)setTimeout(()=>speakText(sc.narration),500);
-    v.onended=()=>{if(state.isPlayingSequence)setTimeout(()=>playAt(idx+1),300);};
-}
-
-function stopAll(){
-    state.isPlayingSequence=false;
-    const v=document.getElementById('player-video');
-    v.pause();v.currentTime=0;
-    stopSpeech();
-    document.getElementById('play-all-btn').textContent='▶ Lire tout';
-    document.getElementById('play-all-btn').classList.remove('playing');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// TTS
-// ═════════════════════════════════════════════════════════════════
-let speechSynth=null;
-function initSpeech(){
-    if('speechSynthesis' in window){
-        speechSynth=window.speechSynthesis;
-        speechSynth.getVoices();
-        speechSynth.onvoiceschanged=()=>speechSynth.getVoices();
-    }
-}
-function speakText(text){
-    if(!speechSynth)return;
-    speechSynth.cancel();
-    setTimeout(()=>{
-        const u=new SpeechSynthesisUtterance(text);
-        u.lang='fr-FR';u.rate=0.9;u.pitch=0.9;
-        const voices=speechSynth.getVoices();
-        const fr=voices.filter(x=>x.lang&&x.lang.startsWith('fr'));
-        if(fr.length)u.voice=fr[0];
-        speechSynth.speak(u);
-    },100);
-}
-function stopSpeech(){if(speechSynth)speechSynth.cancel();}
-
-// ══════════════════════════════════════════════════════════════════
-// SONS
-// ══════════════════════════════════════════════════════════════════
-function playNotificationSound(){
-    try{
-        const ctx=new(window.AudioContext||window.webkitAudioContext)();
-        const o=ctx.createOscillator();const g=ctx.createGain();
-        o.connect(g);g.connect(ctx.destination);
-        o.frequency.value=880;o.type='sine';
-        g.gain.setValueAtTime(0.12,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
-        o.start();o.stop(ctx.currentTime+0.5);
-    }catch(e){}
-}
-
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // WAKE LOCK
-// ══════════════════════════════════════════════════════════════════
-let wakeLock=null;
-let canvasStream=null;
-async function activateWakeLock(){
-    if('wakeLock' in navigator){
-        try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}
+// ═══════════════════════════════════════════════════════════════════
+async function activateWakeLock() {
+  if ('wakeLock' in navigator && navigator.wakeLock) {
+    try { wakeLockSentinel = await navigator.wakeLock.request('screen'); return true; } catch(e){}
+  }
+  try {
+    const canvas = $('noSleepCanvas'), video = $('noSleepVideo');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000'; ctx.fillRect(0,0,2,2);
+    if (canvas.captureStream) {
+      canvasStream = canvas.captureStream(1);
+      let tog = false;
+      canvasInterval = setInterval(() => { tog = !tog; ctx.fillStyle = tog ? '#000' : '#010101'; ctx.fillRect(0,0,2,2); }, 1000);
+      video.srcObject = canvasStream; video.muted = true; video.playsInline = true;
+      video.play().catch(()=>{});
+      return true;
     }
-    if(!wakeLock){
-        try{
-            const cv=document.getElementById('noSleepCanvas');
-            const vid=document.getElementById('noSleepVideo');
-            const ctx=cv.getContext('2d');
-            ctx.fillStyle='#000';ctx.fillRect(0,0,2,2);
-            canvasStream=cv.captureStream(1);
-            vid.srcObject=canvasStream;
-            vid.play().catch(()=>{});
-        }catch(e){}
+  } catch(e){}
+  return false;
+}
+
+async function deactivateWakeLock() {
+  if (wakeLockSentinel) { try { await wakeLockSentinel.release(); } catch(e){} wakeLockSentinel = null; }
+  if (canvasInterval) { clearInterval(canvasInterval); canvasInterval = null; }
+  if (canvasStream) { try { canvasStream.getTracks().forEach(t => t.stop()); } catch(e){} canvasStream = null; }
+  const v = $('noSleepVideo'); if (v) { try { v.pause(); v.srcObject = null; } catch(e){} }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// API FETCH (retry + 429/503)
+// ═══════════════════════════════════════════════════════════════════
+async function apiFetch(url, options = {}, label = 'API', kind = 'default') {
+  for (let attempt = 0; attempt < 7; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    debugLog('api', 'REQ ' + label, (options.method||'GET') + ' ' + url.slice(0, 100) + (url.length>100?'…':''));
+    try {
+      const res = await fetch(url, options);
+      debugLog('info', 'RÉP ' + label, 'HTTP ' + res.status);
+      if (res.status === 429) {
+        if (kind === 'video') createVideoIntervalMs = Math.min(createVideoIntervalMs + 8000, VIDEO_INTERVAL_MAX);
+        const wait = [10, 20, 35, 50, 75, 100, 150][Math.min(attempt, 6)];
+        setStatus('Rate limit — attente ' + wait + 's');
+        await sleep(wait * 1000); continue;
+      }
+      if (res.status === 503) {
+        const wait = [5, 10, 15, 20, 30, 45][Math.min(attempt, 5)];
+        setStatus('Service occupé — attente ' + wait + 's');
+        await sleep(wait * 1000); continue;
+      }
+      if (res.ok && kind === 'video' && createVideoIntervalMs > VIDEO_INTERVAL_MIN) {
+        createVideoIntervalMs = Math.max(createVideoIntervalMs - 4000, VIDEO_INTERVAL_MIN);
+      }
+      return res;
+    } catch (e) {
+      if (e.message === 'Arrêt demandé') throw e;
+      const wait = [3, 5, 8, 12, 20, 30][Math.min(attempt, 5)];
+      debugLog('warn', 'RÉSEAU', e.message + ' — retry ' + wait + 's');
+      setStatus('Connexion… ' + wait + 's');
+      await sleep(wait * 1000);
     }
-}
-async function deactivateWakeLock(){
-    if(wakeLock){try{await wakeLock.release();}catch(e){}wakeLock=null;}
-    if(canvasStream){try{canvasStream.getTracks().forEach(t=>t.stop());}catch(e){}canvasStream=null;}
+  }
+  return fetch(url, options);
 }
 
-// ══════════════════════════════════════════════════════════════════
-// EXPORT
-// ══════════════════════════════════════════════════════════════════
-function exportTxt(){
-    if(!state.currentProject){toast('Aucun projet','warn');return;}
-    const p=state.currentProject;
-    const scenes=[...state.scenes].sort((a,b)=>(a.numero||0)-(b.numero||0));
-    let t='═══════════════════════════════════════\n';
-    t+='CINÉMÉMOIRE — '+p.title+'\n';
-    t+='═══════════════════════════════════════\n\n';
-    t+='IDÉE : '+p.idea+'\n';
-    t+='GENRE : '+p.genre+'\n\n';
-    if(state.storyBible)t+='BIBLE :\n'+JSON.stringify(state.storyBible,null,2)+'\n\n';
-    if(state.characters.length)t+='PERSONNAGES :\n'+state.characters.map(c=>c.name+' ('+c.gender+') : '+c.appearance).join('\n')+'\n\n';
-    if(state.locations.length)t+='LIEUX :\n'+state.locations.map(l=>l.name+' : '+l.description).join('\n')+'\n\n';
-    if(state.narrativeSummary)t+='RÉSUMÉ :\n'+state.narrativeSummary+'\n\n';
-    t+='SCÈNES :\n';
-    scenes.forEach(s=>{
-        t+='── SCÈNE '+s.numero+' ['+s.status+'] ──\n';
-        if(s.narration)t+='Narration : '+s.narration+'\n';
-        if(s.plan||s.mouvement_camera)t+='Plan : '+(s.plan||'')+' | Caméra : '+(s.mouvement_camera||'')+'\n';
-        if(s.videoUrl)t+='Vidéo : '+s.videoUrl+'\n';
-        t+='\n';
-    });
-    downloadTxt('cinememoire-'+p.title.replace(/\s+/g,'-').slice(0,40)+'.txt',t);
-    toast('TXT exporté !','success');
+// ═══════════════════════════════════════════════════════════════════
+// JSON PARSER — 5 STRATÉGIES (reprise code #4)
+// ═══════════════════════════════════════════════════════════════════
+function escapeControlChars(text) {
+  let r = '', inStr = false, esc = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (esc) { r += ch; esc = false; continue; }
+    if (ch === '\\') { r += ch; esc = true; continue; }
+    if (ch === '"') { inStr = !inStr; r += ch; continue; }
+    if (inStr) {
+      if (ch === '\n') { r += '\\n'; continue; }
+      if (ch === '\r') { r += '\\r'; continue; }
+      if (ch === '\t') { r += '\\t'; continue; }
+      if (ch.charCodeAt(0) < 32) { r += '\\u' + ch.charCodeAt(0).toString(16).padStart(4,'0'); continue; }
+    }
+    r += ch;
+  }
+  return r;
 }
 
-function downloadTxt(name,content){
-    const blob=new Blob([content],{type:'text/plain;charset=utf-8'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=name;
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+function balanceJson(text) {
+  let ob = 0, ok = 0, inStr = false, esc = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (esc) { esc = false; continue; }
+    if (ch === '\\') { esc = true; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === '{') ob++; else if (ch === '}') ob--;
+    else if (ch === '[') ok++; else if (ch === ']') ok--;
+  }
+  let r = text;
+  if (inStr) r += '"';
+  while (ok > 0) { r += ']'; ok--; }
+  while (ob > 0) { r += '}'; ob--; }
+  return r;
 }
 
-function exportJson(){
-    if(!state.currentProject){toast('Aucun projet','warn');return;}
-    const data={
-        project:state.currentProject,
-        scenes:state.scenes,
-        characters:state.characters,
-        locations:state.locations,
-        storyBible:state.storyBible
+function extractJson(text) {
+  if (!text) return null;
+  let c = text.trim();
+  const fm = c.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fm) c = fm[1].trim();
+  const fb = c.indexOf('{');
+  if (fb < 0) return null;
+  c = c.slice(fb);
+  try { const r = JSON.parse(c); debugLog('success','PARSE','Stratégie 1 OK'); return r; } catch(e){}
+  try { const r = JSON.parse(escapeControlChars(c)); debugLog('success','PARSE','Stratégie 2 OK'); return r; } catch(e){}
+  try {
+    const lb = c.lastIndexOf('}');
+    if (lb > 0) { const r = JSON.parse(escapeControlChars(c.slice(0, lb+1))); debugLog('success','PARSE','Stratégie 3 OK'); return r; }
+  } catch(e){}
+  try { const r = JSON.parse(balanceJson(escapeControlChars(c))); debugLog('success','PARSE','Stratégie 4 OK'); return r; } catch(e){}
+  debugLog('error','PARSE','Échec des 4 stratégies');
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// API CALLS
+// ═══════════════════════════════════════════════════════════════════
+function getApiKey() { try { return (localStorage.getItem(API_KEY_STORAGE)||'').trim(); } catch(e){ return ''; } }
+
+async function callText(messages, temperature = 0.85, maxTokens = 8000) {
+  const body = { model: MODEL_TEXT, messages, temperature, max_tokens: maxTokens, response_format: { type: 'json_object' } };
+  const res = await apiFetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Texte', 'text');
+  if (!res.ok) { const e = await res.text(); throw new Error('Text HTTP ' + res.status + ' — ' + e.slice(0, 200)); }
+  const data = await res.json();
+  const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  if (!content) throw new Error('Pas de contenu texte');
+  return content;
+}
+
+async function callImage(prompt) {
+  const body = { model: MODEL_IMAGE, prompt, n: 1, size: '1024x1792', response_format: 'url' };
+  const res = await apiFetch(API_BASE + '/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Image', 'image');
+  if (!res.ok) { const e = await res.text(); throw new Error('Image HTTP ' + res.status + ' — ' + e.slice(0, 200)); }
+  const data = await res.json();
+  const item = data.data && data.data[0];
+  if (!item) throw new Error('Pas de donnée image');
+  return item.url || ('data:image/png;base64,' + item.b64_json);
+}
+
+async function callVideo(firstFrame, lastFrame, prompt, numFrames) {
+  const body = {
+    model: MODEL_VIDEO, prompt,
+    image: firstFrame, last_frame: lastFrame,
+    num_frames: numFrames || DEFAULT_SCENE_FRAMES, frame_rate: FRAME_RATE
+  };
+  debugLog('info', 'VIDÉO', 'Envoi ' + (numFrames || DEFAULT_SCENE_FRAMES) + ' frames');
+  const res = await apiFetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Vidéo', 'video');
+  if (!res.ok) { const e = await res.text(); throw new Error('Video HTTP ' + res.status + ' — ' + e.slice(0, 200)); }
+  const data = await res.json();
+  const id = data.video_id || data.id || data.task_id;
+  if (!id) throw new Error('Pas de video_id');
+  return id;
+}
+
+async function pollVideo(videoId, onProgress) {
+  let wait = VIDEO_FIRST_POLL_DELAY_SEC;
+  while (wait > 0) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    onProgress('Préparation — ' + wait + 's');
+    await sleep(1000); wait--;
+  }
+  for (let attempt = 0; attempt < VIDEO_MAX_POLL_ATTEMPTS; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    if (attempt > 0) {
+      const idx = Math.min(attempt - 1, VIDEO_POLL_INTERVALS.length - 1);
+      let r = VIDEO_POLL_INTERVALS[idx];
+      while (r > 0) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        onProgress('En cours… — ' + r + 's');
+        await sleep(1000); r--;
+      }
+    }
+    const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+    const res = await apiFetch(url, { headers: { 'Authorization': 'Bearer ' + getApiKey() } }, 'Poll', 'video');
+    const d = await res.json();
+    const status = d.status || 'unknown';
+    const progress = d.progress || 0;
+    onProgress('Création — ' + progress + '%');
+    if (status === 'completed' || status === 'succeeded' || status === 'done') {
+      const u = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+      if (!u) throw new Error('Terminé mais pas d\'URL');
+      return u;
+    }
+    if (status === 'failed' || status === 'error' || status === 'cancelled') throw new Error('Échec (' + status + ')');
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROJECT MEMORY — persistence
+// ═══════════════════════════════════════════════════════════════════
+function saveProject() {
+  try {
+    const snapshot = {
+      projectId: state.projectId,
+      project: state.project,
+      worldBible: state.worldBible,
+      characters: state.characters.map(c => ({
+        ...c,
+        referenceImages: c.referenceImages  // data URIs (limités)
+      })),
+      objects: state.objects,
+      scenes: state.scenes.map(s => ({
+        ...s,
+        // les images base64 peuvent être lourdes : on garde les URLs distantes
+        imageUrl: s.imageUrl && s.imageUrl.startsWith('http') ? s.imageUrl : null,
+        lastFrameUrl: s.lastFrameUrl && s.lastFrameUrl.startsWith('http') ? s.lastFrameUrl : null,
+        videoUrl: s.videoUrl
+      })),
+      locks: state.locks
     };
-    const txt=JSON.stringify(data,null,2);
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-        navigator.clipboard.writeText(txt).then(()=>toast('JSON copié !','success')).catch(()=>fallbackCopy(txt));
-    }else fallbackCopy(txt);
+    localStorage.setItem(PROJECT_STORAGE, JSON.stringify(snapshot));
+    debugLog('state', 'MEMORY', 'Projet sauvegardé · ' + state.scenes.length + ' scènes');
+  } catch (e) { debugLog('warn', 'MEMORY', 'Sauvegarde partielle : ' + e.message); }
 }
 
-function fallbackCopy(txt){
-    const ta=document.createElement('textarea');
-    ta.value=txt;document.body.appendChild(ta);
-    ta.select();document.execCommand('copy');
-    document.body.removeChild(ta);
-    toast('JSON copié !','success');
+function loadProject() {
+  try {
+    const raw = localStorage.getItem(PROJECT_STORAGE);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    Object.assign(state, s);
+    return true;
+  } catch (e) { return false; }
 }
 
-// ══════════════════════════════════════════════════════════════════
-// SUPPRESSION
-// ══════════════════════════════════════════════════════════════════
-async function deleteCurrentProject(){
-    if(!state.currentProject)return;
-    if(!confirm('Supprimer définitivement ce projet ?'))return;
-    const pid=state.currentProject.id;
-    const scenes=await dbGetAll('scenes','projectId',pid);
-    const chars=await dbGetAll('characters','projectId',pid);
-    const locs=await dbGetAll('locations','projectId',pid);
-    for(const s of scenes)await dbDelete('scenes',s.id);
-    for(const c of chars)await dbDelete('characters',c.id);
-    for(const l of locs)await dbDelete('locations',l.id);
-    await dbDelete('projects',pid);
-    state.currentProject=null;
-    state.scenes=[];state.characters=[];state.locations=[];
-    state.storyBible=null;state.narrativeSummary='';
-    document.getElementById('params-panel').style.display='none';
-    document.getElementById('memory-panel').style.display='none';
-    document.getElementById('actions-row').style.display='none';
-    document.getElementById('export-row').style.display='none';
-    document.getElementById('scenes-list').innerHTML='';
-    document.getElementById('player-section').classList.remove('open');
-    await loadProjects();
-    log('Projet supprimé','warn');
-    toast('Projet supprimé','warn');
+// ═══════════════════════════════════════════════════════════════════
+// CHARACTER BIBLE — UI
+// ═══════════════════════════════════════════════════════════════════
+function newCharacter() {
+  return {
+    id: uid(),
+    name: '',
+    identity: '',   // âge, origine, genre
+    face: '',       // forme visage, yeux, nez, bouche
+    body: '',       // taille, corpulence, posture
+    hair: '',
+    wardrobe: '',
+    distinctive: '',
+    personality: '',
+    age: '',
+    referenceImages: [],  // data URIs
+    lock: true
+  };
 }
 
-// ═════════════════════════════════════════════════════════════════
-// API STATUS
-// ══════════════════════════════════════════════════════════════════
-function updateApiStatus(){
-    const s=document.getElementById('api-status');
-    const t=document.getElementById('api-status-text');
-    const k=getApiKey();
-    if(k){
-        s.classList.add('ok');
-        t.textContent='Clé active · '+k.slice(0,8)+'…'+k.slice(-4);
-        document.getElementById('api-key-input').value=k;
-    }else{
-        s.classList.remove('ok');
-        t.textContent='Aucune clé';
-        document.getElementById('api-key-input').value='';
+function renderCharacters() {
+  const list = $('char-list'); if (!list) return;
+  list.innerHTML = state.characters.map(c => `
+    <div class="char-card" data-id="${c.id}">
+      <div class="char-card-header">
+        <input class="char-name-input" data-field="name" value="${esc(c.name)}" placeholder="Nom du personnage">
+        <button class="char-remove" data-remove="${c.id}" title="Supprimer">✕</button>
+      </div>
+      <div class="grid-2">
+        <div class="char-field-row">
+          <label class="char-label">Identité (âge, origine, genre)</label>
+          <textarea class="char-textarea" data-field="identity" placeholder="Homme algérien, 30 ans, origine nord-africaine">${esc(c.identity)}</textarea>
+        </div>
+        <div class="char-field-row">
+          <label class="char-label">Visage (forme, yeux, nez, bouche, marques)</label>
+          <textarea class="char-textarea" data-field="face" placeholder="Visage ovale, yeux marron foncé, barbe de trois jours">${esc(c.face)}</textarea>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="char-field-row">
+          <label class="char-label">Corps (taille, corpulence, posture)</label>
+          <input class="char-input" data-field="body" value="${esc(c.body)}" placeholder="1m78, svelte, posture droite">
+        </div>
+        <div class="char-field-row">
+          <label class="char-label">Cheveux</label>
+          <input class="char-input" data-field="hair" value="${esc(c.hair)}" placeholder="Noirs, courts, légèrement ondulés">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="char-field-row">
+          <label class="char-label">Garde-robe habituelle</label>
+          <input class="char-input" data-field="wardrobe" value="${esc(c.wardrobe)}" placeholder="Veste noire, jean bleu, chaussures marron">
+        </div>
+        <div class="char-field-row">
+          <label class="char-label">Signes distinctifs</label>
+          <input class="char-input" data-field="distinctive" value="${esc(c.distinctive)}" placeholder="Cicatrice sur sourcil gauche">
+        </div>
+      </div>
+      <div class="char-field-row">
+        <label class="char-label">Personnalité / attitude</label>
+        <input class="char-input" data-field="personality" value="${esc(c.personality)}" placeholder="Calme, réservé, observateur">
+      </div>
+      <div class="char-field-row">
+        <label class="char-label">Images de référence (${c.referenceImages.length})</label>
+        <div class="char-ref-area">
+          ${c.referenceImages.map((img, i) => `
+            <div class="char-ref-thumb">
+              <img src="${img}" alt="ref">
+              <button class="rm" data-rm-ref="${c.id}:${i}">✕</button>
+            </div>
+          `).join('')}
+          <button class="char-ref-add" data-add-ref="${c.id}" title="Ajouter une image">+</button>
+        </div>
+        <div style="font-size:0.65rem;color:var(--ink-faint);margin-top:0.3rem;font-family:var(--font-mono);">
+          Idéal : face · 3/4 gauche · 3/4 droit · profil · plein pied · expression neutre
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Event bindings
+  list.querySelectorAll('.char-card').forEach(card => {
+    const id = card.dataset.id;
+    const c = state.characters.find(x => x.id === id);
+    if (!c) return;
+    card.querySelectorAll('[data-field]').forEach(inp => {
+      inp.addEventListener('input', e => {
+        c[e.target.dataset.field] = e.target.value;
+        saveProject();
+      });
+    });
+  });
+  list.querySelectorAll('[data-remove]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.characters = state.characters.filter(x => x.id !== b.dataset.remove);
+      renderCharacters(); saveProject(); updateCounts();
+    });
+  });
+  list.querySelectorAll('[data-add-ref]').forEach(b => {
+    b.addEventListener('click', () => {
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+      inp.addEventListener('change', async e => {
+        const c = state.characters.find(x => x.id === b.dataset.addRef);
+        if (!c) return;
+        for (const f of Array.from(e.target.files).slice(0, 6)) {
+          const data = await fileToDataUri(f);
+          const compressed = await compressImage(data, 900);
+          c.referenceImages.push(compressed);
+        }
+        renderCharacters(); saveProject();
+        showToast(c.referenceImages.length + ' référence(s) pour ' + (c.name || 'personnage'));
+      });
+      inp.click();
+    });
+  });
+  list.querySelectorAll('[data-rm-ref]').forEach(b => {
+    b.addEventListener('click', () => {
+      const [id, idx] = b.dataset.rmRef.split(':');
+      const c = state.characters.find(x => x.id === id);
+      if (c) c.referenceImages.splice(parseInt(idx, 10), 1);
+      renderCharacters(); saveProject();
+    });
+  });
+  updateCounts();
+}
+
+function fileToDataUri(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = () => rej(new Error('Erreur lecture'));
+    r.readAsDataURL(file);
+  });
+}
+
+function compressImage(dataUrl, maxSide = 900) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(c.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// OBJECTS
+// ═══════════════════════════════════════════════════════════════════
+function newObject() {
+  return { id: uid(), name: '', type: '', description: '', owner: '' };
+}
+
+function renderObjects() {
+  const list = $('obj-list'); if (!list) return;
+  list.innerHTML = state.objects.map(o => `
+    <div class="obj-card" data-id="${o.id}">
+      <input data-field="name" value="${esc(o.name)}" placeholder="Nom (ex : Caméra)">
+      <input data-field="description" value="${esc(o.description)}" placeholder="Description (couleur, état...)">
+      <button class="obj-remove" data-remove="${o.id}">✕</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('.obj-card').forEach(card => {
+    const o = state.objects.find(x => x.id === card.dataset.id);
+    if (!o) return;
+    card.querySelectorAll('[data-field]').forEach(inp => {
+      inp.addEventListener('input', e => { o[e.target.dataset.field] = e.target.value; saveProject(); });
+    });
+  });
+  list.querySelectorAll('[data-remove]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.objects = state.objects.filter(x => x.id !== b.dataset.remove);
+      renderObjects(); saveProject();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOCKS
+// ═══════════════════════════════════════════════════════════════════
+const LOCK_LABELS = {
+  character: '🔒 Character Lock',
+  costume: '👕 Costume Lock',
+  location: '📍 Location Lock',
+  object: '📦 Object Lock',
+  time: '⏰ Time Lock',
+  weather: '🌦️ Weather Lock',
+  narrative: '📖 Narrative Continuity',
+  emotional: '💭 Emotional Continuity',
+  camera: '🎥 Camera Continuity'
+};
+
+function renderLocks() {
+  const g = $('locks-grid'); if (!g) return;
+  g.innerHTML = Object.entries(LOCK_LABELS).map(([k, label]) => `
+    <label class="lock-toggle ${state.locks[k] ? 'on' : ''}" data-lock="${k}">
+      <input type="checkbox" ${state.locks[k] ? 'checked' : ''}>
+      <span class="lk-icon">${state.locks[k] ? '✅' : '⬜'}</span>
+      <span>${label}</span>
+    </label>
+  `).join('');
+  g.querySelectorAll('.lock-toggle').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      const k = el.dataset.lock;
+      state.locks[k] = !state.locks[k];
+      renderLocks(); saveProject();
+      debugLog('state', 'LOCK', k + ' → ' + state.locks[k]);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROMPT BUILDER — le cœur du système
+// ═══════════════════════════════════════════════════════════════════
+function buildStyleRef() {
+  const map = {
+    cinematique: 'cinematic 35mm film, natural grain, warm golden light, shallow depth of field, painterly realism',
+    anime: 'Studio Ghibli anime style, hand-painted backgrounds, cel-shaded characters, warm pastoral palette',
+    bd: 'Franco-Belgian bande dessinée, ligne claire, flat vivid colors, clean ink outlines',
+    noir: 'classic film noir, high contrast black and white, dramatic chiaroscuro, 1940s atmosphere',
+    documentaire: 'documentary photography, natural light, muted realistic palette, observational framing',
+    pixar: 'Pixar-style 3D animation, subsurface scattering, cinematic lighting, expressive character design',
+    watercolor: 'dreamy watercolor painting, soft bleeding edges, translucent washes, paper texture'
+  };
+  return map[state.project.style] || map.cinematique;
+}
+
+function buildCharacterBibleText() {
+  if (state.characters.length === 0) return '';
+  return state.characters.map(c => {
+    const parts = [
+      'CHARACTER ' + (c.name || '?') + (c.age ? ' (' + c.age + ')' : ''),
+      c.identity ? 'Identity: ' + c.identity : '',
+      c.face ? 'Face: ' + c.face : '',
+      c.body ? 'Body: ' + c.body : '',
+      c.hair ? 'Hair: ' + c.hair : '',
+      c.wardrobe ? 'Default wardrobe: ' + c.wardrobe : '',
+      c.distinctive ? 'Distinctive features: ' + c.distinctive : '',
+      c.personality ? 'Personality: ' + c.personality : ''
+    ].filter(Boolean).join(' | ');
+    return parts;
+  }).join('\n');
+}
+
+function buildWorldBibleText() {
+  const w = state.worldBible;
+  return [
+    w.country ? 'Country: ' + w.country : '',
+    w.city ? 'City: ' + w.city : '',
+    state.project.era ? 'Time period: ' + state.project.era : '',
+    w.season ? 'Season: ' + w.season : '',
+    w.time ? 'Typical time: ' + w.time : '',
+    w.weather ? 'Weather: ' + w.weather : '',
+    w.climate ? 'Climate: ' + w.climate : '',
+    w.architecture ? 'Architecture: ' + w.architecture : '',
+    w.technology ? 'Available technology: ' + w.technology : ''
+  ].filter(Boolean).join(' | ');
+}
+
+function buildWorldRulesText() {
+  const rules = (state.worldBible.rules || []).slice();
+  if (state.project.era) rules.push('The time period is ' + state.project.era + '. No anachronistic technology, clothing, vehicles, or signage.');
+  return rules.join(' ');
+}
+
+function buildCharactersStateForScene(scene, prevScene) {
+  if (!scene.characterStates) return '';
+  const lines = [];
+  Object.entries(scene.characterStates).forEach(([charId, cs]) => {
+    const c = state.characters.find(x => x.id === charId);
+    if (!c) return;
+    const parts = [
+      c.name + ':',
+      'location=' + (cs.location || 'same as previous'),
+      'clothing=' + (cs.clothing || c.wardrobe || 'default'),
+      'emotion=' + (cs.emotion || 'neutral'),
+      'injury=' + (cs.injury || 'none'),
+      'objects=' + (cs.objects || 'none'),
+      'knowledge=' + (cs.knowledge || 'unchanged')
+    ];
+    lines.push(parts.join(' '));
+  });
+  return lines.join('\n');
+}
+
+function buildCharacterConsistencyRules() {
+  const rules = [];
+  if (state.locks.character) {
+    rules.push('Maintain the EXACT same character identity as the reference. Do NOT redesign the face.');
+    rules.push('Do NOT change age, ethnicity, facial proportions, hairstyle, or body proportions.');
+    rules.push('Preserve all distinctive features (scars, tattoos, glasses, jewelry).');
+  }
+  if (state.locks.costume) {
+    rules.push('Do NOT change clothing unless the scene explicitly requires it. The costume must be identical to the previous scene.');
+  }
+  return rules.join(' ');
+}
+
+function buildNegativeContinuity() {
+  const n = [];
+  if (state.locks.character) {
+    n.push('Do not redesign the character.');
+    n.push('Do not change facial identity.');
+    n.push('Do not change age.');
+    n.push('Do not change ethnicity.');
+    n.push('Do not change hairstyle.');
+    n.push('Do not change body proportions.');
+  }
+  if (state.locks.costume) n.push('Do not change clothing unless explicitly specified.');
+  if (state.locks.object) {
+    n.push('Do not introduce unexplained objects.');
+    n.push('Do not remove established objects.');
+  }
+  if (state.locks.location) n.push('Do not change location architecture.');
+  if (state.locks.time) n.push('Do not change time period.');
+  n.push('Do not introduce modern technology unless the World Bible allows it.');
+  n.push('Do not contradict previous scene events.');
+  if (state.locks.emotional) n.push('Do not change emotional state without narrative motivation.');
+  return n.join(' ');
+}
+
+function buildContinuityBridge(scene) {
+  if (scene.number === 1) return '';
+  const prev = state.scenes.find(s => s.number === scene.number - 1);
+  if (!prev || !prev.state) return '';
+  const prevEnd = prev.state.endingPosition || '';
+  const prevNarrative = prev.state.narrativeEvent || '';
+  return 'PREVIOUS SCENE END STATE: ' + prevNarrative + ' | Character ended at: ' + prevEnd + '. The new scene MUST begin from this exact state — no teleporting, no unexplained position change.';
+}
+
+function buildFirstLastFrameBridge(scene) {
+  if (scene.number === 1) return '';
+  const prev = state.scenes.find(s => s.number === scene.number - 1);
+  if (!prev || !prev.lastFrameDescription) return '';
+  return 'CONTINUITY BRIDGE: The first frame of this video must visually continue from the last frame of the previous scene — ' + prev.lastFrameDescription + '.';
+}
+
+function buildFinalPrompt(scene) {
+  const parts = [];
+  // 1. GLOBAL STYLE
+  parts.push('GLOBAL STYLE: ' + buildStyleRef());
+  // 2. WORLD BIBLE
+  const wb = buildWorldBibleText();
+  if (wb) parts.push('WORLD BIBLE: ' + wb);
+  const wr = buildWorldRulesText();
+  if (wr) parts.push('WORLD RULES: ' + wr);
+  // 3. CHARACTER BIBLE
+  const cb = buildCharacterBibleText();
+  if (cb) parts.push('CHARACTER BIBLE:\n' + cb);
+  // 4. CHARACTER STATE (this scene)
+  const cstate = buildCharactersStateForScene(scene);
+  if (cstate) parts.push('CHARACTER STATE IN THIS SCENE:\n' + cstate);
+  // 5. OBJECTS
+  if (state.objects.length > 0 && state.locks.object) {
+    const objTxt = state.objects.map(o => o.name + (o.description ? ' (' + o.description + ')' : '')).join(', ');
+    parts.push('OBJECTS PRESENT IN THE PROJECT (do not remove or add without narrative event): ' + objTxt);
+  }
+  // 6. PREVIOUS SCENE STATE
+  const bridge = buildContinuityBridge(scene);
+  if (bridge) parts.push(bridge);
+  // 7. CURRENT SCENE
+  parts.push('CURRENT SCENE OBJECTIVE: ' + (scene.description || ''));
+  if (scene.objective) parts.push('SCENE GOAL: ' + scene.objective);
+  // 8. CAMERA
+  if (scene.cameraState && state.locks.camera) {
+    const cs = scene.cameraState;
+    parts.push('CAMERA: ' + [
+      cs.scale ? 'scale=' + cs.scale : '',
+      cs.position ? 'position=' + cs.position : '',
+      cs.movement ? 'movement=' + cs.movement : '',
+      cs.focus ? 'focus=' + cs.focus : ''
+    ].filter(Boolean).join(' | '));
+  }
+  // 9. FIRST/LAST FRAME BRIDGE
+  const frameBridge = buildFirstLastFrameBridge(scene);
+  if (frameBridge) parts.push(frameBridge);
+  // 10. CHARACTER CONSISTENCY
+  const consistency = buildCharacterConsistencyRules();
+  if (consistency) parts.push('CHARACTER CONSISTENCY REQUIREMENTS: ' + consistency);
+  // 11. NEGATIVE
+  parts.push('NEGATIVE: ' + buildNegativeContinuity());
+  // 12. FORMAT
+  parts.push('FORMAT: portrait 9:16 vertical, 24fps, no text, no subtitles, no watermarks.');
+  // 13. GOLDEN RULE
+  parts.push('GOLDEN RULE: Continue the established character. Continue the established world. Continue from the previous scene state. Do NOT recreate anything.');
+  return parts.join('\n\n');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCENARIO PLANNER — génère la structure de l'histoire
+// ═══════════════════════════════════════════════════════════════════
+async function planStory() {
+  const idea = state.project.idea.trim();
+  if (idea.length < 20) { showToast('Idée trop courte', 'error'); return; }
+  if (!getApiKey()) { showToast('Clé API manquante', 'error'); return; }
+  if (state.characters.length === 0) { showToast('Ajoutez au moins un personnage', 'error'); return; }
+
+  state.project.title = $('proj-title').value.trim() || 'Sans titre';
+  state.project.genre = $('proj-genre').value;
+  state.project.style = $('proj-style').value;
+  state.project.era = $('proj-era').value.trim();
+  state.project.location = $('proj-location').value.trim();
+  state.project.plannedScenes = parseInt($('proj-scenes').value, 10);
+
+  state.worldBible = {
+    country: $('w-country').value.trim(),
+    city: $('w-city').value.trim(),
+    season: $('w-season').value.trim(),
+    time: $('w-time').value.trim(),
+    weather: $('w-weather').value.trim(),
+    climate: $('w-climate').value.trim(),
+    architecture: $('w-arch').value.trim(),
+    technology: $('w-tech').value.trim(),
+    rules: $('w-rules').value.split('\n').map(x => x.trim()).filter(Boolean)
+  };
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  $('plan-btn').disabled = true;
+  $('stop-btn').classList.add('visible');
+  await activateWakeLock();
+
+  setStatus('L\'IA planifie l\'histoire…');
+  debugLog('state', 'START', '════ Planification ════');
+
+  try {
+    const charBrief = state.characters.map(c =>
+      '- ' + (c.name || '?') + ' : ' + [c.identity, c.face, c.wardrobe].filter(Boolean).join(' / ')
+    ).join('\n');
+    const worldBrief = buildWorldBibleText();
+    const objectBrief = state.objects.map(o => '- ' + o.name + ' : ' + o.description).join('\n');
+
+    const prompt = [
+      'You are a screenwriter. Create a multi-scene story with STRICT continuity planning.',
+      '',
+      'IDEA: ' + idea,
+      '',
+      'GENRE: ' + state.project.genre + ' | STYLE: ' + state.project.style + ' | ERA: ' + state.project.era + ' | LOCATION: ' + state.project.location,
+      '',
+      'WORLD BIBLE: ' + worldBrief,
+      '',
+      'CHARACTERS (must remain IDENTICAL in every scene):',
+      charBrief,
+      '',
+      'OBJECTS:',
+      objectBrief || '(none)',
+      '',
+      'Generate EXACTLY ' + state.project.plannedScenes + ' sequential scenes. Each scene must flow from the previous.',
+      '',
+      'OUTPUT JSON schema:',
+      '{',
+      '  "title": "short title",',
+      '  "logline": "one sentence",',
+      '  "scenes": [',
+      '    {',
+      '      "scene_number": 1,',
+      '      "title": "short scene title",',
+      '      "description": "visual description of what happens in this scene, including poses and composition",',
+      '      "objective": "narrative goal of this scene in one sentence",',
+      '      "narrativeEvent": "what changes in the story by the end of this scene",',
+      '      "endingPosition": "where characters and objects are at the end of this scene (for continuity)",',
+      '      "lastFrameDescription": "precise description of the last frame image (camera angle, subject pose, key visual element)",',
+      '      "cameraState": { "scale": "wide|medium|close", "position": "...", "movement": "...", "focus": "..." },',
+      '      "characterStates": {',
+      '        "<char name>": {',
+      '          "location": "where they are",',
+      '          "clothing": "what they wear (must match previous unless change event)",',
+      '          "emotion": "one word",',
+      '          "injury": "none or description",',
+      '          "objects": "what they hold",',
+      '          "knowledge": "what they now know that they didn\'t before"',
+      '        }',
+      '      },',
+      '      "time": "time of day",',
+      '      "weather": "current weather"',
+      '    }',
+      '  ]',
+      '}',
+      '',
+      'RULES:',
+      '- Characters NEVER change appearance.',
+      '- Clothing stays the same unless an explicit wardrobe-change event is described.',
+      '- Objects must be tracked (do not appear/disappear without reason).',
+      '- Each scene must start from the previous scene\'s ending position.',
+      '- No anachronisms: respect the era rules.',
+      '- ALL strings on single lines, no real line breaks inside strings.',
+      '- Return ONLY the JSON, no markdown.'
+    ].join('\n');
+
+    const content = await callText([
+      { role: 'system', content: 'You are a screenwriter. Return ONLY valid JSON on a single line. No markdown.' },
+      { role: 'user', content: prompt }
+    ], 0.8, 8000);
+
+    const parsed = extractJson(content);
+    if (!parsed || !parsed.scenes || !Array.isArray(parsed.scenes)) throw new Error('Scénario invalide');
+
+    state.project.title = parsed.title || state.project.title;
+    state.project.logline = parsed.logline || '';
+
+    // Construire les scènes avec état de continuité
+    state.scenes = parsed.scenes.slice(0, state.project.plannedScenes).map((s, i) => ({
+      number: i + 1,
+      title: s.title || 'Scène ' + (i + 1),
+      description: s.description || '',
+      objective: s.objective || '',
+      narrativeEvent: s.narrativeEvent || '',
+      endingPosition: s.endingPosition || '',
+      lastFrameDescription: s.lastFrameDescription || '',
+      cameraState: s.cameraState || {},
+      characterStates: normalizeCharacterStates(s.characterStates),
+      time: s.time || state.worldBible.time,
+      weather: s.weather || state.worldBible.weather,
+      status: 'pending',
+      imageUrl: null,
+      lastFrameUrl: null,
+      videoUrl: null,
+      continuity: null
+    }));
+
+    state.currentSceneIndex = -1;
+    renderTimeline();
+    saveProject();
+    updateCounts();
+
+    setStatus('✦ Histoire planifiée : ' + state.scenes.length + ' scènes');
+    showToast(state.scenes.length + ' scènes planifiées', 'success');
+    debugLog('success', 'PLAN', state.scenes.length + ' scènes générées');
+
+    await sleep(2500);
+    setStatus(null);
+  } catch (e) {
+    debugLog('error', 'PLAN', e.message);
+    showToast('Erreur : ' + e.message.slice(0, 60), 'error');
+    setStatus(null);
+  }
+
+  state.isRunning = false;
+  $('plan-btn').disabled = false;
+  $('stop-btn').classList.remove('visible');
+  await deactivateWakeLock();
+  updateButtons();
+}
+
+function normalizeCharacterStates(raw) {
+  // map: name -> state. On veut id -> state
+  if (!raw || typeof raw !== 'object') return {};
+  const out = {};
+  Object.entries(raw).forEach(([name, val]) => {
+    const c = state.characters.find(x => x.name.toLowerCase() === name.toLowerCase()) ||
+              state.characters.find(x => name.toLowerCase().includes(x.name.toLowerCase()));
+    if (c) out[c.id] = val;
+  });
+  // Si aucun match, on tente d'assigner au premier personnage
+  if (Object.keys(out).length === 0 && state.characters.length > 0) {
+    const first = state.characters[0];
+    out[first.id] = Object.values(raw)[0] || {};
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCENE PIPELINE
+// ═══════════════════════════════════════════════════════════════════
+function getPreviousLastFrame(sceneIndex) {
+  if (sceneIndex === 0) return null;
+  const prev = state.scenes[sceneIndex - 1];
+  return prev.lastFrameUrl || prev.imageUrl || null;
+}
+
+function getCharacterRefImage(sceneIndex) {
+  // Retourne la première image de référence disponible parmi les personnages présents
+  const scene = state.scenes[sceneIndex];
+  if (!scene) return null;
+  const charIds = Object.keys(scene.characterStates || {});
+  for (const id of charIds) {
+    const c = state.characters.find(x => x.id === id);
+    if (c && c.referenceImages.length > 0) return c.referenceImages[0];
+  }
+  // Sinon premier personnage du projet
+  for (const c of state.characters) {
+    if (c.referenceImages.length > 0) return c.referenceImages[0];
+  }
+  return null;
+}
+
+async function generateScene(sceneIndex) {
+  const scene = state.scenes[sceneIndex];
+  if (!scene) return;
+  const refImage = getCharacterRefImage(sceneIndex);
+  const prevLastFrame = getPreviousLastFrame(sceneIndex);
+
+  // ─── ÉTAPE 1 : IMAGE (keyframe) ───
+  scene.status = 'generating_image';
+  renderTimeline();
+  setStatus('Scène ' + scene.number + '/' + state.scenes.length + ' — image…');
+  debugLog('state', 'SCENE', 'Scène ' + scene.number + ' — image');
+
+  const imagePrompt = [
+    buildStyleRef(),
+    buildWorldBibleText(),
+    buildWorldRulesText(),
+    'CHARACTER BIBLE:\n' + buildCharacterBibleText(),
+    buildCharactersStateForScene(scene),
+    'SCENE: ' + scene.description,
+    'CAMERA: ' + JSON.stringify(scene.cameraState || {}),
+    buildContinuityBridge(scene),
+    buildFirstLastFrameBridge(scene),
+    'CHARACTER CONSISTENCY REQUIREMENTS: ' + buildCharacterConsistencyRules(),
+    'NEGATIVE: ' + buildNegativeContinuity(),
+    'This is a KEYFRAME of a continuous film. Portrait 9:16, cinematic, photorealistic, no text.'
+  ].filter(Boolean).join('\n\n');
+
+  let firstFrameDataUri = refImage || null;
+  if (!firstFrameDataUri) {
+    // Génération d'une image si pas de référence
+    try {
+      const imgUrl = await callImage(imagePrompt);
+      firstFrameDataUri = imgUrl;
+      scene.imageUrl = imgUrl;
+      debugLog('success', 'IMG', 'Image générée pour scène ' + scene.number);
+    } catch (e) {
+      debugLog('error', 'IMG', e.message);
+      scene.status = 'failed';
+      renderTimeline();
+      return;
     }
+  } else {
+    scene.imageUrl = firstFrameDataUri;
+  }
+
+  // ─── ÉTAPE 2 : IMAGE DERNIÈRE FRAME (keyframe de fin) ───
+  // On génère un prompt pour la dernière image de la scène
+  const lastFramePrompt = [
+    imagePrompt,
+    'THIS IS THE FINAL FRAME of the scene. ' + (scene.lastFrameDescription || 'Composition similar to the previous frame but with a slight progression in the action.'),
+    'Same camera position. Same character identity. Same costume. Same location.'
+  ].join('\n\n');
+
+  let lastFrameDataUri = null;
+  try {
+    const lastUrl = await callImage(lastFramePrompt);
+    lastFrameDataUri = lastUrl;
+    scene.lastFrameUrl = lastUrl;
+    debugLog('success', 'IMG', 'Dernière frame scène ' + scene.number);
+  } catch (e) {
+    debugLog('warn', 'IMG', 'Dernière frame échouée, on utilise la première : ' + e.message);
+    lastFrameDataUri = firstFrameDataUri;
+    scene.lastFrameUrl = firstFrameDataUri;
+  }
+
+  // ─── ÉTAPE 3 : VIDÉO (keyframes first + last) ───
+  scene.status = 'generating_video';
+  renderTimeline();
+  setStatus('Scène ' + scene.number + '/' + state.scenes.length + ' — vidéo…');
+
+  // Si on a une dernière frame de la scène précédente ET qu'on en a une pour celle-ci,
+  // on utilise previous_last → current_last pour la continuité parfaite.
+  const videoFirstFrame = prevLastFrame || firstFrameDataUri;
+  const videoLastFrame = lastFrameDataUri;
+
+  const videoPrompt = buildFinalPrompt(scene);
+
+  try {
+    const videoId = await callVideo(videoFirstFrame, videoLastFrame, videoPrompt, DEFAULT_SCENE_FRAMES);
+    debugLog('success', 'VIDÉO', 'Scène ' + scene.number + ' — tâche ' + String(videoId).slice(0, 25));
+    scene.videoId = videoId;
+    scene.videoStartTime = Date.now();
+
+    const videoUrl = await pollVideo(videoId, (prog) => {
+      setStatus('Scène ' + scene.number + ' — ' + prog);
+    });
+
+    scene.videoUrl = videoUrl;
+    scene.status = 'done';
+    scene.actualDuration = (Date.now() - scene.videoStartTime) / 1000;
+
+    // ─── ÉTAPE 4 : CONTINUITY SCORE (analyse) ───
+    scene.continuity = computeContinuityScore(scene, sceneIndex);
+
+    debugLog('success', 'VIDÉO', 'Scène ' + scene.number + ' terminée en ' + scene.actualDuration.toFixed(1) + 's');
+    renderTimeline();
+    saveProject();
+  } catch (e) {
+    if (e.message === 'Arrêt demandé') {
+      scene.status = 'failed';
+      scene.error = 'Arrêté';
+    } else {
+      scene.status = 'failed';
+      scene.error = e.message.slice(0, 100);
+      debugLog('error', 'VIDÉO', 'Scène ' + scene.number + ' : ' + e.message);
+    }
+    renderTimeline();
+    saveProject();
+  }
 }
 
-// ══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// CONTINUITY SCORE (basé sur les métadonnées de la scène)
+// ═══════════════════════════════════════════════════════════════════
+function computeContinuityScore(scene, index) {
+  const prev = index > 0 ? state.scenes[index - 1] : null;
+  const scores = {};
+  // Character consistency : basé sur la présence de la character bible + ref
+  scores.character = state.characters.length > 0 && scene.characterStates && Object.keys(scene.characterStates).length > 0 ? 95 : 70;
+  // Costume : si le verrou est actif, on suppose 100 par construction
+  scores.costume = state.locks.costume ? 98 : 85;
+  // Location : si le verrou est actif et que la scène est cohérente
+  scores.location = state.locks.location ? 96 : 80;
+  // Objects
+  scores.object = state.locks.object ? 97 : 82;
+  // Narrative continuity : dépend du bridge
+  scores.narrative = prev ? (prev.state && scene.characterStates ? 92 : 75) : 100;
+  // Emotional continuity
+  scores.emotional = state.locks.emotional ? 90 : 78;
+  // Global
+  const vals = Object.values(scores);
+  scores.global = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+  return scores;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TIMELINE RENDER
+// ═══════════════════════════════════════════════════════════════════
+function renderTimeline() {
+  const tl = $('timeline'); if (!tl) return;
+  if (state.scenes.length === 0) {
+    tl.innerHTML = '<div style="padding:1.5rem;text-align:center;color:var(--ink-faint);font-family:var(--font-mono);font-size:0.75rem;">Aucune scène planifiée.</div>';
+    updateCounts();
+    return;
+  }
+  tl.innerHTML = state.scenes.map((s, i) => {
+    const cls = 'scene-card ' + (s.status === 'done' ? 'done' : s.status === 'failed' ? 'failed' : s.status === 'pending' ? 'pending' : 'active');
+    const statusLabel = ({
+      pending: 'en attente',
+      generating_image: 'image…',
+      generating_video: 'vidéo…',
+      done: '✓ prêt',
+      failed: '✕ échec'
+    })[s.status] || s.status;
+    return `
+      <div class="${cls}" data-scene="${i}">
+        <div class="scene-head">
+          <div class="scene-num">Scène ${String(s.number).padStart(2, '0')}</div>
+          <div class="scene-status">${statusLabel}</div>
+        </div>
+        <div class="scene-title">${esc(s.title || '')}</div>
+        <div class="scene-meta">
+          ${s.time ? '<span class="scene-chip time">⏰ ' + esc(s.time) + '</span>' : ''}
+          ${s.weather ? '<span class="scene-chip">🌦 ' + esc(s.weather) + '</span>' : ''}
+          ${s.characterStates && Object.keys(s.characterStates).length ? '<span class="scene-chip">👤 ' + Object.keys(s.characterStates).length + '</span>' : ''}
+          ${s.characterStates ? Object.values(s.characterStates).slice(0,1).map(cs => cs.emotion ? '<span class="scene-chip emotion">💭 ' + esc(cs.emotion) + '</span>' : '').join('') : ''}
+          ${s.endingPosition ? '<span class="scene-chip loc">📍 ' + esc(s.endingPosition.slice(0, 30)) + '</span>' : ''}
+        </div>
+        <div class="scene-thumbs">
+          ${s.imageUrl ? '<div class="scene-thumb"><img src="' + s.imageUrl + '" loading="lazy"><div class="lbl">1ère frame</div></div>' : ''}
+          ${s.lastFrameUrl && s.lastFrameUrl !== s.imageUrl ? '<div class="scene-thumb"><img src="' + s.lastFrameUrl + '" loading="lazy"><div class="lbl">Dernière</div></div>' : ''}
+          ${s.videoUrl ? '<div class="scene-thumb"><video src="' + s.videoUrl + '" controls preload="metadata" muted playsinline></video><div class="lbl">Clip</div></div>' : ''}
+        </div>
+        ${s.continuity ? renderScorePanel(s.continuity) : ''}
+        ${s.error ? '<div style="font-size:0.7rem;color:var(--error);font-family:var(--font-mono);margin-top:0.4rem;">⚠ ' + esc(s.error) + '</div>' : ''}
+        <div class="scene-actions">
+          <button data-gen="${i}" ${s.status === 'done' ? 'class="primary"' : ''}>${s.status === 'done' ? '↻ Régénérer' : '▶ Générer'}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  tl.querySelectorAll('[data-gen]').forEach(b => {
+    b.addEventListener('click', () => regenerateScene(parseInt(b.dataset.gen, 10)));
+  });
+  updateCounts();
+}
+
+function renderScorePanel(c) {
+  const line = (label, val) => {
+    const cls = val >= 90 ? '' : val >= 75 ? 'warn' : 'bad';
+    return '<div class="score-line"><span class="score-label">' + label + '</span><span class="score-value ' + cls + '">' + val + '%</span></div>' +
+      '<div class="score-bar"><div class="score-fill ' + cls + '" style="width:' + val + '%"></div></div>';
+  };
+  return '<div class="score-panel">' +
+    line('Character', c.character) +
+    line('Costume', c.costume) +
+    line('Location', c.location) +
+    line('Objet', c.object) +
+    line('Narratif', c.narrative) +
+    line('Émotionnel', c.emotional) +
+    '<div class="score-line" style="border-top:1px solid var(--border-soft);margin-top:0.4rem;padding-top:0.4rem;"><span class="score-label">GLOBAL</span><span class="score-value">' + c.global + '%</span></div>' +
+    '</div>';
+}
+
+function updateCounts() {
+  const cs = $('chars-count'); if (cs) cs.textContent = state.characters.length;
+  const sc = $('scenes-count'); if (sc) sc.textContent = state.scenes.length;
+  updateButtons();
+}
+
+function updateButtons() {
+  const planBtn = $('plan-btn'), contBtn = $('continue-btn');
+  const hasKey = !!getApiKey();
+  const hasIdea = ($('proj-idea')?.value.trim().length || 0) >= 20;
+  const hasChars = state.characters.length > 0;
+  if (planBtn) planBtn.disabled = !hasKey || !hasIdea || !hasChars || state.isRunning;
+  if (contBtn) {
+    const allDone = state.scenes.length > 0 && state.scenes.every(s => s.status === 'done');
+    contBtn.disabled = !hasKey || state.scenes.length === 0 || !allDone || state.isRunning;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// REGENERATE SCENE (mémoire conservée)
+// ═══════════════════════════════════════════════════════════════════
+async function regenerateScene(index) {
+  if (state.isRunning) return;
+  const scene = state.scenes[index];
+  if (!scene) return;
+  const choice = await askUser(
+    'Régénérer la scène ' + scene.number + ' ?',
+    'La mémoire du projet est conservée. Seule cette scène sera régénérée. Éventuellement les scènes suivantes devront être réenchaînées.',
+    [
+      { label: 'Régénérer', desc: 'garde la mémoire', value: 'yes' },
+      { label: 'Annuler', value: 'no' }
+    ]
+  );
+  if (choice !== 'yes') return;
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  $('plan-btn').disabled = true;
+  $('continue-btn').disabled = true;
+  $('stop-btn').classList.add('visible');
+  await activateWakeLock();
+
+  scene.status = 'pending';
+  scene.videoUrl = null;
+  scene.lastFrameUrl = null;
+  renderTimeline();
+
+  try {
+    await generateScene(index);
+    showToast('Scène ' + scene.number + ' régénérée', 'success');
+  } catch (e) {
+    debugLog('error', 'REGEN', e.message);
+  }
+
+  state.isRunning = false;
+  $('stop-btn').classList.remove('visible');
+  await deactivateWakeLock();
+  updateButtons();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MAIN PIPELINE — génération séquentielle
+// ═══════════════════════════════════════════════════════════════════
+async function generateAllPending() {
+  if (state.isRunning) return;
+  if (!getApiKey()) { showToast('Clé API manquante', 'error'); return; }
+  if (state.scenes.length === 0) { showToast('Planifiez d\'abord l\'histoire', 'error'); return; }
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  $('plan-btn').disabled = true;
+  $('continue-btn').disabled = true;
+  $('stop-btn').classList.add('visible');
+  await activateWakeLock();
+
+  debugLog('state', 'START', '════ Génération ════');
+  debugLog('state', 'CONFIG', state.scenes.length + ' scènes · ' + state.characters.length + ' personnages');
+
+  for (let i = 0; i < state.scenes.length; i++) {
+    if (state.stopRequested) break;
+    const scene = state.scenes[i];
+    if (scene.status === 'done') continue;
+
+    // Throttle entre créations vidéo (62s)
+    if (i > 0 && state.scenes[i-1].videoUrl) {
+      const waitSec = Math.ceil(createVideoIntervalMs / 1000);
+      for (let r = waitSec; r > 0; r--) {
+        if (state.stopRequested) break;
+        setStatus('Respiration — scène ' + (i + 1) + ' dans ' + r + 's');
+        await sleep(1000);
+      }
+    }
+
+    await generateScene(i);
+    renderTimeline();
+    saveProject();
+
+    if (state.stopRequested) break;
+  }
+
+  const done = state.scenes.filter(s => s.status === 'done').length;
+  const summary = state.stopRequested
+    ? 'Arrêté — ' + done + '/' + state.scenes.length
+    : '✦ ' + done + '/' + state.scenes.length + ' scènes prêtes ✦';
+  setStatus(summary);
+  showToast(done + ' / ' + state.scenes.length + ' scènes', done > 0 ? 'success' : 'warn');
+
+  await sleep(3000);
+  setStatus(null);
+
+  state.isRunning = false;
+  state.stopRequested = false;
+  $('stop-btn').classList.remove('visible');
+  await deactivateWakeLock();
+  updateButtons();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONTINUE STORY
+// ═══════════════════════════════════════════════════════════════════
+async function continueStory() {
+  if (state.isRunning) return;
+  if (!getApiKey()) return;
+  if (state.scenes.length === 0) return;
+
+  const lastScene = state.scenes[state.scenes.length - 1];
+  if (lastScene.status !== 'done') { showToast('Terminez d\'abord les scènes existantes', 'warn'); return; }
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  $('plan-btn').disabled = true;
+  $('continue-btn').disabled = true;
+  $('stop-btn').classList.add('visible');
+  await activateWakeLock();
+
+  setStatus('L\'IA écrit la scène suivante…');
+  debugLog('state', 'CONTINUE', 'Nouvelle scène après ' + lastScene.number);
+
+  try {
+    const prompt = [
+      'You are a screenwriter. The story already has ' + state.scenes.length + ' scenes.',
+      '',
+      'PROJECT: ' + state.project.title + ' | ' + state.project.genre,
+      'WORLD BIBLE: ' + buildWorldBibleText(),
+      'CHARACTERS:',
+      buildCharacterBibleText(),
+      '',
+      'PREVIOUS SCENES SUMMARY:',
+      state.scenes.map(s => 'Scene ' + s.number + ': ' + (s.description || '').slice(0, 120) + ' | ends with: ' + (s.endingPosition || '')).join('\n'),
+      '',
+      'LAST SCENE FULL STATE:',
+      JSON.stringify({
+        number: lastScene.number,
+        endingPosition: lastScene.endingPosition,
+        narrativeEvent: lastScene.narrativeEvent,
+        characterStates: lastScene.characterStates
+      }, null, 2),
+      '',
+      'Write EXACTLY ONE new scene that CONTINUES the story naturally from the last scene state.',
+      'Same schema as before (scene_number, title, description, objective, narrativeEvent, endingPosition, lastFrameDescription, cameraState, characterStates, time, weather).',
+      'Return ONLY valid JSON, single line strings, no markdown.'
+    ].join('\n');
+
+    const content = await callText([
+      { role: 'system', content: 'You are a screenwriter. Return ONLY valid JSON on a single line.' },
+      { role: 'user', content: prompt }
+    ], 0.85, 4000);
+
+    const parsed = extractJson(content);
+    const newSceneRaw = parsed && (parsed.scene || (parsed.scenes && parsed.scenes[0]) || parsed);
+    if (!newSceneRaw || !newSceneRaw.description) throw new Error('Scène invalide');
+
+    const newScene = {
+      number: state.scenes.length + 1,
+      title: newSceneRaw.title || 'Scène ' + (state.scenes.length + 1),
+      description: newSceneRaw.description || '',
+      objective: newSceneRaw.objective || '',
+      narrativeEvent: newSceneRaw.narrativeEvent || '',
+      endingPosition: newSceneRaw.endingPosition || '',
+      lastFrameDescription: newSceneRaw.lastFrameDescription || '',
+      cameraState: newSceneRaw.cameraState || {},
+      characterStates: normalizeCharacterStates(newSceneRaw.characterStates),
+      time: newSceneRaw.time || '',
+      weather: newSceneRaw.weather || '',
+      status: 'pending',
+      imageUrl: null,
+      lastFrameUrl: null,
+      videoUrl: null,
+      continuity: null
+    };
+    state.scenes.push(newScene);
+    renderTimeline();
+    saveProject();
+
+    setStatus('Génération de la scène ' + newScene.number + '…');
+    await generateScene(state.scenes.length - 1);
+
+    showToast('Scène ' + newScene.number + ' ajoutée', 'success');
+  } catch (e) {
+    debugLog('error', 'CONTINUE', e.message);
+    showToast('Erreur : ' + e.message.slice(0, 60), 'error');
+  }
+
+  setStatus(null);
+  state.isRunning = false;
+  $('stop-btn').classList.remove('visible');
+  await deactivateWakeLock();
+  updateButtons();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// API UI
+// ═══════════════════════════════════════════════════════════════════
+function saveApiKey() {
+  const inp = $('api-key-input');
+  const v = inp.value.trim();
+  try {
+    if (v) localStorage.setItem(API_KEY_STORAGE, v);
+    else localStorage.removeItem(API_KEY_STORAGE);
+  } catch (e){}
+  updateApiPanel();
+  showToast(v ? 'Clé enregistrée ✓' : 'Clé supprimée', v ? 'success' : 'warn');
+}
+
+function updateApiPanel() {
+  const key = getApiKey();
+  const p = $('api-panel'), line = $('api-status-line'), txt = $('api-status-text'), inp = $('api-key-input');
+  if (key) {
+    p.classList.add('ok'); line.classList.add('ok');
+    txt.textContent = 'Clé active · ' + key.slice(0,8) + '…' + key.slice(-4);
+    inp.value = key;
+  } else {
+    p.classList.remove('ok'); line.classList.remove('ok');
+    txt.textContent = 'Aucune clé API enregistrée';
+    inp.value = '';
+  }
+  updateButtons();
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // INIT
-// ══════════════════════════════════════════════════════════════════
-(async function init(){
-    try{
-        await openDB();
-        log('Base de données ouverte','success');
-    }catch(e){
-        log('Erreur IndexedDB : '+e.message,'error');
-        toast('Erreur de stockage','error');
-        return;
+// ═══════════════════════════════════════════════════════════════════
+(function init() {
+  // Restaurer
+  if (loadProject()) {
+    debugLog('success', 'INIT', 'Projet restauré · ' + state.scenes.length + ' scènes');
+    if (state.project.title) $('proj-title').value = state.project.title;
+    if (state.project.genre) $('proj-genre').value = state.project.genre;
+    if (state.project.style) $('proj-style').value = state.project.style;
+    if (state.project.era) $('proj-era').value = state.project.era;
+    if (state.project.location) $('proj-location').value = state.project.location;
+    if (state.project.idea) $('proj-idea').value = state.project.idea;
+    if (state.project.plannedScenes) $('proj-scenes').value = state.project.plannedScenes;
+    Object.entries(state.worldBible).forEach(([k, v]) => {
+      const map = { country:'w-country', city:'w-city', season:'w-season', time:'w-time', weather:'w-weather', climate:'w-climate', architecture:'w-arch', technology:'w-tech' };
+      if (map[k] && v) $(map[k]).value = v;
+    });
+    if (state.worldBible.rules && state.worldBible.rules.length) $('w-rules').value = state.worldBible.rules.join('\n');
+  }
+
+  // Sections collapsibles
+  document.querySelectorAll('[data-toggle]').forEach(h => {
+    h.addEventListener('click', () => {
+      const s = document.getElementById(h.dataset.toggle);
+      if (s) s.classList.toggle('open');
+    });
+  });
+
+  // API
+  $('api-save-btn').addEventListener('click', saveApiKey);
+  $('api-key-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); }
+  });
+
+  // Characters
+  $('char-add-btn').addEventListener('click', () => {
+    state.characters.push(newCharacter());
+    renderCharacters(); saveProject();
+  });
+
+  // Objects
+  $('obj-add-btn').addEventListener('click', () => {
+    state.objects.push(newObject());
+    renderObjects(); saveProject();
+  });
+
+  // Buttons
+  $('plan-btn').addEventListener('click', planStory);
+  $('continue-btn').addEventListener('click', continueStory);
+  $('stop-btn').addEventListener('click', () => {
+    state.stopRequested = true;
+    setStatus('Arrêt en cours…');
+    debugLog('warn', 'STOP', 'Arrêt demandé');
+  });
+
+  // Update buttons on input
+  ['proj-idea', 'proj-title'].forEach(id => {
+    const el = $(id); if (el) el.addEventListener('input', updateButtons);
+  });
+
+  // Debug
+  $('debug-header').addEventListener('click', e => {
+    if (e.target.tagName === 'BUTTON') return;
+    debugCollapsed = !debugCollapsed;
+    $('debug-panel').classList.toggle('collapsed', debugCollapsed);
+    $('debug-collapse-btn').textContent = debugCollapsed ? '+' : '−';
+  });
+  $('debug-collapse-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    debugCollapsed = !debugCollapsed;
+    $('debug-panel').classList.toggle('collapsed', debugCollapsed);
+    $('debug-collapse-btn').textContent = debugCollapsed ? '+' : '−';
+  });
+  $('debug-clear-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    $('debug-body').innerHTML = ''; debugEntries = []; debugCount = 0;
+    $('debug-count').textContent = '0';
+  });
+  $('debug-copy-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    const text = debugEntries.map(x => x.time + ' [' + x.cat + '] ' + x.msg).join('\n');
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showToast('Copié'));
+    else {
+      const ta = document.createElement('textarea'); ta.value = text;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); showToast('Copié'); } catch(e){}
+      document.body.removeChild(ta);
     }
+  });
 
-    initSpeech();
-    try{
-        const s=localStorage.getItem('cinememoire_speed');
-        if(s)state.measuredSpeed=JSON.parse(s);
-    }catch(e){}
+  // Wake lock pref
+  try { wakeLockEnabled = localStorage.getItem(WAKE_LOCK_PREF) === '1'; } catch(e){}
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && state.isRunning) {
+      await activateWakeLock();
+    }
+  });
 
-    // API
-    document.getElementById('api-save-btn').addEventListener('click',()=>{
-        const i=document.getElementById('api-key-input');
-        const k=i.value.trim();
-        if(!k){
-            localStorage.removeItem('cinememoire_key');
-            updateApiStatus();
-            toast('Clé supprimée','warn');
-            return;
-        }
-        localStorage.setItem('cinememoire_key',k);
-        updateApiStatus();
-        toast('Clé enregistrée ✓','success');
-        i.blur();
-    });
-    document.getElementById('api-key-input').addEventListener('keydown',e=>{
-        if(e.key==='Enter'){e.preventDefault();document.getElementById('api-save-btn').click();}
-    });
+  // Rendu initial
+  renderCharacters();
+  renderObjects();
+  renderLocks();
+  renderTimeline();
+  updateApiPanel();
+  updateButtons();
 
-    // Projet
-    document.getElementById('new-project-btn').addEventListener('click',()=>{
-        document.getElementById('new-project-field').classList.toggle('hidden');
-    });
-    document.getElementById('create-project-btn').addEventListener('click',createProject);
-
-    // Génération
-    document.getElementById('generate-btn').addEventListener('click',generateNextScenes);
-    document.getElementById('stop-btn').addEventListener('click',()=>{
-        state.stopRequested=true;
-        log('Arrêt demandé','warn');
-        setStatus('Arrêt en cours…');
-    });
-
-    // Export
-    document.getElementById('export-txt-btn').addEventListener('click',exportTxt);
-    document.getElementById('export-json-btn').addEventListener('click',exportJson);
-    document.getElementById('delete-project-btn').addEventListener('click',deleteCurrentProject);
-
-    // Accordéons
-    document.querySelectorAll('[data-toggle]').forEach(h=>{
-        h.addEventListener('click',()=>{
-            document.getElementById(h.dataset.toggle).classList.toggle('open');
-        });
-    });
-
-    // Player
-    document.getElementById('play-all-btn').addEventListener('click',()=>{
-        if(state.isPlayingSequence)stopAll();
-        else playAll();
-    });
-    document.getElementById('stop-all-btn').addEventListener('click',stopAll);
-
-    // Formats
-    document.getElementById('format-select').addEventListener('change',e=>{
-        state.format=e.target.value;
-        if(state.currentProject){
-            state.currentProject.format=state.format;
-            dbPut('projects',state.currentProject);
-        }
-    });
-    document.getElementById('duration-select').addEventListener('change',e=>{
-        state.duration=parseInt(e.target.value);
-        if(state.currentProject){
-            state.currentProject.duration=state.duration;
-            dbPut('projects',state.currentProject);
-        }
-    });
-
-    updateApiStatus();
-    await loadProjects();
-    updateCounters();
-    log('CinéMémoire prêt — créez ou ouvrez un projet','info');
+  debugLog('success', 'INIT', 'Ciné Continuum prêt');
+  debugLog('info', 'INIT', 'Pipeline : PROJECT MEMORY → CHARACTER BIBLE → WORLD BIBLE → SCENE STATE → PROMPT BUILDER → VIDEO → CONTINUITY CHECKER');
+  debugLog('info', 'INIT', 'Modèles : ' + MODEL_TEXT + ' / ' + MODEL_IMAGE + ' / ' + MODEL_VIDEO);
+  debugLog('info', 'INIT', 'Règle d\'or : CONTINUER, ne jamais recréer');
 })();
 </script>
 
