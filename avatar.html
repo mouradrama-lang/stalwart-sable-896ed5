@@ -2043,4 +2043,1080 @@ if(pack.theme) html+='<div class="ip-line"><span class="ip-label">Thème</span><
 html+='<div class="ip-line"><span class="ip-label">Personnages</span><span class="ip-val">'+pack.characters.length+' / '+MAX_CHARACTERS+'</span></div>';
 html+='<div class="ip-line"><span class="ip-label">Scènes</span><span class="ip-val">'+pack.scenes.length+'</span></div>';
 html+='<div class="ip-line"><span class="ip-label">Durée totale</span><span class="ip-val">'+totalDurSec+' s</span></div>';
-html+
+html+='<div class="ip-line"><span class="ip-label">Temps estimé</span><span class="ip-val">≈ '+estTimeMin+' min</span></div>';
+html+='<div class="ip-chars">';
+pack.characters.forEach(c=>{
+const styleName=STYLE_PROMPTS[c.style]?'':' (style par défaut)';
+html+='<div class="ip-char">'+esc(c.name)+' — '+esc(c.gender||'homme')+', '+esc(c.age||'adulte')+', '+esc(c.ethnicity||'—')+styleName+'</div>';
+});
+html+='</div>';
+html+='<div class="ip-scenes">';
+pack.scenes.forEach((s,i)=>{
+const dur=((s.duration||defaultDur)/24).toFixed(1);
+html+='<div class="ip-scene"><strong>Scène '+(i+1)+'</strong> ('+dur+'s) — '+
+esc(s.characterNames.join(', '))+
+(s.decor?' · Décor: '+esc(s.decor.slice(0,60))+(s.decor.length>60?'…':''):'')+
+'</div>';
+});
+html+='</div>';
+
+// Actions
+html+='<div class="import-actions">';
+html+='<button type="button" class="btn mint" id="import-start-btn">🚀 Lancer la génération</button>';
+html+='<button type="button" class="btn" id="import-reanalyze-btn">🔍 Re-analyser</button>';
+html+='</div>';
+
+html+='</div>';
+container.innerHTML=html;
+
+// Bind actions
+$('import-start-btn').addEventListener('click',startImportGeneration);
+$('import-reanalyze-btn').addEventListener('click',analyzeImport);
+
+showToast('Pack valide ✓','success');
+debugLog('success','IMPORT','Pack analysé : '+pack.characters.length+' persos, '+pack.scenes.length+' scènes');
+}
+
+// ─── MODE DE GÉNÉRATION ───
+function bindImportModes(){
+document.querySelectorAll('.import-mode').forEach(el=>{
+el.addEventListener('click',()=>{
+document.querySelectorAll('.import-mode').forEach(x=>x.classList.remove('selected'));
+el.classList.add('selected');
+state.importMode=el.dataset.mode;
+});
+});
+}
+
+// ─── PIPELINE PRINCIPAL ───
+async function startImportGeneration(){
+if(state.isRunning)return;
+if(!getApiKey()){showToast('Ajoutez votre clé API','error');return}
+if(!state.importPack){showToast('Analysez d\'abord le pack','error');return}
+
+const pack=state.importPack;
+
+// Vérifier la place dans la bibliothèque
+const placeLeft=MAX_CHARACTERS-state.characters.length;
+if(pack.characters.length>placeLeft){
+if(!confirm('La bibliothèque contient déjà '+state.characters.length+' personnages. Il reste '+placeLeft+' place(s). Le pack contient '+pack.characters.length+' personnages.\n\nContinuer va ajouter seulement les '+placeLeft+' premiers. Continuer ?')){
+return;
+}
+}
+
+state.isRunning=true;
+state.stopRequested=false;
+showScreen('generation');
+$('generation-title').textContent='🎬 Import Pack — '+state.importMode==='auto'?'Mode Auto':'Validation';
+
+const progressEl=$('generation-progress');
+progressEl.innerHTML='';
+
+// ═══ PHASE 1 : PORTRAITS ═══
+const charsToCreate=pack.characters.slice(0,placeLeft);
+const totalChars=charsToCreate.length;
+const portraitVariantCount=state.importMode==='validate'?4:1;
+
+// Créer les cartes de progression pour chaque personnage
+charsToCreate.forEach((c,i)=>{
+const card=document.createElement('div');
+card.className='scene-progress pending';
+card.id='import-char-'+i;
+card.innerHTML=
+'<div class="sp-icon">👤</div>'+
+'<div class="sp-body">'+
+'<div class="sp-title">'+esc(c.name)+'</div>'+
+'<div class="sp-step" id="import-char-step-'+i+'">Portrait'+(portraitVariantCount>1?'s':'')+' : en attente…</div>'+
+'<div class="sp-bar"><div class="sp-fill" id="import-char-fill-'+i+'"></div></div>'+
+'</div>';
+progressEl.appendChild(card);
+});
+
+// Créer les cartes de progression pour chaque scène (masquées pour l'instant)
+pack.scenes.forEach((s,i)=>{
+const card=document.createElement('div');
+card.className='scene-progress pending';
+card.id='import-scene-'+i;
+card.style.display='none';
+card.innerHTML=
+'<div class="sp-icon">'+(i+1)+'</div>'+
+'<div class="sp-body">'+
+'<div class="sp-title">Scène '+(i+1)+'</div>'+
+'<div class="sp-step" id="import-scene-step-'+i+'">En attente…</div>'+
+'<div class="sp-bar"><div class="sp-fill" id="import-scene-fill-'+i+'"></div></div>'+
+'</div>';
+progressEl.appendChild(card);
+});
+
+setStatus('Génération des portraits…');
+debugLog('state','IMPORT','Démarrage — Mode : '+state.importMode);
+
+const generatedCharacters=[];
+
+try{
+await activateWakeLock();
+
+// ─── GÉNÉRATION DES PORTRAITS ───
+for(let i=0;i<charsToCreate.length;i++){
+if(state.stopRequested)break;
+const charDef=charsToCreate[i];
+const card=$('import-char-'+i);
+if(card){card.classList.remove('pending');card.classList.add('image');}
+const stepEl=$('import-char-step-'+i);
+const fillEl=$('import-char-fill-'+i);
+
+if(stepEl)stepEl.textContent='Génération '+(portraitVariantCount>1?'des 4 portraits':'du portrait')+'…';
+if(fillEl)fillEl.style.width='10%';
+
+const dna={
+name:charDef.name,
+style:charDef.style||'cinematic-realistic',
+styleLabel:(STYLE_PROMPTS[charDef.style]?'':'')+charDef.style||'Cinématique',
+gender:charDef.gender||'homme',
+age:charDef.age||'Adulte (31-50)',
+ethnicity:charDef.ethnicity||'Maghrébine / Nord-africaine',
+description:charDef.description,
+outfit:charDef.outfit||'',
+photoRef:null
+};
+
+try{
+// Générer N portraits (1 ou 4 selon le mode)
+const variants=[];
+for(let v=0;v<portraitVariantCount;v++){
+const pPrompt=buildPortraitPrompt(dna,v);
+const url=await generateImage(pPrompt);
+variants.push(url);
+addMediaLog('portrait',url,charDef.name+' · variante '+(v+1));
+if(fillEl)fillEl.style.width=(10+(v+1)/portraitVariantCount*70)+'%';
+}
+
+let chosenUrl=null;
+if(state.importMode==='validate'&&variants.length>1){
+// Stocker les variantes pour validation ultérieure
+generatedCharacters.push({charDef,dna,variants,chosenUrl:null,pendingValidation:true});
+if(stepEl)stepEl.textContent='✓ 4 portraits prêts — à valider';
+if(fillEl)fillEl.style.width='100%';
+}else{
+// Mode auto : premier portrait
+chosenUrl=variants[0];
+generatedCharacters.push({charDef,dna,variants,chosenUrl,pendingValidation:false});
+if(stepEl)stepEl.textContent='✓ Portrait prêt';
+if(fillEl)fillEl.style.width='100%';
+}
+}catch(e){
+if(e.message==='Arrêt demandé')break;
+if(stepEl)stepEl.textContent='✕ Échec : '+e.message.slice(0,40);
+if(card){card.classList.remove('image');card.classList.add('failed');}
+generatedCharacters.push({charDef,dna,variants:[],chosenUrl:null,error:e.message});
+}
+}
+
+// ─── SI MODE VALIDATION : AFFICHER L'INTERFACE DE CHOIX ───
+if(state.importMode==='validate'){
+const pendingChars=generatedCharacters.filter(gc=>gc.pendingValidation&&gc.variants.length>0);
+if(pendingChars.length>0){
+setStatus('À vous de choisir les portraits…');
+const validationHTML=buildValidationUI(generatedCharacters);
+const wrapper=document.createElement('div');
+wrapper.innerHTML=validationHTML;
+progressEl.appendChild(wrapper);
+bindValidationUI(generatedCharacters);
+debugLog('state','IMPORT','En attente de validation des portraits');
+// On met en pause ici — la suite se déclenche via le bouton
+state.isRunning=false;
+updateAllButtons();
+return;
+}
+}
+
+// ─── MODE AUTO : ENCHAÎNER DIRECTEMENT ───
+await continueAfterPortraits(generatedCharacters,pack);
+
+}catch(e){
+debugLog('error','IMPORT',e.message);
+showToast('Erreur : '+e.message.slice(0,60),'error',4000);
+state.isRunning=false;
+state.stopRequested=false;
+}
+}
+
+// ─── UI DE VALIDATION DES PORTRAITS ───
+function buildValidationUI(generatedCharacters){
+let html='<div style="background:var(--panel);border:1px solid var(--mint);border-left:3px solid var(--mint);border-radius:var(--radius);padding:1rem 1.1rem;margin-top:1rem;">';
+html+='<h3 style="margin-bottom:.7rem">👁️ Validez les portraits</h3>';
+html+='<p style="font-size:.74rem;color:var(--ink-dim);margin-bottom:1rem;line-height:1.5;">Choisissez le meilleur portrait pour chaque personnage. Ensuite, les scènes seront générées automatiquement.</p>';
+
+generatedCharacters.forEach((gc,i)=>{
+if(!gc.pendingValidation||gc.variants.length===0)return;
+html+='<div style="margin-bottom:1.3rem;" data-validation-char="'+i+'">';
+html+='<div style="font-family:var(--font-display);font-size:.82rem;font-weight:800;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;">'+esc(gc.charDef.name)+'</div>';
+html+='<div class="portraits-grid" data-char-idx="'+i+'" style="margin-top:.5rem">';
+gc.variants.forEach((url,v)=>{
+html+='<div class="portrait-variant" data-char-idx="'+i+'" data-variant-idx="'+v+'">'+
+'<img src="'+url+'" alt="">'+
+'</div>';
+});
+html+='</div>';
+html+='</div>';
+});
+
+html+='<button type="button" class="btn mint mt-1" id="confirm-validation-btn" disabled>✓ Confirmer et lancer les scènes</button>';
+html+='</div>';
+return html;
+}
+
+function bindValidationUI(generatedCharacters){
+// Map pour tracker les choix
+const choices={};
+
+document.querySelectorAll('.portrait-variant[data-char-idx]').forEach(el=>{
+el.addEventListener('click',()=>{
+const charIdx=parseInt(el.dataset.charIdx,10);
+const varIdx=parseInt(el.dataset.variantIdx,10);
+choices[charIdx]=varIdx;
+// Retirer la sélection des autres
+document.querySelectorAll('.portrait-variant[data-char-idx="'+charIdx+'"]').forEach(v=>v.classList.remove('selected'));
+el.classList.add('selected');
+// Vérifier si tous les personnages en attente ont un choix
+const pendingIdxs=generatedCharacters.map((gc,i)=>({gc,i})).filter(x=>x.gc.pendingValidation&&x.gc.variants.length>0).map(x=>x.i);
+const allChosen=pendingIdxs.every(i=>choices[i]!==undefined);
+const btn=$('confirm-validation-btn');
+if(btn)btn.disabled=!allChosen;
+});
+});
+
+const btn=$('confirm-validation-btn');
+if(btn)btn.addEventListener('click',async()=>{
+// Appliquer les choix
+generatedCharacters.forEach((gc,i)=>{
+if(gc.pendingValidation&&gc.variants.length>0&&choices[i]!==undefined){
+gc.chosenUrl=gc.variants[choices[i]];
+gc.pendingValidation=false;
+}
+});
+// Retirer l'UI de validation
+document.querySelectorAll('[data-validation-char]').forEach(el=>el.remove());
+btn.remove();
+// Reprendre la génération
+state.isRunning=true;
+updateAllButtons();
+await continueAfterPortraits(generatedCharacters,state.importPack);
+});
+}
+
+// ─── SUITE : SAUVEGARDER LES PERSONNAGES PUIS GÉNÉRER LES SCÈNES ───
+async function continueAfterPortraits(generatedCharacters,pack){
+setStatus('Sauvegarde des personnages…');
+
+// 1. Sauvegarder les personnages dans la bibliothèque
+const createdChars=[];
+for(const gc of generatedCharacters){
+if(!gc.chosenUrl)continue;
+const c={
+id:uid(),
+name:gc.charDef.name,
+style:gc.charDef.style||'cinematic-realistic',
+styleLabel:(gc.charDef.style||'').replace(/^(cinematic-realistic|cyberpunk|anime-semi-realistic|ghibli|pixar|comic-franco-belge|oil-painting|claymation|noir-bw|documentary)$/,''),
+gender:gc.dna.gender,
+age:gc.dna.age,
+ethnicity:gc.dna.ethnicity,
+description:gc.dna.description,
+outfit:gc.dna.outfit,
+photoRef:null,
+portraitUrl:gc.chosenUrl,
+portraitPrompt:null,
+createdAt:new Date().toISOString(),
+fromImport:true
+};
+state.characters.push(c);
+createdChars.push({def:gc.charDef,char:c});
+}
+saveLibrary();
+debugLog('success','IMPORT',createdChars.length+' personnages sauvegardés');
+
+// 2. Configurer l'état pour les scènes
+state.storyTitle=pack.title||'';
+state.storyTheme=pack.theme||'';
+state.scenes=[];
+state.sceneCount=pack.scenes.length;
+
+// Map nom → id pour retrouver les personnages
+const nameToId={};
+createdChars.forEach(cc=>{nameToId[cc.def.name]=cc.char.id});
+
+// Construire les scènes
+pack.scenes.forEach((s,i)=>{
+const charIds=(s.characterNames||[]).map(n=>nameToId[n]).filter(Boolean);
+state.scenes.push({
+index:i,
+description:s.description||'',
+decor:s.decor||'',
+characterIds:charIds,
+duration:s.duration||state.defaultDuration||241
+});
+});
+
+// 3. Générer les scènes
+setStatus('Génération des scènes…');
+await runSceneGeneration(createdChars,pack);
+}
+
+// ─── GÉNÉRATION DES SCÈNES (pipeline existant adapté) ───
+async function runSceneGeneration(createdChars,pack){
+const results=state.scenes.map(s=>({
+...s,imageUrl:null,videoId:null,videoUrl:null,status:'pending',error:null
+}));
+
+// Afficher les cartes de scène
+pack.scenes.forEach((s,i)=>{
+const card=$('import-scene-'+i);
+if(card)card.style.display='flex';
+});
+
+const totalStart=Date.now();
+
+try{
+// PHASE IMAGES
+debugLog('state','IMPORT','Génération des '+results.length+' images de scène');
+setStatus('Génération des images…');
+
+const imageTasks=results.map((r,i)=>async()=>{
+if(state.stopRequested)return;
+const card=$('import-scene-'+i);
+if(card){card.classList.remove('pending');card.classList.add('image');}
+const stepEl=$('import-scene-step-'+i);
+const fillEl=$('import-scene-fill-'+i);
+if(stepEl)stepEl.textContent='Peinture de la scène…';
+if(fillEl)fillEl.style.width='10%';
+try{
+const prompt=buildSceneImagePrompt(r,i);
+const url=await generateImage(prompt);
+r.imageUrl=url;
+r.status='image-done';
+if(card){card.classList.remove('image');card.classList.add('image-done');}
+if(stepEl)stepEl.textContent='✓ Image prête';
+if(fillEl)fillEl.style.width='40%';
+addMediaLog('image',url,'Scène '+(i+1));
+}catch(e){
+if(e.message==='Arrêt demandé')return;
+r.error=e.message;r.status='failed';
+if(card){card.classList.remove('image');card.classList.add('failed');}
+if(stepEl)stepEl.textContent='✕ '+e.message.slice(0,40);
+}
+});
+
+await runRateLimitedQueue(imageTasks,IMAGE_PARALLEL,IMAGE_INTERVAL_MS);
+
+// PHASE VIDÉOS
+debugLog('state','IMPORT','Génération des '+results.length+' vidéos');
+setStatus('Création des vidéos…');
+createVideoIntervalMs=VIDEO_INTERVAL_SAFE;
+
+for(let i=0;i<results.length;i++){
+if(state.stopRequested)break;
+const r=results[i];
+if(!r.imageUrl)continue;
+const card=$('import-scene-'+i);
+if(card){card.classList.remove('image-done');card.classList.add('video');}
+const stepEl=$('import-scene-step-'+i);
+const fillEl=$('import-scene-fill-'+i);
+if(stepEl)stepEl.textContent='Création vidéo…';
+
+try{
+const prompt=buildSceneVideoPrompt(r,i);
+const videoId=await generateVideo(r.imageUrl,prompt,r.duration);
+r.videoId=videoId;
+const videoUrl=await pollVideo(videoId,(msg,pct)=>{
+if(stepEl)stepEl.textContent=msg;
+if(fillEl)fillEl.style.width=(40+pct*0.6)+'%';
+});
+r.videoUrl=videoUrl;
+r.status='done';
+recordGenTime('video',Date.now()-totalStart);
+if(card){card.classList.remove('video');card.classList.add('done');}
+if(stepEl)stepEl.textContent='✓ Scène terminée';
+if(fillEl)fillEl.style.width='100%';
+addMediaLog('video',videoUrl,'Scène '+(i+1));
+}catch(e){
+if(e.message==='Arrêt demandé')break;
+r.error=e.message;r.status='failed';
+if(card){card.classList.remove('video');card.classList.add('failed');}
+if(stepEl)stepEl.textContent='✕ '+e.message.slice(0,40);
+}
+
+if(i<results.length-1&&!state.stopRequested){
+const waitSec=Math.ceil(createVideoIntervalMs/1000);
+for(let s=waitSec;s>0;s--){
+if(state.stopRequested)break;
+setStatus('Pause entre scènes — '+s+'s');
+await sleep(1000);
+}
+}
+}
+}catch(e){
+debugLog('error','IMPORT',e.message);
+}
+
+const totalElapsed=(Date.now()-totalStart)/1000;
+const okVideos=results.filter(r=>r.videoUrl).length;
+const summary='✦ '+okVideos+'/'+results.length+' scènes en '+fmtEta(totalElapsed)+' ✦';
+debugLog('state','FIN',summary);
+setStatus(summary);
+await sleep(3500);
+setStatus(null);
+
+state.isRunning=false;
+state.stopRequested=false;
+
+// Sauvegarder le projet
+const project=createOrUpdateProject(results);
+debugLog('success','IMPORT','Film importé et sauvegardé : '+project.title);
+state.lastResults=project.results;
+state.currentProjectId=project.id;
+showResultGallery(project.results,project.title,false);
+showToast('Import terminé — '+okVideos+' scènes ✦','success',4000);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION MANUELLE (compose story) — RÉUTILISE LE PIPELINE EXISTANT
+// ══════════════════════════════════════════════════════════════════
+async function runStoryGeneration(){
+if(state.isRunning)return;
+if(!getApiKey()){showToast('Ajoutez votre clé API','error');return}
+if(state.characters.length===0){showToast('Créez au moins un personnage','error');return}
+if(state.scenes.length===0){showToast('Aucune scène configurée','error');return}
+for(let i=0;i<state.scenes.length;i++){
+if(state.scenes[i].characterIds.length===0){showToast('Scène '+(i+1)+' : aucun personnage','error');return}
+}
+const isContinuation=!!state.editingProjectId;
+state.isRunning=true;
+state.stopRequested=false;
+showScreen('generation');
+$('generation-title').textContent='🎬 Génération en cours';
+const progressEl=$('generation-progress');
+progressEl.innerHTML='';
+state.scenes.forEach((s,i)=>{
+const card=document.createElement('div');
+card.className='scene-progress pending';
+card.id='sp-scene-'+i;
+card.innerHTML=
+'<div class="sp-icon">'+(i+1)+'</div>'+
+'<div class="sp-body">'+
+'<div class="sp-title">Scène '+(i+1)+(isContinuation?' (nouvelle)':'')+'</div>'+
+'<div class="sp-step" id="sp-step-'+i+'">En attente…</div>'+
+'<div class="sp-bar"><div class="sp-fill" id="sp-fill-'+i+'"></div></div>'+
+'</div>';
+progressEl.appendChild(card);
+});
+const results=state.scenes.map(s=>({...s,imageUrl:null,videoId:null,videoUrl:null,status:'pending',error:null}));
+const totalStart=Date.now();
+try{
+await activateWakeLock();
+setStatus('Génération des images…');
+const imageTasks=results.map((r,i)=>async()=>{
+if(state.stopRequested)return;
+const card=$('sp-scene-'+i);
+if(card){card.classList.remove('pending');card.classList.add('image');}
+const step=$('sp-step-'+i);if(step)step.textContent='Peinture de la scène…';
+const fill=$('sp-fill-'+i);if(fill)fill.style.width='10%';
+try{
+const prompt=buildSceneImagePrompt(r,i);
+const url=await generateImage(prompt);
+r.imageUrl=url;r.status='image-done';
+if(card){card.classList.remove('image');card.classList.add('image-done');}
+if(step)step.textContent='✓ Image prête';
+if(fill)fill.style.width='40%';
+addMediaLog('image',url,'Scène '+(i+1));
+}catch(e){
+if(e.message==='Arrêt demandé')return;
+r.error=e.message;r.status='failed';
+if(card){card.classList.remove('image');card.classList.add('failed');}
+if(step)step.textContent='✕ '+e.message.slice(0,40);
+}
+});
+await runRateLimitedQueue(imageTasks,IMAGE_PARALLEL,IMAGE_INTERVAL_MS);
+setStatus('Création des vidéos…');
+createVideoIntervalMs=VIDEO_INTERVAL_SAFE;
+for(let i=0;i<results.length;i++){
+if(state.stopRequested)break;
+const r=results[i];
+if(!r.imageUrl)continue;
+const card=$('sp-scene-'+i);
+if(card){card.classList.remove('image-done');card.classList.add('video');}
+const step=$('sp-step-'+i);if(step)step.textContent='Création vidéo…';
+try{
+const prompt=buildSceneVideoPrompt(r,i);
+const videoId=await generateVideo(r.imageUrl,prompt,r.duration);
+r.videoId=videoId;
+const videoUrl=await pollVideo(videoId,(msg,pct)=>{
+if(step)step.textContent=msg;
+const fill=$('sp-fill-'+i);if(fill)fill.style.width=(40+pct*0.6)+'%';
+});
+r.videoUrl=videoUrl;r.status='done';
+recordGenTime('video',Date.now()-totalStart);
+if(card){card.classList.remove('video');card.classList.add('done');}
+if(step)step.textContent='✓ Scène terminée';
+const fill=$('sp-fill-'+i);if(fill)fill.style.width='100%';
+addMediaLog('video',videoUrl,'Scène '+(i+1));
+}catch(e){
+if(e.message==='Arrêt demandé')break;
+r.error=e.message;r.status='failed';
+if(card){card.classList.remove('video');card.classList.add('failed');}
+if(step)step.textContent='✕ '+e.message.slice(0,40);
+}
+if(i<results.length-1&&!state.stopRequested){
+const waitSec=Math.ceil(createVideoIntervalMs/1000);
+for(let s=waitSec;s>0;s--){
+if(state.stopRequested)break;
+setStatus('Pause entre scènes — '+s+'s');
+await sleep(1000);
+}
+}
+}
+}catch(e){
+debugLog('error','GLOBAL',e.message);
+}
+const totalElapsed=(Date.now()-totalStart)/1000;
+const okVideos=results.filter(r=>r.videoUrl).length;
+const summary=state.stopRequested?'Arrêté — '+okVideos+'/'+results.length+' scènes':'✦ '+okVideos+'/'+results.length+' scènes en '+fmtEta(totalElapsed)+' ✦';
+setStatus(summary);
+await sleep(3500);
+setStatus(null);
+state.isRunning=false;
+state.stopRequested=false;
+const project=createOrUpdateProject(results);
+state.lastResults=project.results;
+state.currentProjectId=project.id;
+cancelContinueMode();
+showResultGallery(project.results,project.title,false);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RÉSULTAT + RÉGÉNÉRATION
+// ══════════════════════════════════════════════════════════════════
+function showResultGallery(results,title,showContinueBanner){
+showScreen('result');
+const grid=$('gallery-grid');if(!grid)return;
+const theme=$('result-title');
+if(theme)theme.textContent=title||state.storyTitle||state.storyTheme||'Votre film';
+const contBtn=$('result-continue-btn');
+if(contBtn){
+const canContinue=!!state.currentProjectId&&state.projects.find(p=>p.id===state.currentProjectId);
+contBtn.style.display=canContinue?'flex':'none';
+}
+grid.innerHTML=results.map((r,i)=>{
+if(!r.videoUrl)return '<div class="video-card" style="aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;color:var(--error);font-size:.75rem;padding:1rem;text-align:center">Scène '+(i+1)+'<br>Échec : '+esc(r.error||'inconnu')+'</div>';
+return '<div class="video-card" data-scene-idx="'+i+'">'+
+'<video src="'+r.videoUrl+'" controls playsinline preload="metadata"></video>'+
+'<button class="download-btn" data-download="'+i+'" title="Télécharger">⬇</button>'+
+'<div class="vc-caption">'+
+'<div class="vc-num">✦ Scène '+(i+1)+'</div>'+
+'<div class="vc-title">'+(r.description?esc(r.description.slice(0,60))+(r.description.length>60?'…':''):'Scène '+(i+1))+'</div>'+
+'<div class="vc-decor">📍 '+esc((r.decor||'décor non spécifié').slice(0,80))+'</div>'+
+'<div class="vc-actions">'+
+'<button class="vc-action-btn regen" data-regen="'+i+'" title="Régénérer cette scène">↻ Régénérer</button>'+
+'</div>'+
+'</div></div>';
+}).join('');
+grid.querySelectorAll('[data-download]').forEach(btn=>{
+btn.addEventListener('click',async e=>{
+e.stopPropagation();
+const i=parseInt(btn.dataset.download,10);
+const r=results[i];
+if(!r||!r.videoUrl)return;
+showToast('Téléchargement…','success',1500);
+const fname='Avatar-Story-Scene-'+String(i+1).padStart(2,'0')+'.mp4';
+const ok=await downloadUrl(r.videoUrl,fname);
+if(ok){btn.classList.add('done');btn.textContent='✓';
+setTimeout(()=>{btn.classList.remove('done');btn.textContent='⬇'},3000)}
+});
+});
+grid.querySelectorAll('[data-regen]').forEach(btn=>{
+btn.addEventListener('click',e=>{
+e.stopPropagation();
+const i=parseInt(btn.dataset.regen,10);
+openRegenModal(i);
+});
+});
+updateSaveInfo();
+}
+
+function updateSaveInfo(){
+const el=$('save-info');if(!el)return;
+if(!state.lastResults||state.lastResults.length===0){el.textContent='—';el.classList.remove('ok');return}
+const total=state.lastResults.length;
+const withVideo=state.lastResults.filter(r=>r.videoUrl).length;
+el.innerHTML='💾 <strong>'+withVideo+'/'+total+'</strong> scènes · film sauvegardé dans « Mes films »';
+el.classList.add('ok');
+}
+
+function openRegenModal(sceneIndex){
+if(!state.lastResults||sceneIndex<0||sceneIndex>=state.lastResults.length){
+showToast('Scène introuvable','error');return;
+}
+const r=state.lastResults[sceneIndex];
+state.regeneratingSceneIndex=sceneIndex;
+state.regeneratingProjectId=state.currentProjectId;
+$('regen-scene-num').textContent=sceneIndex+1;
+$('regen-project-info').textContent='Projet : '+(state.storyTitle||state.storyTheme||'Sans titre')+' · Personnages : '+(r.characterIds||[]).length;
+$('regen-description').value=r.description||'';
+$('regen-decor').value=r.decor||'';
+const sel=$('regen-duration');
+sel.innerHTML=DURATION_OPTIONS.map(o=>
+'<option value="'+o.value+'"'+(o.value===r.duration?' selected':'')+'>'+o.label+'</option>'
+).join('');
+$('regen-modal').classList.add('visible');
+}
+
+function closeRegenModal(){
+$('regen-modal').classList.remove('visible');
+state.regeneratingSceneIndex=null;
+state.regeneratingProjectId=null;
+}
+
+async function doRegenerateScene(){
+if(state.isRunning)return;
+const sceneIndex=state.regeneratingSceneIndex;
+const projectId=state.regeneratingProjectId;
+if(sceneIndex===null||!projectId){showToast('Erreur','error');return}
+const p=state.projects.find(x=>x.id===projectId);
+if(!p){showToast('Film introuvable','error');return}
+const newDescription=$('regen-description').value.trim();
+const newDecor=$('regen-decor').value.trim();
+const newDuration=parseInt($('regen-duration').value,10);
+const oldScene=p.results[sceneIndex];
+if(!oldScene){showToast('Scène introuvable','error');return}
+const tempScene={
+description:newDescription||oldScene.description,
+decor:newDecor||oldScene.decor,
+characterIds:oldScene.characterIds,
+duration:newDuration
+};
+state.isRunning=true;
+state.stopRequested=false;
+$('regen-confirm-btn').disabled=true;
+closeRegenModal();
+const card=document.querySelector('.video-card[data-scene-idx="'+sceneIndex+'"]');
+if(card)card.classList.add('regenerating');
+setStatus('Régénération de la scène '+(sceneIndex+1)+'…');
+try{
+await activateWakeLock();
+setStatus('Nouvelle image…');
+const imgPrompt=buildSceneImagePrompt(tempScene,sceneIndex);
+const newImageUrl=await generateImage(imgPrompt);
+setStatus('Nouvelle vidéo…');
+const waitBeforeVideo=Math.min(createVideoIntervalMs/1000,10);
+if(waitBeforeVideo>0)await sleep(waitBeforeVideo*1000);
+const vidPrompt=buildSceneVideoPrompt(tempScene,sceneIndex);
+const videoId=await generateVideo(newImageUrl,vidPrompt,newDuration);
+const newVideoUrl=await pollVideo(videoId,(msg,pct)=>{
+setStatus('Scène '+(sceneIndex+1)+' : '+msg);
+});
+p.results[sceneIndex]={
+...oldScene,
+description:newDescription||oldScene.description,
+decor:newDecor||oldScene.decor,
+duration:newDuration,
+imageUrl:newImageUrl,
+videoId:videoId,
+videoUrl:newVideoUrl,
+status:'done',
+error:null,
+regeneratedAt:new Date().toISOString()
+};
+p.updatedAt=new Date().toISOString();
+saveProjects();
+addMediaLog('image',newImageUrl,'Scène '+(sceneIndex+1)+' (régénérée)');
+addMediaLog('video',newVideoUrl,'Scène '+(sceneIndex+1)+' (régénérée)');
+state.lastResults=p.results;
+showResultGallery(p.results,p.title,false);
+showToast('Scène '+(sceneIndex+1)+' régénérée ✓','success',3000);
+}catch(e){
+if(e.message==='Arrêt demandé'){showToast('Régénération annulée','warn');}
+else{showToast('Erreur : '+e.message.slice(0,60),'error',4000);}
+if(card)card.classList.remove('regenerating');
+}
+state.isRunning=false;
+state.stopRequested=false;
+$('regen-confirm-btn').disabled=false;
+setStatus(null);
+}
+
+async function downloadUrl(url,filename){
+try{
+const res=await fetch(url,{mode:'cors'});
+if(!res.ok)throw new Error('HTTP '+res.status);
+const blob=await res.blob();
+const objectUrl=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=objectUrl;a.download=filename;a.style.display='none';
+document.body.appendChild(a);a.click();
+setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(objectUrl)},1000);
+return true;
+}catch(e){
+try{window.open(url,'_blank','noopener');
+showToast('Ouverture dans un onglet — clic droit → Enregistrer','warn',5000);
+return true}catch(e2){return false}
+}
+}
+
+async function downloadAll(){
+const results=state.lastResults||[];
+if(results.length===0){showToast('Rien à télécharger','warn');return}
+const btn=$('download-all-btn');if(btn)btn.disabled=true;
+const progressEl=$('download-progress');
+const labelEl=$('dp-label'),countEl=$('dp-count'),fillEl=$('dp-fill');
+progressEl.classList.add('visible');
+const ready=results.filter(r=>r.videoUrl);
+let done=0;const total=ready.length;
+for(let i=0;i<results.length;i++){
+const r=results[i];
+if(!r.videoUrl)continue;
+if(labelEl)labelEl.textContent='Scène '+(i+1);
+if(countEl)countEl.textContent=(done+1)+' / '+total;
+if(fillEl)fillEl.style.width=((done/total)*100)+'%';
+await downloadUrl(r.videoUrl,'Avatar-Story-Scene-'+String(i+1).padStart(2,'0')+'.mp4');
+if(r.imageUrl){await sleep(400);
+await downloadUrl(r.imageUrl,'Avatar-Story-Scene-'+String(i+1).padStart(2,'0')+'.jpg')}
+done++;
+if(fillEl)fillEl.style.width=((done/total)*100)+'%';
+if(done<total)await sleep(1200);
+}
+if(fillEl)fillEl.style.width='100%';
+if(labelEl)labelEl.textContent='✦ Terminé ✦';
+await sleep(2200);
+progressEl.classList.remove('visible');
+if(btn)btn.disabled=false;
+showToast(total+' scène'+(total>1?'s':'')+' téléchargée'+(total>1?'s':''),'success',3500);
+}
+
+async function copyAllUrls(){
+const results=state.lastResults||[];
+const lines=results.map((r,i)=>'Scène '+(i+1)+' — '+(r.description||'')+'\n'+
+(r.videoUrl?'  Vidéo : '+r.videoUrl+'\n':'')+
+(r.imageUrl?'  Image : '+r.imageUrl:'')
+).join('\n\n');
+if(!lines){showToast('Aucune URL','warn');return}
+try{
+if(navigator.clipboard&&window.isSecureContext){
+await navigator.clipboard.writeText(lines);
+showToast('URLs copiées','success');
+}else{legacyCopy(lines,ok=>showToast(ok?'URLs copiées':'Copie impossible',ok?'success':'error'))}
+}catch(e){showToast('Erreur copie','error')}
+}
+
+function exportJson(){
+const results=state.lastResults||[];
+const data={
+version:2,app:'Avatar Story Studio',
+exportedAt:new Date().toISOString(),
+title:state.storyTitle,
+characters:state.characters,
+theme:state.storyTheme,
+results
+};
+const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='avatar-story-'+Date.now()+'.json';
+document.body.appendChild(a);a.click();
+setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},500);
+showToast('Film exporté','success');
+}
+
+function handleImportJson(file){
+const reader=new FileReader();
+reader.onload=e=>{
+try{
+const data=JSON.parse(e.target.result);
+if(data.characters&&Array.isArray(data.characters)){
+state.characters=data.characters.slice(0,MAX_CHARACTERS);saveLibrary()}
+if(data.theme)state.storyTheme=data.theme;
+if(data.title)state.storyTitle=data.title;
+if(data.results&&Array.isArray(data.results)){
+state.lastResults=data.results;
+const p=createOrUpdateProject(data.results);
+renderProjects();
+showResultGallery(data.results,p.title,false);
+}else{showScreen('library')}
+showToast('Film importé ✓','success',3000);
+}catch(err){showToast('Fichier invalide','error');}
+};
+reader.readAsText(file);
+}
+
+function updateAllButtons(){
+const key=!!getApiKey();
+const addBtn=$('add-character-btn');
+if(addBtn)addBtn.disabled=!key;
+const genBtn=$('generate-portraits-btn');
+if(genBtn)genBtn.disabled=!key||state.isRunning;
+const goStory=$('go-story-btn');
+if(goStory)goStory.disabled=state.characters.length===0;
+const startBtn=$('start-generation-btn');
+if(startBtn)startBtn.disabled=!key||state.characters.length===0||state.isRunning;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO-SAVE
+// ══════════════════════════════════════════════════════════════════
+let savePending=false;
+
+function buildSnapshot(){
+const fields={};
+document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el=>{
+if(el.type==='file')return;
+if(el.id==='api-key-input')return;
+if(el.id.startsWith('debug'))return;
+if(el.id==='import-json-input')return;
+if(el.id==='char-photo')return;
+if(el.id==='import-json-input-text')return;
+if(el.id==='regen-description'||el.id==='regen-decor'||el.id==='regen-duration')return;
+fields[el.id]=(el.type==='checkbox'||el.type==='radio')?el.checked:el.value;
+});
+return {
+fields,
+storyTitle:state.storyTitle||'',
+storyTheme:state.storyTheme||'',
+sceneCount:state.sceneCount||5,
+defaultDuration:state.defaultDuration||241,
+scenes:state.scenes||[],
+currentScreen:state.currentScreen||'library',
+editingCharId:state.editingChar?state.editingChar.id:null,
+editingProjectId:state.editingProjectId||null,
+photoRef:state.editingChar?state.editingChar.photoRef:null,
+charFields:state.editingChar?{
+name:$('char-name')?.value||'',
+style:$('char-style')?.value||'',
+gender:$('char-gender')?.value||'',
+age:$('char-age')?.value||'',
+ethnicity:$('char-ethnicity')?.value||'',
+description:$('char-description')?.value||'',
+outfit:$('char-outfit')?.value||''
+}:null,
+savedAt:new Date().toISOString()
+};
+}
+
+function doSave(){
+if(savePending)return;
+savePending=true;
+setTimeout(()=>{
+try{
+const data=buildSnapshot();
+localStorage.setItem(DRAFT_KEY,JSON.stringify(data));
+}catch(e){
+try{localStorage.removeItem(DRAFT_KEY);localStorage.setItem(DRAFT_KEY,JSON.stringify(buildSnapshot()))}catch(e2){}
+}
+savePending=false;
+},250);
+}
+
+function doRestore(){
+try{
+const raw=localStorage.getItem(DRAFT_KEY);
+if(!raw)return false;
+const d=JSON.parse(raw);
+if(!d.savedAt)return false;
+const age=(Date.now()-new Date(d.savedAt).getTime())/1000/86400;
+if(age>3){localStorage.removeItem(DRAFT_KEY);return false;}
+if(d.storyTitle)state.storyTitle=d.storyTitle;
+if(d.storyTheme)state.storyTheme=d.storyTheme;
+if(d.sceneCount)state.sceneCount=d.sceneCount;
+if(d.defaultDuration)state.defaultDuration=d.defaultDuration;
+if(Array.isArray(d.scenes)&&d.scenes.length>0)state.scenes=d.scenes;
+if(d.editingProjectId)state.editingProjectId=d.editingProjectId;
+let restored=0;
+Object.keys(d.fields||{}).forEach(id=>{
+const el=$(id);
+if(!el)return;
+if(el.type==='checkbox'||el.type==='radio'){el.checked=d.fields[id]}
+else{el.value=d.fields[id]}
+restored++;
+});
+if(d.photoRef){
+const preview=$('photo-preview');
+if(preview&&!preview.querySelector('img')){
+preview.innerHTML='<img src="'+d.photoRef+'" style="width:100%;max-width:200px;border-radius:var(--radius);display:block;margin:0 auto;border:1px solid var(--border)">';
+}
+}
+if($('scene-count-select')&&d.sceneCount)$('scene-count-select').value=String(d.sceneCount);
+if($('default-duration-select')&&d.defaultDuration)$('default-duration-select').value=String(d.defaultDuration);
+if(d.currentScreen==='creator'){
+state.editingChar=d.editingCharId?{id:d.editingCharId,photoRef:d.photoRef||null}:{photoRef:d.photoRef||null};
+setTimeout(()=>{
+showScreen('creator');
+if(d.charFields){
+if($('char-name'))$('char-name').value=d.charFields.name;
+if($('char-style'))$('char-style').value=d.charFields.style;
+if($('char-gender'))$('char-gender').value=d.charFields.gender;
+if($('char-age'))$('char-age').value=d.charFields.age;
+if($('char-ethnicity'))$('char-ethnicity').value=d.charFields.ethnicity;
+if($('char-description'))$('char-description').value=d.charFields.description;
+if($('char-outfit'))$('char-outfit').value=d.charFields.outfit;
+}
+},200);
+}else if(d.currentScreen==='story'){setTimeout(()=>showScreen('story'),200);}
+else if(d.currentScreen==='result'){setTimeout(()=>showScreen('result'),200);}
+else if(d.currentScreen==='import'){setTimeout(()=>showScreen('import'),200);}
+if(restored>0)showDraftBanner();
+return true;
+}catch(e){return false}
+}
+
+function showDraftBanner(){
+const b=$('draft-banner');if(!b)return;
+b.classList.add('visible');
+setTimeout(()=>b.classList.remove('visible'),4000);
+}
+
+function attachAutoSave(){
+document.addEventListener('input',e=>{
+if(e.target.id==='import-json-input-text')return;
+doSave();
+},true);
+document.addEventListener('change',e=>{
+if(e.target.id==='import-json-input-text')return;
+doSave();
+},true);
+document.addEventListener('blur',doSave,true);
+document.addEventListener('visibilitychange',()=>{
+if(document.visibilityState==='hidden')doSave();
+});
+window.addEventListener('beforeunload',doSave);
+window.addEventListener('pagehide',doSave);
+setInterval(doSave,2000);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init(){
+state.characters=loadLibrary();
+state.projects=loadProjects();
+
+const saveBtn=$('api-save-btn');
+if(saveBtn)saveBtn.addEventListener('click',saveApiKey);
+const apiInput=$('api-key-input');
+if(apiInput)apiInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveApiKey()}});
+
+const wakeBtn=$('wake-toggle-btn');
+if(wakeBtn)wakeBtn.addEventListener('click',toggleWakeLock);
+try{const saved=localStorage.getItem(WAKE_LOCK_PREF);wakeLockEnabled=saved==='1'}catch(e){}
+if(wakeLockEnabled)activateWakeLock().then(()=>updateWakeStatus());
+
+const dh=$('debug-header');
+if(dh)dh.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')return;toggleDebugCollapse()});
+$('debug-collapse-btn').addEventListener('click',e=>{e.stopPropagation();toggleDebugCollapse()});
+$('debug-clear-btn').addEventListener('click',e=>{e.stopPropagation();clearDebug()});
+$('debug-copy-btn').addEventListener('click',e=>{e.stopPropagation();copyDebug()});
+
+document.querySelectorAll('[data-toggle]').forEach(h=>{
+h.addEventListener('click',()=>{const t=$(h.dataset.toggle);if(t)t.classList.toggle('open')});
+});
+
+// IMPORT JSON
+$('open-import-btn').addEventListener('click',openImportScreen);
+$('import-back').addEventListener('click',()=>showScreen('library'));
+$('paste-clipboard-btn').addEventListener('click',pasteFromClipboard);
+$('clear-import-btn').addEventListener('click',clearImportScreen);
+$('analyze-import-btn').addEventListener('click',analyzeImport);
+bindImportModes();
+
+// Personnages + story
+$('add-character-btn').addEventListener('click',()=>openCreator());
+$('creator-back').addEventListener('click',()=>showScreen('library'));
+$('go-story-btn').addEventListener('click',()=>{
+state.editingProjectId=null;
+cancelContinueMode();
+state.storyTitle='';
+state.storyTheme='';
+state.scenes=[];
+$('story-title-input').value='';
+$('story-theme').value='';
+showScreen('story');
+});
+$('story-back').addEventListener('click',()=>{cancelContinueMode();showScreen('library');});
+$('result-back').addEventListener('click',()=>{state.editingProjectId=null;cancelContinueMode();showScreen('library');});
+
+bindPhotoUpload();
+$('generate-portraits-btn').addEventListener('click',generatePortraits);
+$('save-character-btn').addEventListener('click',saveCharacterFromCreator);
+
+$('scene-count-select').addEventListener('change',renderStoryConfig);
+$('default-duration-select').addEventListener('change',()=>{
+const dur=parseInt($('default-duration-select').value,10);
+state.defaultDuration=dur;
+state.scenes.forEach(s=>{if(!s.duration)s.duration=dur});
+renderStoryConfig();
+});
+$('story-theme').addEventListener('input',e=>{state.storyTheme=e.target.value});
+$('story-title-input').addEventListener('input',e=>{state.storyTitle=e.target.value});
+
+// Bouton générer (mode manuel)
+const storyScreen=$('screen-story');
+if(storyScreen&&!$('start-generation-btn')){
+const btn=document.createElement('button');
+btn.type='button';btn.className='btn primary mt-1';btn.id='start-generation-btn';
+btn.textContent='🎬 Générer le film';
+btn.disabled=true;
+btn.addEventListener('click',runStoryGeneration);
+storyScreen.appendChild(btn);
+}
+
+$('stop-btn').addEventListener('click',()=>{
+if(!state.isRunning)return;
+state.stopRequested=true;
+setStatus('Arrêt en cours…');
+});
+
+$('download-all-btn').addEventListener('click',downloadAll);
+$('copy-urls-btn').addEventListener('click',copyAllUrls);
+$('export-json-btn').addEventListener('click',exportJson);
+$('import-json-btn').addEventListener('click',()=>$('import-json-input').click());
+$('import-json-input').addEventListener('change',e=>{
+const f=e.target.files&&e.target.files[0];
+if(f)handleImportJson(f);
+e.target.value='';
+});
+
+$('result-continue-btn').addEventListener('click',()=>{
+if(!state.currentProjectId){showToast('Aucun projet actif','error');return}
+continueProject(state.currentProjectId);
+});
+
+$('regen-cancel-btn').addEventListener('click',closeRegenModal);
+$('regen-confirm-btn').addEventListener('click',doRegenerateScene);
+$('regen-modal').addEventListener('click',e=>{
+if(e.target.id==='regen-modal')closeRegenModal();
+});
+
+$('projects-clear-all-btn').addEventListener('click',()=>{
+if(state.projects.length===0){showToast('Aucun film à effacer','warn');return}
+if(confirm('Supprimer TOUS les '+state.projects.length+' films ? Cette action est irréversible.')){
+state.projects=[];
+saveProjects();
+renderProjects();
+showToast('Tous les films ont été supprimés','warn');
+}
+});
+
+updateApiPanel();
+updateTimingDisplay();
+updateWakeStatus();
+renderLibrary();
+renderProjects();
+updateSaveInfo();
+
+attachAutoSave();
+setTimeout(()=>{
+const restored=doRestore();
+if(restored)debugLog('success','AUTOSAVE','Brouillon restauré');
+},500);
+
+debugLog('success','INIT','Avatar Story Studio prêt (v3 — avec Import Pack JSON)');
+})();
+</script>
+</body>
+</html>
