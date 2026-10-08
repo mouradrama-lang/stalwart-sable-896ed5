@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#070912">
-<title>Avatar Story Studio v5 — Cohérence de personnage</title>
+<title>Avatar Story Studio v5.1</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -106,7 +106,6 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .row-2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 @media(max-width:520px){.row-2{grid-template-columns:1fr}}
 
-/* Import zone */
 .import-zone{background:var(--bg-2);border:2px dashed var(--violet);border-radius:var(--radius);padding:1rem;margin-bottom:1rem}
 .import-zone.has-content{border-style:solid;border-color:var(--mint)}
 .import-textarea{width:100%;min-height:200px;padding:.85rem 1rem;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--mint-soft);font-family:var(--font-mono);font-size:.72rem;line-height:1.5;resize:vertical;white-space:pre;overflow:auto;margin-bottom:0}
@@ -121,7 +120,6 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .import-errors h4{font-family:var(--font-display);font-size:.72rem;color:var(--error);text-transform:uppercase;margin-bottom:.5rem;font-weight:800}
 .import-errors li{margin-left:1.2rem;margin-bottom:.25rem}
 
-/* Mode selector */
 .mode-selector{background:var(--bg-2);border:1px solid var(--border-soft);border-radius:var(--radius);padding:.9rem;margin-bottom:1rem}
 .mode-selector .ms-title{font-family:var(--font-display);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan-soft);margin-bottom:.7rem;font-weight:800}
 .mode-options{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
@@ -139,7 +137,6 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .mode-info{font-size:.68rem;color:var(--ink-dim);font-family:var(--font-mono);line-height:1.45;margin-top:.7rem;padding:.55rem .7rem;background:var(--bg);border-radius:var(--radius);border-left:2px solid var(--cyan)}
 .mode-info.gold{border-left-color:var(--gold);color:#e8d880}
 
-/* Characters */
 .characters-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem;margin-bottom:1rem}
 .char-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;transition:all .2s;cursor:pointer}
 .char-card:hover{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,229,255,.15)}
@@ -154,22 +151,18 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .char-card.empty{display:flex;align-items:center;justify-content:center;min-height:180px;border-style:dashed;background:transparent;color:var(--ink-faint);text-align:center;padding:1rem}
 .char-card.empty:hover{border-color:var(--cyan);color:var(--cyan-soft);background:rgba(0,229,255,.04)}
 
-/* Refsheet */
 .refsheet-preview{margin-top:.8rem;background:#000;border:1px solid var(--gold-deep);border-radius:var(--radius);overflow:hidden}
 .refsheet-preview img{width:100%;display:block}
 
-/* Bible */
 .bible-lock{background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(255,140,26,.04));border:1px solid var(--gold-deep);border-left:2px solid var(--gold);border-radius:var(--radius);padding:.9rem 1rem;margin-top:.5rem;font-size:.78rem;line-height:1.6;color:var(--ink);font-style:italic}
 .bible-lock .bl-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.18em;color:var(--gold);font-weight:700;font-style:normal;margin-bottom:.4rem;display:block}
 .bible-json{background:#05050a;border:1px solid var(--border);border-radius:var(--radius);padding:.8rem 1rem;font-family:var(--font-mono);font-size:.68rem;line-height:1.5;color:#a8d8b0;max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin-top:.5rem}
 
-/* Scenes config */
 .scene-config{background:var(--bg-2);border:1px solid var(--border-soft);border-radius:var(--radius);padding:.85rem;margin-bottom:.6rem}
 .scene-config .sc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;padding-bottom:.5rem;border-bottom:1px solid var(--border-soft)}
 .scene-config .sc-num{font-family:var(--font-display);font-size:.75rem;font-weight:800;text-transform:uppercase;color:var(--cyan)}
 .scene-config .sc-duration{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-dim)}
 
-/* Progress */
 .scene-progress{background:var(--bg-2);border:1px solid var(--border-soft);border-radius:var(--radius);padding:.85rem .95rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;position:relative}
 .scene-progress .sp-icon{width:34px;height:34px;border-radius:50%;background:var(--panel-3);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-family:var(--font-mono);font-weight:800;color:var(--ink-dim);flex-shrink:0;transition:all .3s}
 .scene-progress.pending .sp-icon{color:var(--ink-faint)}
@@ -180,6 +173,7 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .scene-progress.failed .sp-icon{background:var(--error);color:#fff}
 .scene-progress.retrying .sp-icon{background:rgba(245,158,11,.15);color:var(--warn);animation:pulse 1.2s ease infinite}
 .scene-progress .sp-lock-badge{position:absolute;top:.4rem;right:.4rem;padding:.15rem .4rem;background:rgba(255,215,0,.15);border:1px solid var(--gold);color:var(--gold);border-radius:3px;font-size:.5rem;font-weight:800}
+.scene-progress .sp-solo-badge{position:absolute;top:.4rem;right:.4rem;padding:.15rem .4rem;background:rgba(168,85,247,.15);border:1px solid var(--violet);color:var(--violet-soft);border-radius:3px;font-size:.5rem;font-weight:800}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 .scene-progress .sp-body{flex:1;min-width:0}
 .scene-progress .sp-title{font-family:var(--font-display);font-size:.72rem;font-weight:800;text-transform:uppercase;color:var(--ink);margin-bottom:.15rem}
@@ -189,7 +183,6 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .overall-progress{height:6px;background:var(--bg-2);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:1rem}
 .overall-progress .op-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber));transition:width .4s ease}
 
-/* Gallery */
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.8rem}
 .video-card{background:#000;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;display:flex;flex-direction:column}
 .video-card video{width:100%;display:block;aspect-ratio:9/16;object-fit:cover;background:#000}
@@ -198,6 +191,7 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .video-card .vc-title{font-family:var(--font-display);font-size:.78rem;font-weight:800;color:var(--ink);text-transform:uppercase;margin-bottom:.25rem}
 .video-card .vc-decor{font-size:.66rem;color:var(--ink-dim);line-height:1.4}
 .video-card .vc-lock{position:absolute;top:.5rem;left:.5rem;padding:.15rem .5rem;background:rgba(255,215,0,.9);border:1px solid var(--gold);color:#000;border-radius:3px;font-size:.54rem;font-weight:800;text-transform:uppercase;font-family:var(--font-mono);z-index:4}
+.video-card .vc-solo{position:absolute;top:1.9rem;left:.5rem;padding:.15rem .5rem;background:rgba(168,85,247,.9);border:1px solid var(--violet);color:#fff;border-radius:3px;font-size:.54rem;font-weight:800;text-transform:uppercase;font-family:var(--font-mono);z-index:4}
 .video-card .vc-score{position:absolute;top:.5rem;right:.5rem;padding:.15rem .5rem;background:rgba(0,0,0,.85);border:1px solid var(--cyan-deep);color:var(--cyan-soft);border-radius:3px;font-size:.58rem;font-weight:800;font-family:var(--font-mono);z-index:4}
 .video-card .vc-score.good{border-color:rgba(34,197,94,.5);color:#4ade80}
 .video-card .vc-score.bad{border-color:rgba(239,68,68,.5);color:#f87171}
@@ -206,7 +200,6 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .video-card .vc-action-btn:hover{border-color:var(--cyan);color:var(--cyan-soft)}
 .download-btn{position:absolute;top:.5rem;right:.5rem;background:rgba(7,9,18,.85);color:var(--cyan-soft);border:1px solid var(--cyan-deep);width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;z-index:5;backdrop-filter:blur(4px)}
 
-/* Save bar */
 .save-bar{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--violet);border-radius:var(--radius);padding:1rem 1.1rem;margin-top:1rem}
 .save-bar .sb-title{font-family:var(--font-display);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink);margin-bottom:.7rem;font-weight:700}
 .save-bar .sb-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.5rem}
@@ -216,7 +209,6 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .save-info{font-size:.66rem;color:var(--ink-dim);font-family:var(--font-mono);margin-top:.7rem;padding:.4rem .6rem;background:var(--bg-2);border-radius:var(--radius);text-align:center}
 .save-info.ok{color:var(--success);background:rgba(34,197,94,.08)}
 
-/* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:2000;padding:1rem;backdrop-filter:blur(6px);overflow-y:auto}
 .modal-overlay.visible{display:flex}
 .modal-content{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.7)}
@@ -226,13 +218,11 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .rg-score-info{background:var(--bg-2);border:1px solid var(--border-soft);border-radius:var(--radius);padding:.7rem .9rem;margin-bottom:.8rem;font-size:.72rem;font-family:var(--font-mono);color:var(--ink-dim);line-height:1.5}
 .rg-score-info strong{color:var(--gold)}
 
-/* Status bar */
 .status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);color:var(--ink);padding:.85rem 1.1rem;font-size:.76rem;display:flex;align-items:center;gap:.65rem;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:100;font-family:var(--font-mono);box-shadow:0 -4px 24px rgba(0,0,0,.6)}
 .status-bar.visible{transform:translateY(0)}
 .spinner{width:12px;height:12px;border:2px solid rgba(0,229,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Debug */
 .debug-panel{position:fixed;bottom:0;left:0;right:0;height:230px;background:#050710;border-top:2px solid var(--cyan-deep);z-index:200;display:flex;flex-direction:column;font-family:var(--font-mono);box-shadow:0 -8px 32px rgba(0,0,0,.7);transition:height .3s ease}
 .debug-panel.collapsed{height:34px}
 .debug-header{display:flex;justify-content:space-between;align-items:center;padding:.4rem .7rem;background:linear-gradient(90deg,#0a0f1c,#141b30);border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;user-select:none}
@@ -253,7 +243,6 @@ h3{font-family:var(--font-display);font-size:.85rem;font-weight:700;letter-spaci
 .debug-msg{color:#d8e0f0}
 .debug-data{margin-top:.3rem;padding:.4rem .5rem;background:#08090f;border:1px solid var(--border-soft);border-radius:2px;font-size:.62rem;color:#a8d8b0;max-height:150px;overflow:auto;white-space:pre-wrap;word-break:break-all;line-height:1.4}
 
-/* Media log */
 .media-log{margin-top:.8rem}
 .media-log-entry{display:flex;gap:.55rem;padding:.45rem;background:var(--bg-2);border:1px solid var(--border-soft);border-radius:var(--radius);margin-bottom:.32rem;font-size:.66rem;align-items:center;font-family:var(--font-mono)}
 .media-log-entry .ml-tag{font-size:.54rem;padding:.14rem .36rem;border-radius:2px;text-transform:uppercase;font-weight:800;flex-shrink:0}
@@ -283,15 +272,14 @@ body{padding:1rem .85rem 20rem}
 
 <header>
 <div class="eyebrow">Character Consistency Studio</div>
-<h1>Avatar Story Studio v5</h1>
-<p class="subtitle">Planche 6 vues · Character Bible · Scoring cohérence</p>
+<h1>Avatar Story Studio v5.1</h1>
+<p class="subtitle">Chaque scène = sa vidéo · Planche 6 vues · Scoring</p>
 </header>
 
 <div class="info-banner">
-<strong>🎯 Le pipeline :</strong> <strong class="hl-gold">1.</strong> Créer un personnage → <strong class="hl-mint">planche 6 vues</strong> + <strong class="hl-mint">Character Bible</strong>. <strong class="hl-gold">2.</strong> Mode <strong class="hl-gold">🔒 Verrouillé</strong> = planche envoyée comme <strong>vraie image de référence</strong> à chaque scène. <strong class="hl-gold">3.</strong> <strong class="hl-cyan">Consistency Checker</strong> → score 0-100 → <strong>régénération auto</strong> si sous le seuil.
+<strong>🎬 Nouveauté v5.1 :</strong> <strong class="hl-gold">chaque scène a sa propre vidéo</strong>. Les scènes 1→N-1 sont chaînées en keyframes (transition fluide), et la <strong class="hl-mint">dernière scène</strong> a une vidéo simple (mouvement organique sur l'image finale).
 </div>
 
-<!-- API KEY -->
 <div class="api-panel" id="api-panel">
 <label for="api-key-input" style="display:block;font-size:.7rem;color:var(--ink-dim);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700">🔑 Clé API Agnes</label>
 <input type="password" class="api-key-input" id="api-key-input" placeholder="Collez votre clé API ici (sk-...)" autocomplete="off" spellcheck="false">
@@ -302,7 +290,6 @@ body{padding:1rem .85rem 20rem}
 <div class="wake-status" id="wake-status"><span id="wake-status-text">💤 Veille automatique</span><button type="button" id="wake-toggle-btn">Garder l'écran allumé</button></div>
 </div>
 
-<!-- IMPORT JSON -->
 <div class="section open" id="section-import-cta">
 <div class="section-header" data-toggle="section-import-cta">
 <span class="section-title">📥 Import Pack JSON <span class="badge mint">rapide</span></span>
@@ -314,7 +301,6 @@ body{padding:1rem .85rem 20rem}
 </div></div>
 </div>
 
-<!-- LIBRARY -->
 <div class="screen" id="screen-library">
 <h2>🎬 Mes films <span style="font-size:.75rem;color:var(--ink-dim);font-family:var(--font-mono);font-weight:400" id="projects-count">0</span></h2>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem;flex-wrap:wrap;gap:.5rem">
@@ -329,7 +315,6 @@ body{padding:1rem .85rem 20rem}
 <button type="button" class="btn mint" id="go-story-btn" disabled>→ Composer une histoire</button>
 </div>
 
-<!-- IMPORT SCREEN -->
 <div class="screen hidden" id="screen-import">
 <div class="screen-nav"><button type="button" class="back-btn" id="import-back">← Retour</button><span class="step-indicator">📥 Import</span></div>
 <h2>📥 Coller un pack JSON</h2>
@@ -344,7 +329,6 @@ body{padding:1rem .85rem 20rem}
 <div id="import-preview-container"></div>
 </div>
 
-<!-- CREATOR -->
 <div class="screen hidden" id="screen-creator">
 <div class="screen-nav"><button type="button" class="back-btn" id="creator-back">← Retour</button><span class="step-indicator">✨ Personnage</span></div>
 <h2 id="creator-title">✨ Nouveau personnage</h2>
@@ -411,13 +395,13 @@ body{padding:1rem .85rem 20rem}
 
 <div class="field">
 <label for="char-description">Description physique détaillée</label>
-<textarea id="char-description" placeholder="Ex : Petite fille de 10 ans, silhouette fine et vive. Grands yeux ronds noirs pétillants, visage doux et arrondi. Cheveux noirs épais coupés au carré avec frange droite, deux couettes attachées par des rubans rouges. Robe bleu ciel à tablier blanc." rows="6"></textarea>
+<textarea id="char-description" placeholder="Décrivez le personnage précisément…" rows="6"></textarea>
 <div class="hint">💡 Plus tu es précis, plus la planche sera fidèle.</div>
 </div>
 
 <div class="field">
 <label for="char-outfit">Tenue détaillée</label>
-<textarea id="char-outfit" placeholder="Ex : Robe simple bleu ciel à manches courtes, tablier blanc noué à la taille, chaussettes hautes blanches, chaussures cuir marron, rubans rouges." style="min-height:60px"></textarea>
+<textarea id="char-outfit" placeholder="Robe, accessoires, couleurs…" style="min-height:60px"></textarea>
 </div>
 
 <div class="field">
@@ -425,7 +409,7 @@ body{padding:1rem .85rem 20rem}
 <div style="position:relative;border:2px dashed var(--border);border-radius:var(--radius);padding:1rem;text-align:center;background:var(--bg-2);cursor:pointer" id="photo-drop">
 <input type="file" accept="image/*" id="char-photo" style="position:absolute;inset:0;opacity:0;cursor:pointer">
 <div style="font-size:1.6rem;opacity:.5;margin-bottom:.3rem">📷</div>
-<div style="font-size:.78rem;color:var(--ink-dim)"><strong style="color:var(--cyan-soft)">Cliquez pour uploader</strong><br>Sert d'<em>inspiration</em></div>
+<div style="font-size:.78rem;color:var(--ink-dim)"><strong style="color:var(--cyan-soft)">Cliquez pour uploader</strong></div>
 </div>
 <div id="photo-preview" style="margin-top:.6rem"></div>
 </div>
@@ -435,7 +419,6 @@ body{padding:1rem .85rem 20rem}
 <div id="refsheet-result" class="hidden" style="margin-top:1rem">
 <h3>🔒 Planche de référence générée</h3>
 <div class="refsheet-preview"><img id="refsheet-img" alt="Planche 6 vues"></div>
-<div class="hint">Cette planche est l'identité absolue du personnage.</div>
 <h3 style="margin-top:1rem">📖 Character Lock Prompt</h3>
 <div class="bible-lock" id="bible-lock-display">
 <span class="bl-label">🔒 Identité figée — injectée dans TOUS les prompts</span>
@@ -445,7 +428,6 @@ body{padding:1rem .85rem 20rem}
 </div>
 </div>
 
-<!-- STORY -->
 <div class="screen hidden" id="screen-story">
 <div class="screen-nav"><button type="button" class="back-btn" id="story-back">← Retour</button><span class="step-indicator">📖 Configuration</span></div>
 <h2 id="story-screen-title">📖 Votre histoire</h2>
@@ -457,13 +439,13 @@ body{padding:1rem .85rem 20rem}
 <div class="mode-option selected" data-mode="libre" role="button" tabindex="0" id="mode-libre">
 <span class="mo-icon">🎬</span>
 <div class="mo-name">Libre</div>
-<div class="mo-desc">Génération depuis le prompt texte seul. Plus de liberté, visage variable.</div>
+<div class="mo-desc">Génération depuis le prompt texte seul. Visage variable.</div>
 </div>
 <div class="mode-option gold" data-mode="verrouille" role="button" tabindex="0" id="mode-verrouille">
 <span class="mo-badge">🔒 reco</span>
 <span class="mo-icon">🔒</span>
 <div class="mo-name">Verrouillé</div>
-<div class="mo-desc">La planche 6 vues est envoyée comme image de référence. Identité préservée.</div>
+<div class="mo-desc">La planche 6 vues est envoyée comme image de référence.</div>
 </div>
 </div>
 <div class="mode-info" id="mode-info">🎬 <strong>Mode Libre</strong> — génération depuis le texte seul.</div>
@@ -526,7 +508,6 @@ body{padding:1rem .85rem 20rem}
 <button type="button" class="btn primary" id="start-generation-btn" disabled>🎬 Générer le film</button>
 </div>
 
-<!-- GENERATION -->
 <div class="screen hidden" id="screen-generation">
 <div class="screen-nav"><span class="step-indicator">🎬 Génération</span></div>
 <h2 id="generation-title">🎬 Génération en cours</h2>
@@ -535,7 +516,6 @@ body{padding:1rem .85rem 20rem}
 <div id="generation-progress"></div>
 </div>
 
-<!-- RESULT -->
 <div class="screen hidden" id="screen-result">
 <div class="screen-nav"><button type="button" class="back-btn" id="result-back">← Mes films</button><span class="step-indicator">✦ Terminé ✦</span></div>
 <h2 id="result-title">Votre film</h2>
@@ -556,7 +536,6 @@ body{padding:1rem .85rem 20rem}
 </div>
 </div>
 
-<!-- MEDIA LOG -->
 <div class="section" id="medialog-section">
 <div class="section-header" data-toggle="medialog-section">
 <span class="section-title">🗂️ Journal des médias <span class="badge" id="medialog-count">0</span></span>
@@ -567,7 +546,6 @@ body{padding:1rem .85rem 20rem}
 </div></div>
 </div>
 
-<!-- REGEN MODAL -->
 <div class="modal-overlay" id="regen-modal">
 <div class="modal-content">
 <h3>↻ Régénérer la scène <span id="regen-scene-num">1</span></h3>
@@ -621,10 +599,10 @@ const DEBUG_MAX=800;
 const MAX_CHARACTERS=8;
 const MAX_PROJECTS=50;
 
-const API_KEY_STORAGE='ccs_api_key_v5';
-const LIBRARY_KEY='ccs_library_v5';
-const PROJECTS_KEY='ccs_projects_v5';
-const WAKE_LOCK_PREF='ccs_wakelock_v5';
+const API_KEY_STORAGE='ccs_api_key_v51';
+const LIBRARY_KEY='ccs_library_v51';
+const PROJECTS_KEY='ccs_projects_v51';
+const WAKE_LOCK_PREF='ccs_wakelock_v51';
 
 const STYLE_PROMPTS={
 'cinematic-realistic':'cinematic photorealistic, naturalistic lighting, film still quality, 35mm film grain, shallow depth of field, professional cinematography',
@@ -644,9 +622,6 @@ const DURATION_OPTIONS=[
 {value:193,label:'8 s'},{value:241,label:'10 s'}
 ];
 
-// ══════════════════════════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════════════════════════
 const state={
 characters:[],
 editingChar:null,
@@ -675,9 +650,6 @@ importPack:null
 
 let debugCount=0,debugEntries=[],debugCollapsed=false;
 
-// ══════════════════════════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════════════════════════
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -687,9 +659,6 @@ function uid(){return 'c'+Date.now()+Math.floor(Math.random()*1000)}
 function fmtDate(iso){try{const d=new Date(iso);return d.toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){return''}}
 function sanitizeText(t){return String(t||'').replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/\u2013/g,'-').replace(/\u2014/g,'--').replace(/\u2026/g,'...').replace(/[\u200B-\u200D\uFEFF]/g,'').replace(/\u00A0/g,' ')}
 
-// ══════════════════════════════════════════════════════════════════
-// LOG
-// ══════════════════════════════════════════════════════════════════
 function debugLog(level,category,msg,data){
 const body=$('debug-body');if(!body)return;
 const time=new Date().toLocaleTimeString('fr-FR',{hour12:false});
@@ -741,9 +710,6 @@ while(log.querySelectorAll('.media-log-entry').length>200){const f=log.querySele
 const c=$('medialog-count');if(c)c.textContent=String(log.querySelectorAll('.media-log-entry').length);
 }
 
-// ══════════════════════════════════════════════════════════════════
-// WAKE LOCK
-// ══════════════════════════════════════════════════════════════════
 let wakeLockSentinel=null,wakeLockEnabled=false,canvasStream=null,canvasInterval=null;
 const isWakeLockSupported=()=>'wakeLock' in navigator&&typeof navigator.wakeLock.request==='function';
 async function requestWakeLockAPI(){if(!isWakeLockSupported())return false;
@@ -771,9 +737,6 @@ else{wakeLockEnabled=true;const ok=await activateWakeLock();try{localStorage.set
 updateWakeStatus()}
 document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&wakeLockEnabled){await activateWakeLock();updateWakeStatus()}});
 
-// ══════════════════════════════════════════════════════════════════
-// API KEY — UNE SEULE CLÉ (comme versions précédentes)
-// ══════════════════════════════════════════════════════════════════
 function getApiKey(){try{return (localStorage.getItem(API_KEY_STORAGE)||'').trim()}catch(e){return''}}
 function hasApiKey(){return !!getApiKey()}
 function saveApiKey(){
@@ -794,9 +757,6 @@ else{panel.classList.remove('ok');sl.classList.remove('ok');
 st.textContent='Aucune clé API enregistrée';input.value='';input.placeholder='Collez votre clé API ici (sk-...)'}
 updateButtons()}
 
-// ══════════════════════════════════════════════════════════════════
-// API FETCH
-// ══════════════════════════════════════════════════════════════════
 async function apiFetch(url,options={},label='API',maxAttempts=5){
 let lastErr=null;
 for(let attempt=0;attempt<maxAttempts;attempt++){
@@ -830,9 +790,6 @@ await sleep(w*1000)
 throw lastErr||new Error('Tentatives épuisées : '+label)
 }
 
-// ══════════════════════════════════════════════════════════════════
-// JSON PARSER — 5 stratégies
-// ══════════════════════════════════════════════════════════════════
 function balanceJson(text){let ob=0,ok=0,inStr=false,esc=false;
 for(let i=0;i<text.length;i++){const ch=text[i];
 if(esc){esc=false;continue}if(ch==='\\'){esc=true;continue}if(ch==='"'){inStr=!inStr;continue}
@@ -890,9 +847,6 @@ try{return JSON.parse(balanceJson(r))}catch(e2){
 debugLog('error','PARSE','S2 fail : '+e2.message);
 return null}}}
 
-// ══════════════════════════════════════════════════════════════════
-// TEXT / VISION
-// ══════════════════════════════════════════════════════════════════
 async function callChat(systemPrompt,userPrompt,label,maxTokens=8000,temperature=0.7){
 const sys=sanitizeText(systemPrompt)||'Assistant.';
 const usr=sanitizeText(userPrompt);
@@ -921,9 +875,6 @@ let c=msg&&msg.content;
 if(!c&&msg&&msg.reasoning_content)c=msg.reasoning_content;
 return c}
 
-// ══════════════════════════════════════════════════════════════════
-// IMAGE
-// ══════════════════════════════════════════════════════════════════
 async function generateImage(prompt,referenceImages){
 const body={model:MODEL_IMAGE,prompt:sanitizeText(prompt),n:1,size:'1K',ratio:'9:16'};
 if(referenceImages&&referenceImages.length){body.extra_body={image:referenceImages}}
@@ -934,9 +885,6 @@ if(item.url)return item.url;
 if(item.b64_json)return 'data:image/png;base64,'+item.b64_json;
 throw new Error('Format inconnu')}
 
-// ══════════════════════════════════════════════════════════════════
-// VIDEO
-// ══════════════════════════════════════════════════════════════════
 async function createVideoTask(prompt,imageUrl,lastFrameUrl,duration){
 const body={model:MODEL_VIDEO,prompt:sanitizeText(prompt),num_frames:duration,frame_rate:FRAME_RATE};
 if(imageUrl&&lastFrameUrl){body.image=imageUrl;body.last_frame=lastFrameUrl}
@@ -966,9 +914,6 @@ return u}
 if(status==='failed'||status==='error'||status==='cancelled')throw new Error('Échec ('+status+')')}
 throw new Error('Délai max dépassé')}
 
-// ══════════════════════════════════════════════════════════════════
-// REFSHEET 6 VUES
-// ══════════════════════════════════════════════════════════════════
 async function generateReferenceSheet(){
 const style=$('char-style').value;
 const stylePrompt=STYLE_PROMPTS[style]||STYLE_PROMPTS.ghibli;
@@ -1010,9 +955,6 @@ debugLog('ai','REFSHEET','Envoi ('+prompt.length+' chars)');
 const refs=state.photoRef?[state.photoRef]:[];
 return await generateImage(prompt,refs.length?refs:undefined)}
 
-// ══════════════════════════════════════════════════════════════════
-// CHARACTER BIBLE
-// ══════════════════════════════════════════════════════════════════
 async function buildBible(){
 const desc=$('char-description').value.trim();
 const outfit=$('char-outfit').value.trim();
@@ -1069,9 +1011,6 @@ if(!Array.isArray(bible.color_palette)||bible.color_palette.length<3)bible.color
 bible.name=bible.name||name;
 return bible}
 
-// ══════════════════════════════════════════════════════════════════
-// CONSISTENCY
-// ══════════════════════════════════════════════════════════════════
 async function urlToDataUrl(url){const blob=await fetch(url).then(r=>r.blob());return new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)})}
 
 async function checkConsistency(sceneUrl,refsheetUrl,bible){
@@ -1080,24 +1019,24 @@ const [sceneData,refData]=await Promise.all([urlToDataUrl(sceneUrl),urlToDataUrl
 const system='Tu es un expert en cohérence de personnages pour la génération d\'images IA. Tu compares deux images et donnes un score OBJECTIF. Tu réponds TOUJOURS en JSON strict valide.';
 const user=[
 'Voici deux images:',
-'- IMAGE 1: la PLANCHE DE RÉFÉRENCE du personnage (identité absolue).',
+'- IMAGE 1: la PLANCHE DE RÉFÉRENCE du personnage.',
 '- IMAGE 2: une IMAGE DE SCÈNE qui doit contenir le même personnage.',
 '',
 'PERSONNAGE ATTENDU:',
 (bible.character_lock_prompt||'').slice(0,600),
 '',
-'Analyse la cohérence. Retourne UNIQUEMENT ce JSON:',
+'Retourne UNIQUEMENT ce JSON:',
 '{',
 '  "score": <0-100 global>,',
-'  "identity": <0-100 visage/tête/cheveux>,',
-'  "outfit": <0-100 tenue/accessoires>,',
-'  "posture": <0-100 posture>,',
-'  "ambiance": <0-100 style global>,',
-'  "issues": ["liste courte"],',
+'  "identity": <0-100>,',
+'  "outfit": <0-100>,',
+'  "posture": <0-100>,',
+'  "ambiance": <0-100>,',
+'  "issues": ["..."],',
 '  "verdict": "phrase courte"',
 '}',
 '',
-'Sois objectif. Score < 75 = incohérent. Si pas de personnage, score = 0.'
+'Score < 75 = incohérent.'
 ].join('\n');
 const content=await callVision(system,user,[refData,sceneData],'Vision',900);
 if(!content)return null;
@@ -1111,9 +1050,6 @@ debugLog('vision','CONSISTENCY','Score='+parsed.score+' · '+(parsed.verdict||''
 return parsed}
 catch(e){debugLog('warn','CONSISTENCY','Erreur : '+e.message);return null}}
 
-// ══════════════════════════════════════════════════════════════════
-// BUILD PROMPTS
-// ══════════════════════════════════════════════════════════════════
 function buildImagePrompt(scene,bible,sceneCount){
 const isLocked=state.generationMode==='verrouille';
 const stylePrompt=STYLE_PROMPTS[$('char-style').value]||STYLE_PROMPTS.ghibli;
@@ -1149,17 +1085,30 @@ parts.push('','CAMERA: One continuous slow movement. Perfect bilateral symmetry.
 parts.push('','CONSTRAINTS: 100% identity match with input frames. No text, no watermark, no cuts.','Format: vertical portrait 9:16.');
 return parts.filter(Boolean).join('\n')}
 
-// ══════════════════════════════════════════════════════════════════
-// STORAGE
-// ══════════════════════════════════════════════════════════════════
+// Nouveau : prompt vidéo pour la DERNIÈRE SCÈNE (pas de last_frame, mouvement seul)
+function buildFinalVideoPrompt(scene,bible,sceneCount){
+const isLocked=state.generationMode==='verrouille';
+const stylePrompt=STYLE_PROMPTS[$('char-style').value]||STYLE_PROMPTS.ghibli;
+const line=scene.dialogue||'';
+const parts=[
+'CINEMATIC FINAL SHOT — '+stylePrompt,
+'',
+'FINAL SCENE '+(scene.index+1)+' / '+sceneCount+' of the film.',
+'ACTION: '+(scene.description||''),
+'DÉCOR: '+(scene.decor||''),
+];
+if(isLocked&&bible)parts.push('','CHARACTER LOCK (doit rester identique à la référence):',bible.character_lock_prompt||'');
+parts.push('','CAMERA: Slow, meditative. Very subtle movement — a gentle push-in or slow pull-back. The character breathes, blinks, lives. The light shifts slowly. The atmosphere is contemplative and climactic.',
+'','STYLE: pastel palette, deadpan acting, 35mm grain.',
+'','AUDIO: No music. Natural ambience only.'+(line?' The character says in French: "'+line+'" — one calm delivery.':''));
+parts.push('','CONSTRAINTS: 100% identity match with input frame. No text, no watermark, no cuts. Subtle continuous movement only.','Format: vertical portrait 9:16.');
+return parts.filter(Boolean).join('\n')}
+
 function loadLibrary(){try{const r=localStorage.getItem(LIBRARY_KEY);if(!r)return[];const a=JSON.parse(r);return Array.isArray(a)?a:[]}catch(e){return[]}}
 function saveLibrary(){try{localStorage.setItem(LIBRARY_KEY,JSON.stringify(state.characters))}catch(e){}}
 function loadProjects(){try{const r=localStorage.getItem(PROJECTS_KEY);if(!r)return[];const a=JSON.parse(r);return Array.isArray(a)?a:[]}catch(e){return[]}}
 function saveProjects(){try{localStorage.setItem(PROJECTS_KEY,JSON.stringify(state.projects))}catch(e){}}
 
-// ══════════════════════════════════════════════════════════════════
-// RENDER
-// ══════════════════════════════════════════════════════════════════
 function renderLibrary(){
 const grid=$('characters-grid');if(!grid)return;
 const count=$('lib-count');if(count)count.textContent=state.characters.length+' / '+MAX_CHARACTERS;
@@ -1234,9 +1183,6 @@ else grb.textContent='🎨 Générer la planche 6 vues + Character Bible'}
 const scb=$('save-character-btn');if(scb)scb.disabled=!state.refsheetUrl||!state.bible;
 const sgb=$('start-generation-btn');if(sgb)sgb.disabled=!key||!state.editingChar||!state.scenes.length||state.isRunning}
 
-// ══════════════════════════════════════════════════════════════════
-// SCREENS
-// ══════════════════════════════════════════════════════════════════
 function showScreen(name){
 document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
 const t=$('screen-'+name);if(t)t.classList.remove('hidden');
@@ -1253,9 +1199,6 @@ $('refsheet-result').classList.add('hidden');
 $('photo-preview').innerHTML='';
 updateButtons();showScreen('creator')}
 
-// ══════════════════════════════════════════════════════════════════
-// MODE SELECTOR
-// ══════════════════════════════════════════════════════════════════
 function renderModeSelector(){
 const libre=$('mode-libre'),ver=$('mode-verrouille');if(!libre||!ver)return;
 libre.classList.toggle('selected',state.generationMode==='libre');
@@ -1263,10 +1206,10 @@ ver.classList.toggle('selected',state.generationMode==='verrouille');
 const info=$('mode-info');if(!info)return;
 if(state.generationMode==='verrouille'){
 info.classList.add('gold');
-info.innerHTML='🔒 <strong>Mode Verrouillé</strong> — la <strong>planche 6 vues</strong> est envoyée comme image de référence à chaque génération. L\'identité est préservée par le modèle lui-même.'
+info.innerHTML='🔒 <strong>Mode Verrouillé</strong> — la <strong>planche 6 vues</strong> est envoyée comme image de référence à chaque génération.'
 }else{
 info.classList.remove('gold');
-info.innerHTML='🎬 <strong>Mode Libre</strong> — génération depuis le texte seul. Visage variable.'
+info.innerHTML='🎬 <strong>Mode Libre</strong> — génération depuis le texte seul.'
 }}
 
 function bindModeSelector(){
@@ -1275,9 +1218,6 @@ const set=m=>{if(state.generationMode===m)return;state.generationMode=m;renderMo
 el.addEventListener('click',()=>set(el.dataset.mode));
 el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();set(el.dataset.mode)}})})}
 
-// ══════════════════════════════════════════════════════════════════
-// STORY CONFIG
-// ══════════════════════════════════════════════════════════════════
 function renderStoryConfig(){
 const cnt=parseInt($('scene-count-select').value,10)||5;
 const dur=parseInt($('default-duration-select').value,10)||241;
@@ -1290,7 +1230,8 @@ const c=$('scenes-config');if(!c)return;
 c.innerHTML=state.scenes.map((s,i)=>{
 const cur=DURATION_OPTIONS.find(o=>o.value===s.duration)||DURATION_OPTIONS[4];
 const opts=DURATION_OPTIONS.map(o=>'<option value="'+o.value+'"'+(o.value===s.duration?' selected':'')+'>'+o.label+'</option>').join('');
-return '<div class="scene-config"><div class="sc-head"><span class="sc-num">Scène '+(i+1)+'</span><span class="sc-duration">⏱ '+cur.label+'</span></div>'+
+const isFinal=i===cnt-1;
+return '<div class="scene-config"><div class="sc-head"><span class="sc-num">Scène '+(i+1)+(isFinal?' 🎬 Finale':'')+'</span><span class="sc-duration">⏱ '+cur.label+'</span></div>'+
 '<div class="field"><label for="sc-desc-'+i+'">Description</label><textarea id="sc-desc-'+i+'" data-idx="'+i+'" data-field="description" style="min-height:60px" placeholder="Que se passe-t-il ?">'+esc(s.description)+'</textarea></div>'+
 '<div class="field"><label for="sc-decor-'+i+'">Décor</label><textarea id="sc-decor-'+i+'" data-idx="'+i+'" data-field="decor" style="min-height:50px" placeholder="Où ça se passe ?">'+esc(s.decor)+'</textarea></div>'+
 '<div class="field"><label for="sc-dial-'+i+'">Dialogue (courte phrase)</label><input type="text" id="sc-dial-'+i+'" data-idx="'+i+'" data-field="dialogue" value="'+escAttr(s.dialogue)+'" placeholder="Ex : Le vent se lève…"></div>'+
@@ -1305,9 +1246,6 @@ if(f==='duration'){const head=el.closest('.scene-config').querySelector('.sc-dur
 const opt=DURATION_OPTIONS.find(o=>o.value===state.scenes[idx].duration);if(head&&opt)head.textContent='⏱ '+opt.label}}})});
 updateButtons()}
 
-// ══════════════════════════════════════════════════════════════════
-// CREATE CHARACTER
-// ══════════════════════════════════════════════════════════════════
 async function createCharacter(){
 if(state.isRunning)return;
 if(!hasApiKey()){showToast('Ajoutez une clé API','error');return}
@@ -1348,9 +1286,6 @@ saveLibrary();state.editingChar=char;renderLibrary();
 showToast(name+' sauvegardé','success');
 $('go-story-btn').disabled=false}
 
-// ══════════════════════════════════════════════════════════════════
-// SCRIPT
-// ══════════════════════════════════════════════════════════════════
 async function generateScript(){
 const theme=$('story-theme').value.trim();
 const title=$('story-title-input').value.trim();
@@ -1369,7 +1304,7 @@ title?'TITRE SUGGÉRÉ: '+title:'',
 '',
 'RÈGLES:',
 '- Chaque scène a: description (français), decor (english), dialogue (français, max 12 mots), duration.',
-'- Le personnage GARDE EXACTEMENT la même apparence dans TOUTES les scènes.',
+'- Le personnage GARDE EXACTEMENT la même apparence.',
 '',
 'FORMAT (UNIQUEMENT ce JSON):',
 '{',
@@ -1390,9 +1325,6 @@ while(script.scenes.length<state.sceneCount){script.scenes.push({scene_number:sc
 script.scenes.forEach((s,i)=>{s.scene_number=i+1;if(!s.duration)s.duration=state.defaultDuration});
 return script}
 
-// ══════════════════════════════════════════════════════════════════
-// MAIN GENERATION
-// ══════════════════════════════════════════════════════════════════
 async function runGeneration(){
 if(state.isRunning)return;
 if(!hasApiKey()){showToast('Clé API manquante','error');return}
@@ -1410,23 +1342,23 @@ $('generation-title').textContent='🎬 '+(isLocked?'Verrouillé 🔒':'Libre �
 const progressEl=$('generation-progress');progressEl.innerHTML='';
 state.scenes.forEach((s,i)=>{const card=document.createElement('div');
 card.className='scene-progress pending';card.id='sp-scene-'+i;
-card.innerHTML=(isLocked?'<span class="sp-lock-badge">🔒</span>':'')+
-'<div class="sp-icon">'+(i+1)+'</div><div class="sp-body"><div class="sp-title">Scène '+(i+1)+'</div><div class="sp-step" id="sp-step-'+i+'">En attente…</div><div class="sp-bar"><div class="sp-fill" id="sp-fill-'+i+'"></div></div></div>';
+const isFinal=i===state.scenes.length-1;
+card.innerHTML=(isLocked?'<span class="sp-lock-badge">🔒</span>':'')+(isFinal?'<span class="sp-solo-badge" style="top:1.9rem">🎬 SOLO</span>':'')+
+'<div class="sp-icon">'+(i+1)+'</div><div class="sp-body"><div class="sp-title">Scène '+(i+1)+(isFinal?' · Finale':'')+'</div><div class="sp-step" id="sp-step-'+i+'">En attente…</div><div class="sp-bar"><div class="sp-fill" id="sp-fill-'+i+'"></div></div></div>';
 progressEl.appendChild(card)});
 setOverall(0,state.scenes.length);
-const results=state.scenes.map(s=>({...s,imageUrl:null,videoId:null,videoUrl:null,status:'pending',error:null,consistency:null,locked:isLocked,retryCount:0}));
+const results=state.scenes.map(s=>({...s,imageUrl:null,videoId:null,videoUrl:null,status:'pending',error:null,consistency:null,locked:isLocked,retryCount:0,isFinal:false}));
 
 let refsheetData=null;
 if(isLocked&&state.editingChar.refsheetUrl){
 try{refsheetData=await urlToDataUrl(state.editingChar.refsheetUrl);
-debugLog('success','REF','Planche chargée en base64 pour référence');
+debugLog('success','REF','Planche chargée');
 }catch(e){debugLog('warn','REF','Erreur planche : '+e.message)}}
 
 const totalStart=Date.now();
 try{
 await activateWakeLock();
 
-// SCÉNARIO
 setStatus('Scénario…');
 const script=await generateScript();
 results.forEach((r,i)=>{const sc=script.scenes[i];
@@ -1434,7 +1366,6 @@ if(sc){if(!r.description)r.description=sc.description;if(!r.decor)r.decor=sc.dec
 state.storyTitle=script.title||state.storyTitle;
 debugLog('success','SCRIPT',script.scenes.length+' scènes');
 
-// IMAGES
 setStatus('Images…');
 const imageTasks=results.map((r,i)=>async()=>{
 if(state.stopRequested)return;
@@ -1469,7 +1400,7 @@ if(step)step.textContent='✓ Cohérent ('+cons.score+'/100)';
 debugLog('success','SCORE','Scène '+(i+1)+' — '+cons.score+'/100 ✓')
 }else{
 const sc=cons?cons.score:'?';
-debugLog('warn','SCORE','Scène '+(i+1)+' — '+sc+'/100 < '+state.consistencyThreshold+' → retry');
+debugLog('warn','SCORE','Scène '+(i+1)+' — '+sc+'/100 < '+state.consistencyThreshold);
 if(attempt>=state.maxRetries){
 success=true;
 if(card){card.classList.remove('analyzing');card.classList.add('image-done')}
@@ -1489,17 +1420,21 @@ await sleep(2000)
 }}});
 await runQueue(imageTasks,IMAGE_PARALLEL,IMAGE_INTERVAL_MS);
 
-// VIDÉOS (chaînage keyframes)
+// ══════════════════════════════════════════════════════════════════
+// VIDÉOS — CHAQUE SCÈNE A SA VIDÉO
+// ══════════════════════════════════════════════════════════════════
 const readyResults=results.filter(r=>r.imageUrl);
-if(readyResults.length>=2){
+if(readyResults.length>=1){
 setStatus('Vidéos…');
+
+// Boucle pour les scènes NON finales (keyframes vers scène suivante)
 for(let i=0;i<readyResults.length-1;i++){
 if(state.stopRequested)break;
 const a=readyResults[i],b=readyResults[i+1];
 const realIdx=results.indexOf(a);
 const card=$('sp-scene-'+realIdx);
 if(card){card.classList.remove('image-done');card.classList.add('video')}
-const step=$('sp-step-'+realIdx);if(step)step.textContent='Vidéo…';
+const step=$('sp-step-'+realIdx);if(step)step.textContent='Vidéo (chaînée)…';
 const fill=$('sp-fill-'+realIdx);if(fill)fill.style.width='60%';
 try{
 const vPrompt=buildVideoPrompt(a,state.editingChar.bible,results.length);
@@ -1508,10 +1443,10 @@ a.videoId=taskId;
 const vUrl=await pollVideo(taskId,(msg)=>{if(step)step.textContent=msg});
 a.videoUrl=vUrl;a.status='done';
 if(card){card.classList.remove('video');card.classList.add('done')}
-if(step)step.textContent='✓ Terminé';
+if(step)step.textContent='✓ Terminé (chaînée)';
 if(fill)fill.style.width='100%';
-addMediaLog('video',vUrl,'Scène '+(realIdx+1));
-debugLog('success','VIDÉO',(realIdx+1)+' OK');
+addMediaLog('video',vUrl,'Scène '+(realIdx+1)+' (chaînée)');
+debugLog('success','VIDÉO',(realIdx+1)+' chaînée OK');
 }catch(e){
 if(e.message==='Arrêt demandé')break;
 debugLog('error','VIDÉO '+(realIdx+1),e.message);
@@ -1520,13 +1455,44 @@ if(card){card.classList.remove('video');card.classList.add('failed')}}
 setOverall(results.filter(x=>x.videoUrl).length,results.length);
 if(i<readyResults.length-2&&!state.stopRequested){
 for(let r=60;r>0;r--){if(state.stopRequested)break;setStatus('Pause '+r+'s');await sleep(1000)}}}
+
+// ══════════════════════════════════════════════════════════════════
+// VIDÉO FINALE — dernière scène, image-to-video simple (pas de chaînage)
+// ══════════════════════════════════════════════════════════════════
+if(!state.stopRequested){
 const last=readyResults[readyResults.length-1];
-if(last&&!last.videoUrl)last.status='done';
+const realIdx=results.indexOf(last);
+const card=$('sp-scene-'+realIdx);
+if(card){card.classList.remove('image-done');card.classList.add('video')}
+const step=$('sp-step-'+realIdx);if(step)step.textContent='Vidéo finale (solo)…';
+const fill=$('sp-fill-'+realIdx);if(fill)fill.style.width='60%';
+setStatus('Vidéo finale…');
+try{
+const vPromptFinal=buildFinalVideoPrompt(last,state.editingChar.bible,results.length);
+const taskIdFinal=await createVideoTask(vPromptFinal,last.imageUrl,null,last.duration||state.defaultDuration);
+last.videoId=taskIdFinal;
+const vUrlFinal=await pollVideo(taskIdFinal,(msg)=>{if(step)step.textContent=msg});
+last.videoUrl=vUrlFinal;last.status='done';last.isFinal=true;
+if(card){card.classList.remove('video');card.classList.add('done')}
+if(step)step.textContent='✓ Finale terminée';
+if(fill)fill.style.width='100%';
+addMediaLog('video',vUrlFinal,'Scène '+(realIdx+1)+' (finale solo)');
+debugLog('success','VIDÉO','Finale '+(realIdx+1)+' solo OK');
+}catch(e){
+if(e.message==='Arrêt demandé'){
+// pas grave, on garde l'image finale
+}else{
+debugLog('error','VIDÉO','Finale : '+e.message);
+last.status='failed';last.error=e.message;
+if(card){card.classList.remove('video');card.classList.add('failed')}
+}}
+setOverall(results.filter(x=>x.videoUrl).length,results.length);
+}
 }
 }catch(e){debugLog('error','GLOBAL',e.message)}
 const elapsed=(Date.now()-totalStart)/1000;
 const okV=results.filter(r=>r.videoUrl).length;
-const summary=state.stopRequested?'Arrêté':'✦ '+okV+'/'+results.length+' · '+fmtEta(elapsed)+' ✦';
+const summary=state.stopRequested?'Arrêté':'✦ '+okV+'/'+results.length+' vidéos · '+fmtEta(elapsed)+' ✦';
 setStatus(summary);await sleep(3500);setStatus(null);
 state.isRunning=false;state.stopRequested=false;updateButtons();
 const project=saveProject(results);
@@ -1560,9 +1526,6 @@ state.projects.unshift(project);
 if(state.projects.length>MAX_PROJECTS)state.projects=state.projects.slice(0,MAX_PROJECTS);
 saveProjects();return project}
 
-// ══════════════════════════════════════════════════════════════════
-// RESULT
-// ══════════════════════════════════════════════════════════════════
 function showResultGallery(results,title){
 showScreen('result');
 const grid=$('gallery-grid');if(!grid)return;
@@ -1571,11 +1534,12 @@ if(!results||!results.length){grid.innerHTML='';return}
 grid.innerHTML=results.map((r,i)=>{
 const isLocked=r.locked||state.generationMode==='verrouille';
 const lockB=isLocked?'<span class="vc-lock">🔒</span>':'';
+const soloB=r.isFinal?'<span class="vc-solo">🎬 Finale</span>':'';
 const scoreB=r.consistency?'<span class="vc-score '+(r.consistency.score>=state.consistencyThreshold?'good':'bad')+'">'+r.consistency.score+'</span>':'';
 if(!r.videoUrl&&!r.imageUrl){
 return '<div class="video-card"><div style="aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;color:var(--error);font-size:.75rem;padding:1rem;text-align:center">Scène '+(i+1)+' échouée</div></div>'}
 const media=r.videoUrl?'<video src="'+escAttr(r.videoUrl)+'" controls playsinline preload="metadata"></video>':'<img src="'+escAttr(r.imageUrl)+'" style="width:100%;aspect-ratio:9/16;object-fit:cover;display:block">';
-return '<div class="video-card">'+media+lockB+scoreB+
+return '<div class="video-card">'+media+lockB+soloB+scoreB+
 (r.videoUrl?'<button class="download-btn" data-dl="'+i+'">⬇</button>':'')+
 '<div class="vc-caption"><div class="vc-num">✦ Scène '+(i+1)+'</div>'+
 '<div class="vc-title">'+esc((r.description||'Scène '+(i+1)).slice(0,50))+'</div>'+
@@ -1596,9 +1560,6 @@ const a=document.createElement('a');a.href=objUrl;a.download=filename;a.style.di
 document.body.appendChild(a);a.click();setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(objUrl)},1000);return true}
 catch(e){try{window.open(url,'_blank','noopener');showToast('Ouverture dans un onglet','warn',5000);return true}catch(e2){return false}}}
 
-// ══════════════════════════════════════════════════════════════════
-// REGEN
-// ══════════════════════════════════════════════════════════════════
 function openRegenModal(idx){
 if(!state.lastResults||idx<0||idx>=state.lastResults.length){showToast('Scène introuvable','error');return}
 const r=state.lastResults[idx];
@@ -1636,12 +1597,18 @@ const refs=refsheetData?[refsheetData]:[];
 setStatus('Image…');
 const newImg=await generateImage(imgP,refs.length?refs:undefined);
 let newVid=old.videoUrl;
-if(idx<p.results.length-1&&p.results[idx+1]&&p.results[idx+1].imageUrl){
-setStatus('Vidéo…');
+const isFinal=idx===p.results.length-1;
+if(isFinal){
+setStatus('Vidéo finale…');
+const vP=buildFinalVideoPrompt(tempScene,state.editingChar?state.editingChar.bible:null,p.results.length);
+const tid=await createVideoTask(vP,newImg,null,newDur);
+newVid=await pollVideo(tid,(m)=>setStatus('Scène '+(idx+1)+' : '+m));
+}else if(idx<p.results.length-1&&p.results[idx+1]&&p.results[idx+1].imageUrl){
+setStatus('Vidéo chaînée…');
 const vP=buildVideoPrompt(tempScene,state.editingChar?state.editingChar.bible:null,p.results.length);
 const tid=await createVideoTask(vP,newImg,p.results[idx+1].imageUrl,newDur);
 newVid=await pollVideo(tid,(m)=>setStatus('Scène '+(idx+1)+' : '+m))}
-p.results[idx]={...old,description:newDesc,decor:newDecor,duration:newDur,imageUrl:newImg,videoUrl:newVid,status:'done'};
+p.results[idx]={...old,description:newDesc,decor:newDecor,duration:newDur,imageUrl:newImg,videoUrl:newVid,status:'done',isFinal};
 saveProjects();
 state.lastResults=p.results;
 showResultGallery(p.results,p.title);
@@ -1649,16 +1616,13 @@ showToast('Scène '+(idx+1)+' régénérée','success')}
 catch(e){if(e.message==='Arrêt demandé')showToast('Annulé','warn');else{debugLog('error','REGEN',e.message);showToast('Erreur : '+e.message.slice(0,60),'error')}}
 state.isRunning=false;state.stopRequested=false;updateButtons();setStatus(null)}
 
-// ══════════════════════════════════════════════════════════════════
-// EXPORT / IMPORT
-// ══════════════════════════════════════════════════════════════════
 function exportJson(){
-const data={version:5,app:'Avatar Story Studio v5',exportedAt:new Date().toISOString(),
+const data={version:51,app:'Avatar Story Studio v5.1',exportedAt:new Date().toISOString(),
 title:state.storyTitle,theme:state.storyTheme,mode:state.generationMode,
 characters:state.characters,results:state.lastResults||[]};
 const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
 const url=URL.createObjectURL(blob);const a=document.createElement('a');
-a.href=url;a.download='avatar-v5-'+Date.now()+'.json';document.body.appendChild(a);a.click();
+a.href=url;a.download='avatar-v51-'+Date.now()+'.json';document.body.appendChild(a);a.click();
 setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},500);
 showToast('Exporté','success')}
 
@@ -1678,9 +1642,6 @@ showToast('Importé','success')}
 catch(err){showToast('Fichier invalide','error')}};
 r.readAsText(file)}
 
-// ══════════════════════════════════════════════════════════════════
-// IMPORT PACK JSON
-// ══════════════════════════════════════════════════════════════════
 function openImportScreen(){showScreen('import')}
 function clearImport(){$('import-json-input-text').value='';$('import-preview-container').innerHTML='';$('import-zone').classList.remove('has-content');state.importPack=null}
 
@@ -1716,7 +1677,7 @@ let html='<div class="import-preview"><h4>✅ Pack valide</h4>';
 if(pack.title)html+='<div class="ip-line"><span class="ip-label">Titre</span><span class="ip-val">'+esc(pack.title)+'</span></div>';
 html+='<div class="ip-line"><span class="ip-label">Mode</span><span class="ip-val '+(mode==='verrouille'?'lock':'')+'">'+(mode==='verrouille'?'🔒 Verrouillé':'🎬 Libre')+'</span></div>';
 html+='<div class="ip-line"><span class="ip-label">Personnages</span><span class="ip-val">'+pack.characters.length+(lockedCount?' · '+lockedCount+' 🔒':'')+'</span></div>';
-html+='<div class="ip-line"><span class="ip-label">Scènes</span><span class="ip-val">'+pack.scenes.length+'</span></div>';
+html+='<div class="ip-line"><span class="ip-label">Scènes</span><span class="ip-val">'+pack.scenes.length+' ('+pack.scenes.length+' vidéos)</span></div>';
 html+='<div class="ip-line"><span class="ip-label">Durée totale</span><span class="ip-val">'+totalSec+' s</span></div>';
 html+='<div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(16,217,160,.2)">';
 pack.characters.forEach(c=>{html+='<div class="ip-char">🎭 '+esc(c.name)+(c.locked?' 🔒':'')+'</div>'});
@@ -1773,7 +1734,6 @@ if(card){card.classList.remove('image');card.classList.add('failed')}
 if(step)step.textContent='✕ '+e.message.slice(0,40)}}
 state.editingChar=state.characters[0];
 renderLibrary();
-// Préparer les scènes
 state.sceneCount=pack.scenes.length;
 state.scenes=pack.scenes.map((s,i)=>({index:i,description:s.description||'',decor:s.decor||'',dialogue:s.dialogue||'',duration:s.duration||241}));
 state.storyTitle=pack.title||'';
@@ -1787,9 +1747,6 @@ runGeneration();
 }catch(e){debugLog('error','IMPORT',e.message);showToast('Erreur : '+e.message.slice(0,60),'error')}
 state.isRunning=false;state.stopRequested=false;updateButtons()}
 
-// ══════════════════════════════════════════════════════════════════
-// PROJECTS
-// ══════════════════════════════════════════════════════════════════
 function openProject(id){
 const p=state.projects.find(x=>x.id===id);if(!p)return;
 state.lastResults=p.results;state.currentProjectId=p.id;
@@ -1812,9 +1769,6 @@ $('story-screen-title').textContent='📖 Continuer';
 showScreen('story');renderModeSelector();
 const cb=$('cancel-cont');if(cb)cb.addEventListener('click',()=>{state.editingProjectId=null;$('continue-banner-container').innerHTML='';showScreen('library')})}
 
-// ══════════════════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════════════════
 (function init(){
 window.addEventListener('unhandledrejection',e=>debugLog('error','UNHANDLED',(e.reason&&e.reason.message)||String(e.reason)));
 window.addEventListener('error',e=>debugLog('error','ERROR',e.message||'Erreur'));
@@ -1912,9 +1866,8 @@ $('debug-copy-btn').addEventListener('click',e=>{e.stopPropagation();copyDebug()
 updateApiPanel();updateButtons();updateWakeStatus();
 renderLibrary();renderProjects();renderModeSelector();
 
-debugLog('success','INIT','Avatar Story Studio v5 prêt');
-debugLog('info','INIT','Pipeline : PLAN 6 VUES → BIBLE → SCÉNARIO → IMAGES (avec ref) → CONSISTENCY CHECK → VIDÉOS');
-debugLog('info','INIT','Une seule clé API · Modes Libre/Verrouillé · Import Pack JSON');
+debugLog('success','INIT','Avatar Story Studio v5.1 prêt');
+debugLog('info','INIT','✨ Chaque scène a sa vidéo : scènes 1→N-1 chaînées + dernière scène solo');
 })();
 </script>
 </body>
