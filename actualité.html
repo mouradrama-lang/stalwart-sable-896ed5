@@ -69,9 +69,13 @@ h1 { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 300; margin
 .theme-textarea:focus, .rss-input:focus { outline: none; border-color: var(--lavender); }
 .control-row { margin-bottom: 1rem; }
 .control-label { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; }
+.control-label .hint { display: block; text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-faint); margin-top: 0.25rem; font-size: 0.68rem; font-style: italic; }
 select { width: 100%; padding: 0.8rem 0.95rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.88rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.95rem center; background-size: 10px; cursor: pointer; }
 select:focus { outline: none; border-color: var(--blue); }
 select option { background: var(--night-3); color: var(--ink); }
+select.rule-select { border-color: var(--purple-deep); }
+select.rule-select:focus { border-color: var(--purple); }
+.preview-badge { display: inline-block; padding: 0.3rem 0.7rem; background: rgba(139,95,196,0.08); border: 1px solid var(--purple-deep); border-radius: var(--radius); font-size: 0.7rem; color: var(--purple-soft); font-family: var(--font-mono); margin-top: 0.4rem; }
 .btn-primary { width: 100%; padding: 1.2rem; border-radius: var(--radius); border: 1px solid var(--yellow-deep); background: linear-gradient(135deg, rgba(232,123,53,0.2), rgba(229,193,90,0.15), rgba(139,95,196,0.15)); color: var(--yellow-soft); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; margin-bottom: 1rem; }
 .btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
 .btn-secondary { width: 100%; padding: 0.85rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink-dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; cursor: pointer; margin-bottom: 0.6rem; text-transform: uppercase; }
@@ -132,8 +136,6 @@ select option { background: var(--night-3); color: var(--ink); }
 .gallery-item .g-caption { padding: 0.6rem 0.7rem; background: var(--panel); display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid var(--border); }
 .gallery-item .g-caption strong { font-family: var(--font-serif); color: var(--yellow-soft); font-size: 0.82rem; font-weight: 500; }
 .gallery-item .g-caption span { font-size: 0.6rem; opacity: 0.65; letter-spacing: 0.12em; text-transform: uppercase; }
-.save-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
-.save-panel h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-dim); margin-bottom: 0.7rem; font-weight: 600; }
 .project-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 300px; overflow-y: auto; margin-top: 0.6rem; }
 .project-item { padding: 0.6rem 0.8rem; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--night-2); display: flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; }
 .project-item .pi-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-serif); color: var(--ink); }
@@ -186,8 +188,7 @@ select option { background: var(--night-3); color: var(--ink); }
 
 <div class="info-banner">
   <strong>Pipeline :</strong> flux RSS Google Actualités → sélection d'un article → scénario IA → images clés → vidéos en chaîne.
-  Toutes les générations utilisent <strong>Agnes AI</strong> (text / image / video).
-  Les projets sont <strong>sauvegardés automatiquement</strong> et exportables en JSON.
+  Toutes les générations utilisent <strong>Agnes AI</strong>. Les projets sont <strong>sauvegardés automatiquement</strong>.
 </div>
 
 <div class="api-panel" id="api-panel">
@@ -199,7 +200,6 @@ select option { background: var(--night-3); color: var(--ink); }
   <div class="wake-status" id="wake-status"><span id="wake-status-text">💤 Veille automatique</span><button type="button" id="wake-toggle-btn">Garder l'écran allumé</button></div>
 </div>
 
-<!-- SECTION 1 : FLUX RSS -->
 <div class="section open" id="section-rss">
   <div class="section-header" data-toggle="section-rss">
     <span class="section-title">📰 Source d'actualité <span class="badge">RSS Google News</span></span>
@@ -238,10 +238,9 @@ select option { background: var(--night-3); color: var(--ink); }
   </div></div>
 </div>
 
-<!-- SECTION 2 : ARTICLE SÉLECTIONNÉ -->
 <div class="section" id="section-article">
   <div class="section-header" data-toggle="section-article">
-    <span class="section-title">📄 Article sélectionné <span class="badge soft">contexte</span></span>
+    <span class="section-title">📄 Article / Contexte <span class="badge soft">modifiable</span></span>
     <span class="chevron">▼</span>
   </div>
   <div class="section-body"><div class="section-content">
@@ -249,13 +248,55 @@ select option { background: var(--night-3); color: var(--ink); }
   </div></div>
 </div>
 
-<!-- SECTION 3 : STYLE -->
+<!-- ══════ SECTION STYLE : DEUX MENUS ══════ -->
 <div class="section open" id="section-style">
   <div class="section-header" data-toggle="section-style">
-    <span class="section-title">🎨 Style visuel du reportage</span>
+    <span class="section-title">🎨 Style & Règles de contenu</span>
     <span class="chevron">▼</span>
   </div>
   <div class="section-body"><div class="section-content">
+
+    <div class="control-row">
+      <label class="control-label">
+        🎨 Style visuel
+        <span class="hint">Le rendu esthétique général de chaque image et vidéo.</span>
+      </label>
+      <select id="visual-style">
+        <option value="photoreal">📷 Photoréaliste / reportage</option>
+        <option value="cinematic">🎬 Cinématique (type Villeneuve)</option>
+        <option value="graphic">📊 Graphique / infographique</option>
+        <option value="illustrated">🖌️ Illustré / peinture éditoriale</option>
+        <option value="archival">📜 Archive / sépia ancien</option>
+        <option value="press">📰 Presse écrite / journal</option>
+        <option value="poster">🪧 Affiche / propagande graphique</option>
+        <option value="bd">💬 Bande dessinée / comic</option>
+        <option value="technical">📐 Schéma technique / blueprint</option>
+      </select>
+      <div class="preview-badge" id="style-preview-badge">📷 Photoréaliste</div>
+    </div>
+
+    <div class="control-row">
+      <label class="control-label">
+        🚫 Règles de contenu
+        <span class="hint">Ce que l'image doit ou ne doit PAS contenir. Combine avec le style.</span>
+      </label>
+      <select id="content-rules" class="rule-select">
+        <option value="none">✳️ Aucune restriction — l'IA décide</option>
+        <option value="no-face">👤 Sans visage humain (dos, mains, silhouettes floues)</option>
+        <option value="no-human">🚷 Sans aucun humain (décors, objets, symboles)</option>
+        <option value="silhouettes">🌑 Silhouettes anonymes uniquement (contre-jour)</option>
+        <option value="symbolic">♟️ Symbolique / allégorique (pions, échecs, animaux totems)</option>
+        <option value="aerial">🛩️ Vue aérienne / satellite uniquement</option>
+        <option value="maps">🗺️ Cartes et données uniquement</option>
+        <option value="documents">📜 Documents, traités, archives, tampons</option>
+        <option value="nature">🌄 Paysages et nature uniquement (aucune présence humaine)</option>
+        <option value="architecture">🏛️ Architecture et monuments uniquement</option>
+        <option value="objects">🕯️ Objets inanimés en gros plan (nature morte)</option>
+        <option value="macro">🔬 Détails abstraits / macro (textures, matières)</option>
+      </select>
+      <div class="preview-badge" id="rules-preview-badge">✳️ Aucune restriction</div>
+    </div>
+
     <div class="control-row">
       <label class="control-label">Ton du reportage</label>
       <select id="tone-select">
@@ -266,15 +307,7 @@ select option { background: var(--night-3); color: var(--ink); }
         <option value="poetic">🌍 Poétique et contemplatif</option>
       </select>
     </div>
-    <div class="control-row">
-      <label class="control-label">Style visuel</label>
-      <select id="visual-style">
-        <option value="photoreal">📷 Photoréaliste / reportage</option>
-        <option value="cinematic">🎬 Cinématique (type Villeneuve)</option>
-        <option value="graphic">📊 Graphique / infographique</option>
-        <option value="illustrated">🖌️ Illustré (carte postale)</option>
-      </select>
-    </div>
+
     <div class="control-row">
       <label class="control-label">Nombre de scènes</label>
       <select id="scene-count-select">
@@ -284,6 +317,7 @@ select option { background: var(--night-3); color: var(--ink); }
         <option value="10">10 scènes (~70s)</option>
       </select>
     </div>
+
     <div class="control-row">
       <label class="control-label">Durée par clip</label>
       <select id="duration-select">
@@ -292,6 +326,7 @@ select option { background: var(--night-3); color: var(--ink); }
         <option value="241">10 secondes (241 frames)</option>
       </select>
     </div>
+
   </div></div>
 </div>
 
@@ -308,7 +343,6 @@ select option { background: var(--night-3); color: var(--ink); }
   <div class="phase-info"><span id="phase-detail">En attente</span><span id="phase-eta"></span></div>
 </div>
 
-<!-- SECTION 4 : SAUVEGARDE -->
 <div class="section" id="section-save">
   <div class="section-header" data-toggle="section-save">
     <span class="section-title">💾 Sauvegardes <span class="badge success" id="save-count-badge">0</span></span>
@@ -359,7 +393,7 @@ select option { background: var(--night-3); color: var(--ink); }
 
 <script>
 // ══════════════════════════════════════════════════════════════════
-// CONFIG — identique aux codes sources validés
+// CONFIG
 // ══════════════════════════════════════════════════════════════════
 const API_BASE = 'https://apihub.agnes-ai.com/v1';
 const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
@@ -382,14 +416,43 @@ const VIDEO_FIRST_POLL_DELAY_SEC = 80;
 const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
 const VIDEO_MAX_POLL_ATTEMPTS = 100;
 
-const TIMING_CACHE_KEY = 'geo_studio_timing_v1';
+const TIMING_CACHE_KEY = 'geo_studio_timing_v2';
 const API_KEY_STORAGE = 'agnes_api_key';
 const WAKE_LOCK_PREF = 'agnes_wakelock_enabled';
-const PROJECTS_STORAGE = 'geo_studio_projects_v1';
-const AUTOSAVE_STORAGE = 'geo_studio_autosave_v1';
+const PROJECTS_STORAGE = 'geo_studio_projects_v2';
+const AUTOSAVE_STORAGE = 'geo_studio_autosave_v2';
 const AUTOSAVE_INTERVAL_MS = 15000;
-
 const DEBUG_MAX_ENTRIES = 600;
+
+// ══════════════════════════════════════════════════════════════════
+// CATALOGUES STYLE + RÈGLES
+// ══════════════════════════════════════════════════════════════════
+const VISUAL_STYLES = {
+  photoreal:    { label: '📷 Photoréaliste', prompt: 'photorealistic documentary photography, natural light, 35mm, cinematic composition, realistic detail, high dynamic range' },
+  cinematic:    { label: '🎬 Cinématique',   prompt: 'cinematic film style like Denis Villeneuve, monumental architecture, muted palette, atmospheric, 35mm film grain, anamorphic wide shots' },
+  graphic:      { label: '📊 Graphique',     prompt: 'graphic design infographic style, bold shapes, data visualization, clean modern editorial illustration, minimal color palette' },
+  illustrated:  { label: '🖌️ Illustré',     prompt: 'painterly illustrated editorial style, warm palette, elegant hand-drawn quality, magazine illustration, visible brushwork' },
+  archival:     { label: '📜 Archive',       prompt: 'vintage archival photography, sepia tones, aged paper, faded colors, historical document aesthetic, subtle scratches and grain' },
+  press:        { label: '📰 Presse',        prompt: 'newspaper front page aesthetic, printed ink texture, columns of text visible, bold headline typography, black and white with selective spot color' },
+  poster:       { label: '🪧 Affiche',       prompt: 'vintage political poster style, flat bold colors, screen-printed texture, constructivist graphic design, strong symbolic shapes' },
+  bd:           { label: '💬 BD / Comic',    prompt: 'comic book illustration style, bold ink outlines, cel-shaded colors, halftone dots, dynamic panels' },
+  technical:    { label: '📐 Schéma',        prompt: 'technical blueprint style, precise linework, annotated schematic, engineering diagram aesthetic, blue and white' }
+};
+
+const CONTENT_RULES = {
+  none:         { label: '✳️ Aucune restriction',          positive: '',                                                                                              negative: '' },
+  'no-face':    { label: '👤 Sans visage humain',           positive: 'Only show human presence from behind, from above, or partially framed. Focus on hands, shoulders, silhouettes without any facial features. Faces must never be visible.', negative: 'No visible faces, no portraits, no recognizable facial features.' },
+  'no-human':   { label: '🚷 Sans aucun humain',            positive: 'Show only environments, objects, symbols, maps, architecture, or data. Never include any human figure.',                                                            negative: 'No people, no humans, no silhouettes, no hands, no bodies. Absolutely no human presence in frame.' },
+  'silhouettes':{ label: '🌑 Silhouettes anonymes',         positive: 'Show anonymous silhouettes only, strongly backlit, against bright backgrounds, always unidentifiable, faceless, devoid of personal features.',                  negative: 'No identifiable faces, no portrait details, no recognizable individuals. Silhouettes must remain anonymous.' },
+  'symbolic':   { label: '♟️ Symbolique',                   positive: 'Represent concepts through symbols: chess pieces, flags, animals as national totems (eagle, bear, dragon, lion), puppets, strings, threads, scales of justice, masks. Metaphorical and allegorical only.', negative: 'No realistic human figures. Symbols and totems only.' },
+  'aerial':     { label: '🛩️ Vue aérienne',                 positive: 'Show only aerial or satellite views, from high altitude, bird\'s eye perspective, top-down angle, drone footage aesthetic. Cities, borders, terrain seen from above.',                  negative: 'No ground-level views. No faces, no humans visible at close range. Top-down only.' },
+  'maps':       { label: '🗺️ Cartes et données',            positive: 'Show only maps, chart graphics, data visualizations, colored zones, arrows, borders, terrain layers, geographic overlays. Purely cartographic.',                                        negative: 'No photographs. No people. Only maps, charts and data visualizations.' },
+  'documents':  { label: '📜 Documents et archives',        positive: 'Show only documents, treaties, letters, stamps, paper, typewriters, folders, seals, official seals. Vintage documentary materials.',                                              negative: 'No people, no faces. Only inanimate documents and objects.' },
+  'nature':     { label: '🌄 Paysages nature',              positive: 'Show only natural landscapes, forests, mountains, oceans, deserts, skies, storms, aurora. No artificial or human elements.',                                                       negative: 'No humans, no buildings, no vehicles, no artificial structures. Pure nature only.' },
+  'architecture':{ label: '🏛️ Architecture',                positive: 'Show only buildings, monuments, palaces, temples, city skylines, streets, urban structures. Focus on architecture and urbanism.',                                                negative: 'No people, no faces. Architecture and urban structures only.' },
+  'objects':    { label: '🕯️ Objets en gros plan',          positive: 'Show only inanimate objects in close-up: cups, weapons, flags, coins, books, keys, artifacts. Still-life composition.',                                                            negative: 'No humans. Objects only.' },
+  'macro':      { label: '🔬 Macro abstrait',                positive: 'Show only abstract macro photography of textures, materials, surfaces, particles, light, dust, fabric, metal, water. Fully abstract.',                                          negative: 'No humans, no recognizable objects. Abstract textures and materials only.' }
+};
 
 // ══════════════════════════════════════════════════════════════════
 // ÉTAT
@@ -400,6 +463,7 @@ const state = {
   articleContent: '',
   tone: 'documentary',
   visualStyle: 'photoreal',
+  contentRules: 'none',
   sceneCount: 5,
   durationFrames: 161,
   isRunning: false,
@@ -516,7 +580,7 @@ function setPhase(phase, detail, eta) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// WAKE LOCK (identique aux codes sources)
+// WAKE LOCK
 // ══════════════════════════════════════════════════════════════════
 let wakeLockSentinel = null, wakeLockEnabled = false, canvasStream = null, canvasInterval = null;
 const isWakeLockSupported = () => 'wakeLock' in navigator && typeof navigator.wakeLock.request === 'function';
@@ -630,14 +694,13 @@ function updateApiPanel() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// RSS — Lecture via proxies CORS
+// RSS
 // ══════════════════════════════════════════════════════════════════
 function buildRssUrl() {
   const topic = $('rss-topic').value;
   const customQuery = $('custom-query').value.trim();
   const lang = $('rss-lang').value;
   const [hl, gl_ceid] = [lang.split('-')[0], lang.replace('-', ':')];
-
   const query = topic === 'custom' ? (customQuery || 'geopolitics') : topic;
   const encoded = encodeURIComponent(query);
   return `https://news.google.com/rss/search?q=${encoded}&hl=${hl}&gl=${gl_ceid.split(':')[0]}&ceid=${gl_ceid}`;
@@ -649,16 +712,13 @@ async function fetchRssWithProxy(rssUrl) {
     (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
     (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`
   ];
-
   for (let i = 0; i < proxies.length; i++) {
     const proxiedUrl = proxies[i](rssUrl);
-    debugLog('api', 'RSS', 'Tentative proxy ' + (i+1) + ' : ' + proxies[i](rssUrl).slice(0, 80) + '…');
+    debugLog('api', 'RSS', 'Tentative proxy ' + (i+1));
     try {
       const res = await fetch(proxiedUrl);
       if (!res.ok) { debugLog('warn', 'RSS', 'Proxy ' + (i+1) + ' HTTP ' + res.status); continue; }
       const data = await res.json();
-
-      // rss2json format
       if (data.items && Array.isArray(data.items)) {
         return data.items.map(it => ({
           title: it.title || '',
@@ -668,15 +728,12 @@ async function fetchRssWithProxy(rssUrl) {
           description: it.description || ''
         }));
       }
-      // allorigins / corsproxy format (raw XML)
       const xml = data.contents || (typeof data === 'string' ? data : null);
       if (xml) {
         const parsed = parseRssXml(xml);
         if (parsed.length > 0) return parsed;
       }
-    } catch(e) {
-      debugLog('warn', 'RSS', 'Proxy ' + (i+1) + ' : ' + e.message);
-    }
+    } catch(e) { debugLog('warn', 'RSS', 'Proxy ' + (i+1) + ' : ' + e.message); }
   }
   throw new Error('Tous les proxies RSS ont échoué');
 }
@@ -742,7 +799,6 @@ function renderNewsList() {
       $('article-content').value = content;
       renderNewsList();
       updateGenerateBtn();
-      // Auto-remplir le nom du projet
       if (!$('project-name').value) {
         $('project-name').value = state.selectedArticle.title.slice(0, 50);
         state.projectName = $('project-name').value;
@@ -753,19 +809,39 @@ function renderNewsList() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PROMPTS
+// FONCTIONS STYLE + RÈGLES
 // ══════════════════════════════════════════════════════════════════
+function getStylePrompt() {
+  const key = $('visual-style').value;
+  return VISUAL_STYLES[key] ? VISUAL_STYLES[key].prompt : VISUAL_STYLES.photoreal.prompt;
+}
+function getRulesPositive() {
+  const key = $('content-rules').value;
+  return CONTENT_RULES[key] ? CONTENT_RULES[key].positive : '';
+}
+function getRulesNegative() {
+  const key = $('content-rules').value;
+  return CONTENT_RULES[key] ? CONTENT_RULES[key].negative : '';
+}
 function buildStyleReference() {
-  const style = $('visual-style').value;
-  const styles = {
-    photoreal: 'photorealistic documentary photography, natural light, 35mm, cinematic composition, realistic detail',
-    cinematic: 'cinematic film style like Denis Villeneuve, monumental architecture, muted palette, atmospheric, 35mm film grain',
-    graphic: 'graphic design infographic style, bold shapes, data visualization, clean modern editorial illustration',
-    illustrated: 'painterly illustrated editorial style, warm palette, elegant hand-drawn quality, magazine illustration'
-  };
-  return styles[style] || styles.photoreal;
+  const styleP = getStylePrompt();
+  const posRules = getRulesPositive();
+  const negRules = getRulesNegative();
+  const parts = [styleP];
+  if (posRules) parts.push('CONTENT RULES: ' + posRules);
+  if (negRules) parts.push('STRICTLY FORBIDDEN: ' + negRules);
+  return parts.join(' ');
+}
+function updateStyleBadges() {
+  const styleKey = $('visual-style').value;
+  const rulesKey = $('content-rules').value;
+  $('style-preview-badge').textContent = VISUAL_STYLES[styleKey] ? VISUAL_STYLES[styleKey].label : '—';
+  $('rules-preview-badge').textContent = CONTENT_RULES[rulesKey] ? CONTENT_RULES[rulesKey].label : '—';
 }
 
+// ══════════════════════════════════════════════════════════════════
+// PROMPTS
+// ══════════════════════════════════════════════════════════════════
 function buildScenarioPrompt(articleContent, sceneCount) {
   const tone = $('tone-select').value;
   const styleRef = buildStyleReference();
@@ -778,6 +854,11 @@ function buildScenarioPrompt(articleContent, sceneCount) {
     poetic: 'poetic, contemplative, humanist'
   }[tone];
 
+  const rulesKey = $('content-rules').value;
+  const rulesConstraint = rulesKey !== 'none'
+    ? `VISUAL CONSTRAINTS (ABSOLUTE): Every image_prompt MUST obey these content rules: ${getRulesPositive()} ${getRulesNegative()}`
+    : '';
+
   return [
     'You are a screenwriter and visual director creating a short geopolitical news video report.',
     '',
@@ -785,6 +866,7 @@ function buildScenarioPrompt(articleContent, sceneCount) {
     articleContent,
     '',
     'VISUAL STYLE: ' + styleRef,
+    rulesConstraint,
     'TONE: ' + toneLabel,
     '',
     'ABSOLUTE RULES:',
@@ -807,7 +889,7 @@ function buildScenarioPrompt(articleContent, sceneCount) {
     '  "scenes": [',
     '    {',
     '      "scene_number": 1,',
-    '      "image_prompt": "detailed visual description for the keyframe, describing exact composition, subjects, setting, lighting, camera angle",',
+    '      "image_prompt": "detailed visual description obeying the visual style AND content rules, describing exact composition, subjects, setting, lighting, camera angle",',
     '      "action_prompt": "continuous camera movement and subtle motion during this scene, no cuts",',
     '      "narration": "short narration text in French, 8 words MAX, journalistic and precise"',
     '    }',
@@ -815,13 +897,13 @@ function buildScenarioPrompt(articleContent, sceneCount) {
     '  ]',
     '}',
     '',
-    'Each image_prompt must be visually descriptive and respectful.',
-    'Each narration line must be short (8 words max), factual, and in French.',
-    'Narration is a voice-over read over the video, not a character speaking on screen.'
+    'Each image_prompt MUST strictly obey the content rules. If the rule says "no face", no image_prompt may mention or suggest any face. If the rule says "no human", no image_prompt may include any person.',
+    'Each narration line must be short (8 words max), factual, and in French.'
   ].join('\n');
 }
 
 function buildImageGenerationPrompt(basePrompt, index, total) {
+  const negRules = getRulesNegative();
   return [
     buildStyleReference(),
     '',
@@ -832,13 +914,15 @@ function buildImageGenerationPrompt(basePrompt, index, total) {
     basePrompt,
     '',
     'Format: portrait 9:16 vertical, journalistic composition, natural lighting.',
-    'No text, no watermark, no logo, no graphic violence.'
-  ].join('\n');
+    'No text, no watermark, no logo, no graphic violence.',
+    negRules ? 'ABSOLUTELY FORBIDDEN IN THIS IMAGE: ' + negRules : ''
+  ].filter(Boolean).join('\n');
 }
 
 function buildVideoPrompt(scene, sceneIndex) {
   const tone = $('tone-select').value;
   const styleRef = buildStyleReference();
+  const negRules = getRulesNegative();
   const narration = scene.narration || '';
   return [
     'CRITICAL: The provided first frame is the EXACT first frame of this video. The provided last frame is the EXACT last frame. The entire video must smoothly interpolate between them.',
@@ -851,15 +935,16 @@ function buildVideoPrompt(scene, sceneIndex) {
     (narration ? 'A calm voice-over in French reads: "' + narration + '" — measured, journalistic, filling the scene without rushing.' : 'No dialogue.'),
     '',
     'ATMOSPHERE: ' + styleRef + '. Tone: ' + tone + '.',
+    negRules ? 'STRICTLY FORBIDDEN: ' + negRules : '',
     '',
     'FORMAT: Portrait 9:16, 24fps, photorealistic, cinematic, high detail.',
     'No text, no subtitles, no watermarks, no music.',
     'Perfect continuity between the first frame, the interpolated motion, and the last frame.'
-  ].join(' ');
+  ].filter(Boolean).join(' ');
 }
 
 // ══════════════════════════════════════════════════════════════════
-// API FETCH avec backoff
+// API FETCH
 // ══════════════════════════════════════════════════════════════════
 async function apiFetch(url, options = {}, label = 'API', kind = 'default') {
   for (let attempt = 0; attempt < 7; attempt++) {
@@ -975,7 +1060,7 @@ function extractJson(text) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// AGNES — TEXT / IMAGE / VIDEO
+// AGNES
 // ══════════════════════════════════════════════════════════════════
 async function generateScenario(articleContent, sceneCount) {
   debugLog('ai', 'TEXT', 'Génération scénario (' + sceneCount + ' scènes)');
@@ -1090,7 +1175,7 @@ async function pollVideo(videoId, onProgress) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// QUEUE IMAGE (parallèle x3)
+// QUEUE IMAGE
 // ══════════════════════════════════════════════════════════════════
 function createRateLimitedQueue(maxConcurrent, minIntervalMs) {
   let running = 0, lastStart = 0;
@@ -1123,6 +1208,9 @@ function renderScenario() {
   const s = state.scenario;
   let html = '<div class="scenario-title">' + esc(s.title || 'Sans titre') + '</div>';
   if (s.logline) html += '<div class="scenario-meta">' + esc(s.logline) + '</div>';
+  const styleKey = $('visual-style').value;
+  const rulesKey = $('content-rules').value;
+  html += '<div class="scenario-meta">Style : ' + esc(VISUAL_STYLES[styleKey]?.label || '—') + ' · Règles : ' + esc(CONTENT_RULES[rulesKey]?.label || '—') + '</div>';
   s.scenes.forEach((sc, i) => {
     html += '<div class="scene-block" data-scene="' + i + '">';
     html += '<div class="scene-number">Scène ' + (i + 1) + ' / ' + s.scenes.length + '</div>';
@@ -1137,9 +1225,8 @@ function renderScenario() {
 function renderImagesGrid() {
   const grid = $('images-grid');
   if (!state.scenario) return;
-  const total = state.sceneCount;
   let html = '';
-  for (let i = 0; i < total; i++) {
+  for (let i = 0; i < state.sceneCount; i++) {
     const img = state.images[i];
     if (img && img.url) html += '<div class="image-card" data-img="' + i + '"><img src="' + img.url + '" alt=""><div class="img-label">Scène ' + (i+1) + '</div></div>';
     else html += '<div class="image-card loading" data-img="' + i + '">Scène ' + (i+1) + '</div>';
@@ -1189,7 +1276,7 @@ function addToGallery(videoUrl, sceneIndex) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PIPELINE COMPLET
+// PIPELINE
 // ══════════════════════════════════════════════════════════════════
 async function runScenarioPhase() {
   setPhase('text', '✍️ Écriture du scénario…', '');
@@ -1249,7 +1336,6 @@ async function runVideosPhase() {
     const item = state.videos[i];
     const firstFrame = state.images[i] ? state.images[i].url : null;
     const lastFrame = state.images[i+1] ? state.images[i+1].url : (state.images[i] ? state.images[i].url : null);
-    // Dernier clip : on utilise la même image en first et last (ou une image finale idéale)
     if (!firstFrame) { item.status = 'failed'; item.progress = 'Image manquante'; renderQueue(); continue; }
     const effectiveLast = lastFrame || firstFrame;
 
@@ -1306,6 +1392,8 @@ async function startGeneration() {
   state.stopRequested = false;
   state.sceneCount = parseInt($('scene-count-select').value, 10);
   state.durationFrames = parseInt($('duration-select').value, 10);
+  state.visualStyle = $('visual-style').value;
+  state.contentRules = $('content-rules').value;
   state.scenario = null;
   state.images = []; state.videos = []; state.imagePrompts = [];
 
@@ -1320,7 +1408,7 @@ async function startGeneration() {
 
   if (wakeLockEnabled) await activateWakeLock();
 
-  debugLog('state', 'START', 'Démarrage — ' + state.sceneCount + ' scènes');
+  debugLog('state', 'START', 'Démarrage — ' + state.sceneCount + ' scènes · ' + VISUAL_STYLES[state.visualStyle].label + ' · ' + CONTENT_RULES[state.contentRules].label);
   autoSave();
 
   const startTime = Date.now();
@@ -1352,11 +1440,11 @@ function stopGeneration() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// SYSTÈME DE SAUVEGARDE
+// SAUVEGARDE
 // ══════════════════════════════════════════════════════════════════
 function collectProjectData() {
   return {
-    version: 1,
+    version: 2,
     savedAt: new Date().toISOString(),
     name: state.projectName || 'Projet sans nom',
     articleContent: state.articleContent,
@@ -1365,6 +1453,7 @@ function collectProjectData() {
     settings: {
       tone: $('tone-select').value,
       visualStyle: $('visual-style').value,
+      contentRules: $('content-rules').value,
       sceneCount: parseInt($('scene-count-select').value, 10),
       durationFrames: parseInt($('duration-select').value, 10)
     },
@@ -1388,8 +1477,10 @@ function applyProjectData(data) {
   if (data.settings) {
     $('tone-select').value = data.settings.tone || 'documentary';
     $('visual-style').value = data.settings.visualStyle || 'photoreal';
+    $('content-rules').value = data.settings.contentRules || 'none';
     $('scene-count-select').value = data.settings.sceneCount || 5;
     $('duration-select').value = data.settings.durationFrames || 161;
+    updateStyleBadges();
   }
 
   $('article-content').value = state.articleContent;
@@ -1401,7 +1492,6 @@ function applyProjectData(data) {
     renderImagesGrid();
     state.images.forEach((img, i) => { if (img && img.url) updateImageCard(i, img.url); });
     renderQueue();
-    // Galerie
     $('gallery-grid').innerHTML = '';
     state.videos.forEach(v => { if (v.status === 'done' && v.videoUrl) addToGallery(v.videoUrl, v.index); });
     if (state.videos.some(v => v.status === 'done')) $('gallery').style.display = 'block';
@@ -1422,11 +1512,9 @@ function saveProjectNow() {
   data.name = name;
   data.id = 'proj_' + Date.now();
   const projects = getProjects();
-  // Remplacer si existe déjà par nom
   const existingIdx = projects.findIndex(p => p.name === name);
   if (existingIdx >= 0) projects[existingIdx] = data;
   else projects.unshift(data);
-  // Garder max 20 projets
   if (projects.length > 20) projects.length = 20;
   setProjects(projects);
   renderProjects();
@@ -1446,8 +1534,6 @@ function restoreAutoSave() {
     const data = JSON.parse(raw);
     if (data.scenario || data.articleContent) {
       debugLog('info', 'RESTORE', 'Session précédente trouvée');
-      // Ne pas écraser automatiquement — proposer à l'utilisateur
-      // (on peut l'afficher discrètement, ici on le log)
     }
   } catch(e){}
 }
@@ -1530,41 +1616,37 @@ function updateGenerateBtn() {
 // INIT
 // ══════════════════════════════════════════════════════════════════
 (function init() {
-  // API
   $('api-save-btn').addEventListener('click', saveApiKey);
   $('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
 
-  // Wake lock
   try { wakeLockEnabled = localStorage.getItem(WAKE_LOCK_PREF) === '1'; } catch(e){}
   if (wakeLockEnabled) activateWakeLock().then(() => updateWakeStatus());
   $('wake-toggle-btn').addEventListener('click', toggleWakeLock);
 
-  // Sections collapsibles
   document.querySelectorAll('[data-toggle]').forEach(h => {
     h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
   });
 
-  // RSS
   $('rss-topic').addEventListener('change', e => {
     $('custom-query-row').classList.toggle('hidden', e.target.value !== 'custom');
   });
   $('fetch-rss-btn').addEventListener('click', loadRssFeed);
 
-  // Article
   $('article-content').addEventListener('input', e => {
     state.articleContent = e.target.value;
     updateGenerateBtn();
   });
 
-  // Settings
+  // Style + règles : mise à jour du preview
+  $('visual-style').addEventListener('change', updateStyleBadges);
+  $('content-rules').addEventListener('change', updateStyleBadges);
+
   $('scene-count-select').addEventListener('change', e => { state.sceneCount = parseInt(e.target.value, 10); updateGenerateBtn(); });
   $('duration-select').addEventListener('change', e => { state.durationFrames = parseInt(e.target.value, 10); });
 
-  // Generate
   $('generate-btn').addEventListener('click', startGeneration);
   $('stop-btn').addEventListener('click', stopGeneration);
 
-  // Save / Export / Import
   $('project-name').addEventListener('input', e => { state.projectName = e.target.value; });
   $('save-project-btn').addEventListener('click', saveProjectNow);
   $('export-project-btn').addEventListener('click', exportProject);
@@ -1574,29 +1656,26 @@ function updateGenerateBtn() {
     e.target.value = '';
   });
 
-  // Debug
   $('debug-header').addEventListener('click', e => { if (e.target.tagName === 'BUTTON') return; toggleDebugCollapse(); });
   $('debug-collapse-btn').addEventListener('click', e => { e.stopPropagation(); toggleDebugCollapse(); });
   $('debug-clear-btn').addEventListener('click', e => { e.stopPropagation(); clearDebug(); });
   $('debug-copy-btn').addEventListener('click', e => { e.stopPropagation(); copyDebug(); });
 
-  // Auto-save timer
   setInterval(() => { if (!state.isRunning) autoSave(); }, AUTOSAVE_INTERVAL_MS);
   window.addEventListener('beforeunload', autoSave);
 
-  // Restore
   updateApiPanel();
   updateTimingDisplay();
   updateWakeStatus();
+  updateStyleBadges();
   renderNewsList();
   renderProjects();
   restoreAutoSave();
   updateGenerateBtn();
 
-  debugLog('success', 'INIT', 'Géo Studio prêt');
-  debugLog('info', 'INIT', 'Pipeline : RSS → Article → Scénario → Images → Vidéos');
-  debugLog('info', 'INIT', 'Modèles : ' + MODEL_TEXT + ' / ' + MODEL_IMAGE + ' / ' + MODEL_VIDEO);
-  debugLog('info', 'INIT', 'Auto-save toutes les ' + (AUTOSAVE_INTERVAL_MS/1000) + 's');
+  debugLog('success', 'INIT', 'Géo Studio prêt (v2 avec style + règles séparés)');
+  debugLog('info', 'INIT', 'Styles disponibles : ' + Object.keys(VISUAL_STYLES).length);
+  debugLog('info', 'INIT', 'Règles de contenu disponibles : ' + Object.keys(CONTENT_RULES).length);
 })();
 </script>
 </body>
