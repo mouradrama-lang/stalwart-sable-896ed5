@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Géo Studio — Actualité en Vidéo</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --night: #0a0a12; --night-2: #12121c; --night-3: #1a1a28;
+  --panel: #16161f; --panel-2: #1e1e2b; --border: #2a2a3a; --border-soft: #23232f;
+  --orange: #e87b35; --orange-soft: #f0a060; --orange-deep: #b85a1e;
+  --blue: #4a7bc8; --blue-soft: #6a9be0; --blue-deep: #2c4a80;
+  --yellow: #e5c15a; --yellow-soft: #f0d080; --yellow-deep: #b89a3a;
+  --purple: #8b5fc4; --purple-soft: #a880d8; --purple-deep: #5c3a8a;
+  --mint: #a8d8c8; --lavender: #c8b0e0;
+  --ink: #e8e6e0; --ink-dim: #8a8896; --ink-faint: #4a4858;
+  --success: #4a9d6a; --error: #c85a4a; --warn: #d4a017;
+  --radius: 4px;
+  --font-serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+body { font-family: var(--font-sans); background: var(--night); color: var(--ink);
+  min-height: 100vh; padding: 1.5rem 1rem 24rem; font-size: 15px; line-height: 1.55;
+  max-width: 900px; margin: 0 auto; }
+header { margin-bottom: 2rem; text-align: center; padding: 1rem 0 1.5rem; position: relative; }
+header::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 1px; background: linear-gradient(90deg, transparent, var(--orange), var(--yellow), var(--purple), transparent); opacity: 0.5; }
+.kata-mark { font-family: var(--font-serif); font-size: 0.75rem; letter-spacing: 0.4em; color: var(--yellow); text-transform: uppercase; margin-bottom: 0.6rem; opacity: 0.75; }
+h1 { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 300; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--orange) 0%, var(--yellow) 30%, var(--mint) 50%, var(--lavender) 75%, var(--purple) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.05; }
+.subtitle { font-family: var(--font-serif); font-size: 0.95rem; color: var(--ink-dim); font-style: italic; }
+.toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%) translateY(-120px); background: var(--night-3); color: var(--ink); border: 1px solid var(--border); border-left: 3px solid var(--yellow); padding: 0.85rem 1.4rem; border-radius: var(--radius); font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 1000; opacity: 0; transition: transform 0.35s, opacity 0.35s; max-width: 90vw; text-align: center; display: flex; gap: 0.6rem; }
+.toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--error); }
+.toast.warn { border-left-color: var(--warn); }
+.info-banner { background: linear-gradient(135deg, rgba(200,176,224,0.06), rgba(168,216,200,0.05)); border: 1px solid var(--border); border-left: 2px solid var(--lavender); padding: 1rem 1.15rem; border-radius: var(--radius); font-size: 0.8rem; color: var(--ink-dim); margin-bottom: 1.2rem; line-height: 1.6; }
+.info-banner strong { color: var(--ink); font-weight: 600; }
+.section { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; }
+.section.open { box-shadow: 0 0 0 1px rgba(229,193,90,0.05), 0 4px 20px rgba(0,0,0,0.3); }
+.section-header { padding: 1rem 1.2rem; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+.section-header:active { background: var(--panel-2); }
+.section-title { font-family: var(--font-serif); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink); font-weight: 500; display: flex; align-items: center; gap: 0.6rem; }
+.section-title .badge { display: inline-block; padding: 0.15rem 0.55rem; background: transparent; color: var(--yellow); border: 1px solid var(--yellow-deep); border-radius: 2px; font-size: 0.6rem; letter-spacing: 0.15em; font-weight: 600; }
+.section-title .badge.soft { color: var(--blue-soft); border-color: var(--blue-deep); }
+.section-title .badge.success { color: var(--orange-soft); border-color: var(--orange-deep); }
+.section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.3s; }
+.section.open .section-header .chevron { transform: rotate(180deg); color: var(--yellow); }
+.section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.section.open .section-body { max-height: 8000px; }
+.section-content { padding: 0 1.2rem 1.2rem; }
+.api-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+.api-panel.ok { box-shadow: inset 3px 0 0 var(--success); }
+.api-key-input { width: 100%; padding: 0.85rem 1rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-mono); font-size: 0.82rem; margin-bottom: 0.6rem; }
+.api-key-input:focus { outline: none; border-color: var(--blue); }
+.api-save-btn { width: 100%; padding: 0.85rem 1.2rem; border-radius: var(--radius); border: 1px solid var(--yellow-deep); background: linear-gradient(135deg, rgba(232,123,53,0.15), rgba(229,193,90,0.1)); color: var(--yellow-soft); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 0.7rem; }
+.api-status-line { font-size: 0.75rem; padding: 0.6rem 0.9rem; border-radius: var(--radius); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; background: var(--night-2); color: var(--ink-dim); border: 1px solid var(--border-soft); }
+.api-status-line.ok { background: rgba(74,157,106,0.08); color: var(--success); border-color: rgba(74,157,106,0.3); font-weight: 500; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; }
+.api-status-line.ok .status-dot { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.api-hint { font-size: 0.72rem; color: var(--ink-dim); margin-top: 0.5rem; }
+.api-hint a { color: var(--blue-soft); text-decoration: none; border-bottom: 1px dotted var(--blue-deep); }
+.stat-line { font-size: 0.72rem; color: var(--ink-dim); margin-top: 0.6rem; padding: 0.5rem 0.7rem; background: var(--night-2); border-radius: var(--radius); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem; border: 1px solid var(--border-soft); font-family: var(--font-mono); }
+.wake-status { font-size: 0.72rem; padding: 0.6rem 0.8rem; border-radius: var(--radius); margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center; background: rgba(74,123,200,0.08); color: var(--blue-soft); border: 1px solid var(--blue-deep); flex-wrap: wrap; gap: 0.5rem; }
+.wake-status.active { background: rgba(74,157,106,0.08); color: var(--success); border-color: rgba(74,157,106,0.3); }
+.wake-status.warn { background: rgba(212,160,23,0.08); color: var(--warn); border-color: rgba(212,160,23,0.3); }
+.wake-status button { background: transparent; border: 1px solid currentColor; color: inherit; padding: 0.3rem 0.7rem; border-radius: var(--radius); font-size: 0.68rem; cursor: pointer; }
+.theme-textarea, .rss-input { width: 100%; min-height: 60px; padding: 0.9rem 1rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.88rem; line-height: 1.5; resize: vertical; }
+.theme-textarea:focus, .rss-input:focus { outline: none; border-color: var(--lavender); }
+.control-row { margin-bottom: 1rem; }
+.control-label { display: block; font-size: 0.72rem; color: var(--ink-dim); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; }
+select { width: 100%; padding: 0.8rem 0.95rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink); font-family: var(--font-sans); font-size: 0.88rem; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 0.95rem center; background-size: 10px; cursor: pointer; }
+select:focus { outline: none; border-color: var(--blue); }
+select option { background: var(--night-3); color: var(--ink); }
+.btn-primary { width: 100%; padding: 1.2rem; border-radius: var(--radius); border: 1px solid var(--yellow-deep); background: linear-gradient(135deg, rgba(232,123,53,0.2), rgba(229,193,90,0.15), rgba(139,95,196,0.15)); color: var(--yellow-soft); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; margin-bottom: 1rem; }
+.btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
+.btn-secondary { width: 100%; padding: 0.85rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink-dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; cursor: pointer; margin-bottom: 0.6rem; text-transform: uppercase; }
+.btn-secondary:hover { color: var(--blue-soft); border-color: var(--blue-deep); }
+.btn-stop { width: 100%; padding: 0.9rem; border-radius: var(--radius); border: 1px solid var(--error); background: transparent; color: var(--error); font-size: 0.82rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; margin-bottom: 1rem; display: none; }
+.btn-stop.visible { display: block; }
+.btn-small { padding: 0.4rem 0.8rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink-dim); font-size: 0.7rem; cursor: pointer; font-family: inherit; }
+.btn-small:hover { color: var(--yellow-soft); border-color: var(--yellow-deep); }
+.phase-bar { background: var(--panel); border: 1px solid var(--border); border-left: 2px solid var(--purple); border-radius: var(--radius); padding: 0.9rem 1rem; margin-bottom: 1rem; display: none; }
+.phase-bar.visible { display: block; }
+.phase-steps { display: flex; gap: 0.4rem; margin-bottom: 0.7rem; flex-wrap: wrap; }
+.phase-step { flex: 1; min-width: 70px; padding: 0.5rem 0.6rem; border-radius: var(--radius); background: var(--night-2); border: 1px solid var(--border-soft); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; text-align: center; color: var(--ink-faint); font-weight: 600; }
+.phase-step.active { color: var(--yellow); border-color: var(--yellow-deep); background: rgba(229,193,90,0.06); }
+.phase-step.done { color: var(--success); border-color: rgba(74,157,106,0.3); background: rgba(74,157,106,0.05); }
+.phase-info { font-size: 0.75rem; font-family: var(--font-mono); color: var(--ink-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; }
+.news-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 400px; overflow-y: auto; margin-top: 0.8rem; }
+.news-item { padding: 0.75rem 0.9rem; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--night-2); cursor: pointer; transition: all 0.15s; }
+.news-item:hover { border-color: var(--yellow-deep); background: rgba(229,193,90,0.03); }
+.news-item.selected { border-color: var(--yellow); background: rgba(229,193,90,0.08); }
+.news-item .ni-title { font-family: var(--font-serif); font-size: 0.95rem; color: var(--ink); margin-bottom: 0.3rem; line-height: 1.3; }
+.news-item .ni-meta { font-size: 0.68rem; color: var(--ink-dim); font-family: var(--font-mono); display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.news-item .ni-source { color: var(--orange-soft); }
+.scenario-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+.scenario-title { font-family: var(--font-serif); font-size: 1.4rem; color: var(--lavender); margin-bottom: 0.5rem; text-align: center; }
+.scenario-meta { font-size: 0.72rem; color: var(--ink-dim); text-align: center; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; font-family: var(--font-mono); }
+.scene-block { border-left: 2px solid var(--border); padding-left: 0.9rem; margin-bottom: 0.9rem; }
+.scene-block.active { border-left-color: var(--yellow); }
+.scene-block.done { border-left-color: var(--success); }
+.scene-number { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); font-family: var(--font-mono); margin-bottom: 0.2rem; }
+.scene-dialogue { font-family: var(--font-serif); font-size: 1rem; font-style: italic; color: var(--yellow-soft); line-height: 1.5; padding: 0.4rem 0.7rem; background: rgba(229,193,90,0.04); border-left: 2px solid var(--yellow-deep); border-radius: 2px; margin: 0.4rem 0; }
+.scene-dialogue .speaker-name { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--lavender); font-style: normal; font-weight: 600; display: block; margin-bottom: 0.2rem; }
+.scene-action { font-size: 0.72rem; color: var(--ink-dim); margin-top: 0.3rem; }
+.images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.6rem; margin-top: 1.2rem; }
+.image-card { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--night-2); position: relative; aspect-ratio: 9/16; }
+.image-card.loading { display: flex; align-items: center; justify-content: center; color: var(--ink-faint); font-size: 0.65rem; font-family: var(--font-mono); }
+.image-card.loading::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(229,193,90,0.08) 50%, transparent 70%); animation: shimmer 1.8s linear infinite; }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.image-card .img-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.3rem 0.5rem; background: linear-gradient(transparent, rgba(10,10,18,0.9)); font-size: 0.6rem; font-family: var(--font-mono); color: var(--yellow-soft); letter-spacing: 0.1em; text-transform: uppercase; }
+.queue { margin-top: 1.2rem; }
+.queue-summary { background: var(--panel); border: 1px solid var(--border); border-left: 2px solid var(--purple); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 0.7rem; font-size: 0.78rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-family: var(--font-mono); }
+.queue-summary .progress-text { color: var(--yellow); font-weight: 600; }
+.queue-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.75rem 0.9rem; border-radius: var(--radius); border: 1px solid var(--border-soft); margin-bottom: 0.4rem; background: var(--panel); font-size: 0.82rem; }
+.queue-item.pending { opacity: 0.45; }
+.queue-item.creating { border-color: var(--warn); }
+.queue-item.processing { border-color: var(--blue); }
+.queue-item.done { border-color: var(--success); }
+.queue-item.failed { border-color: var(--error); }
+.queue-item .q-icon { font-size: 1rem; width: 1.5rem; text-align: center; flex-shrink: 0; }
+.queue-item .q-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-serif); }
+.queue-item .q-status { font-size: 0.7rem; color: var(--ink-dim); text-align: right; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); }
+.gallery { margin-top: 1.8rem; }
+.gallery-title { font-family: var(--font-serif); font-size: 1.1rem; color: var(--ink); margin-bottom: 1rem; letter-spacing: 0.15em; text-transform: uppercase; text-align: center; padding-bottom: 0.8rem; position: relative; }
+.gallery-title::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--yellow), transparent); }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.9rem; }
+.gallery-item { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: #000; }
+.gallery-item video { width: 100%; display: block; aspect-ratio: 9/16; object-fit: cover; }
+.gallery-item .g-caption { padding: 0.6rem 0.7rem; background: var(--panel); display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid var(--border); }
+.gallery-item .g-caption strong { font-family: var(--font-serif); color: var(--yellow-soft); font-size: 0.82rem; font-weight: 500; }
+.gallery-item .g-caption span { font-size: 0.6rem; opacity: 0.65; letter-spacing: 0.12em; text-transform: uppercase; }
+.save-panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.3rem; margin-bottom: 1rem; }
+.save-panel h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-dim); margin-bottom: 0.7rem; font-weight: 600; }
+.project-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 300px; overflow-y: auto; margin-top: 0.6rem; }
+.project-item { padding: 0.6rem 0.8rem; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--night-2); display: flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; }
+.project-item .pi-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-serif); color: var(--ink); }
+.project-item .pi-date { font-size: 0.65rem; color: var(--ink-faint); font-family: var(--font-mono); flex-shrink: 0; }
+.status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--night-3); border-top: 1px solid var(--border); color: var(--ink); padding: 0.85rem 1.1rem; font-size: 0.78rem; display: flex; align-items: center; gap: 0.7rem; transform: translateY(100%); transition: transform 0.35s; z-index: 100; font-family: var(--font-mono); }
+.status-bar.visible { transform: translateY(0); }
+.status-bar .spinner { width: 12px; height: 12px; border: 2px solid rgba(229,193,90,0.2); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.debug-panel { position: fixed; bottom: 0; left: 0; right: 0; height: 240px; background: #05050a; border-top: 2px solid var(--yellow-deep); z-index: 200; display: flex; flex-direction: column; font-family: var(--font-mono); transition: height 0.3s; }
+.debug-panel.collapsed { height: 36px; }
+.debug-header { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.8rem; background: linear-gradient(90deg, #0f0f18, #1a1a28); border-bottom: 1px solid var(--border); flex-shrink: 0; cursor: pointer; user-select: none; }
+.debug-title { font-size: 0.72rem; color: var(--yellow); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+.debug-badge { font-size: 0.6rem; padding: 0.1rem 0.4rem; background: var(--yellow); color: var(--night); border-radius: 2px; font-weight: 700; }
+.debug-actions { display: flex; gap: 0.3rem; }
+.debug-actions button { background: transparent; border: 1px solid var(--border); color: var(--ink-dim); font-size: 0.62rem; padding: 0.25rem 0.55rem; border-radius: 2px; cursor: pointer; }
+.debug-actions button:hover { color: var(--yellow); border-color: var(--yellow-deep); }
+.debug-body { flex: 1; overflow-y: auto; padding: 0.5rem 0.7rem 1rem; font-size: 0.72rem; line-height: 1.45; color: #c8c8d0; }
+.debug-entry { margin-bottom: 0.3rem; padding: 0.25rem 0.4rem; border-left: 2px solid transparent; word-break: break-word; }
+.debug-entry.info { border-left-color: var(--ink-faint); }
+.debug-entry.success { border-left-color: var(--success); background: rgba(74,157,106,0.04); }
+.debug-entry.warn { border-left-color: var(--warn); background: rgba(212,160,23,0.04); }
+.debug-entry.error { border-left-color: var(--error); background: rgba(200,90,74,0.06); color: #f0a0a0; }
+.debug-entry.api { border-left-color: var(--blue); background: rgba(74,123,200,0.04); }
+.debug-entry.response { border-left-color: var(--purple); }
+.debug-entry.state { border-left-color: var(--orange); }
+.debug-entry.ai { border-left-color: var(--lavender); }
+.debug-time { color: var(--ink-faint); margin-right: 0.5rem; font-size: 0.65rem; }
+.debug-cat { color: var(--yellow-soft); font-weight: 600; margin-right: 0.4rem; font-size: 0.65rem; }
+.debug-data { margin-top: 0.3rem; padding: 0.4rem 0.5rem; background: #0a0a12; border: 1px solid var(--border-soft); font-size: 0.68rem; color: #a8d8b0; max-height: 180px; overflow: auto; white-space: pre-wrap; word-break: break-all; line-height: 1.4; }
+#noSleepCanvas { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+#noSleepVideo { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1; }
+.hidden { display: none !important; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--night-2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+@media (max-width: 480px) {
+  h1 { font-size: 2rem; }
+  body { padding-bottom: 22rem; }
+  .debug-panel { height: 200px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kata-mark">Géo · Studio</div>
+  <h1>Géo Studio</h1>
+  <p class="subtitle">Actualité géopolitique → Film vidéo généré par IA</p>
+</header>
+
+<div class="info-banner">
+  <strong>Pipeline :</strong> flux RSS Google Actualités → sélection d'un article → scénario IA → images clés → vidéos en chaîne.
+  Toutes les générations utilisent <strong>Agnes AI</strong> (text / image / video).
+  Les projets sont <strong>sauvegardés automatiquement</strong> et exportables en JSON.
+</div>
+
+<div class="api-panel" id="api-panel">
+  <input type="password" class="api-key-input" id="api-key-input" placeholder="Collez votre clé API Agnes (sk-...)" autocomplete="off">
+  <button type="button" class="api-save-btn" id="api-save-btn">Enregistrer la clé</button>
+  <div class="api-status-line" id="api-status-line"><span class="status-dot"></span><span id="api-status-text">Aucune clé API</span></div>
+  <div class="api-hint">Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> → Settings → API Keys</div>
+  <div class="stat-line"><span>📊 Vitesse vidéo : <span id="stat-speed">en attente</span></span><span id="stat-samples">0 génération</span></div>
+  <div class="wake-status" id="wake-status"><span id="wake-status-text">💤 Veille automatique</span><button type="button" id="wake-toggle-btn">Garder l'écran allumé</button></div>
+</div>
+
+<!-- SECTION 1 : FLUX RSS -->
+<div class="section open" id="section-rss">
+  <div class="section-header" data-toggle="section-rss">
+    <span class="section-title">📰 Source d'actualité <span class="badge">RSS Google News</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="control-row">
+      <label class="control-label">Thème géopolitique</label>
+      <select id="rss-topic">
+        <option value="geopolitics">🌍 Géopolitique générale</option>
+        <option value="world">🌐 Monde (World)</option>
+        <option value="war+ukraine">⚔️ Guerre Ukraine</option>
+        <option value="middle+east">🕌 Moyen-Orient</option>
+        <option value="china+taiwan">🇨🇳 Chine / Taïwan</option>
+        <option value="nato">🛡️ OTAN</option>
+        <option value="africa+conflict">🌍 Afrique / Conflits</option>
+        <option value="energy+geopolitics">⛽ Énergie / Géopolitique</option>
+        <option value="custom">✏️ Requête personnalisée</option>
+      </select>
+    </div>
+    <div class="control-row hidden" id="custom-query-row">
+      <label class="control-label">Requête personnalisée</label>
+      <input type="text" class="rss-input" id="custom-query" placeholder="ex: iran nuclear talks">
+    </div>
+    <div class="control-row">
+      <label class="control-label">Langue / Région</label>
+      <select id="rss-lang">
+        <option value="fr-FR">🇫🇷 Français (France)</option>
+        <option value="en-US">🇺🇸 English (US)</option>
+        <option value="en-GB">🇬🇧 English (UK)</option>
+        <option value="ar-EG">🇪🇬 العربية</option>
+      </select>
+    </div>
+    <button type="button" class="btn-secondary" id="fetch-rss-btn">📥 Charger les actualités</button>
+    <div class="news-list" id="news-list"></div>
+  </div></div>
+</div>
+
+<!-- SECTION 2 : ARTICLE SÉLECTIONNÉ -->
+<div class="section" id="section-article">
+  <div class="section-header" data-toggle="section-article">
+    <span class="section-title">📄 Article sélectionné <span class="badge soft">contexte</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <textarea class="theme-textarea" id="article-content" placeholder="Sélectionnez un article ci-dessus, ou collez/écrivez directement le contexte ici..."></textarea>
+  </div></div>
+</div>
+
+<!-- SECTION 3 : STYLE -->
+<div class="section open" id="section-style">
+  <div class="section-header" data-toggle="section-style">
+    <span class="section-title">🎨 Style visuel du reportage</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="control-row">
+      <label class="control-label">Ton du reportage</label>
+      <select id="tone-select">
+        <option value="factual">📊 Factuel & analytique</option>
+        <option value="documentary" selected>🎥 Documentaire sérieux</option>
+        <option value="urgent">⚡ Urgent / Breaking news</option>
+        <option value="analytical">🔍 Analyse géopolitique</option>
+        <option value="poetic">🌍 Poétique et contemplatif</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Style visuel</label>
+      <select id="visual-style">
+        <option value="photoreal">📷 Photoréaliste / reportage</option>
+        <option value="cinematic">🎬 Cinématique (type Villeneuve)</option>
+        <option value="graphic">📊 Graphique / infographique</option>
+        <option value="illustrated">🖌️ Illustré (carte postale)</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Nombre de scènes</label>
+      <select id="scene-count-select">
+        <option value="3">3 scènes (~20s)</option>
+        <option value="5" selected>5 scènes (~35s)</option>
+        <option value="8">8 scènes (~55s)</option>
+        <option value="10">10 scènes (~70s)</option>
+      </select>
+    </div>
+    <div class="control-row">
+      <label class="control-label">Durée par clip</label>
+      <select id="duration-select">
+        <option value="121">5 secondes (121 frames)</option>
+        <option value="161" selected>6,5 secondes (161 frames)</option>
+        <option value="241">10 secondes (241 frames)</option>
+      </select>
+    </div>
+  </div></div>
+</div>
+
+<button type="button" class="btn-primary" id="generate-btn" disabled>Générer le reportage vidéo</button>
+<button type="button" class="btn-stop" id="stop-btn">⏹ Arrêter la génération</button>
+
+<div class="phase-bar" id="phase-bar">
+  <div class="phase-steps">
+    <div class="phase-step" data-phase="text">1 · Scénario</div>
+    <div class="phase-step" data-phase="images">2 · Images</div>
+    <div class="phase-step" data-phase="videos">3 · Vidéos</div>
+    <div class="phase-step" data-phase="done">4 · Terminé</div>
+  </div>
+  <div class="phase-info"><span id="phase-detail">En attente</span><span id="phase-eta"></span></div>
+</div>
+
+<!-- SECTION 4 : SAUVEGARDE -->
+<div class="section" id="section-save">
+  <div class="section-header" data-toggle="section-save">
+    <span class="section-title">💾 Sauvegardes <span class="badge success" id="save-count-badge">0</span></span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="section-body"><div class="section-content">
+    <div class="control-row">
+      <label class="control-label">Nom du projet</label>
+      <input type="text" class="rss-input" id="project-name" placeholder="ex: Crise Taïwan 2026">
+    </div>
+    <button type="button" class="btn-secondary" id="save-project-btn">💾 Sauvegarder maintenant</button>
+    <button type="button" class="btn-secondary" id="export-project-btn">📤 Exporter en JSON</button>
+    <button type="button" class="btn-secondary" id="import-project-btn">📥 Importer un JSON</button>
+    <input type="file" accept=".json" id="import-file-input" style="display:none">
+    <div class="project-list" id="project-list"></div>
+  </div></div>
+</div>
+
+<div class="scenario-panel" id="scenario-panel" style="display:none;margin-top:1.5rem;">
+  <div class="scenario-card" id="scenario-card"></div>
+  <div class="images-grid" id="images-grid"></div>
+</div>
+
+<div class="queue" id="queue" style="display:none;"></div>
+
+<div class="gallery" id="gallery" style="display:none;">
+  <div class="gallery-title">Reportage</div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+
+<div class="debug-panel" id="debug-panel">
+  <div class="debug-header" id="debug-header">
+    <div class="debug-title">🖥️ Console <span class="debug-badge" id="debug-count">0</span></div>
+    <div class="debug-actions">
+      <button type="button" id="debug-copy-btn">Copier</button>
+      <button type="button" id="debug-clear-btn">Effacer</button>
+      <button type="button" id="debug-collapse-btn">−</button>
+    </div>
+  </div>
+  <div class="debug-body" id="debug-body"></div>
+</div>
+
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG — identique aux codes sources validés
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+
+const TEXT_TEMPERATURE = 0.8;
+const TEXT_MAX_TOKENS = 8000;
+
+const IMAGE_PARALLEL = 3;
+const IMAGE_INTERVAL_MS = 3400;
+
+const VIDEO_INTERVAL_MIN = 62000;
+const VIDEO_INTERVAL_MAX = 90000;
+const VIDEO_INTERVAL_SAFE = 75000;
+
+const VIDEO_FIRST_POLL_DELAY_SEC = 80;
+const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
+const VIDEO_MAX_POLL_ATTEMPTS = 100;
+
+const TIMING_CACHE_KEY = 'geo_studio_timing_v1';
+const API_KEY_STORAGE = 'agnes_api_key';
+const WAKE_LOCK_PREF = 'agnes_wakelock_enabled';
+const PROJECTS_STORAGE = 'geo_studio_projects_v1';
+const AUTOSAVE_STORAGE = 'geo_studio_autosave_v1';
+const AUTOSAVE_INTERVAL_MS = 15000;
+
+const DEBUG_MAX_ENTRIES = 600;
+
+// ══════════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  rssArticles: [],
+  selectedArticle: null,
+  articleContent: '',
+  tone: 'documentary',
+  visualStyle: 'photoreal',
+  sceneCount: 5,
+  durationFrames: 161,
+  isRunning: false,
+  stopRequested: false,
+  phase: 'idle',
+  scenario: null,
+  imagePrompts: [],
+  images: [],
+  videos: [],
+  projectName: '',
+  currentProjectId: null
+};
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const formatEta = sec => { if (sec < 60) return Math.round(sec)+'s'; const m = Math.floor(sec/60), s = Math.round(sec%60); return m+'m'+(s>0?' '+s+'s':''); };
+
+// ══════════════════════════════════════════════════════════════════
+// DEBUG
+// ══════════════════════════════════════════════════════════════════
+let debugCount = 0, debugEntries = [], debugCollapsed = false;
+function debugLog(level, category, message, data) {
+  const body = $('debug-body');
+  if (!body) return;
+  const time = new Date().toLocaleTimeString('fr-FR', {hour12:false});
+  const entry = document.createElement('div');
+  entry.className = 'debug-entry ' + level;
+  let html = '<span class="debug-time">'+time+'</span><span class="debug-cat">['+esc(category)+']</span><span>'+esc(message)+'</span>';
+  if (data !== undefined && data !== null) {
+    let ds; try { ds = typeof data === 'string' ? data : JSON.stringify(data, null, 2); } catch(e){ ds = String(data); }
+    if (ds.length > 4000) ds = ds.slice(0, 4000) + '\n…[tronqué]';
+    html += '<pre class="debug-data">'+esc(ds)+'</pre>';
+  }
+  entry.innerHTML = html;
+  body.appendChild(entry);
+  debugEntries.push({time, level, category, message});
+  if (debugEntries.length > DEBUG_MAX_ENTRIES) debugEntries.shift();
+  while (body.children.length > DEBUG_MAX_ENTRIES) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+  debugCount++;
+  $('debug-count').textContent = debugCount;
+  console.log('[Géo Studio]', category, message);
+}
+function clearDebug() {
+  $('debug-body').innerHTML = '';
+  debugEntries = []; debugCount = 0;
+  $('debug-count').textContent = '0';
+}
+function copyDebug() {
+  const lines = debugEntries.map(e => e.time + ' [' + e.category + '] ' + e.message).join('\n');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(lines).then(() => showToast('Console copiée', 'success')).catch(() => legacyCopy(lines));
+  } else legacyCopy(lines);
+}
+function legacyCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); showToast('Console copiée', 'success'); } catch(e){ showToast('Copie impossible', 'error'); }
+  document.body.removeChild(ta);
+}
+function toggleDebugCollapse() {
+  debugCollapsed = !debugCollapsed;
+  $('debug-panel').classList.toggle('collapsed', debugCollapsed);
+  $('debug-collapse-btn').textContent = debugCollapsed ? '+' : '−';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════
+let toastTimeout = null;
+function showToast(message, type='success', duration=2500) {
+  const toast = $('toast'), icon = $('toast-icon'), text = $('toast-text');
+  toast.classList.remove('visible','success','error','warn');
+  void toast.offsetWidth;
+  const icons = {success:'✓',error:'✕',warn:'⚠'};
+  icon.textContent = icons[type] || '✓';
+  text.textContent = message;
+  toast.classList.add(type);
+  requestAnimationFrame(() => toast.classList.add('visible'));
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('visible'), duration);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// STATUS BAR
+// ══════════════════════════════════════════════════════════════════
+function setStatus(text) {
+  const bar = $('status-bar'), txt = $('status-text');
+  if (text) { bar.classList.add('visible'); txt.textContent = text; }
+  else bar.classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PHASE BAR
+// ══════════════════════════════════════════════════════════════════
+function setPhase(phase, detail, eta) {
+  state.phase = phase;
+  $('phase-bar').classList.add('visible');
+  document.querySelectorAll('.phase-step').forEach(el => {
+    el.classList.remove('active', 'done');
+    const order = ['text', 'images', 'videos', 'done'];
+    const curIdx = order.indexOf(phase);
+    const elIdx = order.indexOf(el.dataset.phase);
+    if (elIdx < curIdx) el.classList.add('done');
+    else if (elIdx === curIdx) el.classList.add('active');
+  });
+  $('phase-detail').innerHTML = detail || '';
+  $('phase-eta').textContent = eta || '';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// WAKE LOCK (identique aux codes sources)
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel = null, wakeLockEnabled = false, canvasStream = null, canvasInterval = null;
+const isWakeLockSupported = () => 'wakeLock' in navigator && typeof navigator.wakeLock.request === 'function';
+
+async function activateWakeLock() {
+  let success = false;
+  if (isWakeLockSupported()) {
+    try { wakeLockSentinel = await navigator.wakeLock.request('screen'); success = true;
+      wakeLockSentinel.addEventListener('release', () => { wakeLockSentinel = null; updateWakeStatus(); });
+    } catch(e){}
+  }
+  if (!success) {
+    try {
+      const canvas = $('noSleepCanvas'), video = $('noSleepVideo');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 2, 2);
+      if (typeof canvas.captureStream === 'function') {
+        canvasStream = canvas.captureStream(1);
+        let t = false;
+        canvasInterval = setInterval(() => { t = !t; ctx.fillStyle = t ? '#000' : '#010101'; ctx.fillRect(0,0,2,2); }, 1000);
+        video.srcObject = canvasStream; video.muted = true; video.playsInline = true;
+        video.play().catch(() => {}); success = true;
+      }
+    } catch(e){}
+  }
+  return success;
+}
+async function deactivateWakeLock() {
+  if (wakeLockSentinel) { try { await wakeLockSentinel.release(); } catch(e){} wakeLockSentinel = null; }
+  if (canvasInterval) { clearInterval(canvasInterval); canvasInterval = null; }
+  const v = $('noSleepVideo');
+  if (v) { try { v.pause(); v.srcObject = null; } catch(e){} }
+  if (canvasStream) { try { canvasStream.getTracks().forEach(t => t.stop()); } catch(e){} canvasStream = null; }
+}
+function updateWakeStatus() {
+  const el = $('wake-status'), txt = $('wake-status-text'), btn = $('wake-toggle-btn');
+  el.classList.remove('active', 'warn');
+  const isActive = wakeLockSentinel !== null || canvasStream !== null;
+  if (wakeLockEnabled && isActive) { el.classList.add('active'); txt.textContent = '✅ Écran allumé'; btn.textContent = 'Désactiver'; }
+  else if (wakeLockEnabled && !isActive) { el.classList.add('warn'); txt.textContent = '⏳ En attente'; btn.textContent = 'Désactiver'; }
+  else { txt.textContent = '💤 Veille automatique'; btn.textContent = 'Garder l\'écran allumé'; }
+}
+async function toggleWakeLock() {
+  if (wakeLockEnabled) { wakeLockEnabled = false; await deactivateWakeLock(); try { localStorage.setItem(WAKE_LOCK_PREF, '0'); } catch(e){} showToast('Veille auto', 'warn'); }
+  else { wakeLockEnabled = true; const ok = await activateWakeLock(); try { localStorage.setItem(WAKE_LOCK_PREF, '1'); } catch(e){} showToast(ok ? 'Écran allumé' : 'Activez manuellement', ok ? 'success' : 'warn'); }
+  updateWakeStatus();
+}
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && wakeLockEnabled) { await activateWakeLock(); updateWakeStatus(); }
+});
+
+// ══════════════════════════════════════════════════════════════════
+// TIMING CACHE
+// ══════════════════════════════════════════════════════════════════
+function loadTimingCache() { try { return JSON.parse(localStorage.getItem(TIMING_CACHE_KEY) || '{}'); } catch(e){ return {}; } }
+function saveTimingCache(c) { try { localStorage.setItem(TIMING_CACHE_KEY, JSON.stringify(c)); } catch(e){} }
+function recordGenerationTime(key, ms) {
+  const c = loadTimingCache();
+  if (!c[key]) c[key] = [];
+  c[key].push(ms);
+  if (c[key].length > 10) c[key] = c[key].slice(-10);
+  saveTimingCache(c); updateTimingDisplay();
+}
+function estimateGenerationTime(key, fallbackMs) {
+  const c = loadTimingCache();
+  const s = c[key];
+  if (s && s.length > 0) {
+    const sorted = [...s].sort((a,b) => a-b);
+    const mid = Math.floor(sorted.length/2);
+    return sorted.length % 2 === 0 ? (sorted[mid-1]+sorted[mid])/2 : sorted[mid];
+  }
+  return fallbackMs;
+}
+function updateTimingDisplay() {
+  const c = loadTimingCache();
+  const v = c['video'] || [];
+  if (v.length === 0) { $('stat-speed').textContent = 'en attente'; $('stat-samples').textContent = '0 génération'; return; }
+  const avg = v.reduce((a,b) => a+b, 0) / v.length;
+  $('stat-speed').textContent = (avg/1000).toFixed(1) + ' s moyenne';
+  $('stat-samples').textContent = v.length + ' génération' + (v.length > 1 ? 's' : '');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API KEY
+// ══════════════════════════════════════════════════════════════════
+function getApiKey() { try { return (localStorage.getItem(API_KEY_STORAGE) || '').trim(); } catch(e){ return ''; } }
+function saveApiKey() {
+  const input = $('api-key-input');
+  const key = input.value.trim();
+  try {
+    if (key) localStorage.setItem(API_KEY_STORAGE, key);
+    else localStorage.removeItem(API_KEY_STORAGE);
+  } catch(e){}
+  updateApiPanel();
+  showToast(key ? 'Clé enregistrée' : 'Clé supprimée', key ? 'success' : 'warn');
+}
+function updateApiPanel() {
+  const key = getApiKey();
+  if (key) {
+    $('api-panel').classList.add('ok');
+    $('api-status-line').classList.add('ok');
+    $('api-status-text').textContent = 'Clé active · ' + key.slice(0,7) + '…' + key.slice(-4);
+    $('api-key-input').value = key;
+  } else {
+    $('api-panel').classList.remove('ok');
+    $('api-status-line').classList.remove('ok');
+    $('api-status-text').textContent = 'Aucune clé API';
+    $('api-key-input').value = '';
+  }
+  updateGenerateBtn();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RSS — Lecture via proxies CORS
+// ══════════════════════════════════════════════════════════════════
+function buildRssUrl() {
+  const topic = $('rss-topic').value;
+  const customQuery = $('custom-query').value.trim();
+  const lang = $('rss-lang').value;
+  const [hl, gl_ceid] = [lang.split('-')[0], lang.replace('-', ':')];
+
+  const query = topic === 'custom' ? (customQuery || 'geopolitics') : topic;
+  const encoded = encodeURIComponent(query);
+  return `https://news.google.com/rss/search?q=${encoded}&hl=${hl}&gl=${gl_ceid.split(':')[0]}&ceid=${gl_ceid}`;
+}
+
+async function fetchRssWithProxy(rssUrl) {
+  const proxies = [
+    (u) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(u)}`,
+    (u) => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+    (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`
+  ];
+
+  for (let i = 0; i < proxies.length; i++) {
+    const proxiedUrl = proxies[i](rssUrl);
+    debugLog('api', 'RSS', 'Tentative proxy ' + (i+1) + ' : ' + proxies[i](rssUrl).slice(0, 80) + '…');
+    try {
+      const res = await fetch(proxiedUrl);
+      if (!res.ok) { debugLog('warn', 'RSS', 'Proxy ' + (i+1) + ' HTTP ' + res.status); continue; }
+      const data = await res.json();
+
+      // rss2json format
+      if (data.items && Array.isArray(data.items)) {
+        return data.items.map(it => ({
+          title: it.title || '',
+          link: it.link || '',
+          pubDate: it.pubDate || '',
+          source: it.author || (it.title && it.title.split(' - ').pop()) || 'Google News',
+          description: it.description || ''
+        }));
+      }
+      // allorigins / corsproxy format (raw XML)
+      const xml = data.contents || (typeof data === 'string' ? data : null);
+      if (xml) {
+        const parsed = parseRssXml(xml);
+        if (parsed.length > 0) return parsed;
+      }
+    } catch(e) {
+      debugLog('warn', 'RSS', 'Proxy ' + (i+1) + ' : ' + e.message);
+    }
+  }
+  throw new Error('Tous les proxies RSS ont échoué');
+}
+
+function parseRssXml(xml) {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, 'text/xml');
+    const items = doc.querySelectorAll('item');
+    const result = [];
+    items.forEach(item => {
+      const title = item.querySelector('title')?.textContent || '';
+      const link = item.querySelector('link')?.textContent || '';
+      const pubDate = item.querySelector('pubDate')?.textContent || '';
+      const source = item.querySelector('source')?.textContent || 'Google News';
+      const description = item.querySelector('description')?.textContent || '';
+      if (title) result.push({ title, link, pubDate, source, description });
+    });
+    return result;
+  } catch(e) { debugLog('error', 'RSS', 'Parse XML échoué : ' + e.message); return []; }
+}
+
+async function loadRssFeed() {
+  const url = buildRssUrl();
+  debugLog('state', 'RSS', 'Chargement : ' + url);
+  setStatus('Chargement des actualités…');
+  try {
+    const articles = await fetchRssWithProxy(url);
+    state.rssArticles = articles.slice(0, 30);
+    renderNewsList();
+    debugLog('success', 'RSS', articles.length + ' articles chargés');
+    showToast(articles.length + ' articles chargés', 'success');
+  } catch(e) {
+    debugLog('error', 'RSS', e.message);
+    showToast('Erreur RSS : ' + e.message.slice(0,60), 'error', 4000);
+  } finally {
+    setStatus(null);
+  }
+}
+
+function renderNewsList() {
+  const list = $('news-list');
+  if (state.rssArticles.length === 0) {
+    list.innerHTML = '<div style="padding:1rem;color:var(--ink-faint);font-size:0.75rem;text-align:center;">Aucun article chargé. Cliquez sur "Charger les actualités".</div>';
+    return;
+  }
+  list.innerHTML = state.rssArticles.map((a, i) => {
+    const isSelected = state.selectedArticle && state.selectedArticle.link === a.link;
+    return `<div class="news-item ${isSelected ? 'selected' : ''}" data-idx="${i}">
+      <div class="ni-title">${esc(a.title)}</div>
+      <div class="ni-meta">
+        <span class="ni-source">${esc(a.source)}</span>
+        <span>${esc(a.pubDate ? new Date(a.pubDate).toLocaleString('fr-FR') : '')}</span>
+      </div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.news-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.idx, 10);
+      state.selectedArticle = state.rssArticles[idx];
+      const content = `Titre : ${state.selectedArticle.title}\nSource : ${state.selectedArticle.source}\nDate : ${state.selectedArticle.pubDate}\n\nRésumé : ${state.selectedArticle.description || '(pas de description)'}\n\nLien : ${state.selectedArticle.link}`;
+      state.articleContent = content;
+      $('article-content').value = content;
+      renderNewsList();
+      updateGenerateBtn();
+      // Auto-remplir le nom du projet
+      if (!$('project-name').value) {
+        $('project-name').value = state.selectedArticle.title.slice(0, 50);
+        state.projectName = $('project-name').value;
+      }
+      debugLog('state', 'ARTICLE', 'Sélectionné : ' + state.selectedArticle.title);
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPTS
+// ══════════════════════════════════════════════════════════════════
+function buildStyleReference() {
+  const style = $('visual-style').value;
+  const styles = {
+    photoreal: 'photorealistic documentary photography, natural light, 35mm, cinematic composition, realistic detail',
+    cinematic: 'cinematic film style like Denis Villeneuve, monumental architecture, muted palette, atmospheric, 35mm film grain',
+    graphic: 'graphic design infographic style, bold shapes, data visualization, clean modern editorial illustration',
+    illustrated: 'painterly illustrated editorial style, warm palette, elegant hand-drawn quality, magazine illustration'
+  };
+  return styles[style] || styles.photoreal;
+}
+
+function buildScenarioPrompt(articleContent, sceneCount) {
+  const tone = $('tone-select').value;
+  const styleRef = buildStyleReference();
+  const duration = state.durationFrames / FRAME_RATE;
+  const toneLabel = {
+    factual: 'factual, analytical, informative',
+    documentary: 'serious documentary narration, contemplative, journalistic',
+    urgent: 'urgent breaking news, tension, immediacy',
+    analytical: 'geopolitical analysis, strategic thinking, measured',
+    poetic: 'poetic, contemplative, humanist'
+  }[tone];
+
+  return [
+    'You are a screenwriter and visual director creating a short geopolitical news video report.',
+    '',
+    'SOURCE NEWS:',
+    articleContent,
+    '',
+    'VISUAL STYLE: ' + styleRef,
+    'TONE: ' + toneLabel,
+    '',
+    'ABSOLUTE RULES:',
+    '- NO MUSIC. Only natural ambient sound and subtle sound design.',
+    '- The film is composed of ' + sceneCount + ' sequential scenes forming ONE continuous narrative.',
+    '- Each scene lasts ' + duration.toFixed(1) + ' seconds. Total film: ~' + (sceneCount * duration).toFixed(0) + ' seconds.',
+    '- ABSOLUTE CONTINUITY: The last frame of scene N must visually match the first frame of scene N+1.',
+    '- Camera movements are slow, cinematic, purposeful.',
+    '- The visuals must be respectful and neutral — no graphic violence, no sensitive imagery.',
+    '- Format portrait 9:16. No on-screen text.',
+    '',
+    'CRITICAL JSON RULES:',
+    '- All strings on ONE LINE. No real line breaks inside strings.',
+    '- Escape double quotes as \\". No trailing commas. No markdown.',
+    '',
+    'OUTPUT SCHEMA (return ONLY this JSON):',
+    '{',
+    '  "title": "short journalistic title",',
+    '  "logline": "one sentence summary",',
+    '  "scenes": [',
+    '    {',
+    '      "scene_number": 1,',
+    '      "image_prompt": "detailed visual description for the keyframe, describing exact composition, subjects, setting, lighting, camera angle",',
+    '      "action_prompt": "continuous camera movement and subtle motion during this scene, no cuts",',
+    '      "narration": "short narration text in French, 8 words MAX, journalistic and precise"',
+    '    }',
+    '    ... exactly ' + sceneCount + ' scenes ...',
+    '  ]',
+    '}',
+    '',
+    'Each image_prompt must be visually descriptive and respectful.',
+    'Each narration line must be short (8 words max), factual, and in French.',
+    'Narration is a voice-over read over the video, not a character speaking on screen.'
+  ].join('\n');
+}
+
+function buildImageGenerationPrompt(basePrompt, index, total) {
+  return [
+    buildStyleReference(),
+    '',
+    'FRAME ' + (index + 1) + ' OF ' + total + ' — KEY CHAIN FRAME.',
+    index === 0 ? 'This is the OPENING frame.' : 'This frame is BOTH the closing frame of scene ' + index + ' AND the opening frame of scene ' + (index + 1) + '.',
+    'The camera position must be logically continuous with the previous frame.',
+    '',
+    basePrompt,
+    '',
+    'Format: portrait 9:16 vertical, journalistic composition, natural lighting.',
+    'No text, no watermark, no logo, no graphic violence.'
+  ].join('\n');
+}
+
+function buildVideoPrompt(scene, sceneIndex) {
+  const tone = $('tone-select').value;
+  const styleRef = buildStyleReference();
+  const narration = scene.narration || '';
+  return [
+    'CRITICAL: The provided first frame is the EXACT first frame of this video. The provided last frame is the EXACT last frame. The entire video must smoothly interpolate between them.',
+    '',
+    'CAMERA: ONE SINGLE CONTINUOUS SHOT (plan séquence). NO CUTS. Slow, deliberate, cinematic movement.',
+    '',
+    'ACTION: ' + scene.action_prompt,
+    '',
+    'AUDIO: ABSOLUTELY NO MUSIC. Only natural ambient sounds relevant to the scene. ' +
+    (narration ? 'A calm voice-over in French reads: "' + narration + '" — measured, journalistic, filling the scene without rushing.' : 'No dialogue.'),
+    '',
+    'ATMOSPHERE: ' + styleRef + '. Tone: ' + tone + '.',
+    '',
+    'FORMAT: Portrait 9:16, 24fps, photorealistic, cinematic, high detail.',
+    'No text, no subtitles, no watermarks, no music.',
+    'Perfect continuity between the first frame, the interpolated motion, and the last frame.'
+  ].join(' ');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API FETCH avec backoff
+// ══════════════════════════════════════════════════════════════════
+async function apiFetch(url, options = {}, label = 'API', kind = 'default') {
+  for (let attempt = 0; attempt < 7; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    try {
+      const res = await fetch(url, options);
+      debugLog('response', 'HTTP ' + label, 'Status ' + res.status + ' (tentative ' + (attempt+1) + ')');
+      if (res.status === 429) {
+        const wait = [10, 20, 35, 50, 75, 100, 150][Math.min(attempt, 6)];
+        debugLog('warn', 'RATE', '429 — attente ' + wait + 's');
+        setStatus('L\'IA se prépare… (' + wait + 's)');
+        await sleep(wait * 1000);
+        continue;
+      }
+      if (res.status === 503) {
+        const wait = [5, 10, 15, 20, 30, 45][Math.min(attempt, 5)];
+        debugLog('warn', 'SERVICE', '503 — attente ' + wait + 's');
+        await sleep(wait * 1000);
+        continue;
+      }
+      return res;
+    } catch(e) {
+      if (e.message === 'Arrêt demandé') throw e;
+      const wait = [3, 5, 8, 12, 20, 30][Math.min(attempt, 5)];
+      debugLog('warn', 'NETWORK', e.message + ' — retry ' + wait + 's');
+      await sleep(wait * 1000);
+    }
+  }
+  return fetch(url, options);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PARSER JSON 5 STRATÉGIES
+// ══════════════════════════════════════════════════════════════════
+function escapeControlCharsInStrings(text) {
+  let result = '', inString = false, escape = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { result += ch; escape = false; continue; }
+    if (ch === '\\') { result += ch; escape = true; continue; }
+    if (ch === '"') { inString = !inString; result += ch; continue; }
+    if (inString) {
+      if (ch === '\n') { result += '\\n'; continue; }
+      if (ch === '\r') { result += '\\r'; continue; }
+      if (ch === '\t') { result += '\\t'; continue; }
+      const code = ch.charCodeAt(0);
+      if (code < 32) { result += '\\u' + code.toString(16).padStart(4, '0'); continue; }
+    }
+    result += ch;
+  }
+  return result;
+}
+function balanceJson(text) {
+  let ob = 0, ok = 0, inStr = false, esc = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (esc) { esc = false; continue; }
+    if (ch === '\\') { esc = true; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === '{') ob++; else if (ch === '}') ob--;
+    else if (ch === '[') ok++; else if (ch === ']') ok--;
+  }
+  let r = text;
+  if (inStr) r += '"';
+  while (ok > 0) { r += ']'; ok--; }
+  while (ob > 0) { r += '}'; ob--; }
+  return r;
+}
+function salvageScenario(text) {
+  const titleM = text.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  const loglineM = text.match(/"logline"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  const scenes = [];
+  const rx = /"scene_number"\s*:\s*(\d+)[\s\S]*?"image_prompt"\s*:\s*"((?:[^"\\]|\\.)*)"[\s\S]*?"action_prompt"\s*:\s*"((?:[^"\\]|\\.)*)"[\s\S]*?"narration"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+  let m;
+  while ((m = rx.exec(text)) !== null) {
+    scenes.push({
+      scene_number: parseInt(m[1], 10),
+      image_prompt: m[2].replace(/\\n/g, ' ').replace(/\\"/g, '"'),
+      action_prompt: m[3].replace(/\\n/g, ' ').replace(/\\"/g, '"'),
+      narration: m[4].replace(/\\"/g, '"').replace(/\\n/g, ' ')
+    });
+  }
+  if (scenes.length === 0) return null;
+  return {
+    title: titleM ? titleM[1] : 'Sans titre',
+    logline: loglineM ? loglineM[1] : '',
+    scenes
+  };
+}
+function extractJson(text) {
+  if (!text) return null;
+  let c = text.trim();
+  const fm = c.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fm) c = fm[1].trim();
+  const fb = c.indexOf('{');
+  if (fb < 0) return null;
+  c = c.slice(fb);
+  try { const r = JSON.parse(c); debugLog('success', 'PARSE', 'Stratégie 1 OK'); return r; } catch(e1){}
+  try { const r = JSON.parse(escapeControlCharsInStrings(c)); debugLog('success', 'PARSE', 'Stratégie 2 OK'); return r; } catch(e2){}
+  try {
+    const lb = c.lastIndexOf('}');
+    if (lb > 0) {
+      const r = JSON.parse(escapeControlCharsInStrings(c.slice(0, lb + 1)));
+      debugLog('success', 'PARSE', 'Stratégie 3 OK');
+      return r;
+    }
+  } catch(e3){}
+  try { const r = JSON.parse(balanceJson(escapeControlCharsInStrings(c))); debugLog('success', 'PARSE', 'Stratégie 4 OK'); return r; } catch(e4){}
+  try { const r = salvageScenario(c); if (r) { debugLog('success', 'PARSE', 'Stratégie 5 (salvage) OK'); return r; } } catch(e5){}
+  debugLog('error', 'PARSE', 'Échec toutes stratégies');
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AGNES — TEXT / IMAGE / VIDEO
+// ══════════════════════════════════════════════════════════════════
+async function generateScenario(articleContent, sceneCount) {
+  debugLog('ai', 'TEXT', 'Génération scénario (' + sceneCount + ' scènes)');
+  const prompt = buildScenarioPrompt(articleContent, sceneCount);
+  const body = {
+    model: MODEL_TEXT,
+    messages: [
+      { role: 'system', content: 'You are a screenwriter and visual director. You ALWAYS return valid JSON matching the requested schema. All strings on single lines. No markdown.' },
+      { role: 'user', content: prompt }
+    ],
+    temperature: TEXT_TEMPERATURE,
+    max_tokens: TEXT_MAX_TOKENS,
+    response_format: { type: 'json_object' }
+  };
+  const res = await apiFetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Scénario', 'text');
+  if (!res.ok) { const err = await res.text(); throw new Error('Text HTTP ' + res.status + ' — ' + err.slice(0, 200)); }
+  const data = await res.json();
+  const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  debugLog('response', 'SCENARIO', 'Reçu ' + (content ? content.length : 0) + ' chars');
+  const scenario = extractJson(content);
+  if (!scenario || !scenario.scenes || !Array.isArray(scenario.scenes)) throw new Error('Scénario invalide');
+  if (scenario.scenes.length < sceneCount) {
+    debugLog('warn', 'SCENARIO', 'Duplication pour atteindre ' + sceneCount);
+    const last = scenario.scenes[scenario.scenes.length - 1];
+    while (scenario.scenes.length < sceneCount) {
+      scenario.scenes.push({
+        scene_number: scenario.scenes.length + 1,
+        image_prompt: last.image_prompt,
+        action_prompt: last.action_prompt,
+        narration: last.narration
+      });
+    }
+  }
+  if (scenario.scenes.length > sceneCount) scenario.scenes = scenario.scenes.slice(0, sceneCount);
+  return scenario;
+}
+
+async function generateImage(prompt) {
+  const body = { model: MODEL_IMAGE, prompt, n: 1, size: '1024x1792', response_format: 'url' };
+  const res = await apiFetch(API_BASE + '/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Image', 'image');
+  if (!res.ok) { const err = await res.text(); throw new Error('Image HTTP ' + res.status + ' — ' + err.slice(0, 200)); }
+  const data = await res.json();
+  const item = data.data && data.data[0];
+  if (!item) throw new Error('Pas de donnée image');
+  if (item.url) return item.url;
+  if (item.b64_json) return 'data:image/png;base64,' + item.b64_json;
+  throw new Error('Format image inconnu');
+}
+
+async function generateVideo(firstFrame, lastFrame, prompt) {
+  const body = {
+    model: MODEL_VIDEO, prompt,
+    image: firstFrame, last_frame: lastFrame,
+    num_frames: state.durationFrames, frame_rate: FRAME_RATE
+  };
+  const res = await apiFetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Vidéo', 'video');
+  if (!res.ok) { const err = await res.text(); throw new Error('Video HTTP ' + res.status + ' — ' + err.slice(0, 200)); }
+  const data = await res.json();
+  const videoId = data.video_id || data.id || data.task_id;
+  if (!videoId) throw new Error('Pas de video_id');
+  return videoId;
+}
+
+async function pollVideo(videoId, onProgress) {
+  const estimatedMs = estimateGenerationTime('video', 30000 + state.durationFrames * 500);
+  const minWait = Math.min(VIDEO_FIRST_POLL_DELAY_SEC, Math.max(60, Math.floor((estimatedMs/1000) * 0.75)));
+  let remaining = minWait;
+  while (remaining > 0) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    onProgress('Préparation — ' + remaining + 's');
+    await sleep(1000);
+    remaining--;
+  }
+  for (let attempt = 0; attempt < VIDEO_MAX_POLL_ATTEMPTS; attempt++) {
+    if (state.stopRequested) throw new Error('Arrêt demandé');
+    if (attempt > 0) {
+      const idx = Math.min(attempt - 1, VIDEO_POLL_INTERVALS.length - 1);
+      let r = VIDEO_POLL_INTERVALS[idx];
+      while (r > 0) {
+        if (state.stopRequested) throw new Error('Arrêt demandé');
+        onProgress('En cours… — ' + r + 's');
+        await sleep(1000);
+        r--;
+      }
+    }
+    const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+    const res = await apiFetch(url, { method: 'GET', headers: { 'Authorization': 'Bearer ' + getApiKey() } }, 'Polling', 'video');
+    const d = await res.json();
+    const status = d.status || 'unknown';
+    const progress = d.progress || 0;
+    onProgress('Création — ' + progress + '%');
+    if (status === 'completed' || status === 'succeeded' || status === 'done') {
+      const videoUrl = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+      if (!videoUrl) throw new Error('Terminé mais pas d\'URL');
+      return videoUrl;
+    }
+    if (status === 'failed' || status === 'error' || status === 'cancelled') throw new Error('Échec (' + status + ')');
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// QUEUE IMAGE (parallèle x3)
+// ══════════════════════════════════════════════════════════════════
+function createRateLimitedQueue(maxConcurrent, minIntervalMs) {
+  let running = 0, lastStart = 0;
+  const queue = [];
+  let resolveIdle = null;
+  function tryNext() {
+    if (running >= maxConcurrent) return;
+    if (queue.length === 0) {
+      if (running === 0 && resolveIdle) { resolveIdle(); resolveIdle = null; }
+      return;
+    }
+    const wait = Math.max(0, lastStart + minIntervalMs - Date.now());
+    if (wait > 0) { setTimeout(tryNext, wait); return; }
+    const task = queue.shift();
+    running++; lastStart = Date.now();
+    task().finally(() => { running--; setTimeout(tryNext, 0); });
+  }
+  return {
+    add(fn) { return new Promise((res, rej) => { queue.push(() => fn().then(res, rej)); setTimeout(tryNext, 0); }); },
+    idle() { return new Promise(r => { if (running === 0 && queue.length === 0) return r(); resolveIdle = r; }); }
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDU UI
+// ══════════════════════════════════════════════════════════════════
+function renderScenario() {
+  const panel = $('scenario-panel'), card = $('scenario-card');
+  if (!state.scenario) return;
+  const s = state.scenario;
+  let html = '<div class="scenario-title">' + esc(s.title || 'Sans titre') + '</div>';
+  if (s.logline) html += '<div class="scenario-meta">' + esc(s.logline) + '</div>';
+  s.scenes.forEach((sc, i) => {
+    html += '<div class="scene-block" data-scene="' + i + '">';
+    html += '<div class="scene-number">Scène ' + (i + 1) + ' / ' + s.scenes.length + '</div>';
+    if (sc.narration) html += '<div class="scene-dialogue"><span class="speaker-name">Voix off</span>« ' + esc(sc.narration) + ' »</div>';
+    if (sc.action_prompt) html += '<div class="scene-action">' + esc(sc.action_prompt.slice(0, 180)) + (sc.action_prompt.length > 180 ? '…' : '') + '</div>';
+    html += '</div>';
+  });
+  card.innerHTML = html;
+  panel.style.display = 'block';
+}
+
+function renderImagesGrid() {
+  const grid = $('images-grid');
+  if (!state.scenario) return;
+  const total = state.sceneCount;
+  let html = '';
+  for (let i = 0; i < total; i++) {
+    const img = state.images[i];
+    if (img && img.url) html += '<div class="image-card" data-img="' + i + '"><img src="' + img.url + '" alt=""><div class="img-label">Scène ' + (i+1) + '</div></div>';
+    else html += '<div class="image-card loading" data-img="' + i + '">Scène ' + (i+1) + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function updateImageCard(index, url) {
+  const el = document.querySelector('.image-card[data-img="' + index + '"]');
+  if (!el) return;
+  el.classList.remove('loading');
+  el.innerHTML = '<img src="' + url + '" alt=""><div class="img-label">Scène ' + (index+1) + '</div>';
+}
+
+function renderQueue() {
+  const el = $('queue');
+  if (!state.videos.length) { el.style.display = 'none'; return; }
+  const total = state.videos.length;
+  const done = state.videos.filter(v => v.status === 'done').length;
+  const failed = state.videos.filter(v => v.status === 'failed').length;
+  let html = '<div class="queue-summary"><span class="progress-text">VIDÉOS : ' + done + '/' + total + '</span>';
+  if (failed > 0) html += '<span style="color:var(--error);">' + failed + ' échec(s)</span>';
+  html += '</div>';
+  html += state.videos.map(item => {
+    let icon = '○', statusText = 'En file', cls = 'pending';
+    if (item.status === 'creating') { icon = '◐'; statusText = 'Préparation…'; cls = 'creating'; }
+    else if (item.status === 'processing') { icon = '◐'; statusText = item.progress || 'En cours…'; cls = 'processing'; }
+    else if (item.status === 'done') { icon = '●'; statusText = 'Terminé'; cls = 'done'; }
+    else if (item.status === 'failed') { icon = '✕'; statusText = 'Échec'; cls = 'failed'; }
+    return '<div class="queue-item ' + cls + '"><div class="q-icon">' + icon + '</div><div class="q-name">Scène ' + (item.index+1) + '</div><div class="q-status">' + esc(statusText) + '</div></div>';
+  }).join('');
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+function addToGallery(videoUrl, sceneIndex) {
+  const galleryEl = $('gallery'), grid = $('gallery-grid');
+  galleryEl.style.display = 'block';
+  const scene = state.scenario.scenes[sceneIndex];
+  const el = document.createElement('div');
+  el.className = 'gallery-item';
+  el.innerHTML = '<video controls preload="metadata" playsinline><source src="' + videoUrl + '" type="video/mp4"></video>' +
+    '<div class="g-caption"><strong>Scène ' + (sceneIndex+1) + '</strong>' +
+    (scene.narration ? '<span style="font-style:italic;color:var(--lavender);">« ' + esc(scene.narration) + ' »</span>' : '') +
+    '<span>9:16 · Sans musique</span></div>';
+  grid.appendChild(el);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE COMPLET
+// ══════════════════════════════════════════════════════════════════
+async function runScenarioPhase() {
+  setPhase('text', '✍️ Écriture du scénario…', '');
+  try {
+    state.scenario = await generateScenario(state.articleContent, state.sceneCount);
+    state.imagePrompts = state.scenario.scenes.map(s => s.image_prompt);
+    state.images = new Array(state.sceneCount).fill(null);
+    state.videos = state.scenario.scenes.map((_, i) => ({ index: i, status: 'pending', progress: null, videoId: null, videoUrl: null }));
+    renderScenario(); renderImagesGrid(); renderQueue();
+    autoSave();
+    return true;
+  } catch(e) {
+    debugLog('error', 'SCENARIO', e.message);
+    showToast('Erreur scénario : ' + e.message.slice(0, 50), 'error', 4000);
+    return false;
+  }
+}
+
+async function runImagesPhase() {
+  setPhase('images', '🎨 Génération des ' + state.sceneCount + ' images…', '');
+  const queue = createRateLimitedQueue(IMAGE_PARALLEL, IMAGE_INTERVAL_MS);
+  let completed = 0;
+  const tasks = [];
+  for (let i = 0; i < state.sceneCount; i++) {
+    const idx = i;
+    const prompt = buildImageGenerationPrompt(state.imagePrompts[idx], idx, state.sceneCount);
+    tasks.push(queue.add(async () => {
+      if (state.stopRequested) return;
+      try {
+        const url = await generateImage(prompt);
+        state.images[idx] = { url, prompt };
+        updateImageCard(idx, url);
+        completed++;
+        setPhase('images', '🎨 Images : ' + completed + '/' + state.sceneCount, '≈ ' + formatEta(Math.max(0, (state.sceneCount - completed) * 4)) + ' restant');
+        debugLog('success', 'IMAGE ' + (idx+1), 'OK');
+        autoSave();
+      } catch(e) {
+        if (e.message === 'Arrêt demandé') return;
+        debugLog('error', 'IMAGE ' + (idx+1), e.message);
+        completed++;
+      }
+    }));
+  }
+  await Promise.allSettled(tasks);
+  await queue.idle();
+  const ok = state.images.filter(x => x && x.url).length;
+  debugLog(ok === state.sceneCount ? 'success' : 'warn', 'IMAGES', ok + '/' + state.sceneCount);
+  return ok === state.sceneCount;
+}
+
+async function runVideosPhase() {
+  setPhase('videos', '🎬 Génération des vidéos…', '');
+  const total = state.videos.length;
+  const polling = [];
+  for (let i = 0; i < total; i++) {
+    if (state.stopRequested) break;
+    const item = state.videos[i];
+    const firstFrame = state.images[i] ? state.images[i].url : null;
+    const lastFrame = state.images[i+1] ? state.images[i+1].url : (state.images[i] ? state.images[i].url : null);
+    // Dernier clip : on utilise la même image en first et last (ou une image finale idéale)
+    if (!firstFrame) { item.status = 'failed'; item.progress = 'Image manquante'; renderQueue(); continue; }
+    const effectiveLast = lastFrame || firstFrame;
+
+    item.status = 'creating'; item.progress = 'Préparation…'; renderQueue();
+    setPhase('videos', '🎬 Scène ' + (i+1) + '/' + total + ' — envoi…', '');
+    try {
+      const prompt = buildVideoPrompt(state.scenario.scenes[i], i);
+      const videoId = await generateVideo(firstFrame, effectiveLast, prompt);
+      item.videoId = videoId; item.startTime = Date.now();
+      item.status = 'processing'; item.progress = 'En cours…';
+      renderQueue();
+      polling.push((async () => {
+        try {
+          const url = await pollVideo(videoId, (prog) => { item.progress = prog; renderQueue(); });
+          const elapsed = Date.now() - item.startTime;
+          recordGenerationTime('video', elapsed);
+          item.status = 'done'; item.videoUrl = url; item.progress = 'Terminé';
+          renderQueue();
+          addToGallery(url, i);
+          debugLog('success', 'VIDEO ' + (i+1), 'Terminée en ' + (elapsed/1000).toFixed(1) + 's');
+          autoSave();
+        } catch(e) {
+          if (e.message === 'Arrêt demandé') { item.status = 'failed'; item.progress = 'Arrêté'; }
+          else { item.status = 'failed'; item.progress = 'Échec'; debugLog('error', 'VIDEO ' + (i+1), e.message); }
+          renderQueue();
+        }
+      })());
+    } catch(e) {
+      if (e.message === 'Arrêt demandé') break;
+      item.status = 'failed'; item.progress = 'Échec';
+      renderQueue();
+      debugLog('error', 'VIDEO ' + (i+1), e.message);
+    }
+    if (i < total - 1 && !state.stopRequested) {
+      const waitSec = Math.ceil(VIDEO_INTERVAL_SAFE / 1000);
+      for (let r = waitSec; r > 0; r--) {
+        if (state.stopRequested) break;
+        setPhase('videos', '🌬️ Respiration — prochaine vidéo dans ' + r + 's', '');
+        await sleep(1000);
+      }
+    }
+  }
+  if (polling.length) { setPhase('videos', '🎞️ Finalisation…', ''); await Promise.allSettled(polling); }
+  const done = state.videos.filter(v => v.status === 'done').length;
+  debugLog(done === total ? 'success' : 'warn', 'VIDEOS', done + '/' + total);
+}
+
+async function startGeneration() {
+  if (state.isRunning) return;
+  if (!getApiKey()) { showToast('Ajoutez la clé API', 'error'); $('api-key-input').focus(); return; }
+  if (!state.articleContent || state.articleContent.length < 30) { showToast('Sélectionnez ou collez un article', 'error'); return; }
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  state.sceneCount = parseInt($('scene-count-select').value, 10);
+  state.durationFrames = parseInt($('duration-select').value, 10);
+  state.scenario = null;
+  state.images = []; state.videos = []; state.imagePrompts = [];
+
+  $('scenario-panel').style.display = 'none';
+  $('gallery-grid').innerHTML = '';
+  $('gallery').style.display = 'none';
+  $('queue').innerHTML = '';
+  $('queue').style.display = 'none';
+  $('stop-btn').classList.add('visible');
+  $('generate-btn').disabled = true;
+  $('phase-bar').classList.add('visible');
+
+  if (wakeLockEnabled) await activateWakeLock();
+
+  debugLog('state', 'START', 'Démarrage — ' + state.sceneCount + ' scènes');
+  autoSave();
+
+  const startTime = Date.now();
+  try {
+    const okS = await runScenarioPhase();
+    if (!okS || state.stopRequested) throw new Error('Arrêt');
+    await runImagesPhase();
+    if (state.stopRequested) throw new Error('Arrêt');
+    await runVideosPhase();
+    setPhase('done', '✦ Reportage terminé ✦', '');
+  } catch(e) { debugLog('error', 'GLOBAL', e.message); }
+
+  const elapsed = (Date.now() - startTime) / 1000;
+  const done = state.videos.filter(v => v.status === 'done').length;
+  setStatus((state.stopRequested ? 'Arrêté' : '✦ Terminé') + ' — ' + done + '/' + state.sceneCount + ' vidéos en ' + formatEta(elapsed));
+  await sleep(4000); setStatus(null);
+  state.isRunning = false; state.stopRequested = false;
+  $('stop-btn').classList.remove('visible');
+  updateGenerateBtn();
+  autoSave();
+  showToast(done + ' vidéo' + (done > 1 ? 's' : '') + ' générée' + (done > 1 ? 's' : ''), done > 0 ? 'success' : 'error');
+}
+
+function stopGeneration() {
+  if (!state.isRunning) return;
+  state.stopRequested = true;
+  debugLog('warn', 'STOP', 'Arrêt demandé');
+  setStatus('Arrêt en cours…');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SYSTÈME DE SAUVEGARDE
+// ══════════════════════════════════════════════════════════════════
+function collectProjectData() {
+  return {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    name: state.projectName || 'Projet sans nom',
+    articleContent: state.articleContent,
+    selectedArticle: state.selectedArticle,
+    rssArticles: state.rssArticles.slice(0, 20),
+    settings: {
+      tone: $('tone-select').value,
+      visualStyle: $('visual-style').value,
+      sceneCount: parseInt($('scene-count-select').value, 10),
+      durationFrames: parseInt($('duration-select').value, 10)
+    },
+    scenario: state.scenario,
+    imagePrompts: state.imagePrompts,
+    images: state.images,
+    videos: state.videos
+  };
+}
+
+function applyProjectData(data) {
+  state.projectName = data.name || '';
+  state.articleContent = data.articleContent || '';
+  state.selectedArticle = data.selectedArticle || null;
+  state.rssArticles = data.rssArticles || [];
+  state.scenario = data.scenario || null;
+  state.imagePrompts = data.imagePrompts || [];
+  state.images = data.images || [];
+  state.videos = data.videos || [];
+
+  if (data.settings) {
+    $('tone-select').value = data.settings.tone || 'documentary';
+    $('visual-style').value = data.settings.visualStyle || 'photoreal';
+    $('scene-count-select').value = data.settings.sceneCount || 5;
+    $('duration-select').value = data.settings.durationFrames || 161;
+  }
+
+  $('article-content').value = state.articleContent;
+  $('project-name').value = state.projectName;
+
+  renderNewsList();
+  if (state.scenario) {
+    renderScenario();
+    renderImagesGrid();
+    state.images.forEach((img, i) => { if (img && img.url) updateImageCard(i, img.url); });
+    renderQueue();
+    // Galerie
+    $('gallery-grid').innerHTML = '';
+    state.videos.forEach(v => { if (v.status === 'done' && v.videoUrl) addToGallery(v.videoUrl, v.index); });
+    if (state.videos.some(v => v.status === 'done')) $('gallery').style.display = 'block';
+  }
+  updateGenerateBtn();
+}
+
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem(PROJECTS_STORAGE) || '[]'); } catch(e){ return []; }
+}
+function setProjects(list) {
+  try { localStorage.setItem(PROJECTS_STORAGE, JSON.stringify(list)); } catch(e){}
+}
+function saveProjectNow() {
+  const name = $('project-name').value.trim() || 'Projet ' + new Date().toLocaleString('fr-FR');
+  state.projectName = name;
+  const data = collectProjectData();
+  data.name = name;
+  data.id = 'proj_' + Date.now();
+  const projects = getProjects();
+  // Remplacer si existe déjà par nom
+  const existingIdx = projects.findIndex(p => p.name === name);
+  if (existingIdx >= 0) projects[existingIdx] = data;
+  else projects.unshift(data);
+  // Garder max 20 projets
+  if (projects.length > 20) projects.length = 20;
+  setProjects(projects);
+  renderProjects();
+  debugLog('success', 'SAVE', 'Projet sauvegardé : ' + name);
+  showToast('Projet sauvegardé', 'success');
+}
+function autoSave() {
+  try {
+    const data = collectProjectData();
+    localStorage.setItem(AUTOSAVE_STORAGE, JSON.stringify(data));
+  } catch(e){}
+}
+function restoreAutoSave() {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_STORAGE);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.scenario || data.articleContent) {
+      debugLog('info', 'RESTORE', 'Session précédente trouvée');
+      // Ne pas écraser automatiquement — proposer à l'utilisateur
+      // (on peut l'afficher discrètement, ici on le log)
+    }
+  } catch(e){}
+}
+function renderProjects() {
+  const projects = getProjects();
+  const list = $('project-list');
+  $('save-count-badge').textContent = projects.length;
+  if (projects.length === 0) {
+    list.innerHTML = '<div style="padding:0.8rem;color:var(--ink-faint);font-size:0.72rem;text-align:center;">Aucune sauvegarde. Cliquez sur "Sauvegarder maintenant".</div>';
+    return;
+  }
+  list.innerHTML = projects.map(p => `
+    <div class="project-item">
+      <div class="pi-name">${esc(p.name)}</div>
+      <div class="pi-date">${esc(new Date(p.savedAt).toLocaleDateString('fr-FR'))}</div>
+      <button class="btn-small" data-load="${p.id}" style="color:var(--blue-soft);">Charger</button>
+      <button class="btn-small" data-del="${p.id}" style="color:var(--error);">✕</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('[data-load]').forEach(b => {
+    b.addEventListener('click', () => {
+      const p = projects.find(x => x.id === b.dataset.load);
+      if (p) { applyProjectData(p); debugLog('success', 'LOAD', 'Projet chargé : ' + p.name); showToast('Projet chargé', 'success'); }
+    });
+  });
+  list.querySelectorAll('[data-del]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (!confirm('Supprimer ce projet ?')) return;
+      const list2 = getProjects().filter(x => x.id !== b.dataset.del);
+      setProjects(list2);
+      renderProjects();
+      showToast('Projet supprimé', 'warn');
+    });
+  });
+}
+function exportProject() {
+  const data = collectProjectData();
+  data.name = $('project-name').value.trim() || 'projet';
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'geo-studio-' + data.name.replace(/[^a-z0-9]/gi, '_') + '-' + Date.now() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  debugLog('success', 'EXPORT', 'Fichier JSON généré');
+  showToast('Export réussi', 'success');
+}
+function importProject(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      applyProjectData(data);
+      debugLog('success', 'IMPORT', 'Projet importé : ' + (data.name || 'sans nom'));
+      showToast('Projet importé', 'success');
+    } catch(err) {
+      debugLog('error', 'IMPORT', err.message);
+      showToast('Fichier JSON invalide', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UPDATE BUTTON
+// ══════════════════════════════════════════════════════════════════
+function updateGenerateBtn() {
+  const btn = $('generate-btn');
+  const hasKey = !!getApiKey();
+  const hasArticle = state.articleContent && state.articleContent.trim().length > 30;
+  btn.disabled = !hasKey || !hasArticle || state.isRunning;
+  if (state.isRunning) btn.textContent = 'Génération en cours…';
+  else if (!hasKey) btn.textContent = 'Ajoutez votre clé API';
+  else if (!hasArticle) btn.textContent = 'Sélectionnez ou collez un article';
+  else btn.textContent = 'Générer le reportage vidéo (' + state.sceneCount + ' scènes)';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init() {
+  // API
+  $('api-save-btn').addEventListener('click', saveApiKey);
+  $('api-key-input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveApiKey(); } });
+
+  // Wake lock
+  try { wakeLockEnabled = localStorage.getItem(WAKE_LOCK_PREF) === '1'; } catch(e){}
+  if (wakeLockEnabled) activateWakeLock().then(() => updateWakeStatus());
+  $('wake-toggle-btn').addEventListener('click', toggleWakeLock);
+
+  // Sections collapsibles
+  document.querySelectorAll('[data-toggle]').forEach(h => {
+    h.addEventListener('click', () => $(h.dataset.toggle).classList.toggle('open'));
+  });
+
+  // RSS
+  $('rss-topic').addEventListener('change', e => {
+    $('custom-query-row').classList.toggle('hidden', e.target.value !== 'custom');
+  });
+  $('fetch-rss-btn').addEventListener('click', loadRssFeed);
+
+  // Article
+  $('article-content').addEventListener('input', e => {
+    state.articleContent = e.target.value;
+    updateGenerateBtn();
+  });
+
+  // Settings
+  $('scene-count-select').addEventListener('change', e => { state.sceneCount = parseInt(e.target.value, 10); updateGenerateBtn(); });
+  $('duration-select').addEventListener('change', e => { state.durationFrames = parseInt(e.target.value, 10); });
+
+  // Generate
+  $('generate-btn').addEventListener('click', startGeneration);
+  $('stop-btn').addEventListener('click', stopGeneration);
+
+  // Save / Export / Import
+  $('project-name').addEventListener('input', e => { state.projectName = e.target.value; });
+  $('save-project-btn').addEventListener('click', saveProjectNow);
+  $('export-project-btn').addEventListener('click', exportProject);
+  $('import-project-btn').addEventListener('click', () => $('import-file-input').click());
+  $('import-file-input').addEventListener('change', e => {
+    if (e.target.files[0]) importProject(e.target.files[0]);
+    e.target.value = '';
+  });
+
+  // Debug
+  $('debug-header').addEventListener('click', e => { if (e.target.tagName === 'BUTTON') return; toggleDebugCollapse(); });
+  $('debug-collapse-btn').addEventListener('click', e => { e.stopPropagation(); toggleDebugCollapse(); });
+  $('debug-clear-btn').addEventListener('click', e => { e.stopPropagation(); clearDebug(); });
+  $('debug-copy-btn').addEventListener('click', e => { e.stopPropagation(); copyDebug(); });
+
+  // Auto-save timer
+  setInterval(() => { if (!state.isRunning) autoSave(); }, AUTOSAVE_INTERVAL_MS);
+  window.addEventListener('beforeunload', autoSave);
+
+  // Restore
+  updateApiPanel();
+  updateTimingDisplay();
+  updateWakeStatus();
+  renderNewsList();
+  renderProjects();
+  restoreAutoSave();
+  updateGenerateBtn();
+
+  debugLog('success', 'INIT', 'Géo Studio prêt');
+  debugLog('info', 'INIT', 'Pipeline : RSS → Article → Scénario → Images → Vidéos');
+  debugLog('info', 'INIT', 'Modèles : ' + MODEL_TEXT + ' / ' + MODEL_IMAGE + ' / ' + MODEL_VIDEO);
+  debugLog('info', 'INIT', 'Auto-save toutes les ' + (AUTOSAVE_INTERVAL_MS/1000) + 's');
+})();
+</script>
+</body>
+</html>
