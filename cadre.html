@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadre — Studio de clips IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c0b;
+      --surface: #141413;
+      --raised: #1c1c1a;
+      --fg: #f4f1ea;
+      --muted: #a39e94;
+      --faint: #6e6a62;
+      --line: #2c2b28;
+      --paper: #efeae0;
+      --ink: #161513;
+      --danger: #c45c52;
+      --ok: #7fa77a;
+      --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+      --display: "Newsreader", Georgia, serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    body { margin: 0; min-height: 100dvh; background: var(--bg); }
+    button { font: inherit; color: inherit; background: none; border: 0; }
+    button:not(:disabled) { cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    ::selection { background: var(--paper); color: var(--ink); }
+    .wrap { max-width: 72rem; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
+    header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--line); padding-bottom: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .kicker { margin: 0; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+    h1 { margin: 0; font-family: var(--display); font-size: clamp(2.5rem, 6vw, 3.5rem); font-weight: 500; line-height: 1; letter-spacing: -0.03em; }
+    .status { margin: 0; padding-bottom: 0.25rem; font-size: 0.875rem; color: var(--muted); transition: color 0.2s; }
+    .status[data-state="busy"] { color: var(--paper); }
+    .status[data-state="ok"] { color: var(--ok); }
+    .status[data-state="err"] { color: var(--danger); }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 960px) { .grid { grid-template-columns: 2fr 3fr; gap: 2rem; } }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 1.75rem; padding: 1rem; }
+
+    /* API KEY */
+    .key { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .key input {
+      flex: 1; min-height: 2.75rem; border-radius: 0.5rem;
+      border: 1px solid var(--line); background: var(--bg); color: var(--fg);
+      padding: 0 0.75rem; font: inherit; font-size: 0.875rem; font-family: var(--mono);
+      outline: none; min-width: 0;
+    }
+    .key input:focus { border-color: var(--paper); }
+    .key button {
+      padding: 0 0.9rem; min-height: 2.75rem; border-radius: 0.5rem;
+      background: var(--paper); color: var(--ink); font-weight: 500; font-size: 0.875rem;
+      white-space: nowrap;
+    }
+    .key-status { font-size: 0.75rem; color: var(--faint); margin-bottom: 1.25rem; padding: 0.4rem 0.6rem; border-radius: 0.4rem; background: var(--raised); border: 1px solid var(--line); }
+    .key-status[data-state="ok"] { color: var(--ok); border-color: rgba(127,167,122,0.4); }
+    .key-status[data-state="err"] { color: var(--danger); border-color: rgba(196,92,82,0.4); }
+
+    .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; background: var(--raised); border-radius: 0.75rem; padding: 0.25rem; margin-bottom: 1rem; }
+    .choice, .chip, .go, .audio, .ghost { min-height: 2.75rem; border-radius: 0.5rem; }
+    .choice, .chip { font-size: 0.875rem; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    .choice[aria-pressed="true"], .chip[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+    .choice[aria-pressed="false"] { color: var(--muted); }
+    .chip[aria-pressed="false"] { border: 1px solid var(--line); color: var(--muted); }
+
+    label, legend { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; }
+    textarea { width: 100%; min-height: 8rem; resize: vertical; border-radius: 0.75rem; border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 0.75rem; font: inherit; font-size: 1rem; }
+    textarea::placeholder { color: var(--faint); }
+    textarea:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+    textarea:disabled { opacity: 0.5; }
+    .meta { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--faint); }
+
+    .presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+    .ghost { border: 1px solid var(--line); padding: 0 0.75rem; color: var(--muted); font-size: 0.875rem; transition: border-color 0.15s, color 0.15s; }
+    .ghost:hover:not(:disabled) { color: var(--paper); border-color: var(--paper); }
+
+    fieldset { border: 0; margin: 1.25rem 0 0; padding: 0; }
+    fieldset:disabled { opacity: 0.5; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+    .split { display: grid; gap: 1rem; margin-top: 1.25rem; }
+    @media (min-width: 640px) { .split { grid-template-columns: 1fr 1fr; } }
+    .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem; }
+
+    .upload-zone {
+      margin-top: 0.75rem; border: 1px dashed var(--line); border-radius: 0.75rem;
+      padding: 1rem; text-align: center; cursor: pointer; transition: border-color 0.15s;
+      position: relative; background: var(--bg);
+    }
+    .upload-zone:hover { border-color: var(--paper); }
+    .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-zone p { margin: 0; font-size: 0.875rem; color: var(--muted); }
+    .upload-zone .small { font-size: 0.75rem; color: var(--faint); margin-top: 0.25rem; }
+    .upload-preview { margin-top: 0.75rem; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--line); max-height: 200px; }
+    .upload-preview img { width: 100%; display: block; }
+    .upload-remove {
+      margin-top: 0.5rem; padding: 0 0.75rem; min-height: 2rem;
+      border-radius: 0.5rem; border: 1px solid var(--line);
+      color: var(--muted); font-size: 0.75rem;
+    }
+
+    .go { width: 100%; margin-top: 1rem; background: var(--paper); color: var(--ink); font-size: 1rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: opacity 0.15s; }
+    .go:hover:not(:disabled) { opacity: 0.9; }
+    .go .spinner {
+      width: 0.9rem; height: 0.9rem; border: 2px solid rgba(22,21,19,0.25);
+      border-top-color: var(--ink); border-radius: 50%;
+      animation: spin 0.8s linear infinite; display: none;
+    }
+    .go[data-busy="1"] .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hint, .library p { font-size: 0.875rem; color: var(--faint); }
+    .hint { font-size: 0.75rem; }
+    .error { color: var(--danger); font-size: 0.875rem; margin-top: 0.75rem; }
+
+    .stage-head { display: flex; justify-content: space-between; align-items: center; }
+    h2 { margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 500; }
+    .frame { position: relative; overflow: hidden; border-radius: 1rem; border: 1px solid var(--line); background: var(--bg); width: min(100%, calc(68vh * var(--ar, 1.777))); max-height: 68vh; aspect-ratio: var(--ar, 1.777); margin-inline: auto; transition: aspect-ratio 0.3s ease, width 0.3s ease; }
+    .frame video, .frame img { width: 100%; height: 100%; display: block; object-fit: contain; background: #000; }
+    .corner { position: absolute; width: 1rem; height: 1rem; pointer-events: none; z-index: 2; }
+    .tl { top: 0.75rem; left: 0.75rem; border-top: 1px solid var(--faint); border-left: 1px solid var(--faint); }
+    .tr { top: 0.75rem; right: 0.75rem; border-top: 1px solid var(--faint); border-right: 1px solid var(--faint); }
+    .bl { bottom: 0.75rem; left: 0.75rem; border-bottom: 1px solid var(--faint); border-left: 1px solid var(--faint); }
+    .br { right: 0.75rem; bottom: 0.75rem; border-bottom: 1px solid var(--faint); border-right: 1px solid var(--faint); }
+    .empty { height: 100%; min-height: 12rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1.5rem; color: var(--muted); }
+    .empty p { margin: 0; max-width: 22rem; line-height: 1.5; }
+    .empty .stage-sub { font-size: 0.8rem; color: var(--faint); margin-top: 0.5rem; }
+    .time { font-family: var(--mono); font-size: 0.75rem; color: var(--faint); }
+
+    .loading-stage {
+      height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; gap: 0.9rem; text-align: center;
+    }
+    .loading-stage .circle {
+      width: 2.25rem; height: 2.25rem; border: 2px solid var(--line);
+      border-top-color: var(--paper); border-radius: 50%; animation: spin 0.9s linear infinite;
+    }
+    .loading-stage .lbl { font-size: 0.875rem; color: var(--muted); }
+    .loading-stage .pct { font-family: var(--mono); font-size: 0.75rem; color: var(--faint); }
+
+    .library { margin-top: 1.5rem; }
+    .library-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+    .clip {
+      display: flex; gap: 0.75rem; padding: 0.6rem; border: 1px solid var(--line);
+      border-radius: 0.75rem; background: var(--surface); align-items: center;
+      transition: border-color 0.15s;
+    }
+    .clip:hover { border-color: var(--faint); }
+    .clip video { width: 54px; height: 96px; object-fit: cover; border-radius: 0.4rem; background: #000; flex-shrink: 0; }
+    .clip .info { flex: 1; min-width: 0; }
+    .clip .c-title { font-size: 0.8rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .clip .c-meta { font-family: var(--mono); font-size: 0.68rem; color: var(--faint); margin-top: 0.2rem; }
+    .clip .c-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
+    .clip .c-actions button {
+      width: 2.2rem; height: 2.2rem; border-radius: 0.5rem;
+      border: 1px solid var(--line); color: var(--muted);
+      display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+    }
+    .clip .c-actions button:hover { border-color: var(--paper); color: var(--paper); }
+    .library-empty { font-size: 0.8rem; color: var(--faint); padding: 1rem; text-align: center; border: 1px dashed var(--line); border-radius: 0.75rem; margin-top: 0.75rem; }
+
+    .fatal {
+      position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+      background: var(--surface); color: var(--fg); border: 1px solid var(--danger);
+      border-left: 3px solid var(--danger); padding: 0.75rem 1rem;
+      border-radius: 0.5rem; font-size: 0.85rem; max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 100; display: none;
+    }
+    .fatal.visible { display: block; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div>
+        <p class="kicker">Studio</p>
+        <h1>Cadre</h1>
+      </div>
+      <p class="status" id="status" data-state="idle">Prêt</p>
+    </header>
+
+    <div class="grid">
+      <form class="panel" id="form" autocomplete="off">
+        <div class="key">
+          <input type="password" id="api-key" placeholder="sk-... (clé Agnes)" spellcheck="false">
+          <button type="button" id="api-save">Enregistrer</button>
+        </div>
+        <div class="key-status" id="api-status">Aucune clé API enregistrée.</div>
+
+        <div class="seg">
+          <button class="choice" type="button" id="mode-texte" aria-pressed="true">Texte → vidéo</button>
+          <button class="choice" type="button" id="mode-image" aria-pressed="false">Image → vidéo</button>
+        </div>
+
+        <label for="prompt">Description du plan</label>
+        <textarea id="prompt" maxlength="900" placeholder="Décrivez le plan à générer…">Un train de nuit traverse un pont de pierre sous la pluie. Les phares fendent le brouillard, travelling lent le long du parapet, lumière ambrée, grain discret.</textarea>
+        <div class="meta"><span id="count">0/900</span><span>Ctrl + Entrée</span></div>
+
+        <div class="presets">
+          <button class="ghost" type="button" data-prompt="Un train de nuit traverse un pont de pierre sous la pluie. Les phares fendent le brouillard, travelling lent le long du parapet, lumière ambrée, grain discret.">Train de nuit</button>
+          <button class="ghost" type="button" data-prompt="Gros plan d'une main de céramiste qui centre l'argile sur le tour. Lumière de fenêtre, poussière dans le faisceau, caméra presque immobile, bruit d'atelier.">Atelier</button>
+          <button class="ghost" type="button" data-prompt="Un cerf-volant rouge monte au-dessus des toits de Lisbonne au coucher du soleil. La caméra le suit en plan large, linge qui bouge sur une terrasse.">Toits</button>
+        </div>
+
+        <div id="upload-block" hidden>
+          <label for="file" style="margin-top:1.25rem">Image source</label>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="file" accept="image/*">
+            <p><strong style="color:var(--fg)">Choisir une image</strong></p>
+            <p class="small">Elle sera animée selon votre description</p>
+          </div>
+          <div class="upload-preview" id="upload-preview" hidden>
+            <img id="upload-img" alt="">
+          </div>
+          <button type="button" class="upload-remove" id="upload-remove" hidden>Retirer l'image</button>
+        </div>
+
+        <fieldset id="format">
+          <legend>Format</legend>
+          <div class="row" id="aspects">
+            <button class="chip" type="button" data-aspect="1.777" data-ratio="16:9" aria-pressed="true">16:9</button>
+            <button class="chip" type="button" data-aspect="0.5625" data-ratio="9:16" aria-pressed="false">9:16</button>
+            <button class="chip" type="button" data-aspect="1" data-ratio="1:1" aria-pressed="false">1:1</button>
+            <button class="chip" type="button" data-aspect="1.333" data-ratio="4:3" aria-pressed="false">4:3</button>
+            <button class="chip" type="button" data-aspect="0.75" data-ratio="3:4" aria-pressed="false">3:4</button>
+          </div>
+        </fieldset>
+
+        <div class="split">
+          <fieldset>
+            <legend>Durée</legend>
+            <div class="four">
+              <button class="chip" type="button" data-duration="4" data-frames="96" aria-pressed="false">4s</button>
+              <button class="chip" type="button" data-duration="6" data-frames="145" aria-pressed="true">6s</button>
+              <button class="chip" type="button" data-duration="8" data-frames="193" aria-pressed="false">8s</button>
+              <button class="chip" type="button" data-duration="10" data-frames="241" aria-pressed="false">10s</button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Définition</legend>
+            <div class="three">
+              <button class="chip" type="button" data-resolution="480p" aria-pressed="true">480p</button>
+              <button class="chip" type="button" data-resolution="720p" aria-pressed="false">720p</button>
+              <button class="chip" type="button" data-resolution="1080p" aria-pressed="false">1080p</button>
+            </div>
+          </fieldset>
+        </div>
+
+        <button class="go" type="submit" id="go">
+          <span class="spinner"></span>
+          <span id="go-label">Générer le clip</span>
+        </button>
+        <p class="hint" id="hint">6 s · 480p · 16:9 · modèle rapide</p>
+        <p class="error" id="error" hidden></p>
+      </form>
+
+      <section>
+        <div class="panel">
+          <div class="stage-head"><h2>Aperçu</h2><span class="time" id="time">00:00:00</span></div>
+          <div class="frame" id="frame">
+            <span class="corner tl"></span><span class="corner tr"></span>
+            <span class="corner bl"></span><span class="corner br"></span>
+            <div class="empty" id="stage-empty">
+              <p>Le plan apparaît ici.</p>
+              <p class="stage-sub">Décrivez-le, puis lancez la génération.</p>
+            </div>
+          </div>
+        </div>
+        <div class="library">
+          <h2>Clips de cette session</h2>
+          <p>Les clips restent dans ce navigateur.</p>
+          <div class="library-list" id="library-list">
+            <div class="library-empty" id="library-empty">Aucun clip pour l'instant.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="fatal" id="fatal"></div>
+
+  <canvas id="noSleepCanvas" width="2" height="2" style="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1"></canvas>
+  <video id="noSleepVideo" playsinline muted loop style="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1"></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+
+const VIDEO_FIRST_POLL_DELAY_SEC = 55;
+const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
+const VIDEO_MAX_POLL_ATTEMPTS = 90;
+
+const KEY_STORAGE = 'cadre_api_key_v1';
+const LIBRARY_STORAGE = 'cadre_library_v1';
+const WAKE_LOCK_PREF = 'cadre_wakelock';
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  mode: 'texte',
+  aspect: '1.777',
+  ratio: '16:9',
+  duration: '6',
+  frames: 145,
+  resolution: '480p',
+  uploadedImage: null,
+  uploadedDataUrl: null,
+  busy: false,
+  stopRequested: false,
+  library: []
+};
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// ══════════════════════════════════════════════════════════════════
+// STATUS & ERREURS
+// ══════════════════════════════════════════════════════════════════
+function setStatus(text, stateName){
+  const el = $('#status');
+  el.textContent = text;
+  el.dataset.state = stateName || 'idle';
+}
+function showError(msg){
+  const e = $('#error');
+  if(msg){ e.textContent = msg; e.hidden = false; }
+  else { e.textContent = ''; e.hidden = true; }
+}
+function showFatal(msg){
+  const f = $('#fatal');
+  f.textContent = msg;
+  f.classList.add('visible');
+  setTimeout(() => f.classList.remove('visible'), 5000);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// WAKE LOCK
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel = null, canvasStream = null, canvasInterval = null;
+async function activateWakeLock(){
+  try{
+    if('wakeLock' in navigator && navigator.wakeLock.request){
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+      wakeLockSentinel.addEventListener('release', () => { wakeLockSentinel = null; });
+      return;
+    }
+  }catch(e){}
+  try{
+    const canvas = $('#noSleepCanvas');
+    const video = $('#noSleepVideo');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000'; ctx.fillRect(0,0,2,2);
+    canvasStream = canvas.captureStream(1);
+    let toggle = false;
+    canvasInterval = setInterval(() => {
+      toggle = !toggle;
+      ctx.fillStyle = toggle ? '#000' : '#010101';
+      ctx.fillRect(0,0,2,2);
+    }, 1000);
+    video.srcObject = canvasStream;
+    video.muted = true; video.playsInline = true;
+    video.play().catch(() => {});
+  }catch(e){}
+}
+async function deactivateWakeLock(){
+  if(wakeLockSentinel){ try{ await wakeLockSentinel.release(); }catch(e){} wakeLockSentinel = null; }
+  if(canvasInterval){ clearInterval(canvasInterval); canvasInterval = null; }
+  const video = $('#noSleepVideo');
+  if(video){ try{ video.pause(); video.srcObject = null; }catch(e){} }
+  if(canvasStream){ try{ canvasStream.getTracks().forEach(t => t.stop()); }catch(e){} canvasStream = null; }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CLÉ API
+// ══════════════════════════════════════════════════════════════════
+function getKey(){ try{ return (localStorage.getItem(KEY_STORAGE) || '').trim(); }catch(e){ return ''; } }
+function saveKey(){
+  const input = $('#api-key');
+  const val = input.value.trim();
+  if(!val){
+    try{ localStorage.removeItem(KEY_STORAGE); }catch(e){}
+    updateKeyUI();
+    return;
+  }
+  if(!val.startsWith('sk-') && !confirm('La clé ne commence pas par "sk-". Sauvegarder quand même ?')) return;
+  try{ localStorage.setItem(KEY_STORAGE, val); }catch(e){}
+  updateKeyUI();
+}
+function updateKeyUI(){
+  const key = getKey();
+  const input = $('#api-key');
+  const status = $('#api-status');
+  if(key){
+    input.value = key;
+    status.textContent = 'Clé active · ' + key.slice(0,8) + '…' + key.slice(-4);
+    status.dataset.state = 'ok';
+  } else {
+    input.value = '';
+    status.textContent = 'Aucune clé API enregistrée.';
+    status.dataset.state = '';
+  }
+  refreshGo();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API FETCH AVEC RETRY
+// ══════════════════════════════════════════════════════════════════
+async function apiFetch(url, options = {}, maxAttempts = 5){
+  let lastErr = null;
+  for(let attempt = 0; attempt < maxAttempts; attempt++){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+    const key = getKey();
+    if(!key) throw new Error('Clé API manquante');
+    const headers = Object.assign({}, options.headers || {}, { 'Authorization': 'Bearer ' + key });
+    try{
+      const res = await fetch(url, Object.assign({}, options, { headers }));
+      if(res.ok) return res;
+      if([400,401,403,404].includes(res.status)){
+        const err = new Error('HTTP ' + res.status);
+        err.status = res.status;
+        throw err;
+      }
+      if(res.status === 429){
+        const wait = Math.min(120, 20 + attempt * 15);
+        setStatus('Limite API — attente ' + wait + 's', 'busy');
+        await sleep(wait * 1000);
+        continue;
+      }
+      if([500,502,503,504,520,522,524].includes(res.status)){
+        const wait = Math.min(60, 8 + attempt * 6);
+        setStatus('Service occupé — ' + wait + 's', 'busy');
+        await sleep(wait * 1000);
+        continue;
+      }
+      await sleep(Math.min(45, 5 + attempt * 5) * 1000);
+    }catch(e){
+      if(e.message === 'Arrêt demandé') throw e;
+      if(e.status && [400,401,403,404].includes(e.status)) throw e;
+      lastErr = e;
+      await sleep(Math.min(30, 4 + attempt * 4) * 1000);
+    }
+  }
+  throw lastErr || new Error('Échec de la requête');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION IMAGE
+// ══════════════════════════════════════════════════════════════════
+async function generateImage(prompt, ratio){
+  const body = {
+    model: MODEL_IMAGE,
+    prompt: prompt,
+    n: 1,
+    size: '1K',
+    ratio: ratio
+  };
+  const res = await apiFetch(API_BASE + '/images/generations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  const item = data.data && data.data[0];
+  if(!item) throw new Error('Pas de donnée image');
+  if(item.url) return item.url;
+  if(item.b64_json) return 'data:image/png;base64,' + item.b64_json;
+  throw new Error('Format image inconnu');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION VIDÉO
+// ══════════════════════════════════════════════════════════════════
+async function createVideoTask(prompt, imageUrl, frames){
+  const body = {
+    model: MODEL_VIDEO,
+    prompt: prompt,
+    num_frames: frames,
+    frame_rate: FRAME_RATE
+  };
+  if(imageUrl) body.image = imageUrl;
+  const res = await apiFetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  const id = data.video_id || data.id || data.task_id;
+  if(!id) throw new Error('Pas de video_id retourné');
+  return id;
+}
+
+async function pollVideo(videoId, onProgress){
+  let rem = VIDEO_FIRST_POLL_DELAY_SEC;
+  while(rem > 0){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+    onProgress('Préparation', rem);
+    await sleep(1000);
+    rem--;
+  }
+  for(let attempt = 0; attempt < VIDEO_MAX_POLL_ATTEMPTS; attempt++){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+    if(attempt > 0){
+      const idx = Math.min(attempt - 1, VIDEO_POLL_INTERVALS.length - 1);
+      let r = VIDEO_POLL_INTERVALS[idx];
+      while(r > 0){
+        if(state.stopRequested) throw new Error('Arrêt demandé');
+        onProgress('Création', r);
+        await sleep(1000);
+        r--;
+      }
+    }
+    const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId) + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+    const res = await apiFetch(url, { method: 'GET' }, 3);
+    let data;
+    try{ data = await res.json(); }catch(e){ continue; }
+    const status = data.status || 'unknown';
+    const progress = data.progress || 0;
+    onProgress('Création', null, progress);
+    if(status === 'completed' || status === 'succeeded' || status === 'done'){
+      const videoUrl = (data.metadata && data.metadata.url) || data.url || (data.output && data.output.url);
+      if(!videoUrl) throw new Error('URL manquante');
+      return videoUrl;
+    }
+    if(status === 'failed' || status === 'error' || status === 'cancelled'){
+      throw new Error('Échec (' + status + ')');
+    }
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PREVIEW STAGE
+// ══════════════════════════════════════════════════════════════════
+function showLoadingStage(label, seconds, progress){
+  const frame = $('#frame');
+  const corners = frame.querySelectorAll('.corner');
+  // Nettoie tout sauf les coins
+  Array.from(frame.children).forEach(c => { if(!c.classList.contains('corner')) c.remove(); });
+  const div = document.createElement('div');
+  div.className = 'loading-stage';
+  div.innerHTML =
+    '<div class="circle"></div>' +
+    '<div class="lbl">' + label + '</div>' +
+    (seconds ? '<div class="pct">' + seconds + 's</div>' : '') +
+    (progress ? '<div class="pct">' + progress + '%</div>' : '');
+  frame.appendChild(div);
+}
+
+function showStageVideo(videoUrl){
+  const frame = $('#frame');
+  // Nettoie tout sauf les coins
+  Array.from(frame.children).forEach(c => { if(!c.classList.contains('corner')) c.remove(); });
+  const video = document.createElement('video');
+  video.src = videoUrl;
+  video.controls = true;
+  video.playsInline = true;
+  video.preload = 'metadata';
+  video.muted = true;
+  frame.appendChild(video);
+}
+
+function showStageError(msg){
+  const frame = $('#frame');
+  Array.from(frame.children).forEach(c => { if(!c.classList.contains('corner')) c.remove(); });
+  const div = document.createElement('div');
+  div.className = 'empty';
+  div.innerHTML = '<p style="color:var(--danger)">' + msg + '</p>';
+  frame.appendChild(div);
+}
+
+function resetStage(){
+  const frame = $('#frame');
+  Array.from(frame.children).forEach(c => { if(!c.classList.contains('corner')) c.remove(); });
+  const div = document.createElement('div');
+  div.className = 'empty';
+  div.id = 'stage-empty';
+  div.innerHTML = '<p>Le plan apparaît ici.</p><p class="stage-sub">Décrivez-le, puis lancez la génération.</p>';
+  frame.appendChild(div);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BIBLIOTHÈQUE DE SESSION
+// ══════════════════════════════════════════════════════════════════
+function loadLibrary(){
+  try{
+    const raw = localStorage.getItem(LIBRARY_STORAGE);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+function saveLibrary(){
+  try{
+    localStorage.setItem(LIBRARY_STORAGE, JSON.stringify(state.library.slice(0, 30)));
+  }catch(e){}
+}
+function addToLibrary(clip){
+  state.library.unshift(clip);
+  if(state.library.length > 30) state.library = state.library.slice(0, 30);
+  saveLibrary();
+  renderLibrary();
+}
+function removeFromLibrary(id){
+  state.library = state.library.filter(c => c.id !== id);
+  saveLibrary();
+  renderLibrary();
+}
+function renderLibrary(){
+  const list = $('#library-list');
+  const empty = $('#library-empty');
+  if(!list) return;
+
+  if(!state.library.length){
+    list.innerHTML = '<div class="library-empty">Aucun clip pour l\'instant.</div>';
+    return;
+  }
+
+  list.innerHTML = state.library.map(clip => {
+    const safeTitle = (clip.prompt || '').replace(/[<>&"]/g, '').slice(0, 60);
+    const date = new Date(clip.createdAt).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    return '<div class="clip" data-id="' + clip.id + '">' +
+      '<video src="' + clip.url + '" preload="metadata" muted playsinline></video>' +
+      '<div class="info">' +
+        '<div class="c-title">' + safeTitle + '</div>' +
+        '<div class="c-meta">' + clip.duration + 's · ' + clip.resolution + ' · ' + clip.ratio + ' · ' + date + '</div>' +
+      '</div>' +
+      '<div class="c-actions">' +
+        '<button type="button" data-action="dl" title="Télécharger">⬇</button>' +
+        '<button type="button" data-action="rm" title="Supprimer">✕</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  list.querySelectorAll('.clip').forEach(el => {
+    const id = el.dataset.id;
+    el.addEventListener('click', (e) => {
+      if(e.target.closest('button')) return;
+      const clip = state.library.find(c => c.id === id);
+      if(clip) showStageVideo(clip.url);
+    });
+    el.querySelector('[data-action="dl"]').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const clip = state.library.find(c => c.id === id);
+      if(!clip) return;
+      await downloadUrl(clip.url, 'cadre-' + id + '.mp4');
+    });
+    el.querySelector('[data-action="rm"]').addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeFromLibrary(id);
+    });
+  });
+}
+
+async function downloadUrl(url, filename){
+  try{
+    const r = await fetch(url, { mode: 'cors' });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const blob = await r.blob();
+    const objUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objUrl; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(objUrl); }, 1000);
+  }catch(e){
+    try{ window.open(url, '_blank', 'noopener'); }catch(e2){}
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE PRINCIPAL
+// ══════════════════════════════════════════════════════════════════
+async function generateClip(promptText){
+  if(state.busy) return;
+
+  // Validation
+  if(!getKey()){ showError('Ajoutez d\'abord votre clé API Agnes.'); return; }
+  if(!promptText || promptText.length < 5){ showError('Décrivez le plan (au moins 5 caractères).'); return; }
+  if(state.mode === 'image' && !state.uploadedImage){ showError('Ajoutez une image source ou passez en mode Texte.'); return; }
+
+  state.busy = true;
+  state.stopRequested = false;
+  showError('');
+  await activateWakeLock();
+  refreshGo();
+
+  const startTime = Date.now();
+
+  try{
+    let imageUrl;
+
+    if(state.mode === 'image' && state.uploadedDataUrl){
+      // Mode image : on utilise l'image uploadée
+      setStatus('Préparation de l\'image…', 'busy');
+      showLoadingStage('Préparation de l\'image source…', null, null);
+      imageUrl = state.uploadedDataUrl;
+      await sleep(500);
+    } else {
+      // Mode texte : on génère d'abord l'image
+      setStatus('Peinture du cadre…', 'busy');
+      showLoadingStage('Peinture du cadre…', null, null);
+      imageUrl = await generateImage(promptText, state.ratio);
+
+      // Petit aperçu de l'image générée pendant la génération vidéo
+      const frame = $('#frame');
+      Array.from(frame.children).forEach(c => { if(!c.classList.contains('corner')) c.remove(); });
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      frame.appendChild(img);
+      await sleep(800);
+    }
+
+    // Génération vidéo
+    setStatus('Création du clip…', 'busy');
+    showLoadingStage('Création du clip…', null, null);
+    const videoId = await createVideoTask(promptText, imageUrl, state.frames);
+
+    let lastLabel = '';
+    let lastSeconds = 0;
+
+    const videoUrl = await pollVideo(videoId, (label, seconds, progress) => {
+      if(seconds !== undefined && seconds !== null){
+        setStatus(label + ' — ' + seconds + 's', 'busy');
+        showLoadingStage(label, seconds, null);
+      } else if(progress !== undefined){
+        setStatus('Création — ' + progress + '%', 'busy');
+        showLoadingStage(label, null, progress);
+      } else {
+        setStatus(label, 'busy');
+        showLoadingStage(label, null, null);
+      }
+    });
+
+    // Succès
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    showStageVideo(videoUrl);
+    setStatus('✦ Clip prêt en ' + elapsed + 's ✦', 'ok');
+
+    const clip = {
+      id: 'clip_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+      url: videoUrl,
+      prompt: promptText,
+      duration: state.duration,
+      resolution: state.resolution,
+      ratio: state.ratio,
+      mode: state.mode,
+      createdAt: Date.now()
+    };
+    addToLibrary(clip);
+
+    setTimeout(() => setStatus('Prêt', 'idle'), 5000);
+
+  } catch(e){
+    if(e.message === 'Arrêt demandé'){
+      setStatus('Arrêté', 'idle');
+      resetStage();
+    } else {
+      setStatus('Échec', 'err');
+      showStageError(e.message);
+      showError(e.message);
+      setStatus('Erreur : ' + e.message.slice(0, 60), 'err');
+      setTimeout(() => setStatus('Prêt', 'idle'), 4000);
+    }
+  }
+
+  state.busy = false;
+  state.stopRequested = false;
+  await deactivateWakeLock();
+  refreshGo();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════════
+function refreshGo(){
+  const btn = $('#go');
+  const label = $('#go-label');
+  const busy = state.busy;
+  btn.disabled = busy || !getKey();
+  btn.dataset.busy = busy ? '1' : '0';
+  label.textContent = busy ? 'Génération en cours…' : (getKey() ? 'Générer le clip' : 'Ajoutez une clé API');
+}
+
+function updateHint(){
+  const el = $('#hint');
+  el.textContent = state.duration + ' s · ' + state.resolution + ' · ' + state.ratio + ' · modèle rapide';
+}
+
+function updateModeUI(){
+  const isImage = state.mode === 'image';
+  $('#mode-texte').setAttribute('aria-pressed', String(!isImage));
+  $('#mode-image').setAttribute('aria-pressed', String(isImage));
+  $('#upload-block').hidden = !isImage;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BINDINGS
+// ══════════════════════════════════════════════════════════════════
+const prompt = $('#prompt');
+const frame = $('#frame');
+
+// Compteur
+function updateCount(){
+  $('#count').textContent = prompt.value.trim().length + '/900';
+}
+prompt.addEventListener('input', updateCount);
+updateCount();
+
+// Clé API
+$('#api-save').addEventListener('click', saveKey);
+$('#api-key').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){ e.preventDefault(); saveKey(); }
+});
+
+// Presets
+$$('[data-prompt]').forEach(b => {
+  b.addEventListener('click', () => {
+    prompt.value = b.dataset.prompt;
+    updateCount();
+    prompt.focus();
+  });
+});
+
+// Mode
+$('#mode-texte').addEventListener('click', () => { state.mode = 'texte'; updateModeUI(); });
+$('#mode-image').addEventListener('click', () => { state.mode = 'image'; updateModeUI(); });
+
+// Aspect
+$$('[data-aspect]').forEach(b => {
+  b.addEventListener('click', () => {
+    state.aspect = b.dataset.aspect;
+    state.ratio = b.dataset.ratio;
+    frame.style.setProperty('--ar', state.aspect);
+    $$('[data-aspect]').forEach(el => el.setAttribute('aria-pressed', String(el === b)));
+    updateHint();
+  });
+});
+
+// Durée
+$$('[data-duration]').forEach(b => {
+  b.addEventListener('click', () => {
+    state.duration = b.dataset.duration;
+    state.frames = parseInt(b.dataset.frames, 10);
+    $$('[data-duration]').forEach(el => el.setAttribute('aria-pressed', String(el === b)));
+    updateHint();
+  });
+});
+
+// Résolution
+$$('[data-resolution]').forEach(b => {
+  b.addEventListener('click', () => {
+    state.resolution = b.dataset.resolution;
+    $$('[data-resolution]').forEach(el => el.setAttribute('aria-pressed', String(el === b)));
+    updateHint();
+  });
+});
+
+// Upload image
+$('#file').addEventListener('change', async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  if(!f.type.startsWith('image/')){ showError('Fichier non image.'); return; }
+  if(f.size > 15 * 1024 * 1024){ showError('Image trop lourde (max 15 Mo).'); return; }
+  try{
+    const dataUri = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = ev => res(ev.target.result);
+      r.onerror = () => rej(new Error('Lecture impossible'));
+      r.readAsDataURL(f);
+    });
+    // Compression si trop lourde
+    const compressed = await new Promise((res) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        const maxSide = 1280;
+        const scale = Math.min(1, maxSide / Math.max(width, height));
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+        const c = document.createElement('canvas');
+        c.width = width; c.height = height;
+        c.getContext('2d').drawImage(img, 0, 0, width, height);
+        res(c.toDataURL('image/jpeg', 0.9));
+      };
+      img.onerror = () => res(dataUri);
+      img.src = dataUri;
+    });
+    state.uploadedDataUrl = compressed;
+    state.uploadedImage = f;
+    $('#upload-img').src = compressed;
+    $('#upload-preview').hidden = false;
+    $('#upload-remove').hidden = false;
+    showError('');
+  }catch(err){
+    showError('Impossible de charger l\'image.');
+  }
+  e.target.value = '';
+});
+
+$('#upload-remove').addEventListener('click', () => {
+  state.uploadedDataUrl = null;
+  state.uploadedImage = null;
+  $('#upload-preview').hidden = true;
+  $('#upload-remove').hidden = true;
+  $('#upload-img').src = '';
+});
+
+// Soumission du formulaire
+$('#form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  generateClip(prompt.value.trim());
+});
+
+// Ctrl + Entrée dans le textarea
+prompt.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
+    e.preventDefault();
+    generateClip(prompt.value.trim());
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init(){
+  updateKeyUI();
+  updateModeUI();
+  updateHint();
+  refreshGo();
+  state.library = loadLibrary();
+  renderLibrary();
+  setStatus('Prêt', 'idle');
+  try{
+    const saved = localStorage.getItem(WAKE_LOCK_PREF);
+    if(saved === '1') activateWakeLock();
+  }catch(e){}
+})();
+
+// Filets de sécurité
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled:', e.reason);
+  if(e.reason && e.reason.message && !state.busy){
+    showFatal('Erreur : ' + e.reason.message.slice(0, 100));
+  }
+});
+window.addEventListener('error', (e) => {
+  console.error('Error:', e.message);
+});
+</script>
+</body>
+</html>
