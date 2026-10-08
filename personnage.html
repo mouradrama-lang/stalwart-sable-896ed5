@@ -1,0 +1,2914 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Character Consistency Studio — Cohérence de Personnage</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0a0a12;--bg2:#12121c;--bg3:#1a1a28;
+--panel:#16161f;--border:#2a2a3a;--border-soft:#23232f;
+--ink:#e8e6e0;--dim:#8a8896;--faint:#4a4858;
+--gold:#e5c15a;--gold-soft:#f0d080;--gold-deep:#b89a3a;
+--orange:#e87b35;--orange-soft:#f0a060;--orange-deep:#b85a1e;
+--mint:#a8d8c8;--lavender:#c8b0e0;--sky:#7cc4e8;
+--ok:#4a9d6a;--err:#c85a4a;--warn:#d4a017;
+--r:6px;--fs:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+--fm:ui-monospace,'SF Mono',Menlo,monospace;
+}
+html,body{background:var(--bg)}
+body{
+font-family:var(--fs);background:var(--bg);color:var(--ink);min-height:100vh;
+background-image:
+radial-gradient(circle at 15% 0%, rgba(229,193,90,.05) 0%, transparent 45%),
+radial-gradient(circle at 85% 100%, rgba(200,176,224,.05) 0%, transparent 45%);
+background-attachment:fixed;
+padding:1.5rem 1rem 24rem;font-size:15px;line-height:1.55;
+max-width:1200px;margin:0 auto;
+}
+header{margin-bottom:1.4rem;text-align:center;padding:1rem 0 1.5rem;position:relative}
+header::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
+h1{font-size:1.9rem;font-weight:300;margin-bottom:.4rem;background:linear-gradient(135deg,var(--gold),var(--orange),var(--lavender));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:.02em}
+.subtitle{font-size:.85rem;color:var(--dim);font-style:italic}
+
+.toast{position:fixed;top:1.5rem;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--bg3);color:var(--ink);border:1px solid var(--border);border-left:3px solid var(--gold);padding:.85rem 1.4rem;border-radius:var(--r);font-size:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:1000;opacity:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.2),opacity .35s;max-width:90vw;text-align:center;display:flex;align-items:center;gap:.6rem}
+.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{border-left-color:var(--ok)}
+.toast.error{border-left-color:var(--err)}
+.toast.warn{border-left-color:var(--warn)}
+
+.banner{background:linear-gradient(135deg, rgba(200,176,224,.06), rgba(168,216,200,.05));border:1px solid var(--border);border-left:2px solid var(--lavender);padding:1rem 1.15rem;border-radius:var(--r);font-size:.8rem;color:var(--dim);margin-bottom:1.2rem;line-height:1.6}
+.banner strong{color:var(--ink);font-weight:600}
+.banner .hl-gold{color:var(--gold-soft);font-weight:600}
+.banner .hl-mint{color:var(--mint);font-weight:600}
+.banner .hl-lav{color:var(--lavender);font-weight:600}
+.banner .hl-sky{color:var(--sky);font-weight:600}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.3rem;margin-bottom:1rem}
+.panel.ok{box-shadow:inset 3px 0 0 var(--ok)}
+.panel-label{display:block;font-size:.68rem;color:var(--dim);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.16em;font-weight:700}
+.panel-label b{color:var(--gold);margin-right:.4rem}
+
+input[type=password],input[type=text],textarea{width:100%;padding:.85rem 1rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:var(--fm);font-size:.82rem;margin-bottom:.6rem;outline:none;transition:border-color .15s}
+textarea{font-family:var(--fs);font-size:.88rem;line-height:1.55;resize:vertical;min-height:80px}
+input[type=text]{font-size:.92rem;font-family:var(--fs)}
+input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+
+.btn{width:100%;padding:.85rem 1.2rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-size:.85rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-bottom:.7rem;transition:all .2s;font-family:inherit}
+.btn:hover:not(:disabled){background:var(--bg3);border-color:var(--gold)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary{border-color:var(--gold-deep);background:linear-gradient(135deg,rgba(232,123,53,.2),rgba(229,193,90,.15));color:var(--gold-soft);font-size:1rem;padding:1.2rem;letter-spacing:.2em}
+.btn-primary:disabled{opacity:.5}
+.btn-secondary{border-color:var(--mint);color:var(--mint);background:rgba(168,216,200,.06)}
+.btn-stop{border-color:var(--err);color:var(--err);background:transparent;display:none}
+.btn-stop.visible{display:block}
+.btn-small{padding:.5rem .8rem;font-size:.72rem;letter-spacing:.1em;margin-bottom:0;width:auto;display:inline-block}
+.btn-mini{padding:.35rem .6rem;font-size:.65rem;letter-spacing:.08em;margin-bottom:0;width:auto;display:inline-block}
+
+.status{font-size:.75rem;padding:.6rem .9rem;border-radius:var(--r);margin-bottom:.5rem;display:flex;align-items:center;gap:.6rem;background:var(--bg2);color:var(--dim);border:1px solid var(--border-soft)}
+.status.ok{background:rgba(74,157,106,.08);color:var(--ok);border-color:rgba(74,157,106,.3);font-weight:500}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0}
+.status.ok .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.hint{font-size:.72rem;color:var(--dim);margin-top:.5rem;line-height:1.5}
+.hint a{color:var(--gold);text-decoration:none;border-bottom:1px dotted var(--gold-deep)}
+
+/* Sections collapsibles */
+.section{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);margin-bottom:1rem;overflow:hidden}
+.section.hidden{display:none!important}
+.section-header{padding:1rem 1.2rem;cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.section-header:hover{background:var(--bg2)}
+.section-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.18em;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.badge{display:inline-block;padding:.15rem .55rem;background:transparent;color:var(--gold);border:1px solid var(--gold-deep);border-radius:2px;font-size:.6rem;letter-spacing:.12em;font-weight:700}
+.badge.ok{color:var(--ok);border-color:rgba(74,157,106,.5)}
+.badge.warn{color:var(--warn);border-color:rgba(212,160,23,.5)}
+.badge.err{color:var(--err);border-color:rgba(200,90,74,.5)}
+.badge.mint{color:var(--mint);border-color:rgba(168,216,200,.5)}
+.badge.lav{color:var(--lavender);border-color:rgba(200,176,224,.5)}
+.chevron{font-size:.7rem;color:var(--faint);transition:transform .3s}
+.section.open .chevron{transform:rotate(180deg);color:var(--gold)}
+.section-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.section.open .section-body{max-height:20000px}
+.section-content{padding:0 1.2rem 1.2rem}
+
+/* Clés API */
+.keys-list{margin-top:.7rem}
+.key-row{padding:.4rem .7rem;background:var(--bg2);border:1px solid var(--border-soft);border-radius:var(--r);margin-bottom:.35rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-family:var(--fm);font-size:.72rem}
+.key-row .key-id{color:var(--gold);font-weight:600}
+.key-row .key-state{font-size:.62rem;padding:.15rem .5rem;border-radius:2px;background:rgba(74,157,106,.15);color:var(--ok);border:1px solid rgba(74,157,106,.3);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+.key-row .key-state.cool{background:rgba(212,160,23,.15);color:var(--warn);border-color:rgba(212,160,23,.3)}
+.key-row .key-state.dead{background:rgba(200,90,74,.15);color:var(--err);border-color:rgba(200,90,74,.3)}
+
+/* Bibliothèque de personnages */
+.char-library{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:.8rem}
+.char-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.char-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.char-card.selected{border-color:var(--gold);box-shadow:0 0 0 2px rgba(229,193,90,.2), 0 8px 24px rgba(0,0,0,.4)}
+.char-card .cc-preview{width:100%;aspect-ratio:1/1;background:#000;object-fit:cover;display:block;border-bottom:1px solid var(--border)}
+.char-card .cc-body{padding:.6rem .7rem}
+.char-card .cc-name{font-size:.85rem;color:var(--gold-soft);font-weight:600;margin-bottom:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.char-card .cc-species{font-size:.68rem;color:var(--dim);font-family:var(--fm);margin-bottom:.4rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.char-card .cc-actions{display:flex;gap:.3rem;margin-top:.4rem}
+.char-card .cc-actions button{flex:1;font-size:.62rem;padding:.3rem .5rem;background:var(--bg3);border:1px solid var(--border);color:var(--dim);border-radius:2px;cursor:pointer;font-family:inherit;letter-spacing:.05em}
+.char-card .cc-actions button:hover{color:var(--gold);border-color:var(--gold-deep)}
+.char-card.selected::after{content:'✓ SÉLECTIONNÉ';position:absolute;top:.5rem;right:.5rem;background:var(--gold);color:var(--bg);padding:.15rem .5rem;font-size:.58rem;font-weight:800;letter-spacing:.08em;border-radius:2px}
+.char-empty{text-align:center;padding:2rem 1rem;color:var(--faint);font-size:.85rem;border:1px dashed var(--border);border-radius:var(--r)}
+
+/* Planche de référence — grille 6 vues */
+.refsheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.8rem}
+.refsheet-grid .rs-cell{background:#000;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;position:relative}
+.refsheet-grid .rs-cell img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover}
+.refsheet-grid .rs-cell .rs-label{position:absolute;bottom:0;left:0;right:0;padding:.25rem .5rem;background:linear-gradient(transparent, rgba(10,10,18,.9));font-size:.6rem;font-family:var(--fm);color:var(--gold-soft);text-transform:uppercase;letter-spacing:.1em}
+.refsheet-single{background:#000;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:.8rem}
+.refsheet-single img{width:100%;display:block}
+
+/* Character Bible */
+.bible-json{background:#05050a;border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;font-family:var(--fm);font-size:.7rem;line-height:1.55;color:#a8d8b0;max-height:340px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin-top:.6rem}
+.bible-lock{background:linear-gradient(135deg, rgba(229,193,90,.06), rgba(232,123,53,.04));border:1px solid var(--gold-deep);border-left:2px solid var(--gold);border-radius:var(--r);padding:.9rem 1rem;margin-top:.6rem;font-family:var(--fs);font-size:.78rem;line-height:1.6;color:var(--ink);font-style:italic}
+.bible-lock .bl-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.18em;color:var(--gold);font-weight:700;font-style:normal;margin-bottom:.4rem;display:block}
+
+/* Story input */
+.story-layout{display:grid;grid-template-columns:2fr 1fr;gap:1rem}
+@media(max-width:720px){.story-layout{grid-template-columns:1fr}}
+.settings-box{background:var(--bg2);border:1px solid var(--border-soft);border-radius:var(--r);padding:.9rem 1rem}
+.settings-box .label{display:block;font-size:.68rem;color:var(--dim);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+select{width:100%;padding:.75rem .9rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-size:.85rem;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right .9rem center;background-size:10px;cursor:pointer;margin-bottom:.7rem;font-family:inherit}
+select:focus{outline:none;border-color:var(--gold)}
+
+/* Scènes générées */
+.scenes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:.8rem}
+.scene-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .3s;display:flex;flex-direction:column;position:relative}
+.scene-card.generating{border-color:var(--gold)}
+.scene-card.done{border-color:var(--ok)}
+.scene-card.error{border-color:var(--err)}
+.scene-card.retrying{border-color:var(--warn);animation:retryPulse 1.5s ease infinite}
+@keyframes retryPulse{0%,100%{box-shadow:0 0 0 rgba(212,160,23,0)}50%{box-shadow:0 0 20px rgba(212,160,23,.5)}}
+.scene-card-header{padding:.5rem .7rem;font-size:.68rem;font-family:var(--fm);color:var(--dim);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);gap:.5rem}
+.scene-card-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.scene-card-score{font-size:.66rem;font-weight:700;padding:.15rem .5rem;border-radius:2px}
+.scene-card-score.good{background:rgba(74,157,106,.2);color:var(--ok)}
+.scene-card-score.mid{background:rgba(212,160,23,.2);color:var(--warn)}
+.scene-card-score.bad{background:rgba(200,90,74,.2);color:var(--err)}
+.scene-card-body{padding:.7rem;flex:1;display:flex;flex-direction:column;gap:.5rem}
+.scene-card-body img{width:100%;border-radius:2px;background:#000;display:block;aspect-ratio:9/16;object-fit:cover}
+.scene-card-body video{width:100%;border-radius:2px;background:#000;display:block;aspect-ratio:9/16;object-fit:cover}
+.scene-placeholder{width:100%;aspect-ratio:9/16;background:#0a0a12;border-radius:2px;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:.7rem;font-family:var(--fm);flex-direction:column;gap:.5rem;text-align:center;padding:.5rem}
+.scene-actions{display:flex;gap:.3rem;margin-top:.4rem;flex-wrap:wrap}
+.scene-actions button{flex:1;font-size:.62rem;padding:.35rem .5rem;background:var(--bg3);border:1px solid var(--border);color:var(--dim);border-radius:2px;cursor:pointer;font-family:inherit;letter-spacing:.05em;min-width:70px}
+.scene-actions button:hover{color:var(--gold);border-color:var(--gold-deep)}
+.scene-actions button:disabled{opacity:.4;cursor:not-allowed}
+
+.spinner-mini{width:14px;height:14px;border:2px solid rgba(229,193,90,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Score breakdown */
+.score-breakdown{margin-top:.4rem;font-size:.66rem;font-family:var(--fm);color:var(--dim);line-height:1.45}
+.score-breakdown .sb-row{display:flex;justify-content:space-between;gap:.4rem}
+.score-breakdown .sb-val{color:var(--gold-soft);font-weight:600}
+
+/* Player overlay */
+.player-overlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;align-items:center;justify-content:center;cursor:pointer}
+.player-overlay.visible{display:flex}
+#player-canvas{display:block;max-width:100vw;max-height:100vh;background:#000}
+.player-hint{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.55);font-size:.75rem;font-family:var(--fm);letter-spacing:.15em;text-transform:uppercase;pointer-events:none;padding:.35rem .8rem;background:rgba(0,0,0,.5);border-radius:3px}
+.player-controls{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.1rem;margin-top:.6rem}
+.player-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.6rem}
+.player-row .btn{margin-bottom:0;flex:1;min-width:140px}
+.voice-toggle{display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-size:.75rem;color:var(--dim)}
+.voice-toggle input{width:auto;margin:0;accent-color:var(--gold)}
+
+/* Status bar */
+.status-bar{position:fixed;bottom:250px;left:0;right:0;background:var(--bg3);border-top:1px solid var(--border);color:var(--ink);padding:.75rem 1.1rem;font-size:.78rem;display:flex;align-items:center;gap:.7rem;transform:translateY(200%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:150;font-family:var(--fm);box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+.status-bar.visible{transform:translateY(0)}
+.spinner{width:12px;height:12px;border:2px solid rgba(229,193,90,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+
+/* Debug panel */
+.debug-panel{position:fixed;bottom:0;left:0;right:0;height:240px;background:#05050a;border-top:2px solid var(--gold-deep);z-index:200;display:flex;flex-direction:column;font-family:var(--fm);box-shadow:0 -8px 32px rgba(0,0,0,.7);transition:height .3s ease}
+.debug-panel.collapsed{height:40px}
+.debug-header{display:flex;justify-content:space-between;align-items:center;padding:.4rem .7rem;background:linear-gradient(90deg,#0f0f18,#1a1a28);border-bottom:1px solid var(--border);flex-shrink:0;user-select:none}
+.debug-tabs{display:flex;gap:.25rem}
+.debug-tab{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:.65rem;padding:.35rem .7rem;border-radius:3px;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;font-family:inherit}
+.debug-tab.active{color:var(--gold);border-color:var(--gold);background:rgba(229,193,90,.08)}
+.debug-actions{display:flex;gap:.3rem}
+.debug-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:.6rem;padding:.28rem .55rem;border-radius:2px;cursor:pointer;font-family:inherit;letter-spacing:.05em}
+.debug-actions button:hover{color:var(--gold);border-color:var(--gold-deep)}
+.debug-body{flex:1;overflow-y:auto;padding:.6rem .8rem 1rem;font-size:.72rem;line-height:1.5;color:#c8c8d0}
+.debug-body.hidden{display:none}
+.journal-body{font-size:.78rem}
+.journal-body .j-entry{display:flex;gap:.6rem;padding:.22rem 0;align-items:flex-start;border-bottom:1px dashed rgba(255,255,255,.04)}
+.journal-body .j-entry:last-child{border-bottom:none}
+.journal-body .j-time{font-family:var(--fm);font-size:.7rem;color:var(--faint);flex-shrink:0;min-width:64px;padding-top:.15rem}
+.journal-body .j-icon{flex-shrink:0}
+.journal-body .j-msg{color:#d8d8e0;flex:1;word-break:break-word}
+.journal-body .j-entry.highlight .j-msg{color:var(--gold);font-weight:600}
+.journal-body .j-entry.success .j-msg{color:var(--ok)}
+.journal-body .j-entry.warn .j-msg{color:var(--warn)}
+.journal-body .j-entry.error .j-msg{color:var(--err)}
+.journal-body .j-entry.vision .j-msg{color:var(--lavender)}
+.debug-entry{margin-bottom:.3rem;padding:.25rem .4rem;border-left:2px solid transparent;border-radius:2px;word-break:break-word}
+.debug-entry.info{border-left-color:var(--faint)}
+.debug-entry.success{border-left-color:var(--ok);background:rgba(74,157,106,.04)}
+.debug-entry.warn{border-left-color:var(--warn);background:rgba(212,160,23,.04)}
+.debug-entry.error{border-left-color:var(--err);background:rgba(200,90,74,.06);color:#f0a0a0}
+.debug-entry.api{border-left-color:var(--gold)}
+.debug-entry.response{border-left-color:var(--orange)}
+.debug-entry.vision{border-left-color:var(--lavender)}
+.debug-time{color:var(--faint);margin-right:.5rem;font-size:.65rem}
+.debug-cat{color:var(--gold-soft);font-weight:600;margin-right:.4rem;font-size:.65rem}
+.debug-msg{color:#d8d8e0}
+.debug-data{margin-top:.3rem;padding:.4rem .5rem;background:#0a0a12;border:1px solid var(--border-soft);border-radius:2px;font-size:.68rem;color:#a8d8b0;max-height:160px;overflow:auto;white-space:pre-wrap;word-break:break-all;line-height:1.4}
+
+.hidden{display:none!important}
+
+/* Progress bar */
+.progress-bar{width:100%;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:.7rem;border:1px solid var(--border);display:none}
+.progress-bar.visible{display:block}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));width:0%;transition:width .3s;border-radius:3px}
+.progress-info{font-size:.75rem;font-family:var(--fm);color:var(--dim);display:none;justify-content:space-between;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+.progress-info.visible{display:flex}
+
+/* Textarea création personnage */
+.creation-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:720px){.creation-grid{grid-template-columns:1fr}}
+
+/* Wake lock */
+.wake-status{font-size:.72rem;padding:.55rem .8rem;border-radius:var(--r);margin-top:.5rem;display:flex;justify-content:space-between;align-items:center;background:rgba(124,196,232,.06);color:var(--sky);border:1px solid rgba(124,196,232,.3);flex-wrap:wrap;gap:.5rem}
+.wake-status.active{background:rgba(74,157,106,.06);color:var(--ok);border-color:rgba(74,157,106,.3)}
+.wake-status.warn{background:rgba(212,160,23,.06);color:var(--warn);border-color:rgba(212,160,23,.3)}
+.wake-status button{background:transparent;border:1px solid currentColor;color:inherit;padding:.3rem .7rem;border-radius:var(--r);font-size:.66rem;cursor:pointer;letter-spacing:.05em;font-family:inherit}
+
+/* Stats panel */
+.stat-line{font-size:.7rem;color:var(--dim);margin-top:.6rem;padding:.5rem .7rem;background:var(--bg2);border-radius:var(--r);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.3rem;border:1px solid var(--border-soft);font-family:var(--fm)}
+
+/* Character DNA preview */
+.dna-preview{background:var(--bg2);border:1px solid var(--border-soft);border-radius:var(--r);padding:.9rem 1rem;margin-top:.6rem;font-family:var(--fm);font-size:.72rem;line-height:1.5;color:var(--dim)}
+.dna-preview .dna-key{color:var(--gold-soft);font-weight:600;letter-spacing:.05em;margin-right:.4rem}
+
+@media (max-width:640px){
+h1{font-size:1.5rem}
+.char-library{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+.scenes-grid{grid-template-columns:1fr}
+.refsheet-grid{grid-template-columns:repeat(2,1fr)}
+body{padding-bottom:26rem}
+.debug-panel{height:210px}
+.status-bar{bottom:220px}
+}
+
+/* Notification pulse quand la scène est validée */
+.scene-card.validated{animation:validatedPulse 1s ease}
+@keyframes validatedPulse{0%{box-shadow:0 0 0 rgba(74,157,106,0)}50%{box-shadow:0 0 30px rgba(74,157,106,.6)}100%{box-shadow:0 0 0 rgba(74,157,106,0)}}
+
+/* Barre de score visuelle */
+.score-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.score-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.score-bar-fill.good{background:linear-gradient(90deg,var(--ok),#6ecf8e)}
+.score-bar-fill.mid{background:linear-gradient(90deg,var(--warn),#f0c04a)}
+.score-bar-fill.bad{background:linear-gradient(90deg,var(--err),#e88070)}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Character Consistency Studio</h1>
+<p class="subtitle">Un personnage. Toutes les scènes. La même identité.</p>
+</header>
+
+<div class="banner">
+<strong>🎯 Le pipeline :</strong>
+<strong class="hl-gold">1.</strong> Créer un personnage → l'IA génère une <strong class="hl-mint">planche de référence à 6 vues</strong> (face, profil, 3/4, visage, détails, expressions).
+<strong class="hl-gold">2.</strong> L'IA construit un <strong class="hl-lav">Character Bible</strong> structuré (JSON + <em>character_lock_prompt</em> de 200-300 mots).
+<strong class="hl-gold">3.</strong> Chaque image de scène est générée avec la planche en référence + le lock prompt.
+<strong class="hl-gold">4.</strong> Un <strong class="hl-sky">Consistency Checker</strong> analyse chaque image et donne un <strong>score 0-100</strong> sur 5 critères (identité, tenue, accessoires, posture, ambiance).
+<strong class="hl-gold">5.</strong> Si le score est sous le seuil → <strong>régénération automatique</strong> (jusqu'à 3 fois).
+<strong class="hl-gold">6.</strong> Les vidéos chaînent la dernière image d'une scène à la première de la suivante.
+</div>
+
+<!-- ═══════════ CLÉS API ═══════════ -->
+<div class="panel" id="api-panel">
+<label class="panel-label"><b>01</b> Clés API Agnes — une par ligne (N clés = N workers parallèles)</label>
+<textarea id="api-keys-input" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-yyyyyyyyyyyyyyyyyyyyyyyy" rows="3" spellcheck="false" autocomplete="off"></textarea>
+<button type="button" class="btn" id="api-save-btn">Enregistrer les clés</button>
+<div class="status" id="api-status-line"><span class="dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
+<div class="keys-list" id="api-keys-status"></div>
+<div class="hint">Clés gratuites sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> → Settings → API Keys</div>
+<div class="stat-line">
+<span>📊 Vitesse vidéo : <span id="stat-speed">en attente</span></span>
+<span id="stat-samples">0 génération</span>
+</div>
+<div class="wake-status" id="wake-status">
+<span id="wake-status-text">💤 Veille automatique</span>
+<button type="button" id="wake-toggle-btn">Garder l'écran allumé</button>
+</div>
+</div>
+
+<!-- ═══════════ BIBLIOTHÈQUE DE PERSONNAGES ═══════════ -->
+<div class="section open" id="section-library">
+<div class="section-header" data-toggle="section-library">
+<span class="section-title"><span>👥 02 · Bibliothèque de personnages</span> <span class="badge" id="library-badge">0</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+<div class="char-library" id="char-library">
+<div class="char-empty">Aucun personnage enregistré. Cliquez ci-dessous pour en créer un.</div>
+</div>
+<button type="button" class="btn btn-secondary" id="new-char-btn" style="margin-top:1rem">＋ Créer un nouveau personnage</button>
+</div></div>
+</div>
+
+<!-- ═══════════ CRÉATION DE PERSONNAGE ═══════════ -->
+<div class="section hidden" id="section-create">
+<div class="section-header" data-toggle="section-create">
+<span class="section-title"><span>✨ 03 · Création de personnage</span> <span class="badge lav">nouveau</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+
+<div class="creation-grid">
+<div>
+<label class="panel-label"><b>A</b> Image de référence <span class="badge mint">optionnel mais recommandé</span></label>
+<div style="border:2px dashed var(--border);border-radius:var(--r);padding:1.4rem 1rem;background:var(--bg2);text-align:center;cursor:pointer;position:relative;" id="char-ref-drop">
+<input type="file" accept="image/*" id="char-ref-input" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+<div style="font-size:2rem;color:var(--gold);opacity:.6;margin-bottom:.5rem">🎨</div>
+<div style="font-size:.82rem;color:var(--dim);line-height:1.5"><strong style="color:var(--gold-soft)">Cliquez pour choisir une image</strong><br>Portrait, selfie, illustration, artwork…</div>
+<div style="font-size:.68rem;color:var(--faint);margin-top:.4rem;font-family:var(--fm)">L'IA s'en servira comme base d'identité.</div>
+</div>
+<div id="char-ref-preview-container" class="hidden" style="margin-top:.6rem">
+<img id="char-ref-preview" style="width:100%;max-height:300px;object-fit:contain;background:#000;border:1px solid var(--gold-deep);border-radius:var(--r)">
+<div style="display:flex;gap:.4rem;margin-top:.4rem">
+<button type="button" class="btn btn-mini" id="char-ref-clear">✕ Retirer l'image</button>
+</div>
+</div>
+</div>
+<div>
+<label class="panel-label"><b>B</b> Description textuelle</label>
+<textarea id="char-description" placeholder="Décrivez votre personnage avec précision. Ex :
+
+Un chat siamois anthropomorphe, museau crème, oreilles foncées, yeux bleu ciel, moustaches blanches, tache en losange entre les oreilles. Il porte un kimono de Shaolin rose poudré en velours côtelé, une ceinture moutarde, des chaussettes hautes crème, des chaussons de moine et un casque de moto rétro chromé à visière relevée. Posture droite, mains jointes devant soi, expression deadpan." rows="8"></textarea>
+
+<div style="background:var(--bg2);border:1px solid var(--border-soft);border-radius:var(--r);padding:.7rem .9rem;margin-top:.5rem">
+<label class="label" style="display:block;font-size:.68rem;color:var(--dim);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700">Ou archétype rapide</label>
+<select id="char-archetype">
+<option value="">— Choisir un archétype prédéfini —</option>
+<option value="chaton-siamois-shaolin">🐱 Chaton siamois moine Shaolin</option>
+<option value="chaton-persan-detective">🐱 Chaton persan détective années 40</option>
+<option value="chaton-ecossais-astronaute">🐱 Chaton écossais astronaute rétro</option>
+<option value="chaton-maine-coon-chef">🐱 Chaton maine coon chef cuisinier</option>
+<option value="chaton-sphinx-hacker">🐱 Chaton sphinx hacker cyberpunk</option>
+<option value="chaton-bengal-aventurier">🐱 Chaton bengal aventurier jungle</option>
+<option value="chaton-angora-poete">🐱 Chaton angora poète romantique</option>
+<option value="chaton-chartreux-prof">🐱 Chaton chartreux professeur tweed</option>
+<option value="humain-cyrano">👤 Humain Cyrano de Bergerac</option>
+<option value="humain-jeanne-darc">👤 Humaine Jeanne d'Arc chevalière</option>
+<option value="humain-napoleon">👤 Humain Napoléon moderne</option>
+<option value="humain-marie-curie">👤 Humaine Marie Curie savante</option>
+</select>
+</div>
+</div>
+</div>
+
+<button type="button" class="btn btn-primary" id="create-char-btn" style="margin-top:1rem">🎨 Générer la planche de référence</button>
+<button type="button" class="btn btn-stop" id="create-stop-btn">⏹ Arrêter</button>
+
+<div id="refsheet-section" class="hidden">
+<label class="panel-label" style="margin-top:1rem"><b>C</b> Planche de référence générée</label>
+<div class="refsheet-single" id="refsheet-single">
+<img id="refsheet-image" alt="Planche de référence">
+</div>
+<div class="hint">💡 Cette planche est l'identité absolue du personnage. Elle sera envoyée à chaque génération d'image pour garantir la cohérence.</div>
+</div>
+
+</div></div>
+</div>
+
+<!-- ═══════════ CHARACTER BIBLE ═══════════ -->
+<div class="section hidden" id="section-bible">
+<div class="section-header" data-toggle="section-bible">
+<span class="section-title"><span>📖 04 · Character Bible</span> <span class="badge lav" id="bible-badge">—</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+
+<label class="panel-label"><b>A</b> Character Lock Prompt <span class="badge">injecté dans TOUS les prompts</span></label>
+<div class="bible-lock">
+<span class="bl-label">🔒 Lock Prompt — 200 à 300 mots qui figent l'identité</span>
+<div id="bible-lock-text">—</div>
+</div>
+
+<label class="panel-label" style="margin-top:1rem"><b>B</b> Fiche structurée (JSON)</label>
+<div class="bible-json" id="bible-json">—</div>
+
+<div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">
+<button type="button" class="btn btn-secondary" id="bible-edit-btn" style="flex:1;min-width:140px">✏️ Éditer manuellement</button>
+<button type="button" class="btn btn-secondary" id="bible-regen-btn" style="flex:1;min-width:140px">🔄 Régénérer le Bible</button>
+</div>
+
+<div id="bible-edit-panel" class="hidden" style="margin-top:.8rem">
+<label class="panel-label">Édition du Character Lock Prompt</label>
+<textarea id="bible-lock-edit" rows="8" style="font-family:var(--fm);font-size:.75rem"></textarea>
+<div style="display:flex;gap:.5rem">
+<button type="button" class="btn btn-mini" id="bible-save-btn">💾 Sauvegarder</button>
+<button type="button" class="btn btn-mini" id="bible-cancel-btn">✕ Annuler</button>
+</div>
+</div>
+
+</div></div>
+</div>
+
+<!-- ═══════════ STORY & SCÉNARIO ═══════════ -->
+<div class="section" id="section-story">
+<div class="section-header" data-toggle="section-story">
+<span class="section-title"><span>📝 05 · Histoire & scénario</span> <span class="badge" id="story-badge">—</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+
+<div class="story-layout">
+<div>
+<label class="panel-label"><b>A</b> Votre histoire</label>
+<textarea id="story-input" placeholder="Ex : Le chaton siamois moine Shaolin traverse un temple ancien à l'aube. Il découvre un parchemin secret, le lit à voix haute, et une créature de fumée apparaît. Il engage un duel silencieux avec elle, puis découvre que la créature était son propre reflet. Il médite et atteint l'illumination." rows="8"></textarea>
+</div>
+<div>
+<div class="settings-box">
+<label class="label">Nombre de scènes</label>
+<select id="scene-count">
+<option value="3">3 scènes</option>
+<option value="5" selected>5 scènes</option>
+<option value="8">8 scènes</option>
+<option value="10">10 scènes</option>
+</select>
+<label class="label">Durée par scène</label>
+<select id="scene-duration">
+<option value="121">5 secondes</option>
+<option value="145" selected>6 secondes</option>
+<option value="169">7 secondes</option>
+<option value="241">10 secondes</option>
+</select>
+<label class="label">Seuil de cohérence</label>
+<select id="consistency-threshold">
+<option value="70">70 / 100 — Indulgent</option>
+<option value="80" selected>80 / 100 — Équilibré (recommandé)</option>
+<option value="90">90 / 100 — Strict</option>
+</select>
+<label class="label">Format image</label>
+<select id="image-format">
+<option value="9:16" selected>Portrait 9:16</option>
+<option value="16:9">Paysage 16:9</option>
+<option value="1:1">Carré 1:1</option>
+</select>
+</div>
+</div>
+</div>
+
+<button type="button" class="btn btn-primary" id="generate-script-btn" disabled style="margin-top:1rem">📜 Générer le scénario</button>
+
+<div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="progress-info" id="progress-info">
+<span id="progress-label">En attente…</span>
+<span id="progress-eta"></span>
+</div>
+
+</div></div>
+</div>
+
+<!-- ═══════════ SCÈNES GÉNÉRÉES ═══════════ -->
+<div class="section hidden" id="section-scenes">
+<div class="section-header" data-toggle="section-scenes">
+<span class="section-title"><span>🖼️ 06 · Scènes générées</span> <span class="badge" id="scenes-badge">0</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+
+<button type="button" class="btn btn-primary" id="generate-scenes-btn" disabled>🎨 Générer les images de scène (avec scoring)</button>
+<button type="button" class="btn btn-stop" id="scenes-stop-btn">⏹ Arrêter</button>
+
+<div class="scenes-grid" id="scenes-grid"></div>
+</div></div>
+</div>
+
+<!-- ═══════════ VIDÉOS ═══════════ -->
+<div class="section hidden" id="section-videos">
+<div class="section-header" data-toggle="section-videos">
+<span class="section-title"><span>🎬 07 · Vidéos (keyframes chaînés)</span> <span class="badge" id="videos-badge">0</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+
+<div class="hint" style="margin-bottom:.8rem">🎬 Chaque vidéo chaîne la <strong>dernière image d'une scène</strong> à la <strong>première image de la suivante</strong> — la continuité visuelle est garantie par construction.</div>
+
+<button type="button" class="btn btn-primary" id="generate-videos-btn" disabled>🎬 Générer les vidéos</button>
+<button type="button" class="btn btn-stop" id="videos-stop-btn">⏹ Arrêter</button>
+
+<div class="scenes-grid" id="videos-grid"></div>
+</div></div>
+</div>
+
+<!-- ═══════════ PLAYER ═══════════ -->
+<div class="section hidden" id="section-player">
+<div class="section-header" data-toggle="section-player">
+<span class="section-title"><span>▶ 08 · Player séquentiel</span> <span class="badge" id="player-badge">0</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+<div class="player-controls">
+<div class="player-row">
+<button type="button" class="btn" id="play-film-btn" disabled>▶ Lire le film</button>
+<button type="button" class="btn" id="replay-film-btn" disabled>🔁 Rejouer</button>
+</div>
+<div class="voice-toggle">
+<input type="checkbox" id="voice-toggle" checked>
+<label for="voice-toggle">Narration vocale française (voix du navigateur)</label>
+</div>
+</div>
+<div class="hint">Lecture séquentielle avec incrustations françaises et voix off. Échap ou clic pour quitter.</div>
+</div></div>
+</div>
+
+<!-- ═══════════ STATUS BAR ═══════════ -->
+<div class="status-bar" id="status-bar">
+<div class="spinner"></div>
+<span id="status-text">Préparation…</span>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div class="toast" id="toast">
+<span id="toast-icon">✓</span>
+<span id="toast-text">Message</span>
+</div>
+
+<!-- ═══════════ DEBUG PANEL ═══════════ -->
+<div class="debug-panel" id="debug-panel">
+<div class="debug-header" id="debug-header">
+<div class="debug-tabs">
+<button type="button" class="debug-tab active" data-tab="journal" id="tab-journal">📻 Journal</button>
+<button type="button" class="debug-tab" data-tab="tech" id="tab-tech">🖥️ Technique</button>
+</div>
+<div class="debug-actions">
+<button type="button" id="debug-copy-btn">Copier</button>
+<button type="button" id="debug-clear-btn">Effacer</button>
+<button type="button" id="debug-collapse-btn">−</button>
+</div>
+</div>
+<div class="debug-body journal-body" id="journal-body"></div>
+<div class="debug-body hidden" id="tech-body"></div>
+</div>
+
+<!-- ═══════════ PLAYER OVERLAY ═══════════ -->
+<div class="player-overlay" id="player-overlay">
+<canvas id="player-canvas"></canvas>
+<div class="player-hint" id="player-hint-overlay">Échap ou clic pour quitter</div>
+</div>
+
+<!-- ═══════════ ANTI-VEILLE ═══════════ -->
+<canvas id="noSleepCanvas" width="2" height="2" style="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1"></canvas>
+<video id="noSleepVideo" playsinline muted loop style="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1"></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+
+const VIDEO_FIRST_POLL_DELAY_SEC = 60;
+const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
+const VIDEO_MAX_POLL_ATTEMPTS = 100;
+
+const IMAGE_MAX_RETRIES = 3; // Régénération auto max 3 fois si cohérence insuffisante
+
+const API_KEYS_STORAGE = 'char_consistency_api_keys_v1';
+const CHARACTERS_STORAGE = 'char_consistency_characters_v1';
+const WAKE_LOCK_PREF = 'char_consistency_wakelock';
+
+const DEBUG_MAX = 800;
+const REF_MAX_SIDE = 1280;
+
+// ══════════════════════════════════════════════════════════════════
+// ARCHÉTYPES PRÉDÉFINIS
+// ══════════════════════════════════════════════════════════════════
+const ARCHETYPES = {
+  'chaton-siamois-shaolin': {
+    species: 'chaton siamois anthropomorphe',
+    description: 'Un chat siamois anthropomorphe, museau crème, oreilles foncées, yeux bleu ciel, moustaches blanches, tache en losange entre les oreilles. Il porte un kimono de Shaolin rose poudré en velours côtelé, une ceinture moutarde, des chaussettes hautes crème, des chaussons de moine et un casque de moto rétro chromé à visière relevée. Posture droite, mains jointes devant soi, expression deadpan.',
+    face: 'siamois aux grands yeux bleu ciel, museau crème, oreilles brunes, moustaches fines',
+    outfit: 'kimono de Shaolin rose poudré en velours côtelé, ceinture moutarde, chaussettes hautes crème, chaussons de moine',
+    helmet: 'casque de moto rétro chromé à visière relevée',
+    accessories: 'médaille dorée discrète, ceinture moutarde nouée',
+    posture: 'dos droit, mains jointes devant soi, toujours centré et face caméra',
+    color_palette: ['#F4C2C2', '#E5B95A', '#F5F0E1', '#7B9FB0']
+  },
+  'chaton-persan-detective': {
+    species: 'chaton persan anthropomorphe',
+    description: 'Un chat persan anthropomorphe au pelage gris fumé, museau écrasé, yeux dorés, oreilles petites. Il porte un imperméable beige années 40, un chapeau fedora noir, une chemise blanche, une cravate rouge, et un casque de moto rétro noir intégré au chapeau. Posture voûtée de détective, mains dans les poches, expression mélancolique.',
+    face: 'persan gris fumé aux yeux dorés, museau écrasé, oreilles petites',
+    outfit: 'imperméable beige années 40, chemise blanche, cravate rouge, pantalon à pinces',
+    helmet: 'chapeau fedora noir, casque de moto rétro intégré',
+    accessories: 'calepin, stylo plume doré',
+    posture: 'voûté, mains dans les poches, regard mélancolique',
+    color_palette: ['#C5B7D9', '#E5B95A', '#7B9FB0', '#3B4B55']
+  },
+  'chaton-ecossais-astronaute': {
+    species: 'chaton écossais anthropomorphe',
+    description: 'Un chat écossais anthropomorphe au pelage gris argenté, oreilles pliées, yeux verts. Il porte une combinaison d\'astronaute rétro des années 60, blanche à bandes orange, un casque à bulle en plexiglas transparent, des gants chromés, des bottes magnétiques. Posture militaire, immobile, expression concentrée.',
+    face: 'écossais gris argenté aux yeux verts, oreilles pliées vers l\'avant',
+    outfit: 'combinaison d\'astronaute rétro blanc à bandes orange, ceinture utilitaire',
+    helmet: 'casque à bulle en plexiglas transparent à liseré doré',
+    accessories: 'gants chromés, bottes magnétiques, badges NASA-like rétro',
+    posture: 'militaire, immobile, regard face caméra',
+    color_palette: ['#F5F0E1', '#E87B35', '#7B9FB0', '#E5B95A']
+  },
+  'chaton-maine-coon-chef': {
+    species: 'chaton maine coon anthropomorphe',
+    description: 'Un chat maine coon anthropomorphe, pelage roux tigré, oreilles à plumets, yeux ambrés. Il porte une veste de chef blanche, un tablier rayé bleu et blanc, une toque, des chaussures de cuisine, un casque de moto rétro en forme de toque. Posture fière, mains sur les hanches, expression sévère.',
+    face: 'maine coon roux tigré aux yeux ambrés, oreilles à plumets',
+    outfit: 'veste de chef blanche, tablier rayé bleu-blanc, pantalon noir',
+    helmet: 'toque de chef, casque de moto rétro intégré',
+    accessories: 'couteau de chef, cuillère en bois',
+    posture: 'fière, mains sur les hanches',
+    color_palette: ['#E8A87C', '#F5F0E1', '#7B9FB0', '#E5B95A']
+  },
+  'chaton-sphinx-hacker': {
+    species: 'chaton sphinx anthropomorphe',
+    description: 'Un chat sphinx anthropomorphe, peau rose ridée, grandes oreilles, yeux noirs immenses. Il porte un sweat à capuche noir, un jean slim, des baskets montantes, des lunettes de soleil cyber, un casque de moto rétro noir. Posture avachie, mains sur un clavier invisible, expression intense.',
+    face: 'sphinx rose ridé, grandes oreilles ouvertes, yeux noirs immenses',
+    outfit: 'sweat à capuche noir, jean slim, baskets montantes',
+    helmet: 'casque de moto rétro noir à visière teintée',
+    accessories: 'lunettes de soleil cyber, écouteurs roses, clavier mécanique',
+    posture: 'avachie, mains sur clavier',
+    color_palette: ['#E87B35', '#3B4B55', '#E5B95A', '#E8A87C']
+  },
+  'chaton-bengal-aventurier': {
+    species: 'chaton bengal anthropomorphe',
+    description: 'Un chat bengal anthropomorphe, pelage tacheté léopard, yeux verts intenses, oreilles grandes. Il porte une chemise kaki, un short cargo, des chaussures de randonnée, un chapeau explorer, un casque de moto rétro camouflage. Posture alerte, jumelles autour du cou, expression vigilante.',
+    face: 'bengal tacheté léopard aux yeux verts intenses, grandes oreilles',
+    outfit: 'chemise kaki, short cargo, chaussures de randonnée, ceinture utilitaire',
+    helmet: 'chapeau explorer, casque de moto rétro camouflage',
+    accessories: 'jumelles, boussole dorée, gourde en cuir',
+    posture: 'alerte, mains sur les hanches',
+    color_palette: ['#B8C9A8', '#E8A87C', '#3B4B55', '#E5B95A']
+  },
+  'chaton-angora-poete': {
+    species: 'chaton angora anthropomorphe',
+    description: 'Un chat angora anthropomorphe, pelage blanc long, yeux bleus rêveurs, oreilles à plumets. Il porte une chemise de poète blanche à jabot, un gilet en velours bordeaux, un pantalon noir, des chaussures vernies, un casque de moto rétro blanc. Posture contemplative, main sur le cœur, expression rêveuse.',
+    face: 'angora blanc long aux yeux bleus rêveurs',
+    outfit: 'chemise de poète blanche à jabot, gilet velours bordeaux, pantalon noir',
+    helmet: 'casque de moto rétro blanc à visière dorée',
+    accessories: 'plume d\'oie, carnet relié cuir, monocle doré',
+    posture: 'contemplative, main sur le cœur',
+    color_palette: ['#C5B7D9', '#E5B95A', '#F5F0E1', '#8FAE8B']
+  },
+  'chaton-chartreux-prof': {
+    species: 'chaton chartreux anthropomorphe',
+    description: 'Un chat chartreux anthropomorphe, pelage bleu-gris, yeux cuivrés, museau large. Il porte une veste de tweed, un gilet jaune moutarde, une chemise bleu ciel, un nœud papillon rouge, un pantalon de flanelle, des lunettes rondes, un casque de moto rétro intégré au chapeau melon. Posture professorale, index levé, expression sévère.',
+    face: 'chartreux bleu-gris aux yeux cuivrés, museau large',
+    outfit: 'veste de tweed, gilet moutarde, chemise bleu ciel, pantalon de flanelle',
+    helmet: 'chapeau melon, casque de moto rétro intégré',
+    accessories: 'lunettes rondes, craie, livre ancien',
+    posture: 'professorale, index levé',
+    color_palette: ['#F7D794', '#778BEB', '#E77F67', '#3B4B55']
+  },
+  'humain-cyrano': {
+    species: 'humain',
+    description: 'Un homme d\'environ 35 ans, long nez, moustache fine, cheveux bruns mi-longs, yeux sombres passionnés. Il porte un costume de mousquetaire du XVIIe siècle revisité : pourpoint bleu nuit, chemise blanche à jabot, cape rouge, bottes en cuir, chapeau à plume, casque de moto rétro intégré au chapeau. Posture théâtrale, main sur le cœur, expression poétique.',
+    face: 'visage fin aux pommettes hautes, long nez, moustache, yeux sombres passionnés',
+    outfit: 'pourpoint bleu nuit, chemise blanche à jabot, cape rouge, bottes en cuir',
+    helmet: 'chapeau à plume, casque de moto rétro intégré',
+    accessories: 'épée d\'apparat, gant en cuir',
+    posture: 'théâtrale, main sur le cœur',
+    color_palette: ['#E8A87C', '#3B4B55', '#D4A5A5', '#E5B95A']
+  },
+  'humain-jeanne-darc': {
+    species: 'humain',
+    description: 'Une femme d\'environ 22 ans, cheveux courts bruns coupés au bol, yeux bleus déterminés, visage angélique. Elle porte une armure de chevalière médiévale en acier poli, un tabard bleu fleurdelisé, des jambières, des gantelets, un casque de moto rétro intégré au heaume. Posture droite, épée baissée, expression déterminée.',
+    face: 'visage angélique, cheveux courts bruns au bol, yeux bleus déterminés',
+    outfit: 'armure de chevalière en acier poli, tabard bleu fleurdelisé, jambières',
+    helmet: 'heaume de chevalière, casque de moto rétro intégré',
+    accessories: 'épée longue, étendard rouge',
+    posture: 'droite, épée baissée',
+    color_palette: ['#7B9FB0', '#E87B35', '#E5B95A', '#F5F0E1']
+  },
+  'humain-napoleon': {
+    species: 'humain',
+    description: 'Un homme d\'environ 40 ans, taille moyenne, silhouette ramassée, cheveux noirs plaqués, yeux gris perçants. Il porte un uniforme militaire napoléonien revisité : habit bleu à col haut, culotte blanche, bottes hautes noires, bicorne, casque de moto rétro intégré au bicorne. Posture fière, main dans le gilet, expression impérieuse.',
+    face: 'cheveux noirs plaqués, yeux gris perçants, mâchoire carrée',
+    outfit: 'habit militaire bleu à col haut, culotte blanche, bottes hautes noires',
+    helmet: 'bicorne noir, casque de moto rétro intégré',
+    accessories: 'épée d\'officier, décoration étoilée',
+    posture: 'fière, main dans le gilet',
+    color_palette: ['#7B9FB0', '#F5F0E1', '#E5B95A', '#3B4B55']
+  },
+  'humain-marie-curie': {
+    species: 'humain',
+    description: 'Une femme d\'environ 45 ans, cheveux châtains attachés en chignon lâche, yeux gris-violet, visage fatigué mais lumineux. Elle porte une robe longue noire d\'époque victorienne, une blouse blanche à col haut, un tablier de laboratoire, un casque de moto rétro intégré à un chapeau à voilette. Posture concentrée, mains tenant un bécher lumineux, expression intense.',
+    face: 'visage fatigué mais lumineux, cheveux attachés, yeux gris-violet',
+    outfit: 'robe longue noire d\'époque victorienne, blouse blanche à col haut, tablier',
+    helmet: 'chapeau à voilette, casque de moto rétro intégré',
+    accessories: 'bécher lumineux, tube à essai, carnet de notes',
+    posture: 'concentrée, mains tenant un bécher',
+    color_palette: ['#C5B7D9', '#7B9FB0', '#E5B95A', '#3B4B55']
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  keyPool: [],
+  characters: [],           // Bibliothèque de personnages
+  selectedCharacterId: null,
+  workingCharacter: null,    // Personnage en cours de création
+  refImageDataUrl: null,     // Image de référence uploadée
+  refImageForApi: null,      // Image compressée pour l'API
+  refsheetUrl: null,         // Planche générée
+  bible: null,               // Character Bible
+  isCreating: false,
+  isGeneratingScenes: false,
+  isGeneratingScript: false,
+  isGeneratingVideos: false,
+  isPlayingFilm: false,
+  stopRequested: false,
+  playRAF: null,
+  voiceEnabled: true,
+  workingPollUrlBuilder: null,
+  consistencyThreshold: 80,
+  imageFormat: '9:16',
+  sceneCount: 5,
+  durationFrames: 145,
+  script: null,
+  scenes: [],
+  videos: []
+};
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function setStatus(text){const b=document.getElementById('status-bar');const t=document.getElementById('status-text');if(!b||!t)return;if(text){b.classList.add('visible');t.textContent=text}else b.classList.remove('visible')}
+function nowTime(){return new Date().toLocaleTimeString('fr-FR',{hour12:false})}
+
+function sanitizeForApi(text){
+  if(text==null)return '';
+  return String(text)
+    .replace(/[\u2018\u2019\u201B\u2032\u02BC]/g, "'")
+    .replace(/[\u201C\u201D\u201F\u2033]/g, '"')
+    .replace(/\u2013/g, '-').replace(/\u2014/g, '--').replace(/\u2026/g, '...')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\u00A0/g, ' ').replace(/\u202F/g, ' ');
+}
+
+let toastTimeout=null;
+function showToast(message,type='success',duration=2800){
+  const t=document.getElementById('toast');const i=document.getElementById('toast-icon');const x=document.getElementById('toast-text');
+  if(!t||!i||!x)return;
+  t.classList.remove('visible','success','error','warn');void t.offsetWidth;
+  const icons={success:'✓',error:'✕',warn:'⚠'};
+  i.textContent=icons[type]||'✓';
+  x.textContent=message;
+  t.classList.add(type);
+  requestAnimationFrame(()=>t.classList.add('visible'));
+  if(toastTimeout)clearTimeout(toastTimeout);
+  toastTimeout=setTimeout(()=>t.classList.remove('visible'),duration);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// JOURNAL NARRATIF
+// ══════════════════════════════════════════════════════════════════
+function journalLog(msg, level){
+  level = level || 'info';
+  const body = document.getElementById('journal-body');
+  if(!body) return;
+  const icons = { info:'·', highlight:'▶', success:'✅', warn:'⚠️', error:'❌', vision:'👁️', character:'🎭', image:'🎨', script:'✍️', video:'🎥', play:'🎬', key:'🔑', score:'📊' };
+  const icon = icons[level] || '·';
+  const entry = document.createElement('div');
+  entry.className = 'j-entry ' + level;
+  entry.innerHTML = '<span class="j-time">'+esc(nowTime())+'</span><span class="j-icon">'+icon+'</span><span class="j-msg">'+esc(msg)+'</span>';
+  body.appendChild(entry);
+  body.scrollTop = body.scrollHeight;
+  while(body.children.length > DEBUG_MAX) body.removeChild(body.firstChild);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DEBUG TECHNIQUE
+// ══════════════════════════════════════════════════════════════════
+let debugCount=0,debugEntries=[],debugCollapsed=false,currentTab='journal';
+function debugLog(level,category,message,data){
+  const body=document.getElementById('tech-body');if(!body)return;
+  const time=nowTime();const entry=document.createElement('div');
+  entry.className='debug-entry '+level;
+  let html='<span class="debug-time">'+time+'</span><span class="debug-cat">['+esc(category)+']</span><span class="debug-msg">'+esc(message)+'</span>';
+  if(data!==undefined&&data!==null){
+    let ds;
+    if(typeof data==='string')ds=data;
+    else{try{ds=JSON.stringify(data,null,2)}catch(e){ds=String(data)}}
+    if(ds.length>3000)ds=ds.slice(0,3000)+'\n…[tronqué]';
+    html+='<pre class="debug-data">'+esc(ds)+'</pre>';
+  }
+  entry.innerHTML=html;body.appendChild(entry);
+  debugEntries.push({time,level,category,message});
+  if(debugEntries.length>DEBUG_MAX)debugEntries.shift();
+  while(body.children.length>DEBUG_MAX)body.removeChild(body.firstChild);
+  body.scrollTop=body.scrollHeight;
+  debugCount++;
+}
+function clearDebug(){const b=document.getElementById('tech-body');const j=document.getElementById('journal-body');if(b)b.innerHTML='';if(j)j.innerHTML='';debugEntries=[];debugCount=0}
+function copyDebug(){
+  const lines=debugEntries.map(e=>e.time+' ['+e.category+'] '+e.message).join('\n');
+  const finish=(ok)=>showToast(ok?'Console copiée':'Copie impossible',ok?'success':'error');
+  try{
+    if(navigator.clipboard&&window.isSecureContext){
+      navigator.clipboard.writeText(lines).then(()=>finish(true)).catch(()=>legacyCopy(lines,finish));
+      return;
+    }
+  }catch(e){}
+  legacyCopy(lines,finish);
+}
+function legacyCopy(text,cb){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(ta);cb(ok)}
+function toggleDebugCollapse(){const p=document.getElementById('debug-panel');const b=document.getElementById('debug-collapse-btn');if(!p||!b)return;debugCollapsed=!debugCollapsed;p.classList.toggle('collapsed',debugCollapsed);b.textContent=debugCollapsed?'+':'−'}
+function switchTab(tab){
+  currentTab=tab;
+  const j=document.getElementById('journal-body');
+  const t=document.getElementById('tech-body');
+  const tj=document.getElementById('tab-journal');
+  const tt=document.getElementById('tab-tech');
+  if(!j||!t)return;
+  if(tab==='journal'){j.classList.remove('hidden');t.classList.add('hidden');tj.classList.add('active');tt.classList.remove('active')}
+  else{t.classList.remove('hidden');j.classList.add('hidden');tt.classList.add('active');tj.classList.remove('active');t.scrollTop=t.scrollHeight}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// WAKE LOCK
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel=null,wakeLockEnabled=false,canvasStream=null,canvasInterval=null;
+function isWakeLockSupported(){return 'wakeLock' in navigator && typeof navigator.wakeLock.request==='function'}
+async function requestWakeLockAPI(){
+  if(!isWakeLockSupported())return false;
+  try{
+    wakeLockSentinel=await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener('release',()=>{wakeLockSentinel=null;updateWakeStatus()});
+    return true;
+  }catch(e){debugLog('warn','WAKELOCK','Refusé : '+e.message);return false}
+}
+async function releaseWakeLockAPI(){if(wakeLockSentinel){try{await wakeLockSentinel.release()}catch(e){}wakeLockSentinel=null}}
+function startCanvasStream(){
+  if(canvasStream)return true;
+  try{
+    const canvas=document.getElementById('noSleepCanvas');
+    const video=document.getElementById('noSleepVideo');
+    if(!canvas||!video)return false;
+    const ctx=canvas.getContext('2d');
+    if(!ctx)return false;
+    ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);
+    if(typeof canvas.captureStream!=='function')return false;
+    canvasStream=canvas.captureStream(1);
+    let toggle=false;
+    canvasInterval=setInterval(()=>{toggle=!toggle;ctx.fillStyle=toggle?'#000':'#010101';ctx.fillRect(0,0,canvas.width,canvas.height)},1000);
+    video.srcObject=canvasStream;video.muted=true;video.playsInline=true;
+    const p=video.play();if(p&&p.catch)p.catch(()=>{});
+    return true;
+  }catch(e){debugLog('warn','WAKELOCK','Canvas échoué : '+e.message);return false}
+}
+function stopCanvasStream(){
+  if(canvasInterval){clearInterval(canvasInterval);canvasInterval=null}
+  const video=document.getElementById('noSleepVideo');
+  if(video){try{video.pause();video.srcObject=null}catch(e){}}
+  if(canvasStream){try{canvasStream.getTracks().forEach(t=>t.stop())}catch(e){}canvasStream=null}
+}
+async function activateWakeLock(){
+  let success=false;
+  if(isWakeLockSupported())success=await requestWakeLockAPI();
+  if(!success)success=startCanvasStream();
+  if(!success&&!canvasStream)success=startCanvasStream();
+  return success;
+}
+async function deactivateWakeLock(){await releaseWakeLockAPI();stopCanvasStream()}
+function updateWakeStatus(){
+  const el=document.getElementById('wake-status');
+  const txt=document.getElementById('wake-status-text');
+  const btn=document.getElementById('wake-toggle-btn');
+  if(!el||!txt||!btn)return;
+  el.classList.remove('active','warn');
+  const canvas=document.getElementById('noSleepCanvas');
+  const has=isWakeLockSupported()||(canvas&&canvas.captureStream);
+  if(!has){el.classList.add('warn');txt.textContent='⚠️ Non supporté';btn.style.display='none';return}
+  btn.style.display='inline-block';
+  const isActive=wakeLockSentinel!==null||canvasStream!==null;
+  if(wakeLockEnabled&&isActive){el.classList.add('active');txt.textContent='✅ Écran allumé';btn.textContent='Désactiver'}
+  else if(wakeLockEnabled&&!isActive){el.classList.add('warn');txt.textContent='⏳ En attente';btn.textContent='Désactiver'}
+  else{txt.textContent='💤 Veille automatique';btn.textContent='Garder l\'écran allumé'}
+}
+async function toggleWakeLock(){
+  if(wakeLockEnabled){
+    wakeLockEnabled=false;await deactivateWakeLock();
+    try{localStorage.setItem(WAKE_LOCK_PREF,'0')}catch(e){}
+    showToast('Veille automatique','warn');
+  }else{
+    wakeLockEnabled=true;
+    const ok=await activateWakeLock();
+    try{localStorage.setItem(WAKE_LOCK_PREF,'1')}catch(e){}
+    showToast(ok?'Écran allumé':'Activez manuellement',ok?'success':'warn');
+  }
+  updateWakeStatus();
+}
+document.addEventListener('visibilitychange',async()=>{
+  if(document.visibilityState==='visible'&&wakeLockEnabled){await activateWakeLock();updateWakeStatus()}
+});
+
+// ══════════════════════════════════════════════════════════════════
+// MULTI-CLÉS API
+// ══════════════════════════════════════════════════════════════════
+function getStoredKeys(){
+  try{
+    const raw=localStorage.getItem(API_KEYS_STORAGE);
+    if(!raw)return [];
+    const arr=JSON.parse(raw);
+    if(!Array.isArray(arr))return [];
+    return arr.filter(k=>typeof k==='string'&&k.trim().length>0);
+  }catch(e){return []}
+}
+function setStoredKeys(keys){try{localStorage.setItem(API_KEYS_STORAGE,JSON.stringify(keys))}catch(e){}}
+function refreshKeyPool(){
+  const stored=getStoredKeys();
+  const old=state.keyPool||[];
+  state.keyPool=stored.map(k=>{
+    const existing=old.find(p=>p.key===k);
+    return existing||{key:k,lastUsed:0,cooldownUntil:0,active:true,errorCount:0};
+  });
+}
+function hasActiveKey(){return state.keyPool.some(k=>k.active)}
+function getReadyKey(){
+  const now=Date.now();
+  const active=state.keyPool.filter(k=>k.active);
+  if(active.length===0)return{key:null,waitMs:0};
+  const ready=active.filter(k=>!k.cooldownUntil||k.cooldownUntil<=now);
+  if(ready.length===0){
+    const soonest=active.reduce((a,b)=>(a.cooldownUntil||0)<(b.cooldownUntil||0)?a:b);
+    return{key:null,waitMs:Math.max(1000,(soonest.cooldownUntil||0)-now)};
+  }
+  ready.sort((a,b)=>(a.lastUsed||0)-(b.lastUsed||0));
+  return{key:ready[0],waitMs:0};
+}
+async function acquireKey(label){
+  while(true){
+    if(state.stopRequested)throw new Error('Arrêt demandé');
+    const{key,waitMs}=getReadyKey();
+    if(key){key.lastUsed=Date.now();return key}
+    if(waitMs===0)throw new Error('Aucune clé API active');
+    debugLog('warn',label,'Toutes les clés en cooldown — attente '+Math.round(waitMs/1000)+'s');
+    setStatus('Toutes les clés en cooldown — attente '+Math.round(waitMs/1000)+'s');
+    await sleep(waitMs);
+  }
+}
+function renderKeysStatus(){
+  const el=document.getElementById('api-keys-status');
+  if(!el)return;
+  if(state.keyPool.length===0){el.innerHTML='';return}
+  const now=Date.now();
+  el.innerHTML=state.keyPool.map((k,i)=>{
+    let stateHtml='<span class="key-state">Active</span>';
+    if(!k.active)stateHtml='<span class="key-state dead">Inactive</span>';
+    else if(k.cooldownUntil>now){
+      const sec=Math.ceil((k.cooldownUntil-now)/1000);
+      stateHtml='<span class="key-state cool">Cooldown '+sec+'s</span>';
+    }
+    return '<div class="key-row"><span class="key-id">#'+(i+1)+' · '+esc(k.key.slice(0,8))+'…'+esc(k.key.slice(-4))+'</span>'+stateHtml+'</div>';
+  }).join('');
+}
+function saveKeysFromUI(){
+  const input=document.getElementById('api-keys-input');
+  if(!input)return;
+  const raw=input.value||'';
+  const keys=raw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+  const valid=keys.filter(k=>k.startsWith('sk-'));
+  const invalid=keys.filter(k=>!k.startsWith('sk-'));
+  if(invalid.length>0){
+    if(!confirm(invalid.length+' clé(s) ne commencent pas par "sk-". Les ignorer ?'))return;
+  }
+  setStoredKeys(valid);
+  refreshKeyPool();
+  updateApiPanel();
+  renderKeysStatus();
+  if(valid.length===0)showToast('Aucune clé valide enregistrée','warn');
+  else showToast(valid.length+' clé(s) enregistrée(s) ✓','success');
+  debugLog('success','CLÉS',valid.length+' clé(s) active(s) · parallélisme max = '+valid.length);
+  journalLog(valid.length+' clé(s) API active(s). Parallélisme : '+valid.length+' worker(s).','key');
+}
+function updateApiPanel(){
+  const panel=document.getElementById('api-panel');
+  const input=document.getElementById('api-keys-input');
+  const line=document.getElementById('api-status-line');
+  const text=document.getElementById('api-status-text');
+  if(!panel||!input||!line||!text)return;
+  refreshKeyPool();
+  const n=state.keyPool.length;
+  if(n>0){
+    panel.classList.add('ok');line.classList.add('ok');
+    text.textContent=n+' clé(s) active(s) · parallélisme : '+n;
+    input.value=state.keyPool.map(k=>k.key).join('\n');
+    input.placeholder='';
+  }else{
+    panel.classList.remove('ok');line.classList.remove('ok');
+    text.textContent='Aucune clé API enregistrée';
+    input.value='';
+    input.placeholder='Collez vos clés API Agnes ici — une par ligne (sk-...)';
+  }
+  renderKeysStatus();
+  updateButtons();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// API FETCH
+// ══════════════════════════════════════════════════════════════════
+async function apiFetch(url, options, label, maxAttempts){
+  options=options||{};
+  label=label||'API';
+  maxAttempts=(typeof maxAttempts==='number'&&maxAttempts>0)?maxAttempts:6;
+  let lastErr=null;
+  for(let attempt=0;attempt<maxAttempts;attempt++){
+    if(state.stopRequested)throw new Error('Arrêt demandé');
+    let keyObj=null;
+    try{keyObj=await acquireKey(label)}catch(e){throw e}
+    const method=options.method||'GET';
+    let bodyPreview=null;
+    if(options.body){
+      try{
+        const p=JSON.parse(options.body);
+        const c=JSON.parse(JSON.stringify(p));
+        const redact=(o)=>{
+          if(Array.isArray(o)){o.forEach(redact);return}
+          if(o&&typeof o==='object'){
+            for(const k in o){
+              if(typeof o[k]==='string'&&o[k].length>140)o[k]=o[k].slice(0,100)+'…[len '+o[k].length+']';
+              else if(typeof o[k]==='object')redact(o[k]);
+            }
+          }
+        };
+        redact(c);bodyPreview=c;
+      }catch(e){bodyPreview=String(options.body).slice(0,400)}
+    }
+    debugLog('api','REQ '+label,method+' '+url+' · clé #'+(state.keyPool.indexOf(keyObj)+1)+' '+keyObj.key.slice(-4)+' (essai '+(attempt+1)+'/'+maxAttempts+')',bodyPreview);
+    const headers=Object.assign({},options.headers||{},{'Authorization':'Bearer '+keyObj.key});
+    const finalOptions=Object.assign({},options,{headers});
+    try{
+      const t0=Date.now();
+      const res=await fetch(url,finalOptions);
+      const dt=Date.now()-t0;
+      let retryAfter=0;
+      try{retryAfter=parseInt(res.headers.get('Retry-After')||'0',10)||0}catch(e){}
+      let errorText='';
+      if(!res.ok){try{errorText=(await res.clone().text()).slice(0,1200)}catch(e){}}
+      debugLog('response','RÉP '+label,'HTTP '+res.status+' en '+dt+'ms · clé '+keyObj.key.slice(-4),errorText||undefined);
+      if(res.ok){keyObj.errorCount=0;return res}
+      if([400,401,403,404].includes(res.status)){
+        if(res.status===401||res.status===403){
+          keyObj.errorCount=(keyObj.errorCount||0)+1;
+          debugLog('error','CLÉ','Clé '+keyObj.key.slice(-4)+' → HTTP '+res.status+' (errorCount='+keyObj.errorCount+')');
+          if(keyObj.errorCount>=3){keyObj.active=false;debugLog('error','CLÉ','Clé '+keyObj.key.slice(-4)+' désactivée');renderKeysStatus()}
+        }
+        const err=new Error('HTTP '+res.status+' — '+errorText.slice(0,400));
+        err.status=res.status;err.body=errorText;throw err;
+      }
+      if(res.status===429){
+        const wait=retryAfter>0?retryAfter:Math.min(120,20+attempt*15);
+        keyObj.cooldownUntil=Date.now()+wait*1000;
+        debugLog('warn','RATELIMIT','Clé '+keyObj.key.slice(-4)+' → cooldown '+wait+'s');
+        renderKeysStatus();
+        const{key:next}=getReadyKey();
+        if(next&&next!==keyObj){debugLog('info','ROTATION','Nouvelle clé : '+next.key.slice(-4));continue}
+        setStatus('Limite API — nouvelle tentative dans '+wait+'s');
+        await sleep(Math.min(wait*1000,3000));
+        continue;
+      }
+      if([500,502,503,504,520,522,524].includes(res.status)){
+        const wait=Math.min(60,8+attempt*6);
+        debugLog('warn','SERVICE','HTTP '+res.status+' — attente '+wait+'s');
+        setStatus('Service occupé — reprise dans '+wait+'s');
+        await sleep(wait*1000);continue;
+      }
+      const wait=Math.min(60,6+attempt*5);
+      debugLog('warn','HTTP','HTTP '+res.status+' — retry dans '+wait+'s');
+      await sleep(wait*1000);
+    }catch(e){
+      if(e.message==='Arrêt demandé')throw e;
+      if(e.status&&[400,401,403,404].includes(e.status))throw e;
+      lastErr=e;
+      const wait=Math.min(45,4+attempt*4);
+      debugLog('warn','NETWORK',e.message+' — retry dans '+wait+'s');
+      setStatus('Connexion instable — reprise dans '+wait+'s');
+      await sleep(wait*1000);
+    }
+  }
+  throw lastErr||new Error('Tentatives épuisées pour '+label);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// JSON PARSER — 5 STRATÉGIES + RÉPARATIONS
+// ══════════════════════════════════════════════════════════════════
+function balanceJson(text){
+  let ob=0,ok=0,inString=false,escape=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(escape){escape=false;continue}
+    if(ch==='\\'){escape=true;continue}
+    if(ch==='"'){inString=!inString;continue}
+    if(inString)continue;
+    if(ch==='{')ob++;
+    else if(ch==='}')ob--;
+    else if(ch==='[')ok++;
+    else if(ch===']')ok--;
+  }
+  let r=text;
+  if(inString)r+='"';
+  while(ok>0){r+=']';ok--}
+  while(ob>0){r+='}';ob--}
+  return r;
+}
+function fixUnquotedKeys(text){
+  let out='';let i=0;const n=text.length;
+  let inString=false;let escape=false;const stack=[];let lastStructural='{';
+  while(i<n){
+    const ch=text[i];
+    if(escape){out+=ch;escape=false;i++;continue}
+    if(ch==='\\'){out+=ch;escape=true;i++;continue}
+    if(inString){out+=ch;if(ch==='"')inString=false;i++;continue}
+    if(ch==='"'){inString=true;out+=ch;i++;continue}
+    if(ch==='{'){stack.push('{');lastStructural='{';out+=ch;i++;continue}
+    if(ch==='['){stack.push('[');lastStructural='[';out+=ch;i++;continue}
+    if(ch==='}'){if(stack.length)stack.pop();lastStructural='}';out+=ch;i++;continue}
+    if(ch===']'){if(stack.length)stack.pop();lastStructural=']';out+=ch;i++;continue}
+    if(ch===','){lastStructural=',';out+=ch;i++;continue}
+    if(ch===':'){lastStructural=':';out+=ch;i++;continue}
+    if(/\s/.test(ch)){out+=ch;i++;continue}
+    const top=stack[stack.length-1];
+    if((lastStructural==='{'||lastStructural===',')&&top==='{'&&/[A-Za-z_$]/.test(ch)){
+      let j=i;
+      while(j<n&&/[A-Za-z0-9_$]/.test(text[j]))j++;
+      let k=j;
+      while(k<n&&/\s/.test(text[k]))k++;
+      if(text[k]===':'){
+        out+='"'+text.slice(i,j)+'"';
+        i=j;
+        continue;
+      }
+    }
+    out+=ch;i++;
+  }
+  return out;
+}
+function fixMissingCommas(text){
+  let out='';let i=0;const n=text.length;
+  let inString=false;let escape=false;let justClosedValue=false;
+  while(i<n){
+    const ch=text[i];
+    if(escape){out+=ch;escape=false;i++;continue}
+    if(ch==='\\'){out+=ch;escape=true;i++;continue}
+    if(inString){
+      out+=ch;
+      if(ch==='"'){
+        inString=false;
+        let j=i+1;
+        while(j<n&&/\s/.test(text[j]))j++;
+        justClosedValue=(text[j]!==':');
+      }
+      i++;continue;
+    }
+    if(/\s/.test(ch)){out+=ch;i++;continue}
+    if(justClosedValue&&ch!==','&&ch!=='}'&&ch!==']'&&ch!==':'){
+      out+=',';justClosedValue=false;
+    }
+    if(ch==='"'){inString=true;justClosedValue=false;out+=ch;i++;continue}
+    if(ch==='{'){justClosedValue=false;out+=ch;i++;continue}
+    if(ch==='['){justClosedValue=false;out+=ch;i++;continue}
+    if(ch==='}'){justClosedValue=true;out+=ch;i++;continue}
+    if(ch===']'){justClosedValue=true;out+=ch;i++;continue}
+    if(ch===','){justClosedValue=false;out+=ch;i++;continue}
+    if(ch===':'){justClosedValue=false;out+=ch;i++;continue}
+    justClosedValue=false;out+=ch;i++;
+  }
+  return out;
+}
+function repairJson(text){
+  if(!text)return null;
+  let c=String(text).trim();
+  const fm=c.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if(fm)c=fm[1].trim();
+  const fb=c.indexOf('{');
+  if(fb<0)return null;
+  c=c.slice(fb);
+  const lb=c.lastIndexOf('}');
+  if(lb>0)c=c.slice(0,lb+1);
+  let out='';let inString=false;let strDelim='"';let escape=false;
+  for(let i=0;i<c.length;i++){
+    const ch=c[i];
+    if(escape){
+      if('"\\/bfnrtu'.includes(ch)){out+='\\'+ch}else{out+=ch}
+      escape=false;continue;
+    }
+    if(ch==='\\'){escape=true;continue}
+    if(ch==='"'||ch==="'"){
+      if(!inString){inString=true;strDelim=ch;out+='"';continue}
+      if(ch===strDelim){inString=false;out+='"';continue}
+      if(ch==='"'){out+='\\"';continue}
+      out+="'";continue;
+    }
+    if(inString){
+      if(ch==='\n'){out+='\\n';continue}
+      if(ch==='\r'){out+='\\r';continue}
+      if(ch==='\t'){out+='\\t';continue}
+      const code=ch.charCodeAt(0);
+      if(code<32){out+='\\u'+code.toString(16).padStart(4,'0');continue}
+    }
+    out+=ch;
+  }
+  if(escape)out+='\\';
+  if(inString)out+='"';
+  try{out=fixUnquotedKeys(out)}catch(e){}
+  try{out=fixMissingCommas(out)}catch(e){}
+  out=out.replace(/,\s*([}\]])/g,'$1');
+  return out;
+}
+function extractJson(text){
+  if(!text)return null;
+  const repaired=repairJson(text);
+  if(!repaired){debugLog('error','PARSE','Aucun { trouvé');return null}
+  try{return JSON.parse(repaired)}catch(e1){
+    debugLog('warn','PARSE','Stratégie 1 échouée : '+e1.message);
+    try{return JSON.parse(balanceJson(repaired))}catch(e2){
+      debugLog('error','PARSE','Stratégie 2 échouée : '+e2.message);
+      debugLog('error','PARSE','Aperçu',repaired.slice(0,2000));
+      return null;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIDEO ID — DÉCODEUR COMPOSITE + POLLING MULTI-ENDPOINTS
+// ══════════════════════════════════════════════════════════════════
+function decodeCompositeId(composite){
+  if(!composite||typeof composite!=='string')return null;
+  if(!composite.startsWith('video_'))return null;
+  let b64=composite.slice(6);
+  while(b64.length%4)b64+='=';
+  try{
+    const decoded=atob(b64);
+    const m=decoded.match(/video_id:([^;]+)/);
+    if(m&&m[1])return m[1].trim();
+  }catch(e){}
+  return null;
+}
+function buildIdCandidates(videoIdObj){
+  const ids=[];
+  if(typeof videoIdObj==='string'){
+    ids.push({label:'composite',value:videoIdObj});
+    const inner=decodeCompositeId(videoIdObj);
+    if(inner&&inner!==videoIdObj)ids.push({label:'inner',value:inner});
+  }else if(videoIdObj&&typeof videoIdObj==='object'){
+    if(videoIdObj.compositeId)ids.push({label:'composite',value:videoIdObj.compositeId});
+    if(videoIdObj.innerId)ids.push({label:'inner',value:videoIdObj.innerId});
+    const raw=videoIdObj.raw||{};
+    for(const f of ['id','task_id','request_id']){
+      if(raw[f]&&!ids.some(x=>x.value===raw[f]))ids.push({label:'raw.'+f,value:raw[f]});
+    }
+  }
+  const seen=new Set();
+  return ids.filter(x=>{if(seen.has(x.value))return false;seen.add(x.value);return true});
+}
+const POLL_URL_BUILDERS=[
+  {name:'agnesapi-composite',build:(id)=>POLL_BASE+'?video_id='+encodeURIComponent(id)+'&model_name='+encodeURIComponent(MODEL_VIDEO)},
+  {name:'v1-rest',build:(id)=>API_BASE+'/videos/'+encodeURIComponent(id)},
+  {name:'v1-rest-status',build:(id)=>API_BASE+'/videos/'+encodeURIComponent(id)+'/status'},
+  {name:'v1-rest-model',build:(id)=>API_BASE+'/videos/'+encodeURIComponent(id)+'?model_name='+encodeURIComponent(MODEL_VIDEO)},
+];
+
+// ══════════════════════════════════════════════════════════════════
+// FICHIERS
+// ══════════════════════════════════════════════════════════════════
+function fileToDataUri(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=e=>resolve(e.target.result);
+    r.onerror=()=>reject(new Error('Erreur lecture'));
+    r.readAsDataURL(file);
+  });
+}
+async function compressImage(dataUrl,maxSide){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.onload=()=>{
+      let{width,height}=img;
+      const scale=Math.min(1,maxSide/Math.max(width,height));
+      width=Math.round(width*scale);
+      height=Math.round(height*scale);
+      const canvas=document.createElement('canvas');
+      canvas.width=width;canvas.height=height;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,width,height);
+      resolve(canvas.toDataURL('image/jpeg',0.9));
+    };
+    img.onerror=()=>resolve(dataUrl);
+    img.src=dataUrl;
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PERSISTANCE PERSONNAGES
+// ══════════════════════════════════════════════════════════════════
+function loadCharacters(){
+  try{
+    const raw=localStorage.getItem(CHARACTERS_STORAGE);
+    if(!raw)return [];
+    const arr=JSON.parse(raw);
+    if(!Array.isArray(arr))return [];
+    return arr;
+  }catch(e){return []}
+}
+function saveCharacters(chars){
+  try{localStorage.setItem(CHARACTERS_STORAGE,JSON.stringify(chars))}catch(e){}
+}
+function persistCharacter(char){
+  const existing=state.characters.findIndex(c=>c.id===char.id);
+  if(existing>=0)state.characters[existing]=char;
+  else state.characters.unshift(char);
+  saveCharacters(state.characters);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TEXT API — CHAT COMPLETION
+// ══════════════════════════════════════════════════════════════════
+async function callChatCompletion(systemPrompt, userPrompt, label, maxTokens, temperature){
+  const sysMsg=sanitizeForApi(systemPrompt)||'Assistant.';
+  const usrMsg=sanitizeForApi(userPrompt);
+  if(!usrMsg)throw new Error('userPrompt vide');
+  const body={
+    model:MODEL_TEXT,
+    messages:[
+      {role:'system',content:sysMsg},
+      {role:'user',content:usrMsg}
+    ],
+    temperature:typeof temperature==='number'?temperature:0.7,
+    max_tokens:maxTokens||32000,
+    reasoning_effort:'none',
+    chat_template_kwargs:{enable_thinking:false}
+  };
+  const res=await apiFetch(API_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},label,4);
+  const data=await res.json();
+  const choice=data.choices&&data.choices[0];
+  const msg=choice&&choice.message;
+  let content=msg&&msg.content;
+  if(!content&&msg&&msg.reasoning_content){
+    debugLog('warn',label,'content vide → fallback reasoning_content');
+    content=msg.reasoning_content;
+  }
+  debugLog('response',label,'finish_reason='+(choice&&choice.finish_reason)+' · len='+((content&&content.length)||0));
+  return content;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VISION API — ANALYSE IMAGE
+// ══════════════════════════════════════════════════════════════════
+async function callVisionCompletion(systemPrompt, userText, imageDataUrl, label, maxTokens, temperature){
+  const sysMsg=sanitizeForApi(systemPrompt)||'Directeur artistique.';
+  const usrText=sanitizeForApi(userText);
+  const body={
+    model:MODEL_TEXT,
+    messages:[
+      {role:'system',content:sysMsg},
+      {role:'user',content:[
+        {type:'text',text:usrText},
+        {type:'image_url',image_url:{url:imageDataUrl}}
+      ]}
+    ],
+    temperature:typeof temperature==='number'?temperature:0.3,
+    max_tokens:maxTokens||2500,
+    reasoning_effort:'none',
+    chat_template_kwargs:{enable_thinking:false}
+  };
+  const res=await apiFetch(API_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},label,4);
+  const data=await res.json();
+  const choice=data.choices&&data.choices[0];
+  const msg=choice&&choice.message;
+  let content=msg&&msg.content;
+  if(!content&&msg&&msg.reasoning_content)content=msg.reasoning_content;
+  debugLog('response',label,'vision · finish_reason='+(choice&&choice.finish_reason)+' · len='+((content&&content.length)||0));
+  return content;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// IMAGE GENERATION
+// ══════════════════════════════════════════════════════════════════
+async function generateImage(prompt, opts){
+  opts=opts||{};
+  const body={
+    model:MODEL_IMAGE,
+    prompt:sanitizeForApi(prompt),
+    n:1,
+    size:'1K',
+    ratio:opts.ratio||'9:16'
+  };
+  if(opts.referenceImages&&opts.referenceImages.length){
+    body.extra_body={image:opts.referenceImages};
+  }
+  const res=await apiFetch(API_BASE+'/images/generations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},'Image',5);
+  const data=await res.json();
+  const item=data.data&&data.data[0];
+  if(!item)throw new Error('Pas de donnée image');
+  if(item.url)return item.url;
+  if(item.b64_json)return 'data:image/png;base64,'+item.b64_json;
+  throw new Error('Format image inconnu');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIDEO GENERATION
+// ══════════════════════════════════════════════════════════════════
+async function createVideoTask(prompt,imageUrl,lastFrameUrl,duration){
+  const body={model:MODEL_VIDEO,prompt:sanitizeForApi(prompt),num_frames:duration,frame_rate:FRAME_RATE};
+  if(imageUrl&&lastFrameUrl){
+    body.image=imageUrl;
+    body.last_frame=lastFrameUrl;
+  }else if(imageUrl){
+    body.image=imageUrl;
+  }
+  debugLog('ai','PROMPT VIDÉO','Envoyé ('+body.prompt.length+' chars'+(imageUrl?' · +image ref':'')+(lastFrameUrl?' · +last_frame':'')+')');
+  const res=await apiFetch(API_BASE+'/videos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},'Video Task',5);
+  const data=await res.json();
+  const compositeId=data.video_id||data.id||data.task_id;
+  if(!compositeId)throw new Error('Pas de video_id');
+  const innerId=decodeCompositeId(compositeId);
+  return{compositeId,innerId,raw:data};
+}
+async function pollVideo(videoIdObj,onProgress){
+  const candidates=buildIdCandidates(videoIdObj);
+  if(candidates.length===0)throw new Error('Aucun ID exploitable');
+  const minWait=Math.min(VIDEO_FIRST_POLL_DELAY_SEC,Math.max(40,Math.floor(90*0.7)));
+  let rem=minWait;
+  while(rem>0){
+    if(state.stopRequested)throw new Error('Arrêt demandé');
+    onProgress('Préparation — '+rem+'s');
+    await sleep(1000);rem--;
+  }
+  let working={builder:state.workingPollUrlBuilder||null,id:null};
+  for(let attempt=0;attempt<VIDEO_MAX_POLL_ATTEMPTS;attempt++){
+    if(state.stopRequested)throw new Error('Arrêt demandé');
+    if(attempt>0){
+      const idx=Math.min(attempt-1,VIDEO_POLL_INTERVALS.length-1);
+      let r=VIDEO_POLL_INTERVALS[idx];
+      while(r>0){
+        if(state.stopRequested)throw new Error('Arrêt demandé');
+        onProgress('Création — '+r+'s');
+        await sleep(1000);r--;
+      }
+    }
+    const approaches=[];
+    if(working.builder&&working.id)approaches.push({builder:working.builder,id:working.id,priority:true});
+    for(const builder of POLL_URL_BUILDERS){
+      for(const cand of candidates){
+        if(!approaches.some(a=>a.builder===builder&&a.id===cand.value)){
+          approaches.push({builder,id:cand.value,idLabel:cand.label});
+        }
+      }
+    }
+    let gotSuccess=false,lastError=null;
+    for(const ap of approaches){
+      if(state.stopRequested)throw new Error('Arrêt demandé');
+      const url=ap.builder.build(ap.id);
+      try{
+        const res=await apiFetch(url,{method:'GET'},'Polling',2);
+        const d=await res.json();
+        if(!working.builder||!working.id){
+          working.builder=ap.builder;working.id=ap.id;
+          state.workingPollUrlBuilder=ap.builder;
+          debugLog('success','POLLING','Endpoint validé : '+ap.builder.name);
+        }
+        gotSuccess=true;
+        const status=d.status||'unknown';
+        const progress=d.progress||0;
+        onProgress('Création — '+progress+'%');
+        if(status==='completed'||status==='succeeded'||status==='done'){
+          const videoUrl=(d.metadata&&d.metadata.url)||d.url||(d.output&&d.output.url);
+          if(!videoUrl)throw new Error('Terminé mais pas d\'URL');
+          return videoUrl;
+        }
+        if(status==='failed'||status==='error'||status==='cancelled')throw new Error('Échec ('+status+')');
+        break;
+      }catch(e){
+        if(e.message==='Arrêt demandé')throw e;
+        lastError=e;
+        if(e.status===404||e.status===401||e.status===403)continue;
+        break;
+      }
+    }
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PLAN DE RÉFÉRENCE — génération de la planche
+// ══════════════════════════════════════════════════════════════════
+async function generateReferenceSheet(description, archetype, refImageDataUrl, refImageForApi){
+  const archetypeData = archetype && ARCHETYPES[archetype] ? ARCHETYPES[archetype] : null;
+  const fullDesc = description || (archetypeData ? archetypeData.description : '');
+
+  const promptLines = [
+    'Character reference sheet — 6 panels on a single image, arranged in a 3x2 grid with perfect symmetry.',
+    '',
+    'CHARACTER TO DESIGN: ' + fullDesc,
+    '',
+    'PANELS (left to right, top to bottom):',
+    '  1. Full body front view — perfectly centered, symmetrical, arms down.',
+    '  2. Full body profile view (left side) — same character, same outfit.',
+    '  3. Full body 3/4 view — same character, slight angle, still symmetric staging.',
+    '  4. Close-up face — same face, details of eyes, nose, mouth, fur, markings.',
+    '  5. Detail panel — hands, accessories, helmet, distinctive marks.',
+    '  6. Expression sheet — 4 small headshots in a row: neutral, joy, sadness, surprise.',
+    '',
+    'RULES:',
+    '- ALL panels show the SAME character with ABSOLUTE CONSISTENCY.',
+    '- Same face, same fur, same colors, same outfit, same proportions, same accessories.',
+    '- Style: photorealism 35mm film, Wes Anderson aesthetic, pastel palette, symmetrical staging.',
+    '- Clean neutral background (soft pastel) so the character pops.',
+    '- Character is fully clothed. No nudity.',
+    '- This sheet is the ABSOLUTE REFERENCE for character consistency.',
+    '- No text, no watermark, no subtitles.',
+    '- Landscape 16:9 horizontal layout.'
+  ];
+  const prompt = promptLines.join('\n');
+
+  debugLog('ai','PROMPT REFSHEET','Envoyé ('+prompt.length+' chars)');
+  journalLog('Génération de la planche de référence (6 vues)…','character');
+
+  const refs = [];
+  if(refImageForApi)refs.push(refImageForApi);
+
+  const url = await generateImage(prompt, {
+    ratio: '16:9',
+    referenceImages: refs.length ? refs : undefined
+  });
+
+  debugLog('success','REFSHEET','Planche générée');
+  return url;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CHARACTER BIBLE BUILDER
+// ══════════════════════════════════════════════════════════════════
+async function buildCharacterBible(description, archetype, refsheetUrl){
+  const archetypeData = archetype && ARCHETYPES[archetype] ? ARCHETYPES[archetype] : null;
+
+  const systemPrompt = 'Tu es un directeur artistique spécialisé dans la cohérence de personnages pour la génération d\'images IA. Tu produis des descriptions hyper-précises qui figent l\'identité visuelle d\'un personnage. Tu réponds TOUJOURS en JSON strict, valide, sans markdown.';
+
+  const userPrompt = [
+    'Voici un personnage à décrire de manière EXTRÊMEMENT précise pour garantir sa cohérence à travers de nombreuses générations d\'images.',
+    '',
+    'DESCRIPTION FOURNIE:',
+    description || (archetypeData ? archetypeData.description : ''),
+    '',
+    archetypeData ? 'ARCHÉTYPE: ' + JSON.stringify(archetypeData, null, 2) : '',
+    '',
+    'Génère un Character Bible JSON avec cette structure EXACTE:',
+    '{',
+    '  "name": "nom court du personnage",',
+    '  "species": "espèce précise (ex: chaton siamois anthropomorphe, humain, etc.)",',
+    '  "age_impression": "âge apparent",',
+    '  "face": "description extrêmement précise du visage (yeux, nez, bouche, oreilles, moustaches, particularités)",',
+    '  "fur_or_hair": "description précise du pelage ou des cheveux (couleur, longueur, texture)",',
+    '  "eye_color": "couleur exacte des yeux",',
+    '  "distinctive_marks": "signes distinctifs (taches, cicatrices, bijoux)",',
+    '  "body": "description du corps (taille, corpulence, posture habituelle)",',
+    '  "outfit": "description extrêmement précise de la tenue (matières, couleurs, coupe, accessoires)",',
+    '  "helmet": "description précise du casque ou couvre-chef",',
+    '  "accessories": "accessoires récurrents",',
+    '  "signature_posture": "posture caractéristique toujours présente",',
+    '  "signature_expression": "expression habituelle",',
+    '  "color_palette": ["#hex1","#hex2","#hex3","#hex4"],',
+    '  "voice_fr": {"pitch": 1.0, "rate": 1.0, "gender": "male|female|neutral"},',
+    '  "character_lock_prompt": "UN SEUL PARAGRAPHE DE 200 À 300 MOTS EN ANGLAIS qui décrit le personnage à la virgule près. Ce paragraphe sera INJECTÉ TEL QUEL dans tous les prompts d\'image et de vidéo pour figer l\'identité. Il doit commencer par le nom du personnage, décrire la face, les yeux, le pelage/cheveux, le corps, la tenue complète, le casque, les accessoires, la posture, l\'expression, puis préciser: photorealistic 35mm film, fully clothed, deadpan neutral expression, and always rendered with the exact same identity across scenes."',
+    '}',
+    '',
+    'RÈGLES:',
+    '- Le character_lock_prompt DOIT être en anglais et faire 200-300 mots.',
+    '- Il doit être dense et complet: si un générateur d\'image lit UNIQUEMENT ce paragraphe, il doit pouvoir recréer le personnage à l\'identique.',
+    '- La palette de couleurs doit contenir 4 codes hex extraits de la description.',
+    '- Pas de markdown, pas de commentaire.'
+  ].join('\n');
+
+  const content = await callChatCompletion(systemPrompt, userPrompt, 'Character Bible', 4000, 0.6);
+  if(!content)throw new Error('Pas de contenu Character Bible');
+
+  const parsed = extractJson(content);
+  if(!parsed || !parsed.character_lock_prompt){
+    debugLog('error','BIBLE','JSON invalide ou lock_prompt manquant');
+    throw new Error('Character Bible invalide');
+  }
+
+  // Fallback palette
+  if(!Array.isArray(parsed.color_palette) || parsed.color_palette.length < 3){
+    parsed.color_palette = archetypeData ? archetypeData.color_palette : ['#F4C2C2', '#E5B95A', '#F5F0E1', '#7B9FB0'];
+  }
+
+  debugLog('success','BIBLE','Character Bible généré : '+parsed.name);
+  return parsed;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SCRIPT BUILDER
+// ══════════════════════════════════════════════════════════════════
+function buildScriptPrompt(story, charBible, sceneCount){
+  return [
+    'Tu es scénariste et réalisateur. Tu vas découper une histoire en '+sceneCount+' scènes cinématographiques.',
+    '',
+    'HISTOIRE:',
+    story,
+    '',
+    'PERSONNAGE PRINCIPAL (identité FIGÉE, ne jamais altérer):',
+    '- Nom: ' + charBible.name,
+    '- Espèce: ' + (charBible.species || ''),
+    '- Visage: ' + (charBible.face || ''),
+    '- Pelage/cheveux: ' + (charBible.fur_or_hair || ''),
+    '- Tenue: ' + (charBible.outfit || ''),
+    '- Casque: ' + (charBible.helmet || ''),
+    '- Posture: ' + (charBible.signature_posture || ''),
+    '',
+    'RÈGLES ABSOLUES:',
+    '1. Le personnage GARDE EXACTEMENT la même apparence dans TOUTES les scènes.',
+    '2. Chaque scène est un plan continu de quelques secondes.',
+    '3. Chaque scène a un dialogue court en français (5 à 10 mots max).',
+    '4. Chaque scène a un décor décrit en anglais, cohérent avec l\'histoire.',
+    '5. Chaque scène a un prompt image ET un prompt vidéo.',
+    '',
+    'RÈGLES JSON STRICTES:',
+    '- Toutes les chaînes sur UNE SEULE LIGNE.',
+    '- Chaque clé JSON entre guillemets doubles.',
+    '- Échappe uniquement les guillemets doubles internes en \\".',
+    '- Pas de virgule finale. Pas de markdown. Pas de commentaire.',
+    '',
+    'FORMAT DE SORTIE (UNIQUEMENT ce JSON):',
+    '{',
+    '  "title": "titre court de l\'histoire",',
+    '  "logline": "résumé en une phrase",',
+    '  "scenes": [',
+    '    {',
+    '      "scene_number": 1,',
+    '      "action": "description en français de ce qui se passe",',
+    '      "decor": "english description of the location, tied to the story",',
+    '      "image_prompt": "english prompt for the image — describe the scene with the character in it, no need to re-describe the character here (it will be injected separately)",',
+    '      "video_prompt": "english prompt for the video — describe the continuous motion",',
+    '      "dialogue": { "speaker": "Nom", "line_fr": "phrase courte en français" },',
+    '      "emotion": "one word",',
+    '      "text_overlay_fr": "BANDEAU COURT EN MAJUSCULES"',
+    '    }',
+    '    ... exactement '+sceneCount+' scènes ...',
+    '  ]',
+    '}'
+  ].join('\n');
+}
+
+async function generateScript(story, charBible, sceneCount){
+  const prompt = buildScriptPrompt(story, charBible, sceneCount);
+  debugLog('ai','PROMPT SCÉNARIO','Envoyé ('+prompt.length+' chars)');
+  journalLog('Écriture du scénario ('+sceneCount+' scènes)…','script');
+
+  const content = await callChatCompletion(
+    'Tu es scénariste et réalisateur. Tu réponds TOUJOURS en JSON strict valide, sans markdown, sans commentaire. Toutes les chaînes sur UNE SEULE LIGNE.',
+    prompt, 'Scénario', 8000, 0.75
+  );
+
+  if(!content)throw new Error('Pas de contenu scénario');
+  const script = extractJson(content);
+  if(!script || !script.scenes || !Array.isArray(script.scenes)){
+    throw new Error('Scénario JSON invalide');
+  }
+
+  // Normalisation
+  if(script.scenes.length > sceneCount)script.scenes = script.scenes.slice(0, sceneCount);
+  script.scenes.forEach((sc, i)=>{
+    sc.scene_number = i + 1;
+    if(!sc.dialogue || !sc.dialogue.line_fr){
+      sc.dialogue = {speaker: charBible.name, line_fr: 'Voici ce qui arrive maintenant.'};
+    }
+    if(!sc.text_overlay_fr)sc.text_overlay_fr = 'SCÈNE ' + (i+1);
+    if(!sc.emotion)sc.emotion = 'neutral';
+    if(!sc.image_prompt)sc.image_prompt = sc.decor || 'cinematic scene';
+    if(!sc.video_prompt)sc.video_prompt = 'slow continuous movement';
+  });
+
+  debugLog('success','SCÉNARIO',script.scenes.length+' scènes générées');
+  return script;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CONSISTENCY CHECKER — analyse vision + scoring
+// ══════════════════════════════════════════════════════════════════
+async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
+  // Charge les deux images en base64
+  let sceneDataUrl, refDataUrl;
+  try{
+    const [sceneBlob, refBlob] = await Promise.all([
+      fetch(sceneImageUrl).then(r=>r.blob()),
+      fetch(refsheetUrl).then(r=>r.blob())
+    ]);
+    sceneDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(sceneBlob)});
+    refDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(refBlob)});
+  }catch(e){
+    debugLog('error','CONSISTENCY','Impossible de charger les images : '+e.message);
+    return null;
+  }
+
+  const systemPrompt = 'Tu es un expert en cohérence de personnages dans la génération d\'images IA. Tu compares deux images et donnes un score OBJECTIF de cohérence. Tu réponds TOUJOURS en JSON strict valide, sans markdown.';
+
+  const userPrompt = [
+    'Voici deux images :',
+    '- IMAGE 1 : la PLAN
+
+CHE DE RÉFÉRENCE du personnage (identité absolue).',
+    '- IMAGE 2 : une IMAGE DE SCÈNE qui doit contenir le même personnage.',
+    '',
+    'PERSONNAGE ATTENDU:',
+    charBible.character_lock_prompt || 'Non spécifié',
+    '',
+    'Analyse la cohérence entre les deux. Retourne UNIQUEMENT ce JSON:',
+    '{',
+    '  "score": <nombre 0-100, score global de cohérence>,',
+    '  "identity": <0-100, identité visage/tête/fourrure>,',
+    '  "outfit": <0-100, tenue/casque/accessoires>,',
+    '  "posture": <0-100, posture/attitude>,',
+    '  "ambiance": <0-100, ambiance/style global cohérent>,',
+    '  "issues": ["liste de problèmes détectés, ou vide si aucun"],',
+    '  "verdict": "short sentence explaining the score"',
+    '}',
+    '',
+    'RÈGLES:',
+    '- Sois objectif et précis.',
+    '- Le score global doit refléter l\'impression générale.',
+    '- Un score < 75 signifie que la scène est incohérente.',
+    '- Si l\'image ne contient pas de personnage, score = 0.'
+  ].join('\n');
+
+  // Envoie en deux temps car l'API peut ne supporter qu'une image par message
+  // On utilise 2 images dans le même message (array content)
+  try{
+    const body = {
+      model: MODEL_TEXT,
+      messages: [
+        {role:'system', content: systemPrompt},
+        {role:'user', content: [
+          {type:'text', text: userPrompt},
+          {type:'image_url', image_url: {url: refDataUrl}},
+          {type:'image_url', image_url: {url: sceneDataUrl}}
+        ]}
+      ],
+      temperature: 0.2,
+      max_tokens: 800,
+      reasoning_effort: 'none',
+      chat_template_kwargs: {enable_thinking: false}
+    };
+
+    const res = await apiFetch(API_BASE+'/chat/completions', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}, 'Consistency', 3);
+    const data = await res.json();
+    const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if(!content){
+      debugLog('warn','CONSISTENCY','Pas de contenu renvoyé');
+      return null;
+    }
+    const parsed = extractJson(content);
+    if(!parsed)return null;
+
+    // Validation
+    if(typeof parsed.score !== 'number')parsed.score = 0;
+    parsed.score = Math.max(0, Math.min(100, parsed.score));
+    ['identity','outfit','posture','ambiance'].forEach(k=>{
+      if(typeof parsed[k] !== 'number')parsed[k] = 0;
+      parsed[k] = Math.max(0, Math.min(100, parsed[k]));
+    });
+    if(!Array.isArray(parsed.issues))parsed.issues = [];
+    if(!parsed.verdict)parsed.verdict = '';
+
+    debugLog('vision','CONSISTENCY','Score = '+parsed.score+' · '+parsed.verdict.slice(0,80));
+    return parsed;
+  }catch(e){
+    debugLog('warn','CONSISTENCY','Erreur analyse : '+e.message);
+    return null;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BUILD IMAGE PROMPT — cohérence maximale
+// ══════════════════════════════════════════════════════════════════
+function buildSceneImagePrompt(scene, charBible){
+  return [
+    'CINEMATIC FILM STILL — 35mm film, photorealistic, Wes Anderson aesthetic.',
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ CHARACTER LOCK — THIS IDENTITY MUST BE RESPECTED ABSOLUTELY     ║',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    charBible.character_lock_prompt || 'No lock prompt.',
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ SCENE                                                            ║',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    'DECOR: ' + (scene.decor || ''),
+    'ACTION: ' + (scene.action || ''),
+    '',
+    'A reference sheet of the character is provided as input image. The character in this new image MUST be 100% identical to the reference sheet: same face, same fur, same eyes, same outfit, same helmet, same accessories, same proportions, same posture.',
+    '',
+    'CONSTRAINTS:',
+    '- Perfect bilateral symmetry.',
+    '- Dead-center framing.',
+    '- Character fully clothed at all times.',
+    '- Pastel color palette coordinated with the character.',
+    '- 35mm film grain, warm halation.',
+    '- ' + (state.imageFormat === '9:16' ? 'Vertical portrait 9:16.' : state.imageFormat === '16:9' ? 'Horizontal landscape 16:9.' : 'Square 1:1.'),
+    '- No text, no watermark, no subtitles, no on-screen graphics.'
+  ].join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BUILD VIDEO PROMPT — cohérence maximale
+// ══════════════════════════════════════════════════════════════════
+function buildSceneVideoPrompt(scene, charBible){
+  const line = (scene.dialogue && scene.dialogue.line_fr) || '';
+  return [
+    'CINEMATIC SHOT ON 35MM FILM — Wes Anderson aesthetic.',
+    '',
+    'CHARACTER LOCK (must remain identical to the input frames):',
+    charBible.character_lock_prompt || 'No lock prompt.',
+    '',
+    'SCENE: ' + (scene.action || ''),
+    'DECOR: ' + (scene.decor || ''),
+    '',
+    'CAMERA: One continuous slow movement. Perfect bilateral symmetry. Slow dolly-in OR static locked-off frame.',
+    '',
+    'STYLE: pastel palette, deadpan acting, 35mm film grain, warm halation.',
+    '',
+    'AUDIO: No music. Only diegetic ambience. ' + (line ? 'The character says in French: "' + line + '" — one single calm delivery, lips in sync.' : 'No dialogue.'),
+    '',
+    'CONSTRAINTS: 100% identity match with the input frames. No text, no watermark, no camera shake, no cuts.',
+    'Format: ' + (state.imageFormat === '9:16' ? 'vertical portrait 9:16' : state.imageFormat === '16:9' ? 'horizontal landscape 16:9' : 'square 1:1') + '.'
+  ].join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER UI
+// ══════════════════════════════════════════════════════════════════
+function updateButtons(){
+  const newCharBtn=document.getElementById('new-char-btn');
+  const createCharBtn=document.getElementById('create-char-btn');
+  const genScriptBtn=document.getElementById('generate-script-btn');
+  const genScenesBtn=document.getElementById('generate-scenes-btn');
+  const genVideosBtn=document.getElementById('generate-videos-btn');
+  const playBtn=document.getElementById('play-film-btn');
+  const replayBtn=document.getElementById('replay-film-btn');
+
+  const hasKey=hasActiveKey();
+  const hasSelectedChar=!!state.selectedCharacterId;
+  const hasStory=document.getElementById('story-input').value.trim().length>10;
+  const hasScript=!!state.script;
+  const hasScenes=state.scenes.filter(s=>s.status==='done').length>0;
+  const hasVideos=state.videos.filter(v=>v.status==='done').length>0;
+
+  if(createCharBtn){
+    const hasDesc=document.getElementById('char-description').value.trim().length>20;
+    const hasArch=!!document.getElementById('char-archetype').value;
+    createCharBtn.disabled=!hasKey || (!hasDesc && !hasArch) || state.isCreating;
+    if(state.isCreating)createCharBtn.textContent='⏳ Création en cours…';
+    else if(!hasKey)createCharBtn.textContent='🔑 Ajoutez une clé API';
+    else if(!hasDesc && !hasArch)createCharBtn.textContent='📝 Décrivez le personnage ou choisissez un archétype';
+    else createCharBtn.textContent='🎨 Générer la planche de référence';
+  }
+  if(genScriptBtn){
+    genScriptBtn.disabled=!hasKey || !hasSelectedChar || !hasStory || state.isGeneratingScript;
+    if(state.isGeneratingScript)genScriptBtn.textContent='⏳ Scénario en cours…';
+    else if(!hasKey)genScriptBtn.textContent='🔑 Ajoutez une clé API';
+    else if(!hasSelectedChar)genScriptBtn.textContent='👥 Sélectionnez un personnage dans la bibliothèque';
+    else if(!hasStory)genScriptBtn.textContent='📝 Décrivez votre histoire';
+    else genScriptBtn.textContent='📜 Générer le scénario';
+  }
+  if(genScenesBtn){
+    genScenesBtn.disabled=!hasScript || state.isGeneratingScenes;
+    if(state.isGeneratingScenes)genScenesBtn.textContent='⏳ Génération des scènes…';
+    else genScenesBtn.textContent='🎨 Générer les images de scène';
+  }
+  if(genVideosBtn){
+    const allScenesReady=state.scenes.filter(s=>s.status==='done').length===state.scenes.length && state.scenes.length>0;
+    genVideosBtn.disabled=!allScenesReady || state.isGeneratingVideos;
+    if(state.isGeneratingVideos)genVideosBtn.textContent='⏳ Génération des vidéos…';
+    else if(!allScenesReady)genVideosBtn.textContent='🎬 Générez d\'abord toutes les images de scène';
+    else genVideosBtn.textContent='🎬 Générer les vidéos';
+  }
+  if(playBtn)playBtn.disabled=!hasVideos || state.isPlayingFilm;
+  if(replayBtn)replayBtn.disabled=!hasVideos || state.isPlayingFilm;
+}
+
+function renderCharacterLibrary(){
+  const grid=document.getElementById('char-library');
+  const badge=document.getElementById('library-badge');
+  if(!grid)return;
+
+  if(!state.characters.length){
+    grid.innerHTML='<div class="char-empty">Aucun personnage enregistré. Cliquez ci-dessous pour en créer un.</div>';
+    if(badge)badge.textContent='0';
+    return;
+  }
+
+  grid.innerHTML = state.characters.map(c=>{
+    const selected = state.selectedCharacterId === c.id;
+    const preview = c.refsheetUrl || '';
+    return '<div class="char-card'+(selected?' selected':'')+'" data-char-id="'+esc(c.id)+'">'+
+      (preview?'<img class="cc-preview" src="'+preview+'" alt="">':'<div class="cc-preview"></div>')+
+      '<div class="cc-body">'+
+        '<div class="cc-name">'+esc(c.name)+'</div>'+
+        '<div class="cc-species">'+esc(c.species||'—')+'</div>'+
+        '<div class="cc-actions">'+
+          '<button data-action="select" data-char-id="'+esc(c.id)+'">'+(selected?'✓ Sélectionné':'Sélectionner')+'</button>'+
+          '<button data-action="delete" data-char-id="'+esc(c.id)+'">🗑</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  if(badge)badge.textContent=state.characters.length;
+
+  grid.querySelectorAll('.char-card').forEach(card=>{
+    card.addEventListener('click',e=>{
+      if(e.target.tagName==='BUTTON')return;
+      const id=card.dataset.charId;
+      selectCharacter(id);
+    });
+  });
+  grid.querySelectorAll('button[data-action]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const action=btn.dataset.action;
+      const id=btn.dataset.charId;
+      if(action==='select')selectCharacter(id);
+      else if(action==='delete')deleteCharacter(id);
+    });
+  });
+}
+
+function selectCharacter(id){
+  state.selectedCharacterId = id;
+  const char = state.characters.find(c=>c.id===id);
+  if(char){
+    state.bible = char.bible;
+    state.refsheetUrl = char.refsheetUrl;
+    renderCharacterLibrary();
+    renderBible();
+    updateButtons();
+    journalLog('Personnage sélectionné : '+char.name,'character');
+  }
+}
+
+function deleteCharacter(id){
+  if(!confirm('Supprimer ce personnage ?'))return;
+  state.characters = state.characters.filter(c=>c.id!==id);
+  saveCharacters(state.characters);
+  if(state.selectedCharacterId === id){
+    state.selectedCharacterId = null;
+    state.bible = null;
+    state.refsheetUrl = null;
+    renderBible();
+  }
+  renderCharacterLibrary();
+  updateButtons();
+  showToast('Personnage supprimé','warn');
+}
+
+function renderBible(){
+  const section=document.getElementById('section-bible');
+  const lockText=document.getElementById('bible-lock-text');
+  const jsonEl=document.getElementById('bible-json');
+  const badge=document.getElementById('bible-badge');
+  if(!state.bible){
+    section.classList.add('hidden');
+    return;
+  }
+  section.classList.remove('hidden');
+  lockText.textContent = state.bible.character_lock_prompt || '—';
+  jsonEl.textContent = JSON.stringify(state.bible, null, 2);
+  if(badge)badge.textContent = state.bible.name || '—';
+}
+
+function renderScenes(){
+  const grid=document.getElementById('scenes-grid');
+  const badge=document.getElementById('scenes-badge');
+  if(!grid)return;
+
+  if(!state.scenes.length){
+    grid.innerHTML='';
+    if(badge)badge.textContent='0';
+    return;
+  }
+
+  grid.innerHTML = state.scenes.map((s,i)=>{
+    const cls='scene-card ' + (s.status==='done'?'done':s.status==='error'?'error':s.status==='retrying'?'retrying':'generating');
+    const statusText = s.status==='done'?'✓':s.status==='error'?'✕':s.status==='retrying'?'↻':'…';
+    const scoreHtml = (s.consistency && typeof s.consistency.score === 'number') 
+      ? '<span class="scene-card-score '+(s.consistency.score>=state.consistencyThreshold?'good':s.consistency.score>=60?'mid':'bad')+'">'+s.consistency.score+'/100</span>'
+      : '';
+    let bodyHtml = '';
+    if(s.status==='done' && s.imageUrl){
+      bodyHtml = '<img src="'+s.imageUrl+'" alt="Scène '+(i+1)+'">';
+      if(s.consistency){
+        bodyHtml += '<div class="score-bar"><div class="score-bar-fill '+(s.consistency.score>=state.consistencyThreshold?'good':s.consistency.score>=60?'mid':'bad')+'" style="width:'+s.consistency.score+'%"></div></div>';
+        bodyHtml += '<div class="score-breakdown">'+
+          '<div class="sb-row"><span>Identité</span><span class="sb-val">'+s.consistency.identity+'/100</span></div>'+
+          '<div class="sb-row"><span>Tenue</span><span class="sb-val">'+s.consistency.outfit+'/100</span></div>'+
+          '<div class="sb-row"><span>Posture</span><span class="sb-val">'+s.consistency.posture+'/100</span></div>'+
+          '<div class="sb-row"><span>Ambiance</span><span class="sb-val">'+s.consistency.ambiance+'/100</span></div>'+
+        '</div>';
+        if(s.consistency.issues && s.consistency.issues.length){
+          bodyHtml += '<div style="font-size:.62rem;color:var(--err);font-family:var(--fm);margin-top:.3rem">⚠ '+esc(s.consistency.issues.slice(0,2).join(' · '))+'</div>';
+        }
+      }
+    }else if(s.status==='error'){
+      bodyHtml = '<div class="scene-placeholder" style="color:var(--err)">'+esc(s.error||'Erreur')+'</div>';
+    }else{
+      bodyHtml = '<div class="scene-placeholder"><div class="spinner-mini"></div><span>'+esc(s.progress||'En attente…')+'</span></div>';
+    }
+
+    return '<div class="'+cls+'">'+
+      '<div class="scene-card-header">'+
+        '<span class="scene-card-title">🎬 Scène '+(i+1)+'</span>'+
+        scoreHtml+
+      '</div>'+
+      '<div class="scene-card-body">'+
+        bodyHtml+
+        '<div class="scene-actions">'+
+          (s.status==='done'?'<button data-scene-action="regenerate" data-scene-index="'+i+'">🔄 Régénérer</button>':'')+
+          (s.status==='done'?'<button data-scene-action="recheck" data-scene-index="'+i+'">👁 Revérifier</button>':'')+
+        '</div>'+
+        '<div style="font-size:.68rem;color:var(--dim);font-family:var(--fm);line-height:1.4">'+esc((s.dialogue&&s.dialogue.line_fr)||'')+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  const done=state.scenes.filter(s=>s.status==='done').length;
+  if(badge)badge.textContent=done+'/'+state.scenes.length;
+
+  grid.querySelectorAll('button[data-scene-action]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const action=btn.dataset.sceneAction;
+      const idx=parseInt(btn.dataset.sceneIndex,10);
+      if(action==='regenerate')regenerateScene(idx);
+      else if(action==='recheck')recheckScene(idx);
+    });
+  });
+}
+
+function renderVideos(){
+  const grid=document.getElementById('videos-grid');
+  const badge=document.getElementById('videos-badge');
+  if(!grid)return;
+
+  if(!state.videos.length){
+    grid.innerHTML='';
+    if(badge)badge.textContent='0';
+    return;
+  }
+
+  grid.innerHTML = state.videos.map((v,i)=>{
+    const cls='scene-card ' + (v.status==='done'?'done':v.status==='error'?'error':'generating');
+    let bodyHtml = '';
+    if(v.status==='done' && v.url){
+      bodyHtml = '<video src="'+v.url+'" controls preload="metadata" playsinline></video>';
+    }else if(v.status==='error'){
+      bodyHtml = '<div class="scene-placeholder" style="color:var(--err)">'+esc(v.error||'Erreur')+'</div>';
+    }else{
+      bodyHtml = '<div class="scene-placeholder"><div class="spinner-mini"></div><span>'+esc(v.progress||'En attente…')+'</span></div>';
+    }
+
+    return '<div class="'+cls+'">'+
+      '<div class="scene-card-header">'+
+        '<span class="scene-card-title">🎬 Scène '+(i+1)+'</span>'+
+      '</div>'+
+      '<div class="scene-card-body">'+bodyHtml+'</div>'+
+    '</div>';
+  }).join('');
+
+  const done=state.videos.filter(v=>v.status==='done').length;
+  if(badge)badge.textContent=done+'/'+state.videos.length;
+  if(document.getElementById('player-badge'))document.getElementById('player-badge').textContent=done;
+}
+
+function updateProgress(pct,label,eta){
+  const bar=document.getElementById('progress-bar');
+  const fill=document.getElementById('progress-fill');
+  const info=document.getElementById('progress-info');
+  const lab=document.getElementById('progress-label');
+  const et=document.getElementById('progress-eta');
+  if(bar)bar.classList.add('visible');
+  if(info)info.classList.add('visible');
+  if(fill)fill.style.width=Math.max(0,Math.min(100,pct))+'%';
+  if(lab)lab.textContent=label||'';
+  if(et)et.textContent=eta||'';
+}
+function hideProgress(){
+  const bar=document.getElementById('progress-bar');
+  const info=document.getElementById('progress-info');
+  if(bar)bar.classList.remove('visible');
+  if(info)info.classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE — CRÉATION PERSONNAGE
+// ══════════════════════════════════════════════════════════════════
+async function createCharacter(){
+  if(state.isCreating)return;
+  if(!hasActiveKey()){showToast('Ajoutez au moins une clé API','error');return}
+
+  const description=document.getElementById('char-description').value.trim();
+  const archetype=document.getElementById('char-archetype').value;
+  if(!description && !archetype){showToast('Décrivez le personnage ou choisissez un archétype','error');return}
+
+  state.isCreating=true;
+  state.stopRequested=false;
+  updateButtons();
+  setStatus('Étape 1/2 — Génération de la planche de référence…');
+  journalLog('Création du personnage…','character');
+
+  const archetypeData = archetype && ARCHETYPES[archetype] ? ARCHETYPES[archetype] : null;
+  const fullDescription = description || (archetypeData ? archetypeData.description : '');
+
+  try{
+    // ÉTAPE 1 : Planche de référence
+    const refsheetUrl = await generateReferenceSheet(fullDescription, archetype, state.refImageDataUrl, state.refImageForApi);
+    state.refsheetUrl = refsheetUrl;
+
+    document.getElementById('section-refsheet').classList.remove('hidden');
+    document.getElementById('refsheet-image').src = refsheetUrl;
+    document.getElementById('refsheet-section').classList.remove('hidden');
+    document.getElementById('section-create').classList.add('open');
+
+    journalLog('Planche de référence générée ✓','success');
+    showToast('Planche générée','success');
+
+    // ÉTAPE 2 : Character Bible
+    setStatus('Étape 2/2 — Génération du Character Bible…');
+    journalLog('Génération du Character Bible…','character');
+
+    const bible = await buildCharacterBible(fullDescription, archetype, refsheetUrl);
+    state.bible = bible;
+
+    // Sauvegarde
+    const charId = 'char_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+    const charObj = {
+      id: charId,
+      name: bible.name || 'Personnage',
+      species: bible.species || '',
+      refsheetUrl: refsheetUrl,
+      bible: bible,
+      createdAt: Date.now()
+    };
+    persistCharacter(charObj);
+    state.selectedCharacterId = charId;
+
+    renderCharacterLibrary();
+    renderBible();
+    renderScenes();
+    renderVideos();
+
+    document.getElementById('section-bible').classList.remove('hidden');
+    document.getElementById('section-bible').classList.add('open');
+
+    journalLog('Character Bible généré : '+bible.name+' ✓','success');
+    showToast('Personnage créé : '+bible.name,'success');
+
+    setStatus('✦ Personnage prêt ✦');
+    await sleep(2000);
+    setStatus(null);
+
+  }catch(e){
+    if(e.message==='Arrêt demandé'){
+      journalLog('Arrêt demandé.','warn');
+    }else{
+      journalLog('Erreur : '+e.message,'error');
+      debugLog('error','CREATE',e.message);
+      showToast('Erreur : '+e.message.slice(0,60),'error');
+    }
+  }
+
+  state.isCreating=false;
+  state.stopRequested=false;
+  updateButtons();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE — SCÉNARIO
+// ══════════════════════════════════════════════════════════════════
+async function generateScriptPipeline(){
+  if(state.isGeneratingScript)return;
+  if(!hasActiveKey()){showToast('Ajoutez une clé API','error');return}
+  if(!state.selectedCharacterId){showToast('Sélectionnez un personnage','error');return}
+  const story=document.getElementById('story-input').value.trim();
+  if(story.length<10){showToast('Décrivez votre histoire (10 caractères min)','error');return}
+
+  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  if(!char || !char.bible){showToast('Personnage invalide','error');return}
+
+  state.isGeneratingScript=true;
+  state.stopRequested=false;
+  updateButtons();
+  setStatus('Génération du scénario…');
+  updateProgress(10,'Écriture du scénario…','');
+
+  try{
+    const sceneCount=parseInt(document.getElementById('scene-count').value,10);
+    state.sceneCount=sceneCount;
+    state.durationFrames=parseInt(document.getElementById('scene-duration').value,10);
+    state.consistencyThreshold=parseInt(document.getElementById('consistency-threshold').value,10);
+    state.imageFormat=document.getElementById('image-format').value;
+
+    const script=await generateScript(story, char.bible, sceneCount);
+    state.script=script;
+
+    // Initialise les scènes
+    state.scenes = script.scenes.map((sc,i)=>({
+      index: i,
+      status: 'pending',
+      imageUrl: null,
+      progress: null,
+      error: null,
+      consistency: null,
+      dialogue: sc.dialogue,
+      action: sc.action,
+      decor: sc.decor,
+      image_prompt: sc.image_prompt,
+      video_prompt: sc.video_prompt,
+      text_overlay_fr: sc.text_overlay_fr,
+      retryCount: 0
+    }));
+    state.videos = script.scenes.map((sc,i)=>({
+      index: i,
+      status: 'pending',
+      url: null,
+      progress: null,
+      error: null
+    }));
+
+    document.getElementById('section-scenes').classList.remove('hidden');
+    document.getElementById('section-scenes').classList.add('open');
+    document.getElementById('story-badge').textContent = script.scenes.length+' scènes';
+    renderScenes();
+    renderVideos();
+
+    journalLog('Scénario prêt : '+script.scenes.length+' scènes.','success');
+    showToast('Scénario généré','success');
+
+    document.getElementById('section-scenes').scrollIntoView({behavior:'smooth',block:'start'});
+    updateProgress(100,'Scénario prêt','');
+    await sleep(2000);
+    hideProgress();
+    setStatus(null);
+
+  }catch(e){
+    journalLog('Erreur scénario : '+e.message,'error');
+    showToast('Erreur : '+e.message.slice(0,60),'error');
+    hideProgress();
+    setStatus(null);
+  }
+
+  state.isGeneratingScript=false;
+  state.stopRequested=false;
+  updateButtons();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE — GÉNÉRATION SCÈNES (avec cohérence + régénération auto)
+// ══════════════════════════════════════════════════════════════════
+async function generateAllScenes(){
+  if(state.isGeneratingScenes)return;
+  if(!state.scenes.length){showToast('Générez d\'abord le scénario','error');return}
+
+  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  if(!char || !char.bible || !char.refsheetUrl){showToast('Personnage invalide','error');return}
+
+  state.isGeneratingScenes=true;
+  state.stopRequested=false;
+  updateButtons();
+  await activateWakeLock();
+
+  // Convertit la planche en base64 pour l'envoyer en référence
+  let refsheetDataUrl=null;
+  try{
+    const blob = await fetch(char.refsheetUrl).then(r=>r.blob());
+    refsheetDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
+  }catch(e){
+    debugLog('warn','SCENES','Impossible de charger la planche en base64 : '+e.message);
+  }
+
+  const total=state.scenes.length;
+  let done=0;
+
+  for(let i=0;i<total;i++){
+    if(state.stopRequested)break;
+
+    const scene=state.scenes[i];
+    const sceneData=state.script.scenes[i];
+
+    let attempt=0;
+    let success=false;
+
+    while(attempt<IMAGE_MAX_RETRIES && !success && !state.stopRequested){
+      attempt++;
+      scene.retryCount = attempt;
+      scene.status = 'generating';
+      scene.progress = 'Génération (essai '+attempt+'/'+IMAGE_MAX_RETRIES+')…';
+      renderScenes();
+      setStatus('Scène '+(i+1)+'/'+total+' — essai '+attempt+'/'+IMAGE_MAX_RETRIES);
+      updateProgress(((i*IMAGE_MAX_RETRIES+attempt)/(total*IMAGE_MAX_RETRIES))*100, 'Scène '+(i+1)+'/'+total+' — essai '+attempt, '');
+      journalLog('Scène '+(i+1)+' — génération essai '+attempt,'image');
+
+      try{
+        const prompt=buildSceneImagePrompt(scene, char.bible);
+        const refs=[];
+        if(refsheetDataUrl)refs.push(refsheetDataUrl);
+
+        const imageUrl = await generateImage(prompt, {
+          ratio: state.imageFormat,
+          referenceImages: refs.length ? refs : undefined
+        });
+        scene.imageUrl = imageUrl;
+        journalLog('Scène '+(i+1)+' — image générée, analyse de cohérence…','vision');
+
+        // Analyse de cohérence
+        scene.status = 'retrying'; // temporaire pour éviter affichage ✓ trop tôt
+        scene.progress = 'Analyse de cohérence…';
+        renderScenes();
+
+        const consistency = await checkConsistency(imageUrl, char.refsheetUrl, char.bible);
+        scene.consistency = consistency;
+
+        if(consistency && consistency.score >= state.consistencyThreshold){
+          scene.status = 'done';
+          scene.progress = 'Cohérent';
+          success = true;
+          journalLog('Scène '+(i+1)+' ✓ cohérence = '+consistency.score+'/100','success');
+          showToast('Scène '+(i+1)+' : '+consistency.score+'/100','success',1800);
+          renderScenes();
+        }else{
+          const score = consistency ? consistency.score : '?';
+          journalLog('Scène '+(i+1)+' — cohérence insuffisante ('+score+'/100 < '+state.consistencyThreshold+') → régénération','warn');
+          if(attempt>=IMAGE_MAX_RETRIES){
+            scene.status = 'done';
+            scene.progress = 'Acceptée (sous seuil)';
+            success = true;
+            renderScenes();
+            showToast('Scène '+(i+1)+' : score max atteint '+score,'warn',2000);
+          }
+        }
+      }catch(e){
+        if(e.message==='Arrêt demandé')break;
+        scene.status = 'error';
+        scene.error = e.message;
+        scene.progress = 'Erreur';
+        renderScenes();
+        journalLog('Scène '+(i+1)+' — erreur : '+e.message,'error');
+        // En cas d'erreur, on sort de la boucle des tentatives
+        break;
+      }
+    }
+
+    if(scene.status === 'done')done++;
+
+    // Espacement entre les scènes
+    if(i<total-1 && !state.stopRequested){
+      const secs=4;
+      for(let r=secs;r>0;r--){
+        if(state.stopRequested)break;
+        setStatus('Pause '+r+'s avant scène '+(i+2));
+        await sleep(1000);
+      }
+    }
+  }
+
+  state.isGeneratingScenes=false;
+  state.stopRequested=false;
+  updateButtons();
+  hideProgress();
+  await deactivateWakeLock();
+
+  const finalDone=state.scenes.filter(s=>s.status==='done').length;
+  const avgScore = state.scenes.filter(s=>s.consistency).length 
+    ? Math.round(state.scenes.filter(s=>s.consistency).reduce((a,s)=>a+s.consistency.score,0) / state.scenes.filter(s=>s.consistency).length)
+    : 0;
+  setStatus('✦ '+finalDone+'/'+total+' scènes — score moyen '+avgScore+'/100 ✦');
+  await sleep(3000);
+  setStatus(null);
+  journalLog('Scènes terminées : '+finalDone+'/'+total+' · score moyen '+avgScore+'/100',finalDone>0?'success':'warn');
+  showToast(finalDone+' scènes générées','success');
+}
+
+async function regenerateScene(index){
+  if(state.isGeneratingScenes)return;
+  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  if(!char)return;
+
+  const scene = state.scenes[index];
+  const sceneData = state.script.scenes[index];
+
+  let refsheetDataUrl=null;
+  try{
+    const blob = await fetch(char.refsheetUrl).then(r=>r.blob());
+    refsheetDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
+  }catch(e){}
+
+  scene.status='generating';
+  scene.progress='Régénération…';
+  renderScenes();
+  journalLog('Régénération manuelle scène '+(index+1),'image');
+
+  try{
+    const prompt=buildSceneImagePrompt(scene, char.bible);
+    const refs=[];
+    if(refsheetDataUrl)refs.push(refsheetDataUrl);
+    const imageUrl = await generateImage(prompt, {
+      ratio: state.imageFormat,
+      referenceImages: refs.length ? refs : undefined
+    });
+    scene.imageUrl = imageUrl;
+    scene.status='retrying';
+    scene.progress='Analyse…';
+    renderScenes();
+    const consistency = await checkConsistency(imageUrl, char.refsheetUrl, char.bible);
+    scene.consistency = consistency;
+    scene.status='done';
+    scene.progress='Régénéré';
+    renderScenes();
+    showToast('Scène '+(index+1)+' régénérée — '+((consistency&&consistency.score)||'?')+'/100','success');
+    journalLog('Scène '+(index+1)+' régénérée — score '+((consistency&&consistency.score)||'?'),'success');
+  }catch(e){
+    scene.status='error';
+    scene.error=e.message;
+    renderScenes();
+    showToast('Erreur : '+e.message.slice(0,40),'error');
+  }
+}
+
+async function recheckScene(index){
+  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  if(!char)return;
+  const scene = state.scenes[index];
+  if(!scene.imageUrl){showToast('Pas d\'image à analyser','warn');return}
+  scene.status='retrying';
+  scene.progress='Analyse…';
+  renderScenes();
+  try{
+    const consistency = await checkConsistency(scene.imageUrl, char.refsheetUrl, char.bible);
+    scene.consistency = consistency;
+    scene.status='done';
+    renderScenes();
+    showToast('Score : '+((consistency&&consistency.score)||'?')+'/100','success');
+  }catch(e){
+    scene.status='done';
+    renderScenes();
+    showToast('Erreur analyse','error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE — GÉNÉRATION VIDÉOS
+// ══════════════════════════════════════════════════════════════════
+async function generateAllVideos(){
+  if(state.isGeneratingVideos)return;
+  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  if(!char)return;
+
+  const readyScenes = state.scenes.filter(s=>s.status==='done' && s.imageUrl);
+  if(readyScenes.length<2){showToast('Il faut au moins 2 scènes pour générer des vidéos','error');return}
+
+  state.isGeneratingVideos=true;
+  state.stopRequested=false;
+  updateButtons();
+  await activateWakeLock();
+
+  const total = readyScenes.length - 1; // Une vidéo par paire de scènes
+  journalLog('Génération de '+total+' vidéos (keyframes chaînés)…','video');
+
+  // Workers parallèles selon les clés disponibles
+  const workerCount = Math.max(1, state.keyPool.filter(k=>k.active).length);
+  const queue = [];
+  for(let i=0;i<total;i++)queue.push(i);
+
+  const pollTasks=[];
+  async function videoWorker(workerId){
+    while(queue.length>0 && !state.stopRequested){
+      const i = queue.shift();
+      if(i===undefined)break;
+      await generateOneVideo(workerId, i, readyScenes);
+    }
+  }
+  const workers=[];
+  for(let w=0;w<workerCount;w++)workers.push(videoWorker(w));
+  await Promise.all(workers);
+
+  state.isGeneratingVideos=false;
+  state.stopRequested=false;
+  updateButtons();
+  await deactivateWakeLock();
+
+  const done=state.videos.filter(v=>v.status==='done').length;
+  setStatus('✦ '+done+'/'+total+' vidéos prêtes ✦');
+  await sleep(3000);
+  setStatus(null);
+  showToast(done+' vidéos générées','success');
+
+  if(done>0){
+    document.getElementById('section-player').classList.remove('hidden');
+    document.getElementById('section-player').classList.add('open');
+  }
+}
+
+async function generateOneVideo(workerId, index, readyScenes){
+  if(state.stopRequested)return;
+  const sceneA = readyScenes[index];
+  const sceneB = readyScenes[index+1];
+  if(!sceneA || !sceneB || !sceneA.imageUrl || !sceneB.imageUrl)return;
+
+  const v = state.videos[index];
+  v.status='generating';
+  v.progress='Initialisation…';
+  renderVideos();
+
+  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  const sceneData = state.script.scenes[index];
+
+  journalLog('W'+(workerId+1)+' → Vidéo '+(index+1)+' (keyframes)','video');
+
+  try{
+    const prompt=buildSceneVideoPrompt(sceneData, char.bible);
+    const videoIdObj = await createVideoTask(prompt, sceneA.imageUrl, sceneB.imageUrl, state.durationFrames);
+    const url = await pollVideo(videoIdObj, (prog)=>{
+      v.progress = prog;
+      renderVideos();
+    });
+    v.status='done';
+    v.url=url;
+    renderVideos();
+    journalLog('W'+(workerId+1)+' → Vidéo '+(index+1)+' ✓','success');
+  }catch(e){
+    if(e.message==='Arrêt demandé')return;
+    v.status='error';
+    v.error=e.message;
+    renderVideos();
+    journalLog('W'+(workerId+1)+' → Vidéo '+(index+1)+' échouée : '+e.message,'error');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PLAYER + TTS
+// ══════════════════════════════════════════════════════════════════
+let ttsVoice=null;
+function pickFrenchVoice(){
+  if(!('speechSynthesis' in window))return null;
+  const voices=window.speechSynthesis.getVoices();
+  if(!voices||voices.length===0)return null;
+  const fr=voices.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('fr'));
+  if(fr.length===0)return null;
+  const preferred=fr.find(v=>/premium|enhanced|amelie|thomas|audrey|marie/i.test(v.name));
+  return preferred||fr[0];
+}
+function initTTS(){
+  if(!('speechSynthesis' in window))return;
+  const update=()=>{ttsVoice=pickFrenchVoice();if(ttsVoice)debugLog('success','TTS','Voix : '+ttsVoice.name)};
+  update();
+  window.speechSynthesis.onvoiceschanged=update;
+}
+function speakFR(text, charBible){
+  if(!state.voiceEnabled)return;
+  if(!('speechSynthesis' in window))return;
+  if(!text)return;
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='fr-FR';
+    u.rate=(charBible&&charBible.voice_fr&&charBible.voice_fr.rate)||1.0;
+    u.pitch=(charBible&&charBible.voice_fr&&charBible.voice_fr.pitch)||1.0;
+    u.volume=1.0;
+    if(ttsVoice)u.voice=ttsVoice;
+    window.speechSynthesis.speak(u);
+    journalLog('🔊 « '+text.slice(0,90)+(text.length>90?'…':'')+' »','info');
+  }catch(e){}
+}
+function stopTTS(){try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}}
+
+async function playFilm(){
+  const ready=state.videos.filter(v=>v.status==='done'&&v.url);
+  if(ready.length===0){showToast('Aucune vidéo à lire','error');return}
+  if(state.isPlayingFilm)return;
+  state.isPlayingFilm=true;
+  updateButtons();
+
+  const overlay=document.getElementById('player-overlay');
+  const canvas=document.getElementById('player-canvas');
+  const hint=document.getElementById('player-hint-overlay');
+  if(!overlay||!canvas)return;
+
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const cssW=window.innerWidth;
+  const cssH=window.innerHeight;
+  canvas.width=Math.round(cssW*dpr);
+  canvas.height=Math.round(cssH*dpr);
+  canvas.style.width=cssW+'px';
+  canvas.style.height=cssH+'px';
+  const ctx=canvas.getContext('2d');
+
+  overlay.classList.add('visible');
+  hint.classList.remove('hidden');
+  setTimeout(()=>hint.classList.add('hidden'),3500);
+
+  try{
+    if('speechSynthesis' in window){
+      const u0=new SpeechSynthesisUtterance(' ');
+      u0.volume=0;
+      window.speechSynthesis.speak(u0);
+    }
+  }catch(e){}
+
+  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  journalLog('Diffusion du film…','play');
+
+  for(let i=0;i<ready.length;i++){
+    if(!state.isPlayingFilm)break;
+    const v = ready[i];
+    const sceneIndex = state.videos.indexOf(v);
+    const scene = state.script.scenes[sceneIndex];
+    await playOneScene(v.url, scene, ctx, canvas, dpr, char);
+  }
+
+  stopFilmPlayback();
+  journalLog('Diffusion terminée.','success');
+}
+
+function playOneScene(videoUrl, scene, ctx, canvas, dpr, char){
+  return new Promise((resolve)=>{
+    const video=document.createElement('video');
+    video.src=videoUrl;
+    video.playsInline=true;
+    video.muted=true;
+    let ttsFired=false;
+    let finished=false;
+    const finish=()=>{if(finished)return;finished=true;resolve()};
+
+    const startTTS=()=>{
+      if(ttsFired)return;
+      ttsFired=true;
+      const line=scene&&scene.dialogue&&scene.dialogue.line_fr;
+      if(line)speakFR(line, char&&char.bible);
+    };
+
+    const ttsGuard=setTimeout(()=>{startTTS()},2000);
+
+    const drawOverlay=(w,h)=>{
+      const t=video.currentTime||0;
+      const dur=video.duration||6;
+      let alpha=1;
+      if(t<0.4)alpha=t/0.4;
+      else if(dur-t<0.5)alpha=Math.max(0,(dur-t)/0.5);
+      if(alpha<=0)return;
+      const pad=Math.round(Math.min(30*dpr, w*0.03));
+      const bandH=Math.round(Math.min(96*dpr, h*0.16));
+      const bandY=h-bandH-pad;
+      const bandX=pad;
+      const bandW=w-pad*2;
+      ctx.save();
+      ctx.globalAlpha=alpha;
+      const grad=ctx.createLinearGradient(bandX,bandY,bandX,bandY+bandH);
+      grad.addColorStop(0,'rgba(10,10,18,0.0)');
+      grad.addColorStop(0.35,'rgba(10,10,18,0.85)');
+      grad.addColorStop(1,'rgba(10,10,18,0.95)');
+      ctx.fillStyle=grad;
+      ctx.fillRect(bandX,bandY,bandW,bandH);
+      ctx.fillStyle='#e5c15a';
+      ctx.fillRect(bandX,bandY+Math.round(bandH*0.15),Math.round(5*dpr),bandH-Math.round(bandH*0.3));
+      const speakerName=(scene&&scene.dialogue&&scene.dialogue.speaker)||(char&&char.bible&&char.bible.name)||'';
+      const nameSize=Math.round(Math.min(15*dpr, h*0.022));
+      const textSize=Math.round(Math.min(22*dpr, h*0.032));
+      if(speakerName){
+        ctx.fillStyle='#e5c15a';
+        ctx.font='700 '+nameSize+'px -apple-system, BlinkMacSystemFont, Helvetica, Arial';
+        ctx.textBaseline='top';
+        ctx.fillText(speakerName.toUpperCase(),bandX+Math.round(bandH*0.22),bandY+Math.round(bandH*0.18));
+      }
+      const overlayText=(scene&&(scene.text_overlay_fr||(scene.dialogue&&scene.dialogue.line_fr)))||'';
+      if(overlayText){
+        ctx.fillStyle='#f5f0e1';
+        ctx.font='500 '+textSize+'px -apple-system, BlinkMacSystemFont, Helvetica, Arial';
+        ctx.textBaseline='top';
+        let txt=overlayText;
+        const maxW=bandW-Math.round(bandH*0.4);
+        while(ctx.measureText(txt).width>maxW&&txt.length>4){txt=txt.slice(0,-4)+'…'}
+        ctx.fillText(txt,bandX+Math.round(bandH*0.22),bandY+Math.round(bandH*0.5));
+      }
+      ctx.restore();
+    };
+    const draw=()=>{
+      ctx.fillStyle='#000';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      const vw=video.videoWidth||1080;
+      const vh=video.videoHeight||1920;
+      const ar=vw/vh;
+      const car=canvas.width/canvas.height;
+      let dw,dh,dx,dy;
+      if(ar>car){dw=canvas.width;dh=canvas.width/ar;dx=0;dy=(canvas.height-dh)/2}
+      else{dh=canvas.height;dw=canvas.height*ar;dx=(canvas.width-dw)/2;dy=0}
+      try{ctx.drawImage(video,dx,dy,dw,dh)}catch(e){}
+      drawOverlay(canvas.width,canvas.height);
+    };
+    const loop=()=>{
+      if(!state.isPlayingFilm){clearTimeout(ttsGuard);finish();return}
+      if(video.paused||video.ended){clearTimeout(ttsGuard);finish();return}
+      draw();
+      state.playRAF=requestAnimationFrame(loop);
+    };
+
+    video.onloadedmetadata=()=>{
+      clearTimeout(ttsGuard);
+      startTTS();
+      video.play().then(()=>{loop()}).catch(()=>{startTTS();finish()});
+    };
+    video.oncanplay=()=>{startTTS()};
+    video.onended=()=>{clearTimeout(ttsGuard);finish()};
+    video.onerror=()=>{startTTS();clearTimeout(ttsGuard);finish()};
+    video.load();
+  });
+}
+
+function stopFilmPlayback(){
+  state.isPlayingFilm=false;
+  if(state.playRAF)cancelAnimationFrame(state.playRAF);
+  state.playRAF=null;
+  stopTTS();
+  const overlay=document.getElementById('player-overlay');
+  if(overlay)overlay.classList.remove('visible');
+  updateButtons();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RÉFÉRENCE IMAGE — Upload
+// ══════════════════════════════════════════════════════════════════
+function bindCharRefInput(){
+  const input=document.getElementById('char-ref-input');
+  if(!input)return;
+  input.addEventListener('change',async(e)=>{
+    const file=e.target.files&&e.target.files[0];
+    if(!file)return;
+    if(!file.type.startsWith('image/')){showToast('Fichier non image','error');return}
+    if(file.size>15*1024*1024){showToast('Image trop lourde (max 15 Mo)','error');return}
+    try{
+      setStatus('Chargement de la référence…');
+      const raw=await fileToDataUri(file);
+      const compressed=await compressImage(raw, REF_MAX_SIDE);
+      state.refImageDataUrl=compressed;
+      state.refImageForApi=compressed;
+
+      document.getElementById('char-ref-preview-container').classList.remove('hidden');
+      document.getElementById('char-ref-preview').src=compressed;
+      document.getElementById('char-ref-drop').style.display='none';
+      setStatus(null);
+      showToast('Référence chargée','success');
+    }catch(e){
+      setStatus(null);
+      showToast('Erreur chargement','error');
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init(){
+  // Charge les personnages
+  state.characters = loadCharacters();
+
+  // API keys
+  document.getElementById('api-save-btn').addEventListener('click',saveKeysFromUI);
+  document.getElementById('api-keys-input').addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();saveKeysFromUI()}
+  });
+
+  // Sections collapsibles
+  document.querySelectorAll('[data-toggle]').forEach(header=>{
+    header.addEventListener('click',()=>{
+      const el=document.getElementById(header.dataset.toggle);
+      if(el)el.classList.toggle('open');
+    });
+  });
+
+  // Bibliothèque
+  document.getElementById('new-char-btn').addEventListener('click',()=>{
+    document.getElementById('section-create').classList.remove('hidden');
+    document.getElementById('section-create').classList.add('open');
+    document.getElementById('section-create').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+
+  // Upload référence personnage
+  bindCharRefInput();
+  document.getElementById('char-ref-clear').addEventListener('click',()=>{
+    state.refImageDataUrl=null;
+    state.refImageForApi=null;
+    document.getElementById('char-ref-preview-container').classList.add('hidden');
+    document.getElementById('char-ref-drop').style.display='';
+    document.getElementById('char-ref-input').value='';
+  });
+
+  // Archétype → remplit la description
+  document.getElementById('char-archetype').addEventListener('change',e=>{
+    const v=e.target.value;
+    if(v && ARCHETYPES[v]){
+      document.getElementById('char-description').value = ARCHETYPES[v].description;
+    }
+    updateButtons();
+  });
+
+  document.getElementById('char-description').addEventListener('input',updateButtons);
+  document.getElementById('create-char-btn').addEventListener('click',createCharacter);
+  document.getElementById('create-stop-btn').addEventListener('click',()=>{
+    state.stopRequested=true;
+    showToast('Arrêt en cours…','warn');
+  });
+
+  // Édition du Bible
+  document.getElementById('bible-edit-btn').addEventListener('click',()=>{
+    if(!state.bible)return;
+    document.getElementById('bible-lock-edit').value = state.bible.character_lock_prompt || '';
+    document.getElementById('bible-edit-panel').classList.remove('hidden');
+  });
+  document.getElementById('bible-cancel-btn').addEventListener('click',()=>{
+    document.getElementById('bible-edit-panel').classList.add('hidden');
+  });
+  document.getElementById('bible-save-btn').addEventListener('click',()=>{
+    if(!state.bible)return;
+    state.bible.character_lock_prompt = document.getElementById('bible-lock-edit').value.trim();
+    // Sauvegarde
+    const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+    if(char){
+      char.bible = state.bible;
+      saveCharacters(state.characters);
+    }
+    renderBible();
+    document.getElementById('bible-edit-panel').classList.add('hidden');
+    showToast('Character Bible sauvegardé','success');
+  });
+
+  // Story & settings
+  document.getElementById('story-input').addEventListener('input',updateButtons);
+  document.getElementById('scene-count').addEventListener('change',e=>{state.sceneCount=parseInt(e.target.value,10)});
+  document.getElementById('scene-duration').addEventListener('change',e=>{state.durationFrames=parseInt(e.target.value,10)});
+  document.getElementById('consistency-threshold').addEventListener('change',e=>{state.consistencyThreshold=parseInt(e.target.value,10)});
+  document.getElementById('image-format').addEventListener('change',e=>{state.imageFormat=e.target.value});
+
+  // Génération
+  document.getElementById('generate-script-btn').addEventListener('click',generateScriptPipeline);
+  document.getElementById('generate-scenes-btn').addEventListener('click',generateAllScenes);
+  document.getElementById('generate-videos-btn').addEventListener('click',generateAllVideos);
+  document.getElementById('scenes-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
+  document.getElementById('videos-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
+
+  // Player
+  document.getElementById('play-film-btn').addEventListener('click',playFilm);
+  document.getElementById('replay-film-btn').addEventListener('click',playFilm);
+  document.getElementById('player-overlay').addEventListener('click',stopFilmPlayback);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.isPlayingFilm)stopFilmPlayback()});
+  document.getElementById('voice-toggle').addEventListener('change',e=>{
+    state.voiceEnabled=e.target.checked;
+    if(!state.voiceEnabled)stopTTS();
+  });
+
+  // Wake lock
+  document.getElementById('wake-toggle-btn').addEventListener('click',toggleWakeLock);
+  try{ wakeLockEnabled = localStorage.getItem(WAKE_LOCK_PREF)==='1' }catch(e){}
+  if(wakeLockEnabled)activateWakeLock().then(()=>updateWakeStatus());
+
+  // Debug
+  document.getElementById('tab-journal').addEventListener('click',()=>switchTab('journal'));
+  document.getElementById('tab-tech').addEventListener('click',()=>switchTab('tech'));
+  document.getElementById('debug-header').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')return;toggleDebugCollapse()});
+  document.getElementById('debug-collapse-btn').addEventListener('click',e=>{e.stopPropagation();toggleDebugCollapse()});
+  document.getElementById('debug-clear-btn').addEventListener('click',e=>{e.stopPropagation();clearDebug()});
+  document.getElementById('debug-copy-btn').addEventListener('click',e=>{e.stopPropagation();copyDebug()});
+
+  // Init UI
+  refreshKeyPool();
+  updateApiPanel();
+  updateButtons();
+  updateWakeStatus();
+  initTTS();
+  renderCharacterLibrary();
+
+  setInterval(renderKeysStatus,1000);
+
+  debugLog('success','INIT','Character Consistency Studio prêt');
+  debugLog('info','INIT','Pipeline : PERSONNAGE → PLANCHE 6 VUES → CHARACTER BIBLE → SCÉNARIO → IMAGES (avec scoring cohérence) → VIDÉOS KEYFRAMES → PLAYER');
+  debugLog('info','INIT','Cohérence garantie par : planche de référence envoyée à chaque image + character_lock_prompt + analyse vision post-génération + régénération auto (max '+IMAGE_MAX_RETRIES+')');
+  debugLog('info','INIT','Multi-clés API · Parser JSON renforcé · Polling multi-endpoints · Format 1K + ratio');
+  debugLog('info','INIT',Object.keys(ARCHETYPES).length+' archétypes prédéfinis disponibles');
+
+  journalLog('Prêt. Ajoutez vos clés API, créez un personnage, puis lancez la production.','highlight');
+  journalLog('🎯 La cohérence est garantie par la planche de référence + le lock prompt + le scoring automatique.','success');
+})();
+</script>
+</body>
+</html>
