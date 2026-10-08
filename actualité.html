@@ -44,6 +44,7 @@ h1 { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 300; margin
 .section-title .badge { display: inline-block; padding: 0.15rem 0.55rem; background: transparent; color: var(--yellow); border: 1px solid var(--yellow-deep); border-radius: 2px; font-size: 0.6rem; letter-spacing: 0.15em; font-weight: 600; }
 .section-title .badge.soft { color: var(--blue-soft); border-color: var(--blue-deep); }
 .section-title .badge.success { color: var(--orange-soft); border-color: var(--orange-deep); }
+.section-title .badge.lang { color: var(--mint); border-color: #4a8070; }
 .section-header .chevron { font-size: 0.7rem; color: var(--ink-faint); transition: transform 0.3s; }
 .section.open .section-header .chevron { transform: rotate(180deg); color: var(--yellow); }
 .section-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
@@ -75,7 +76,10 @@ select:focus { outline: none; border-color: var(--blue); }
 select option { background: var(--night-3); color: var(--ink); }
 select.rule-select { border-color: var(--purple-deep); }
 select.rule-select:focus { border-color: var(--purple); }
+select.lang-select { border-color: #4a8070; }
+select.lang-select:focus { border-color: var(--mint); }
 .preview-badge { display: inline-block; padding: 0.3rem 0.7rem; background: rgba(139,95,196,0.08); border: 1px solid var(--purple-deep); border-radius: var(--radius); font-size: 0.7rem; color: var(--purple-soft); font-family: var(--font-mono); margin-top: 0.4rem; }
+.preview-badge.lang-badge { background: rgba(168,216,200,0.08); border-color: #4a8070; color: var(--mint); }
 .btn-primary { width: 100%; padding: 1.2rem; border-radius: var(--radius); border: 1px solid var(--yellow-deep); background: linear-gradient(135deg, rgba(232,123,53,0.2), rgba(229,193,90,0.15), rgba(139,95,196,0.15)); color: var(--yellow-soft); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; margin-bottom: 1rem; }
 .btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
 .btn-secondary { width: 100%; padding: 0.85rem; border-radius: var(--radius); border: 1px solid var(--border); background: var(--night-2); color: var(--ink-dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; cursor: pointer; margin-bottom: 0.6rem; text-transform: uppercase; }
@@ -107,6 +111,7 @@ select.rule-select:focus { border-color: var(--purple); }
 .scene-number { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); font-family: var(--font-mono); margin-bottom: 0.2rem; }
 .scene-dialogue { font-family: var(--font-serif); font-size: 1rem; font-style: italic; color: var(--yellow-soft); line-height: 1.5; padding: 0.4rem 0.7rem; background: rgba(229,193,90,0.04); border-left: 2px solid var(--yellow-deep); border-radius: 2px; margin: 0.4rem 0; }
 .scene-dialogue .speaker-name { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--lavender); font-style: normal; font-weight: 600; display: block; margin-bottom: 0.2rem; }
+.scene-dialogue.rtl { direction: rtl; text-align: right; font-size: 1.1rem; }
 .scene-action { font-size: 0.72rem; color: var(--ink-dim); margin-top: 0.3rem; }
 .images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.6rem; margin-top: 1.2rem; }
 .image-card { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: var(--night-2); position: relative; aspect-ratio: 9/16; }
@@ -136,6 +141,8 @@ select.rule-select:focus { border-color: var(--purple); }
 .gallery-item .g-caption { padding: 0.6rem 0.7rem; background: var(--panel); display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid var(--border); }
 .gallery-item .g-caption strong { font-family: var(--font-serif); color: var(--yellow-soft); font-size: 0.82rem; font-weight: 500; }
 .gallery-item .g-caption span { font-size: 0.6rem; opacity: 0.65; letter-spacing: 0.12em; text-transform: uppercase; }
+.gallery-item .g-caption .g-narration { font-size: 0.72rem; color: var(--lavender); font-style: italic; text-transform: none; letter-spacing: 0; }
+.gallery-item .g-caption .g-narration.rtl { direction: rtl; text-align: right; font-size: 0.85rem; }
 .project-list { display: flex; flex-direction: column; gap: 0.4rem; max-height: 300px; overflow-y: auto; margin-top: 0.6rem; }
 .project-item { padding: 0.6rem 0.8rem; border-radius: var(--radius); border: 1px solid var(--border-soft); background: var(--night-2); display: flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; }
 .project-item .pi-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-serif); color: var(--ink); }
@@ -189,6 +196,7 @@ select.rule-select:focus { border-color: var(--purple); }
 <div class="info-banner">
   <strong>Pipeline :</strong> flux RSS Google Actualités → sélection d'un article → scénario IA → images clés → vidéos en chaîne.
   Toutes les générations utilisent <strong>Agnes AI</strong>. Les projets sont <strong>sauvegardés automatiquement</strong>.
+  La narration peut être en <strong>français, anglais ou arabe</strong>.
 </div>
 
 <div class="api-panel" id="api-panel">
@@ -225,12 +233,13 @@ select.rule-select:focus { border-color: var(--purple); }
       <input type="text" class="rss-input" id="custom-query" placeholder="ex: iran nuclear talks">
     </div>
     <div class="control-row">
-      <label class="control-label">Langue / Région</label>
+      <label class="control-label">Langue / Région des sources</label>
       <select id="rss-lang">
         <option value="fr-FR">🇫🇷 Français (France)</option>
         <option value="en-US">🇺🇸 English (US)</option>
         <option value="en-GB">🇬🇧 English (UK)</option>
-        <option value="ar-EG">🇪🇬 العربية</option>
+        <option value="ar-EG">🇪🇬 العربية (مصر)</option>
+        <option value="ar-SA">🇸🇦 العربية (السعودية)</option>
       </select>
     </div>
     <button type="button" class="btn-secondary" id="fetch-rss-btn">📥 Charger les actualités</button>
@@ -248,7 +257,6 @@ select.rule-select:focus { border-color: var(--purple); }
   </div></div>
 </div>
 
-<!-- ══════ SECTION STYLE : DEUX MENUS ══════ -->
 <div class="section open" id="section-style">
   <div class="section-header" data-toggle="section-style">
     <span class="section-title">🎨 Style & Règles de contenu</span>
@@ -295,6 +303,19 @@ select.rule-select:focus { border-color: var(--purple); }
         <option value="macro">🔬 Détails abstraits / macro (textures, matières)</option>
       </select>
       <div class="preview-badge" id="rules-preview-badge">✳️ Aucune restriction</div>
+    </div>
+
+    <div class="control-row">
+      <label class="control-label">
+        🗣️ Langue de narration
+        <span class="hint">La voix off (texte lu sur les vidéos) sera générée par Agnes dans cette langue.</span>
+      </label>
+      <select id="narration-language" class="lang-select">
+        <option value="fr">🇫🇷 Français</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="ar">🇸🇦 العربية (فصحى)</option>
+      </select>
+      <div class="preview-badge lang-badge" id="lang-preview-badge">🇫🇷 Français</div>
     </div>
 
     <div class="control-row">
@@ -416,16 +437,16 @@ const VIDEO_FIRST_POLL_DELAY_SEC = 80;
 const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
 const VIDEO_MAX_POLL_ATTEMPTS = 100;
 
-const TIMING_CACHE_KEY = 'geo_studio_timing_v2';
+const TIMING_CACHE_KEY = 'geo_studio_timing_v3';
 const API_KEY_STORAGE = 'agnes_api_key';
 const WAKE_LOCK_PREF = 'agnes_wakelock_enabled';
-const PROJECTS_STORAGE = 'geo_studio_projects_v2';
-const AUTOSAVE_STORAGE = 'geo_studio_autosave_v2';
+const PROJECTS_STORAGE = 'geo_studio_projects_v3';
+const AUTOSAVE_STORAGE = 'geo_studio_autosave_v3';
 const AUTOSAVE_INTERVAL_MS = 15000;
 const DEBUG_MAX_ENTRIES = 600;
 
 // ══════════════════════════════════════════════════════════════════
-// CATALOGUES STYLE + RÈGLES
+// CATALOGUES
 // ══════════════════════════════════════════════════════════════════
 const VISUAL_STYLES = {
   photoreal:    { label: '📷 Photoréaliste', prompt: 'photorealistic documentary photography, natural light, 35mm, cinematic composition, realistic detail, high dynamic range' },
@@ -454,6 +475,47 @@ const CONTENT_RULES = {
   'macro':      { label: '🔬 Macro abstrait',                positive: 'Show only abstract macro photography of textures, materials, surfaces, particles, light, dust, fabric, metal, water. Fully abstract.',                                          negative: 'No humans, no recognizable objects. Abstract textures and materials only.' }
 };
 
+const NARRATION_LANGUAGES = {
+  fr: {
+    label: '🇫🇷 Français',
+    code: 'fr',
+    name: 'French',
+    nameNative: 'français',
+    direction: 'ltr',
+    instructionForScenario: 'in French',
+    instructionForVideo: 'in French',
+    instructionWordCount: '8 words MAX',
+    systemPromptLang: 'Tu réponds en français.'
+  },
+  en: {
+    label: '🇬🇧 English',
+    code: 'en',
+    name: 'English',
+    nameNative: 'English',
+    direction: 'ltr',
+    instructionForScenario: 'in English',
+    instructionForVideo: 'in English',
+    instructionWordCount: '8 words MAX',
+    systemPromptLang: 'You respond in English.'
+  },
+  ar: {
+    label: '🇸🇦 العربية (فصحى)',
+    code: 'ar',
+    name: 'Arabic',
+    nameNative: 'العربية الفصحى',
+    direction: 'rtl',
+    instructionForScenario: 'in Modern Standard Arabic (العربية الفصحى), professionally and clearly',
+    instructionForVideo: 'in Modern Standard Arabic (العربية الفصحى)',
+    instructionWordCount: '8 كلمات كحد أقصى',
+    systemPromptLang: 'أنت تكتب بالعربية الفصحى الحديثة، بلغة إعلامية واضحة ومهنية.'
+  }
+};
+
+function getNarrationLang() {
+  const key = $('narration-language').value || 'fr';
+  return NARRATION_LANGUAGES[key] || NARRATION_LANGUAGES.fr;
+}
+
 // ══════════════════════════════════════════════════════════════════
 // ÉTAT
 // ══════════════════════════════════════════════════════════════════
@@ -464,6 +526,7 @@ const state = {
   tone: 'documentary',
   visualStyle: 'photoreal',
   contentRules: 'none',
+  narrationLang: 'fr',
   sceneCount: 5,
   durationFrames: 161,
   isRunning: false,
@@ -809,7 +872,7 @@ function renderNewsList() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// FONCTIONS STYLE + RÈGLES
+// STYLE + RÈGLES
 // ══════════════════════════════════════════════════════════════════
 function getStylePrompt() {
   const key = $('visual-style').value;
@@ -824,19 +887,21 @@ function getRulesNegative() {
   return CONTENT_RULES[key] ? CONTENT_RULES[key].negative : '';
 }
 function buildStyleReference() {
-  const styleP = getStylePrompt();
-  const posRules = getRulesPositive();
-  const negRules = getRulesNegative();
-  const parts = [styleP];
-  if (posRules) parts.push('CONTENT RULES: ' + posRules);
-  if (negRules) parts.push('STRICTLY FORBIDDEN: ' + negRules);
+  const parts = [getStylePrompt()];
+  const pos = getRulesPositive();
+  const neg = getRulesNegative();
+  if (pos) parts.push('CONTENT RULES: ' + pos);
+  if (neg) parts.push('STRICTLY FORBIDDEN: ' + neg);
   return parts.join(' ');
 }
 function updateStyleBadges() {
   const styleKey = $('visual-style').value;
   const rulesKey = $('content-rules').value;
+  const langKey = $('narration-language').value;
   $('style-preview-badge').textContent = VISUAL_STYLES[styleKey] ? VISUAL_STYLES[styleKey].label : '—';
   $('rules-preview-badge').textContent = CONTENT_RULES[rulesKey] ? CONTENT_RULES[rulesKey].label : '—';
+  $('lang-preview-badge').textContent = NARRATION_LANGUAGES[langKey] ? NARRATION_LANGUAGES[langKey].label : '—';
+  state.narrationLang = langKey;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -846,6 +911,7 @@ function buildScenarioPrompt(articleContent, sceneCount) {
   const tone = $('tone-select').value;
   const styleRef = buildStyleReference();
   const duration = state.durationFrames / FRAME_RATE;
+  const lang = getNarrationLang();
   const toneLabel = {
     factual: 'factual, analytical, informative',
     documentary: 'serious documentary narration, contemplative, journalistic',
@@ -869,6 +935,9 @@ function buildScenarioPrompt(articleContent, sceneCount) {
     rulesConstraint,
     'TONE: ' + toneLabel,
     '',
+    'NARRATION LANGUAGE: The narration field MUST be written ' + lang.instructionForScenario + '. The narration is a short voice-over line, not a dialogue.',
+    'NARRATION LENGTH: ' + lang.instructionWordCount + '.',
+    '',
     'ABSOLUTE RULES:',
     '- NO MUSIC. Only natural ambient sound and subtle sound design.',
     '- The film is composed of ' + sceneCount + ' sequential scenes forming ONE continuous narrative.',
@@ -881,25 +950,27 @@ function buildScenarioPrompt(articleContent, sceneCount) {
     'CRITICAL JSON RULES:',
     '- All strings on ONE LINE. No real line breaks inside strings.',
     '- Escape double quotes as \\". No trailing commas. No markdown.',
+    lang.code === 'ar' ? '- The narration field MUST contain proper Arabic text with vowels where appropriate (لا تكتب بالحروف اللاتينية).' : '',
     '',
     'OUTPUT SCHEMA (return ONLY this JSON):',
     '{',
-    '  "title": "short journalistic title",',
-    '  "logline": "one sentence summary",',
+    '  "title": "short journalistic title (any language)",',
+    '  "logline": "one sentence summary (any language)",',
     '  "scenes": [',
     '    {',
     '      "scene_number": 1,',
-    '      "image_prompt": "detailed visual description obeying the visual style AND content rules, describing exact composition, subjects, setting, lighting, camera angle",',
-    '      "action_prompt": "continuous camera movement and subtle motion during this scene, no cuts",',
-    '      "narration": "short narration text in French, 8 words MAX, journalistic and precise"',
+    '      "image_prompt": "detailed visual description in ENGLISH obeying the visual style AND content rules",',
+    '      "action_prompt": "continuous camera movement and subtle motion in ENGLISH, no cuts",',
+    '      "narration": "short narration text ' + lang.instructionForScenario + ', ' + lang.instructionWordCount + ', journalistic and precise"',
     '    }',
     '    ... exactly ' + sceneCount + ' scenes ...',
     '  ]',
     '}',
     '',
-    'Each image_prompt MUST strictly obey the content rules. If the rule says "no face", no image_prompt may mention or suggest any face. If the rule says "no human", no image_prompt may include any person.',
-    'Each narration line must be short (8 words max), factual, and in French.'
-  ].join('\n');
+    'Each image_prompt MUST strictly obey the content rules (in English).',
+    'Each narration line MUST be ' + lang.instructionForScenario + ', short, factual.',
+    'The image_prompt and action_prompt stay in ENGLISH to ensure correct image/video generation — only the narration changes language.'
+  ].filter(Boolean).join('\n');
 }
 
 function buildImageGenerationPrompt(basePrompt, index, total) {
@@ -923,6 +994,7 @@ function buildVideoPrompt(scene, sceneIndex) {
   const tone = $('tone-select').value;
   const styleRef = buildStyleReference();
   const negRules = getRulesNegative();
+  const lang = getNarrationLang();
   const narration = scene.narration || '';
   return [
     'CRITICAL: The provided first frame is the EXACT first frame of this video. The provided last frame is the EXACT last frame. The entire video must smoothly interpolate between them.',
@@ -932,7 +1004,7 @@ function buildVideoPrompt(scene, sceneIndex) {
     'ACTION: ' + scene.action_prompt,
     '',
     'AUDIO: ABSOLUTELY NO MUSIC. Only natural ambient sounds relevant to the scene. ' +
-    (narration ? 'A calm voice-over in French reads: "' + narration + '" — measured, journalistic, filling the scene without rushing.' : 'No dialogue.'),
+    (narration ? 'A calm voice-over reads the following line ' + lang.instructionForVideo + ': "' + narration + '" — measured, journalistic, filling the scene without rushing. The narration language is ' + lang.nameNative + '.' : 'No dialogue.'),
     '',
     'ATMOSPHERE: ' + styleRef + '. Tone: ' + tone + '.',
     negRules ? 'STRICTLY FORBIDDEN: ' + negRules : '',
@@ -1063,12 +1135,16 @@ function extractJson(text) {
 // AGNES
 // ══════════════════════════════════════════════════════════════════
 async function generateScenario(articleContent, sceneCount) {
-  debugLog('ai', 'TEXT', 'Génération scénario (' + sceneCount + ' scènes)');
+  const lang = getNarrationLang();
+  debugLog('ai', 'TEXT', 'Génération scénario (' + sceneCount + ' scènes, narration ' + lang.label + ')');
   const prompt = buildScenarioPrompt(articleContent, sceneCount);
+  const systemMsg = lang.code === 'ar'
+    ? 'You are a screenwriter and visual director. You ALWAYS return valid JSON matching the requested schema. All strings on single lines. No markdown. The narration field must be in Modern Standard Arabic (العربية الفصحى). The image_prompt and action_prompt fields must remain in English.'
+    : 'You are a screenwriter and visual director. You ALWAYS return valid JSON matching the requested schema. All strings on single lines. No markdown.';
   const body = {
     model: MODEL_TEXT,
     messages: [
-      { role: 'system', content: 'You are a screenwriter and visual director. You ALWAYS return valid JSON matching the requested schema. All strings on single lines. No markdown.' },
+      { role: 'system', content: systemMsg },
       { role: 'user', content: prompt }
     ],
     temperature: TEXT_TEMPERATURE,
@@ -1206,15 +1282,19 @@ function renderScenario() {
   const panel = $('scenario-panel'), card = $('scenario-card');
   if (!state.scenario) return;
   const s = state.scenario;
+  const lang = NARRATION_LANGUAGES[state.narrationLang] || NARRATION_LANGUAGES.fr;
+  const isRtl = lang.direction === 'rtl';
   let html = '<div class="scenario-title">' + esc(s.title || 'Sans titre') + '</div>';
   if (s.logline) html += '<div class="scenario-meta">' + esc(s.logline) + '</div>';
   const styleKey = $('visual-style').value;
   const rulesKey = $('content-rules').value;
-  html += '<div class="scenario-meta">Style : ' + esc(VISUAL_STYLES[styleKey]?.label || '—') + ' · Règles : ' + esc(CONTENT_RULES[rulesKey]?.label || '—') + '</div>';
+  html += '<div class="scenario-meta">Style : ' + esc(VISUAL_STYLES[styleKey]?.label || '—') + ' · Règles : ' + esc(CONTENT_RULES[rulesKey]?.label || '—') + ' · Langue : ' + esc(lang.label) + '</div>';
   s.scenes.forEach((sc, i) => {
     html += '<div class="scene-block" data-scene="' + i + '">';
     html += '<div class="scene-number">Scène ' + (i + 1) + ' / ' + s.scenes.length + '</div>';
-    if (sc.narration) html += '<div class="scene-dialogue"><span class="speaker-name">Voix off</span>« ' + esc(sc.narration) + ' »</div>';
+    if (sc.narration) {
+      html += '<div class="scene-dialogue' + (isRtl ? ' rtl' : '') + '"><span class="speaker-name">Voix off · ' + esc(lang.label) + '</span>« ' + esc(sc.narration) + ' »</div>';
+    }
     if (sc.action_prompt) html += '<div class="scene-action">' + esc(sc.action_prompt.slice(0, 180)) + (sc.action_prompt.length > 180 ? '…' : '') + '</div>';
     html += '</div>';
   });
@@ -1266,12 +1346,14 @@ function addToGallery(videoUrl, sceneIndex) {
   const galleryEl = $('gallery'), grid = $('gallery-grid');
   galleryEl.style.display = 'block';
   const scene = state.scenario.scenes[sceneIndex];
+  const lang = NARRATION_LANGUAGES[state.narrationLang] || NARRATION_LANGUAGES.fr;
+  const isRtl = lang.direction === 'rtl';
   const el = document.createElement('div');
   el.className = 'gallery-item';
   el.innerHTML = '<video controls preload="metadata" playsinline><source src="' + videoUrl + '" type="video/mp4"></video>' +
     '<div class="g-caption"><strong>Scène ' + (sceneIndex+1) + '</strong>' +
-    (scene.narration ? '<span style="font-style:italic;color:var(--lavender);">« ' + esc(scene.narration) + ' »</span>' : '') +
-    '<span>9:16 · Sans musique</span></div>';
+    (scene.narration ? '<span class="g-narration' + (isRtl ? ' rtl' : '') + '">« ' + esc(scene.narration) + ' »</span>' : '') +
+    '<span>9:16 · Sans musique · ' + esc(lang.label) + '</span></div>';
   grid.appendChild(el);
 }
 
@@ -1394,6 +1476,7 @@ async function startGeneration() {
   state.durationFrames = parseInt($('duration-select').value, 10);
   state.visualStyle = $('visual-style').value;
   state.contentRules = $('content-rules').value;
+  state.narrationLang = $('narration-language').value;
   state.scenario = null;
   state.images = []; state.videos = []; state.imagePrompts = [];
 
@@ -1408,7 +1491,8 @@ async function startGeneration() {
 
   if (wakeLockEnabled) await activateWakeLock();
 
-  debugLog('state', 'START', 'Démarrage — ' + state.sceneCount + ' scènes · ' + VISUAL_STYLES[state.visualStyle].label + ' · ' + CONTENT_RULES[state.contentRules].label);
+  const lang = NARRATION_LANGUAGES[state.narrationLang];
+  debugLog('state', 'START', 'Démarrage — ' + state.sceneCount + ' scènes · ' + VISUAL_STYLES[state.visualStyle].label + ' · ' + CONTENT_RULES[state.contentRules].label + ' · ' + lang.label);
   autoSave();
 
   const startTime = Date.now();
@@ -1444,7 +1528,7 @@ function stopGeneration() {
 // ══════════════════════════════════════════════════════════════════
 function collectProjectData() {
   return {
-    version: 2,
+    version: 3,
     savedAt: new Date().toISOString(),
     name: state.projectName || 'Projet sans nom',
     articleContent: state.articleContent,
@@ -1454,6 +1538,7 @@ function collectProjectData() {
       tone: $('tone-select').value,
       visualStyle: $('visual-style').value,
       contentRules: $('content-rules').value,
+      narrationLang: $('narration-language').value,
       sceneCount: parseInt($('scene-count-select').value, 10),
       durationFrames: parseInt($('duration-select').value, 10)
     },
@@ -1478,8 +1563,10 @@ function applyProjectData(data) {
     $('tone-select').value = data.settings.tone || 'documentary';
     $('visual-style').value = data.settings.visualStyle || 'photoreal';
     $('content-rules').value = data.settings.contentRules || 'none';
+    $('narration-language').value = data.settings.narrationLang || 'fr';
     $('scene-count-select').value = data.settings.sceneCount || 5;
     $('duration-select').value = data.settings.durationFrames || 161;
+    state.narrationLang = data.settings.narrationLang || 'fr';
     updateStyleBadges();
   }
 
@@ -1637,9 +1724,14 @@ function updateGenerateBtn() {
     updateGenerateBtn();
   });
 
-  // Style + règles : mise à jour du preview
   $('visual-style').addEventListener('change', updateStyleBadges);
   $('content-rules').addEventListener('change', updateStyleBadges);
+  $('narration-language').addEventListener('change', () => {
+    updateStyleBadges();
+    const lang = getNarrationLang();
+    showToast('Narration : ' + lang.label, 'success', 1500);
+    debugLog('state', 'LANG', 'Langue narration : ' + lang.label);
+  });
 
   $('scene-count-select').addEventListener('change', e => { state.sceneCount = parseInt(e.target.value, 10); updateGenerateBtn(); });
   $('duration-select').addEventListener('change', e => { state.durationFrames = parseInt(e.target.value, 10); });
@@ -1673,9 +1765,9 @@ function updateGenerateBtn() {
   restoreAutoSave();
   updateGenerateBtn();
 
-  debugLog('success', 'INIT', 'Géo Studio prêt (v2 avec style + règles séparés)');
-  debugLog('info', 'INIT', 'Styles disponibles : ' + Object.keys(VISUAL_STYLES).length);
-  debugLog('info', 'INIT', 'Règles de contenu disponibles : ' + Object.keys(CONTENT_RULES).length);
+  debugLog('success', 'INIT', 'Géo Studio prêt (v3 avec narration multilingue)');
+  debugLog('info', 'INIT', 'Langues narration : ' + Object.keys(NARRATION_LANGUAGES).join(', '));
+  debugLog('info', 'INIT', 'Sources RSS arabes disponibles');
 })();
 </script>
 </body>
