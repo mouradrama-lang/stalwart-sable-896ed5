@@ -251,6 +251,8 @@ body{padding-bottom:26rem}
 .import-errors{background:rgba(200,90,74,.08);border:1px solid var(--err);border-left:3px solid var(--err);border-radius:var(--r);padding:.9rem 1rem;margin-top:1rem;font-size:.72rem;font-family:var(--fm);color:#f0a0a0;line-height:1.5}
 .import-errors h4{font-size:.72rem;color:var(--err);text-transform:uppercase;margin-bottom:.5rem;font-weight:700}
 .import-errors li{margin-left:1.2rem;margin-bottom:.25rem}
+
+.scene-chars-badge{display:inline-block;background:rgba(200,176,224,.15);border:1px solid rgba(200,176,224,.4);color:var(--lavender);font-size:.6rem;padding:.1rem .4rem;border-radius:2px;margin-left:.4rem}
 </style>
 </head>
 <body>
@@ -262,11 +264,11 @@ body{padding-bottom:26rem}
 
 <div class="banner">
 <strong>🎯 Le pipeline :</strong>
-<strong class="hl-gold">1.</strong> Créer un personnage → l'IA génère une <strong class="hl-mint">planche de référence à 6 vues</strong>.
-<strong class="hl-gold">2.</strong> L'IA construit un <strong class="hl-lav">Character Bible</strong> (JSON + lock prompt).
-<strong class="hl-gold">3.</strong> Chaque image de scène est générée avec la planche en référence + le lock prompt.
-<strong class="hl-gold">4.</strong> Un <strong class="hl-sky">Consistency Checker</strong> analyse chaque image.
-<strong class="hl-gold">5.</strong> Les vidéos chaînent la dernière image d'une scène à la première de la suivante.
+<strong class="hl-gold">1.</strong> Créer un ou plusieurs personnages → planche de référence 6 vues.
+<strong class="hl-gold">2.</strong> Character Bible par personnage (JSON + lock prompt).
+<strong class="hl-gold">3.</strong> Scènes <strong class="hl-lav">mono ou multi-personnages</strong> (jusqu'à 3 par scène).
+<strong class="hl-gold">4.</strong> Consistency Checker analyse chaque image.
+<strong class="hl-gold">5.</strong> Vidéos keyframes chaînées.
 </div>
 
 <!-- API KEY -->
@@ -286,14 +288,14 @@ body{padding-bottom:26rem}
 </div>
 </div>
 
-<!-- IMPORT JSON CTA -->
+<!-- IMPORT CTA -->
 <div class="section open" id="section-import-cta">
 <div class="section-header" data-toggle="section-import-cta">
 <span class="section-title"><span>📥 Import Pack JSON</span> <span class="badge mint">rapide</span></span>
 <span class="chevron">▼</span>
 </div>
 <div class="section-body"><div class="section-content">
-<div class="hint" style="margin-top:0;margin-bottom:.8rem">Collez un pack JSON complet → l'app génère automatiquement les planches, les bibles, les scènes et les vidéos.</div>
+<div class="hint" style="margin-top:0;margin-bottom:.8rem">Collez un pack JSON complet → génération automatique multi-personnages.</div>
 <button type="button" class="btn btn-import" id="open-import-btn">📥 Coller un pack JSON</button>
 </div></div>
 </div>
@@ -475,7 +477,6 @@ body{padding-bottom:26rem}
 <button type="button" class="btn btn-stop" id="videos-stop-btn">⏹ Arrêter</button>
 <div class="scenes-grid" id="videos-grid"></div>
 
-<!-- SAVE PANEL -->
 <div class="panel" style="margin-top:1.5rem;background:var(--bg2);border-left:2px solid var(--gold)">
 <label class="panel-label" style="margin-bottom:.8rem">💾 Sauvegarde du film</label>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.5rem">
@@ -558,6 +559,7 @@ const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
 const VIDEO_MAX_POLL_ATTEMPTS = 100;
 
 const IMAGE_MAX_RETRIES = 3;
+const MAX_CHARS_PER_SCENE = 3;
 
 const API_KEY_STORAGE = 'char_consistency_api_key_v2';
 const CHARACTERS_STORAGE = 'char_consistency_characters_v2';
@@ -1029,7 +1031,7 @@ function extractJson(text){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// VIDEO ID DECODER
+// VIDEO ID DECODER + POLLING
 // ══════════════════════════════════════════════════════════════════
 function decodeCompositeId(composite){
   if(!composite||typeof composite!=='string')return null;
@@ -1097,6 +1099,9 @@ async function compressImage(dataUrl,maxSide){
   });
 }
 
+// ══════════════════════════════════════════════════════════════════
+// CHARACTERS PERSISTENCE + HELPERS MULTI
+// ══════════════════════════════════════════════════════════════════
 function loadCharacters(){
   try{
     const raw=localStorage.getItem(CHARACTERS_STORAGE);
@@ -1114,6 +1119,39 @@ function persistCharacter(char){
   if(existing>=0)state.characters[existing]=char;
   else state.characters.unshift(char);
   saveCharacters(state.characters);
+}
+
+// ─── Multi-personnages : extraction des références d'une scène ────
+function findCharactersRefForScene(scene){
+  if(!scene) return [];
+  if(Array.isArray(scene.characters) && scene.characters.length){
+    return scene.characters.filter(Boolean).map(x=>String(x).trim());
+  }
+  const single = scene.character
+              || scene.character_id
+              || scene.characterId
+              || scene.character_name
+              || scene.characterName;
+  if(single){
+    if(Array.isArray(single)) return single.filter(Boolean).map(x=>String(x).trim());
+    return [String(single).trim()];
+  }
+  return [];
+}
+
+function matchCharacters(refs, characters){
+  const matched = [];
+  for(const r of refs){
+    const low = r.toLowerCase();
+    const c = characters.find(x =>
+      x.id === r ||
+      x.packId === r ||
+      x.name === r ||
+      (x.name||'').toLowerCase() === low
+    );
+    if(c && !matched.includes(c)) matched.push(c);
+  }
+  return matched;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1401,7 +1439,7 @@ async function generateScript(story, charBible, sceneCount){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// CONSISTENCY — FIX CORS
+// CONSISTENCY SINGLE
 // ══════════════════════════════════════════════════════════════════
 async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
   let sceneDataUrl, refDataUrl;
@@ -1413,8 +1451,8 @@ async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
     sceneDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(sceneBlob)});
     refDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(refBlob)});
   }catch(e){
-    debugLog('warn','CONSISTENCY','Images non accessibles — scoring ignoré, image acceptée');
-    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Scoring ignoré (CORS)'],verdict:'Image acceptée par défaut'};
+    debugLog('warn','CONSISTENCY','Images non accessibles — scoring ignoré');
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Scoring ignoré (CORS)'],verdict:'Acceptée par défaut'};
   }
 
   const systemPrompt = 'Tu es un expert en cohérence de personnages. Tu compares deux images et donnes un score OBJECTIF. Tu réponds TOUJOURS en JSON strict valide.';
@@ -1461,13 +1499,109 @@ async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
     debugLog('vision','CONSISTENCY','Score = '+parsed.score+' · '+parsed.verdict.slice(0,80));
     return parsed;
   }catch(e){
-    debugLog('warn','CONSISTENCY','Erreur analyse — image acceptée');
+    debugLog('warn','CONSISTENCY','Erreur — image acceptée');
     return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Erreur analyse'],verdict:'Acceptée par défaut'};
   }
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PROMPTS
+// CONSISTENCY MULTI-PERSONNAGES
+// ══════════════════════════════════════════════════════════════════
+async function checkConsistencyMulti(sceneImageUrl, sceneChars){
+  if(!sceneChars || sceneChars.length === 0){
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Pas de perso'],verdict:''};
+  }
+
+  // Cas simple : un seul personnage
+  if(sceneChars.length === 1){
+    const c = sceneChars[0];
+    return await checkConsistency(sceneImageUrl, c.refsheetUrl, c.bible);
+  }
+
+  // Charge l'image de scène
+  let sceneDataUrl;
+  try{
+    const blob = await fetch(sceneImageUrl).then(r=>r.blob());
+    sceneDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
+  }catch(e){
+    debugLog('warn','CONSISTENCY-MULTI','Image scène inaccessible — acceptée');
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['CORS'],verdict:'Acceptée'};
+  }
+
+  // Charge toutes les planches
+  const refDataUrls = [];
+  for(const ch of sceneChars){
+    if(!ch.refsheetUrl) continue;
+    try{
+      const blob = await fetch(ch.refsheetUrl).then(r=>r.blob());
+      const b64 = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
+      refDataUrls.push({charName: ch.name, dataUrl: b64, char: ch});
+    }catch(e){}
+  }
+
+  if(refDataUrls.length === 0){
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Planches inaccessibles'],verdict:''};
+  }
+
+  const names = refDataUrls.map(r => r.charName).join(' et ');
+  const locksText = refDataUrls.map((r,i) =>
+    'PERSONNAGE '+(i+1)+' ('+r.charName+') : '+(r.char.bible.character_lock_prompt||'')
+  ).join('\n\n');
+
+  const systemPrompt = 'Tu es un expert en cohérence de personnages. Tu compares plusieurs planches de référence à une image de scène et donnes un score OBJECTIF. Tu réponds TOUJOURS en JSON strict valide.';
+  const userPrompt = [
+    'Voici une IMAGE DE SCÈNE qui doit contenir '+refDataUrls.length+' personnages : '+names+'.',
+    '',
+    'Les '+refDataUrls.length+' premières images sont les PLANCHES DE RÉFÉRENCE de chaque personnage, dans l\'ordre. La DERNIÈRE image est la SCÈNE.',
+    '',
+    locksText,
+    '',
+    'Retourne UNIQUEMENT ce JSON:',
+    '{"score": <0-100 global>, "identity": <0-100>, "outfit": <0-100>, "posture": <0-100>, "ambiance": <0-100>, "issues": ["..."], "verdict": "phrase"}'
+  ].join('\n');
+
+  try{
+    const content_parts = [{type:'text', text: userPrompt}];
+    for(const r of refDataUrls){
+      content_parts.push({type:'image_url', image_url:{url: r.dataUrl}});
+    }
+    content_parts.push({type:'image_url', image_url:{url: sceneDataUrl}});
+
+    const body = {
+      model: MODEL_TEXT,
+      messages: [
+        {role:'system', content: systemPrompt},
+        {role:'user', content: content_parts}
+      ],
+      temperature: 0.2, max_tokens: 900,
+      reasoning_effort: 'none', chat_template_kwargs: {enable_thinking: false}
+    };
+
+    const res = await apiFetch(API_BASE+'/chat/completions',
+      {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)},
+      'Consistency-Multi', 3);
+    const data = await res.json();
+    const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if(!content) return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:[],verdict:''};
+
+    const parsed = extractJson(content);
+    if(!parsed) return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:[],verdict:''};
+    parsed.score = Math.max(0, Math.min(100, typeof parsed.score==='number'?parsed.score:0));
+    ['identity','outfit','posture','ambiance'].forEach(k=>{
+      parsed[k] = Math.max(0, Math.min(100, typeof parsed[k]==='number'?parsed[k]:0));
+    });
+    if(!Array.isArray(parsed.issues)) parsed.issues = [];
+    if(!parsed.verdict) parsed.verdict = '';
+    debugLog('vision','CONSISTENCY-MULTI', parsed.score+'/100 · '+parsed.verdict.slice(0,80));
+    return parsed;
+  }catch(e){
+    debugLog('warn','CONSISTENCY-MULTI','Erreur : '+e.message+' — acceptée');
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Analyse échouée'],verdict:''};
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPTS — SINGLE
 // ══════════════════════════════════════════════════════════════════
 function buildSceneImagePrompt(scene, charBible){
   return [
@@ -1506,6 +1640,83 @@ function buildSceneVideoPrompt(scene, charBible){
     'AUDIO: No music. ' + (line ? 'Character says in French: "' + line + '" — one calm delivery.' : 'No dialogue.'),
     '',
     'CONSTRAINTS: 100% identity match. No text, no watermark.'
+  ].join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPTS — MULTI
+// ══════════════════════════════════════════════════════════════════
+function buildSceneImagePromptMulti(scene, sceneChars){
+  const charBlocks = sceneChars.map((ch, idx) => {
+    const pos = ['left side of the frame', 'right side of the frame', 'center of the frame'][idx] || ('position '+(idx+1));
+    return [
+      '── CHARACTER '+(idx+1)+' : '+ch.name+' — positioned on the '+pos+' ──',
+      ch.bible.character_lock_prompt || 'No lock prompt.'
+    ].join('\n');
+  }).join('\n\n');
+
+  const refsCount = sceneChars.length;
+  const refsLabel = sceneChars.map(c => c.name).join(', ');
+
+  return [
+    'CINEMATIC FILM STILL — 35mm film, photorealistic, Wes Anderson aesthetic.',
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ MULTI-CHARACTER SCENE — '+refsCount+' DISTINCT CHARACTERS',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    '',
+    'This scene must contain EXACTLY '+refsCount+' characters : '+refsLabel+'.',
+    refsCount+' reference sheets are provided as input images — one per character, in this order : '+refsLabel+'.',
+    'Each character MUST remain 100% visually identical to its respective reference sheet : same face, same fur, same eyes, same outfit, same helmet, same accessories, same proportions.',
+    'Do NOT mix identities. Do NOT duplicate. Do NOT add extra characters.',
+    '',
+    charBlocks,
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ COMPOSITION (respect the layout)',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    scene.composition || (sceneChars.map((c, i) => c.name + ' on the ' + (['left','right','center'][i]||('position '+(i+1)))).join(', ')),
+    'Perfect bilateral symmetry. Dead-center framing. All characters visible, fully clothed.',
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ SCENE ACTION',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    'DECOR : ' + (scene.decor || ''),
+    'ACTION : ' + (scene.action || ''),
+    '',
+    'CONSTRAINTS :',
+    '- 35mm film grain, warm halation.',
+    '- No text, no watermark, no on-screen graphics.',
+    '- ' + (state.imageFormat === '9:16' ? 'Vertical portrait 9:16.' : state.imageFormat === '16:9' ? 'Horizontal landscape 16:9.' : 'Square 1:1.')
+  ].join('\n');
+}
+
+function buildSceneVideoPromptMulti(scene, sceneChars){
+  const line = (scene.dialogue && scene.dialogue.line_fr) || '';
+  const speaker = (scene.dialogue && scene.dialogue.speaker) || (sceneChars[0] ? sceneChars[0].name : '');
+
+  const charLocks = sceneChars.map((ch,i) =>
+    'CHARACTER '+(i+1)+' — '+ch.name+' : '+(ch.bible.character_lock_prompt||'')
+  ).join('\n\n');
+
+  return [
+    'CINEMATIC SHOT ON 35MM FILM — Wes Anderson aesthetic.',
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ '+sceneChars.length+' CHARACTERS — ALL IDENTICAL TO INPUT FRAMES',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    '',
+    charLocks,
+    '',
+    'COMPOSITION : ' + (scene.composition || ''),
+    'SCENE : ' + (scene.action || ''),
+    'DECOR : ' + (scene.decor || ''),
+    '',
+    'CAMERA : One continuous slow movement. Perfect bilateral symmetry. No cuts.',
+    '',
+    'AUDIO : No music. ' + (line ? 'The character '+speaker+' says in French : "'+line+'" — one calm delivery.' : 'No dialogue.'),
+    '',
+    'CONSTRAINTS : 100% identity match with the input frames for ALL characters. No text, no watermark, no shake.'
   ].join('\n');
 }
 
@@ -1682,9 +1893,13 @@ function renderScenes(){
       bodyHtml = '<div class="scene-placeholder"><div class="spinner-mini"></div><span>'+esc(s.progress||'En attente…')+'</span></div>';
     }
 
+    const charsLabel = (s.characterNames && s.characterNames.length)
+      ? '<span class="scene-chars-badge">'+s.characterNames.map(n=>esc(n)).join(' + ')+'</span>'
+      : '';
+
     return '<div class="'+cls+'">'+
       '<div class="scene-card-header">'+
-        '<span class="scene-card-title">🎬 Scène '+(i+1)+'</span>'+
+        '<span class="scene-card-title">🎬 Scène '+(i+1)+charsLabel+'</span>'+
         scoreHtml+
       '</div>'+
       '<div class="scene-card-body">'+
@@ -1732,9 +1947,14 @@ function renderVideos(){
       bodyHtml = '<div class="scene-placeholder"><div class="spinner-mini"></div><span>'+esc(v.progress||'En attente…')+'</span></div>';
     }
 
+    const scene = state.scenes[i];
+    const charsLabel = (scene && scene.characterNames && scene.characterNames.length)
+      ? '<span class="scene-chars-badge">'+scene.characterNames.map(n=>esc(n)).join(' + ')+'</span>'
+      : '';
+
     return '<div class="'+cls+'">'+
       '<div class="scene-card-header">'+
-        '<span class="scene-card-title">🎬 Scène '+(i+1)+'</span>'+
+        '<span class="scene-card-title">🎬 Scène '+(i+1)+charsLabel+'</span>'+
       '</div>'+
       '<div class="scene-card-body">'+bodyHtml+'</div>'+
     '</div>';
@@ -1861,7 +2081,8 @@ async function generateScriptPipeline(){
       index: i, status: 'pending', imageUrl: null, progress: null, error: null,
       consistency: null, dialogue: sc.dialogue, action: sc.action, decor: sc.decor,
       image_prompt: sc.image_prompt, video_prompt: sc.video_prompt,
-      text_overlay_fr: sc.text_overlay_fr, retryCount: 0
+      text_overlay_fr: sc.text_overlay_fr, retryCount: 0,
+      characterIds: [char.id], characterNames: [char.name], composition: ''
     }));
     state.videos = script.scenes.map((sc,i)=>({
       index: i, status: 'pending', url: null, progress: null, error: null
@@ -1893,70 +2114,111 @@ async function generateScriptPipeline(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GENERATE SCENES
+// GENERATE SCENES (multi-personnages)
 // ══════════════════════════════════════════════════════════════════
 async function generateAllScenes(){
   if(state.isGeneratingScenes)return;
   if(!state.scenes.length){showToast('Générez d\'abord le scénario','error');return}
-  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
-  if(!char || !char.bible || !char.refsheetUrl){showToast('Personnage invalide','error');return}
+
+  const defaultCharId = state.selectedCharacterId;
+  if(!defaultCharId){showToast('Sélectionnez un personnage','error');return}
 
   state.isGeneratingScenes=true;
   state.stopRequested=false;
   updateButtons();
   await activateWakeLock();
 
-  let refsheetDataUrl=null;
-  try{
-    const blob = await fetch(char.refsheetUrl).then(r=>r.blob());
-    refsheetDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
-  }catch(e){
-    debugLog('warn','SCENES','Impossible de charger la planche : '+e.message);
+  // Cache planches base64
+  const refsheetCache = {};
+  async function getRefsheetBase64(charId){
+    if(refsheetCache[charId]) return refsheetCache[charId];
+    const c = state.characters.find(x=>x.id===charId);
+    if(!c || !c.refsheetUrl) return null;
+    try{
+      const blob = await fetch(c.refsheetUrl).then(r=>r.blob());
+      const b64 = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
+      refsheetCache[charId] = b64;
+      return b64;
+    }catch(e){
+      debugLog('warn','SCENES','Planche '+charId+' non chargée : '+e.message);
+      return null;
+    }
   }
 
-  const total=state.scenes.length;
-  for(let i=0;i<total;i++){
-    if(state.stopRequested)break;
-    const scene=state.scenes[i];
-    let attempt=0;
-    let success=false;
+  const total = state.scenes.length;
+
+  for(let i=0; i<total; i++){
+    if(state.stopRequested) break;
+
+    const scene = state.scenes[i];
+
+    // Résoudre la liste des personnages
+    let sceneCharIds = Array.isArray(scene.characterIds) ? scene.characterIds.slice() : [];
+    if(sceneCharIds.length === 0) sceneCharIds = [defaultCharId];
+    sceneCharIds = sceneCharIds.slice(0, MAX_CHARS_PER_SCENE);
+
+    const sceneChars = sceneCharIds
+      .map(id => state.characters.find(c => c.id === id))
+      .filter(Boolean);
+
+    if(sceneChars.length === 0){
+      scene.status = 'error';
+      scene.error = 'Aucun personnage';
+      renderScenes();
+      continue;
+    }
+
+    scene.characterNames = sceneChars.map(c => c.name);
+
+    // Charge toutes les planches
+    const refsBase64 = [];
+    for(const ch of sceneChars){
+      const b64 = await getRefsheetBase64(ch.id);
+      if(b64) refsBase64.push(b64);
+    }
+
+    const namesLabel = sceneChars.map(c => c.name).join(' + ');
+
+    let attempt = 0;
+    let success = false;
 
     while(attempt<IMAGE_MAX_RETRIES && !success && !state.stopRequested){
       attempt++;
       scene.retryCount = attempt;
       scene.status = 'generating';
-      scene.progress = 'Génération (essai '+attempt+'/'+IMAGE_MAX_RETRIES+')…';
+      scene.progress = 'Génération ('+namesLabel+' · essai '+attempt+'/'+IMAGE_MAX_RETRIES+')…';
       renderScenes();
-      setStatus('Scène '+(i+1)+'/'+total+' — essai '+attempt+'/'+IMAGE_MAX_RETRIES);
-      updateProgress(((i*IMAGE_MAX_RETRIES+attempt)/(total*IMAGE_MAX_RETRIES))*100, 'Scène '+(i+1)+'/'+total, '');
-      journalLog('Scène '+(i+1)+' — génération essai '+attempt,'image');
+      setStatus('Scène '+(i+1)+'/'+total+' ['+namesLabel+'] — essai '+attempt);
+      updateProgress(((i*IMAGE_MAX_RETRIES+attempt)/(total*IMAGE_MAX_RETRIES))*100, 'Scène '+(i+1)+'/'+total+' — '+namesLabel, '');
+      journalLog('Scène '+(i+1)+' ['+namesLabel+'] — essai '+attempt,'image');
 
       try{
-        const prompt=buildSceneImagePrompt(scene, char.bible);
-        const refs=[];
-        if(refsheetDataUrl)refs.push(refsheetDataUrl);
+        const prompt = sceneChars.length === 1
+          ? buildSceneImagePrompt(scene, sceneChars[0].bible)
+          : buildSceneImagePromptMulti(scene, sceneChars);
+
         const imageUrl = await generateImage(prompt, {
           ratio: state.imageFormat,
-          referenceImages: refs.length ? refs : undefined
+          referenceImages: refsBase64.length ? refsBase64 : undefined
         });
         scene.imageUrl = imageUrl;
         scene.status = 'retrying';
         scene.progress = 'Analyse de cohérence…';
         renderScenes();
 
-        const consistency = await checkConsistency(imageUrl, char.refsheetUrl, char.bible);
+        const consistency = await checkConsistencyMulti(imageUrl, sceneChars);
         scene.consistency = consistency;
 
         if(consistency && consistency.score >= state.consistencyThreshold){
           scene.status = 'done';
           scene.progress = 'Cohérent';
           success = true;
-          journalLog('Scène '+(i+1)+' ✓ cohérence = '+consistency.score+'/100','success');
+          journalLog('Scène '+(i+1)+' ['+namesLabel+'] ✓ cohérence = '+consistency.score+'/100','success');
           showToast('Scène '+(i+1)+' : '+consistency.score+'/100','success',1800);
           renderScenes();
         }else{
           const score = consistency ? consistency.score : '?';
-          journalLog('Scène '+(i+1)+' — score '+score+'/100 → régénération','warn');
+          journalLog('Scène '+(i+1)+' ['+namesLabel+'] — score '+score+'/100 → régénération','warn');
           if(attempt>=IMAGE_MAX_RETRIES){
             scene.status = 'done';
             scene.progress = 'Acceptée (sous seuil)';
@@ -1997,13 +2259,12 @@ async function generateAllScenes(){
     : 0;
   setStatus('✦ '+finalDone+'/'+total+' scènes — score moyen '+avgScore+'/100 ✦');
 
-  // ✨ FIX : Afficher automatiquement la section vidéos
   if(finalDone >= 2){
     document.getElementById('section-videos').classList.remove('hidden');
     document.getElementById('section-videos').classList.add('open');
     const genVidBtn = document.getElementById('generate-videos-btn');
     if(genVidBtn) genVidBtn.disabled = false;
-    journalLog('▶ Prêt à générer les vidéos — cliquez sur le bouton ci-dessous','highlight');
+    journalLog('▶ Prêt à générer les vidéos','highlight');
     setTimeout(()=>document.getElementById('section-videos').scrollIntoView({behavior:'smooth',block:'start'}), 1500);
   }
 
@@ -2015,15 +2276,22 @@ async function generateAllScenes(){
 
 async function regenerateScene(index){
   if(state.isGeneratingScenes)return;
-  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
-  if(!char)return;
   const scene = state.scenes[index];
+  if(!scene) return;
 
-  let refsheetDataUrl=null;
-  try{
-    const blob = await fetch(char.refsheetUrl).then(r=>r.blob());
-    refsheetDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
-  }catch(e){}
+  const sceneCharIds = (scene.characterIds||[state.selectedCharacterId]).filter(Boolean);
+  const sceneChars = sceneCharIds.map(id => state.characters.find(c=>c.id===id)).filter(Boolean);
+  if(sceneChars.length === 0) return;
+
+  const refsBase64 = [];
+  for(const ch of sceneChars){
+    if(!ch.refsheetUrl) continue;
+    try{
+      const blob = await fetch(ch.refsheetUrl).then(r=>r.blob());
+      const b64 = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
+      refsBase64.push(b64);
+    }catch(e){}
+  }
 
   scene.status='generating';
   scene.progress='Régénération…';
@@ -2031,18 +2299,19 @@ async function regenerateScene(index){
   journalLog('Régénération manuelle scène '+(index+1),'image');
 
   try{
-    const prompt=buildSceneImagePrompt(scene, char.bible);
-    const refs=[];
-    if(refsheetDataUrl)refs.push(refsheetDataUrl);
+    const prompt = sceneChars.length === 1
+      ? buildSceneImagePrompt(scene, sceneChars[0].bible)
+      : buildSceneImagePromptMulti(scene, sceneChars);
+
     const imageUrl = await generateImage(prompt, {
       ratio: state.imageFormat,
-      referenceImages: refs.length ? refs : undefined
+      referenceImages: refsBase64.length ? refsBase64 : undefined
     });
     scene.imageUrl = imageUrl;
     scene.status='retrying';
     scene.progress='Analyse…';
     renderScenes();
-    const consistency = await checkConsistency(imageUrl, char.refsheetUrl, char.bible);
+    const consistency = await checkConsistencyMulti(imageUrl, sceneChars);
     scene.consistency = consistency;
     scene.status='done';
     scene.progress='Régénéré';
@@ -2057,15 +2326,15 @@ async function regenerateScene(index){
 }
 
 async function recheckScene(index){
-  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
-  if(!char)return;
   const scene = state.scenes[index];
-  if(!scene.imageUrl){showToast('Pas d\'image','warn');return}
+  if(!scene || !scene.imageUrl){showToast('Pas d\'image','warn');return}
+  const sceneCharIds = (scene.characterIds||[state.selectedCharacterId]).filter(Boolean);
+  const sceneChars = sceneCharIds.map(id => state.characters.find(c=>c.id===id)).filter(Boolean);
   scene.status='retrying';
   scene.progress='Analyse…';
   renderScenes();
   try{
-    const consistency = await checkConsistency(scene.imageUrl, char.refsheetUrl, char.bible);
+    const consistency = await checkConsistencyMulti(scene.imageUrl, sceneChars);
     scene.consistency = consistency;
     scene.status='done';
     renderScenes();
@@ -2082,9 +2351,6 @@ async function recheckScene(index){
 // ══════════════════════════════════════════════════════════════════
 async function generateAllVideos(){
   if(state.isGeneratingVideos)return;
-  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
-  if(!char)return;
-
   const readyScenes = state.scenes.filter(s=>s.status==='done' && s.imageUrl);
   if(readyScenes.length<2){showToast('Il faut au moins 2 scènes','error');return}
 
@@ -2128,13 +2394,20 @@ async function generateOneVideo(index, readyScenes){
   v.progress='Initialisation…';
   renderVideos();
 
-  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
+  // Personnages de la scène de départ
+  const sceneCharIds = (sceneA.characterIds || [state.selectedCharacterId]).filter(Boolean);
+  const sceneChars = sceneCharIds.map(id => state.characters.find(c=>c.id===id)).filter(Boolean);
+  const namesLabel = sceneChars.map(c=>c.name).join(' + ') || '?';
+
   const sceneData = state.script.scenes[index];
 
-  journalLog('Vidéo '+(index+1)+' (keyframes)','video');
+  journalLog('Vidéo '+(index+1)+' (keyframes) ['+namesLabel+']','video');
 
   try{
-    const prompt=buildSceneVideoPrompt(sceneData, char.bible);
+    const prompt = sceneChars.length === 1
+      ? buildSceneVideoPrompt(sceneData, sceneChars[0].bible)
+      : buildSceneVideoPromptMulti(sceneData, sceneChars);
+
     const videoIdObj = await createVideoTask(prompt, sceneA.imageUrl, sceneB.imageUrl, state.durationFrames);
     const url = await pollVideo(videoIdObj, (prog)=>{
       v.progress = prog;
@@ -2143,7 +2416,7 @@ async function generateOneVideo(index, readyScenes){
     v.status='done';
     v.url=url;
     renderVideos();
-    journalLog('Vidéo '+(index+1)+' ✓','success');
+    journalLog('Vidéo '+(index+1)+' ['+namesLabel+'] ✓','success');
   }catch(e){
     if(e.message==='Arrêt demandé')return;
     v.status='error';
@@ -2239,7 +2512,7 @@ function exportJsonBundle(){
     showToast('Rien à exporter','warn');return;
   }
   const bundle = {
-    version: 'v2-1key',
+    version: 'v3-multichar',
     exportedAt: new Date().toISOString(),
     story: document.getElementById('story-input').value.trim(),
     selectedCharacterId: state.selectedCharacterId,
@@ -2247,7 +2520,9 @@ function exportJsonBundle(){
     script: state.script,
     scenes: state.scenes.map(s=>({
       index: s.index, status: s.status, imageUrl: s.imageUrl,
-      consistency: s.consistency, dialogue: s.dialogue, decor: s.decor
+      consistency: s.consistency, dialogue: s.dialogue, decor: s.decor,
+      characterIds: s.characterIds, characterNames: s.characterNames,
+      composition: s.composition
     })),
     videos: state.videos.map(v=>({
       index: v.index, status: v.status, url: v.url
@@ -2301,6 +2576,24 @@ function speakFR(text, charBible){
 }
 function stopTTS(){try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}}
 
+// Trouve le personnage qui parle dans une scène multi
+function findSpeakingCharacter(scene){
+  if(!scene) return null;
+  const speakerName = scene.dialogue && scene.dialogue.speaker;
+  const ids = scene.characterIds || [];
+  if(speakerName && ids.length){
+    const found = state.characters.find(c =>
+      ids.includes(c.id) && c.name === speakerName
+    );
+    if(found) return found;
+  }
+  if(ids.length){
+    const first = state.characters.find(c => c.id === ids[0]);
+    if(first) return first;
+  }
+  return state.characters.find(c => c.id === state.selectedCharacterId) || state.characters[0] || null;
+}
+
 async function playFilm(){
   const ready=state.videos.filter(v=>v.status==='done'&&v.url);
   if(ready.length===0){showToast('Aucune vidéo à lire','error');return}
@@ -2334,7 +2627,6 @@ async function playFilm(){
     }
   }catch(e){}
 
-  const char = state.characters.find(c=>c.id===state.selectedCharacterId);
   journalLog('Diffusion du film…','play');
 
   for(let i=0;i<ready.length;i++){
@@ -2342,7 +2634,8 @@ async function playFilm(){
     const v = ready[i];
     const sceneIndex = state.videos.indexOf(v);
     const scene = state.script.scenes[sceneIndex];
-    await playOneScene(v.url, scene, ctx, canvas, dpr, char);
+    const speakingChar = findSpeakingCharacter(scene);
+    await playOneScene(v.url, scene, ctx, canvas, dpr, speakingChar);
   }
 
   stopFilmPlayback();
@@ -2390,7 +2683,7 @@ function playOneScene(videoUrl, scene, ctx, canvas, dpr, char){
       ctx.fillRect(bandX,bandY,bandW,bandH);
       ctx.fillStyle='#e5c15a';
       ctx.fillRect(bandX,bandY+Math.round(bandH*0.15),Math.round(5*dpr),bandH-Math.round(bandH*0.3));
-      const speakerName=(scene&&scene.dialogue&&scene.dialogue.speaker)||(char&&char.bible&&char.bible.name)||'';
+      const speakerName=(scene&&scene.dialogue&&scene.dialogue.speaker)||(char&&char.name)||'';
       const nameSize=Math.round(Math.min(15*dpr, h*0.022));
       const textSize=Math.round(Math.min(22*dpr, h*0.032));
       if(speakerName){
@@ -2486,6 +2779,7 @@ async function pasteFromClipboard(){
     showToast('Collez manuellement','warn');
   }catch(e){showToast('Collez manuellement','warn')}
 }
+
 function validateImportPack(pack){
   const errors=[];
   if(!pack||typeof pack!=='object'){errors.push('Pack invalide');return errors}
@@ -2504,8 +2798,31 @@ function validateImportPack(pack){
   }else if(pack.story.length<20){
     errors.push('"story" doit contenir au moins 20 caractères');
   }
+  // Vérification scènes
+  if(!pack.scenes || !Array.isArray(pack.scenes)){
+    errors.push('Champ "scenes" manquant');
+  }else{
+    const charNames = new Set(pack.characters.map(c => (c.name||'').toLowerCase()));
+    const charIds = new Set(pack.characters.map(c => c.id).filter(Boolean));
+
+    pack.scenes.forEach((s,i)=>{
+      const refs = findCharactersRefForScene(s);
+      if(refs.length === 0){
+        errors.push('Scène '+(i+1)+' : aucun personnage référencé');
+        return;
+      }
+      if(refs.length > MAX_CHARS_PER_SCENE){
+        errors.push('Scène '+(i+1)+' : '+refs.length+' personnages (max '+MAX_CHARS_PER_SCENE+')');
+      }
+      refs.forEach(ref=>{
+        const ok = charNames.has(ref.toLowerCase()) || charIds.has(ref);
+        if(!ok) errors.push('Scène '+(i+1)+' : personnage inconnu "'+ref+'"');
+      });
+    });
+  }
   return errors;
 }
+
 function analyzeImport(){
   const raw = document.getElementById('import-json-input-text').value.trim();
   if(!raw){showToast('Collez un JSON','warn');return}
@@ -2536,16 +2853,22 @@ function analyzeImport(){
   if(pack.title)html+='<div class="ip-line"><span class="ip-label">Titre</span><span class="ip-val">'+esc(pack.title)+'</span></div>';
   html+='<div class="ip-line"><span class="ip-label">Personnages</span><span class="ip-val">'+pack.characters.length+'</span></div>';
   html+='<div class="ip-line"><span class="ip-label">Scènes</span><span class="ip-val">'+pack.scenes.length+'</span></div>';
-  html+='<div class="ip-line"><span class="ip-label">Durée par scène</span><span class="ip-val">'+pack.scenes[0].duration+' frames ('+Math.round(pack.scenes[0].duration/24*10)/10+'s)</span></div>';
+  if(pack.scenes[0] && pack.scenes[0].duration){
+    html+='<div class="ip-line"><span class="ip-label">Durée par scène</span><span class="ip-val">'+pack.scenes[0].duration+' frames ('+Math.round(pack.scenes[0].duration/24*10)/10+'s)</span></div>';
+  }
   html+='<div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(168,216,200,.2)">';
+  html+='<div style="font-size:.7rem;color:var(--dim);margin-bottom:.4rem">Personnages :</div>';
   pack.characters.forEach(c=>{
-    html+='<div class="ip-line" style="padding:.2rem 0">🎭 <strong style="color:var(--gold-soft)">'+esc(c.name)+'</strong></div>';
+    html+='<div class="ip-line" style="padding:.2rem 0">🎭 <strong style="color:var(--gold-soft)">'+esc(c.name)+'</strong>'+(c.id?(' <span style="color:var(--dim)">['+esc(c.id)+']</span>'):'')+'</div>';
   });
   html+='</div>';
   html+='<div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(168,216,200,.2)">';
-  html+='<div style="font-size:.7rem;color:var(--dim);margin-bottom:.4rem">Scènes :</div>';
+  html+='<div style="font-size:.7rem;color:var(--dim);margin-bottom:.4rem">Scènes (mapping) :</div>';
   pack.scenes.forEach((s,i)=>{
-    html+='<div class="ip-line" style="padding:.15rem 0">▸ Scène '+(i+1)+' — '+esc((s.decor||'').slice(0,60))+'</div>';
+    const refs = findCharactersRefForScene(s);
+    const label = refs.length ? refs.join(' + ') : '⚠️ aucun';
+    const color = refs.length > 1 ? 'var(--lavender)' : 'var(--gold-soft)';
+    html+='<div class="ip-line" style="padding:.15rem 0">▸ Scène '+(i+1)+' — <span style="color:'+color+';font-weight:600">'+esc(label)+'</span></div>';
   });
   html+='</div>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:1rem">';
@@ -2571,22 +2894,24 @@ async function startImportGeneration(){
   state.stopRequested = false;
   updateButtons();
   setStatus('Import en cours…');
-  journalLog('Démarrage de l\'import complet…','highlight');
+  journalLog('Démarrage de l\'import ('+pack.characters.length+' persos, '+pack.scenes.length+' scènes)…','highlight');
 
   try{
-    // 1) Créer les personnages
+    // ═══ 1) CRÉER TOUS LES PERSONNAGES ═══
+    const packCharMap = {};
     for(let i=0; i<pack.characters.length; i++){
       if(state.stopRequested)break;
       const c = pack.characters[i];
-      setStatus('Personnage '+(i+1)+'/'+pack.characters.length+' : '+c.name);
-      journalLog('Création du personnage '+c.name+' ('+(i+1)+'/'+pack.characters.length+')','character');
+      setStatus('Personnage '+(i+1)+'/'+pack.characters.length+' : '+(c.name||''));
+      journalLog('Création du personnage '+(c.name||'')+' ('+(i+1)+'/'+pack.characters.length+')','character');
 
       const refsheet = await generateReferenceSheet(c.description, null, null);
       const bible = await buildCharacterBible(c.description, refsheet);
 
       const charObj = {
-        id: 'char_'+Date.now()+'_'+i,
-        name: c.name,
+        id: 'char_'+Date.now()+'_'+i+'_'+Math.random().toString(36).slice(2,6),
+        packId: c.id || c.name || '',
+        name: c.name || bible.name || 'Personnage '+(i+1),
         species: bible.species || '',
         description: c.description,
         refsheetUrl: refsheet,
@@ -2594,10 +2919,13 @@ async function startImportGeneration(){
         createdAt: Date.now()
       };
       persistCharacter(charObj);
+      if(c.id) packCharMap[c.id] = charObj.id;
+      if(c.name) packCharMap[c.name] = charObj.id;
+
+      journalLog('✓ '+(c.name||'')+' créé','success');
     }
 
-    // Sélectionner le premier personnage
-    if(state.characters.length>0){
+    if(state.characters[0]){
       state.selectedCharacterId = state.characters[0].id;
       state.bible = state.characters[0].bible;
       state.refsheetUrl = state.characters[0].refsheetUrl;
@@ -2605,42 +2933,89 @@ async function startImportGeneration(){
       renderBible();
     }
 
-    // 2) Configurer l'histoire
+    // ═══ 2) CONFIGURER ═══
     document.getElementById('story-input').value = pack.story;
     document.getElementById('scene-count').value = String(pack.scenes.length);
-
-    // 3) Créer le script à partir du pack directement
-    setStatus('Création du scénario…');
-    const char = state.characters.find(c=>c.id===state.selectedCharacterId);
-    const sceneCount = pack.scenes.length;
-    state.sceneCount = sceneCount;
+    state.sceneCount = pack.scenes.length;
     state.durationFrames = pack.scenes[0].duration || 145;
     state.consistencyThreshold = parseInt(document.getElementById('consistency-threshold').value, 10);
     state.imageFormat = document.getElementById('image-format').value;
 
-    state.script = {
-      title: pack.title || 'Import',
-      logline: '',
-      scenes: pack.scenes.map((s, i) => ({
+    // ═══ 3) MAPPING SCÈNES → PERSONNAGES (MULTI) ═══
+    const scenesMapped = pack.scenes.map((s, i) => {
+      const refs = findCharactersRefForScene(s);
+      let charsMatched = matchCharacters(refs, state.characters);
+
+      if(charsMatched.length === 0 && state.characters[0]){
+        charsMatched = [state.characters[0]];
+      }
+      charsMatched = charsMatched.slice(0, MAX_CHARS_PER_SCENE);
+
+      const characterIds = charsMatched.map(c => c.id);
+      const characterNames = charsMatched.map(c => c.name);
+
+      // Composition explicite
+      let composition = s.composition;
+      if(!composition){
+        composition = charsMatched.map((c, idx) => {
+          const positions = ['left side of the frame', 'right side of the frame', 'center of the frame'];
+          return c.name + ' on the ' + (positions[idx] || ('position '+(idx+1)));
+        }).join(', ');
+      }
+
+      const speakerName = s.speaker || characterNames[0] || 'Personnage';
+
+      return {
         scene_number: i+1,
+        characterIds: characterIds,
+        characterNames: characterNames,
+        composition: composition,
         action: s.description || '',
         decor: s.decor || '',
         image_prompt: s.description || s.decor || '',
-        video_prompt: 'slow continuous movement',
-        dialogue: { speaker: char.name, line_fr: '...' },
-        emotion: 'neutral',
-        text_overlay_fr: s.description ? s.description.slice(0, 40) : 'SCÈNE '+(i+1)
-      }))
+        video_prompt: s.video_prompt || 'slow continuous movement',
+        dialogue: s.dialogue || { speaker: speakerName, line_fr: (s.text_overlay_fr || '...') },
+        emotion: s.emotion || 'neutral',
+        text_overlay_fr: s.text_overlay_fr || (s.description ? s.description.slice(0, 40) : 'SCÈNE '+(i+1))
+      };
+    });
+
+    const mapping = scenesMapped.map(s =>
+      'S'+s.scene_number+'→['+s.characterNames.join('+')+']'
+    ).join(' · ');
+    journalLog('Mapping : '+mapping,'highlight');
+
+    state.script = {
+      title: pack.title || 'Import',
+      logline: '',
+      scenes: scenesMapped
     };
 
     state.scenes = state.script.scenes.map((sc, i) => ({
-      index: i, status: 'pending', imageUrl: null, progress: null, error: null,
-      consistency: null, dialogue: sc.dialogue, action: sc.action, decor: sc.decor,
-      image_prompt: sc.image_prompt, video_prompt: sc.video_prompt,
-      text_overlay_fr: sc.text_overlay_fr, retryCount: 0
+      index: i,
+      status: 'pending',
+      imageUrl: null,
+      progress: null,
+      error: null,
+      consistency: null,
+      characterIds: sc.characterIds || [],
+      characterNames: sc.characterNames || [],
+      composition: sc.composition || '',
+      dialogue: sc.dialogue,
+      action: sc.action,
+      decor: sc.decor,
+      image_prompt: sc.image_prompt,
+      video_prompt: sc.video_prompt,
+      text_overlay_fr: sc.text_overlay_fr,
+      retryCount: 0
     }));
+
     state.videos = state.script.scenes.map((sc, i) => ({
-      index: i, status: 'pending', url: null, progress: null, error: null
+      index: i,
+      status: 'pending',
+      url: null,
+      progress: null,
+      error: null
     }));
 
     document.getElementById('section-scenes').classList.remove('hidden');
@@ -2649,13 +3024,11 @@ async function startImportGeneration(){
     renderScenes();
     renderVideos();
 
-    journalLog('Scénario créé depuis le pack : '+state.script.scenes.length+' scènes','success');
-
-    // 4) Générer les scènes
+    // ═══ 4) GÉNÉRER LES SCÈNES ═══
     setStatus('Génération des images de scène…');
     await generateAllScenes();
 
-    // 5) Générer les vidéos
+    // ═══ 5) GÉNÉRER LES VIDÉOS ═══
     if(!state.stopRequested){
       setStatus('Génération des vidéos…');
       await generateAllVideos();
@@ -2786,7 +3159,7 @@ function bindCharRefInput(){
   document.getElementById('scenes-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
   document.getElementById('videos-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
 
-  // 💾 SAUVEGARDE
+  // SAUVEGARDE
   document.getElementById('download-all-videos-btn').addEventListener('click', downloadAllVideos);
   document.getElementById('download-all-images-btn').addEventListener('click', downloadAllImages);
   document.getElementById('copy-all-urls-btn').addEventListener('click', copyAllUrls);
@@ -2821,9 +3194,12 @@ function bindCharRefInput(){
   initTTS();
   renderCharacterLibrary();
 
-  debugLog('success','INIT','Character Consistency Studio prêt');
-  debugLog('info','INIT','Une seule clé API · Import Pack JSON · Sauvegarde 4 boutons');
-  journalLog('Prêt. Ajoutez votre clé API ou importez un pack JSON.','highlight');
+  debugLog('success','INIT','Character Consistency Studio v3 — MULTI-PERSONNAGES');
+  debugLog('info','INIT','Jusqu\'à '+MAX_CHARS_PER_SCENE+' personnages par scène');
+  debugLog('info','INIT','Champs supportés : character, character_id, characterId, character_name, characters[]');
+  debugLog('info','INIT','Composition explicite supportée via "composition"');
+  debugLog('info','INIT','Consistency checker groupé pour scènes multi');
+  journalLog('Prêt. Ajoutez votre clé API ou importez un pack JSON multi-personnages.','highlight');
 })();
 </script>
 </body>
