@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a12">
+<title>Pub Factory — Publicités IA pour Fiverr</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0a0a12;--bg2:#12121c;--bg3:#1a1a28;
+--panel:#16161f;--border:#2a2a3a;
+--ink:#e8e6e0;--dim:#8a8896;--faint:#4a4858;
+--acc:#e5c15a;--acc2:#e87b35;
+--ok:#4a9d6a;--err:#c85a4a;--warn:#d4a017;
+--r:10px;
+--fs:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+--fm:ui-monospace,'SF Mono',Menlo,monospace;
+}
+html,body{background:var(--bg);overscroll-behavior:none}
+body{font-family:var(--fs);background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem .8rem 6rem;font-size:15px;line-height:1.55;max-width:900px;margin:0 auto}
+h1{font-size:1.5rem;font-weight:400;letter-spacing:-.02em}
+h2{font-size:1rem;color:var(--acc);margin-bottom:.7rem;font-weight:600}
+h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.15em;color:var(--dim);margin-bottom:.6rem;font-weight:700}
+header{text-align:center;padding:.8rem 0 1.2rem;margin-bottom:.8rem;border-bottom:1px solid var(--border)}
+header .brand{font-size:.62rem;letter-spacing:.3em;color:var(--acc);text-transform:uppercase;opacity:.75;margin-bottom:.3rem}
+header h1{background:linear-gradient(135deg,var(--acc2),var(--acc));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+header .sub{font-size:.75rem;color:var(--dim);font-style:italic;margin-top:.2rem}
+
+.api-panel{background:linear-gradient(135deg,rgba(232,123,53,.08),rgba(229,193,90,.05));border:1px solid var(--acc2);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:1rem}
+.api-panel.ok{background:linear-gradient(135deg,rgba(74,157,106,.08),rgba(74,157,106,.04));border-color:var(--ok)}
+.api-panel .ap-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;gap:.5rem;flex-wrap:wrap}
+.api-panel .ap-title{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);font-weight:700}
+.api-panel.ok .ap-title{color:var(--ok)}
+.api-panel .ap-link{font-size:.68rem;color:var(--acc2);text-decoration:none;border:1px solid var(--acc2);padding:.3rem .6rem;border-radius:4px;background:rgba(232,123,53,.06);font-weight:600}
+.api-panel input{width:100%;padding:.85rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:var(--fm);font-size:.82rem}
+.api-panel input:focus{border-color:var(--acc);outline:none}
+.api-panel .ap-actions{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
+.api-panel .ap-status{font-size:.72rem;padding:.55rem .8rem;border-radius:6px;background:var(--bg2);color:var(--dim);border:1px solid var(--border);margin-top:.6rem;font-family:var(--fm);display:flex;align-items:center;gap:.5rem}
+.api-panel .ap-status.ok{background:rgba(74,157,106,.08);color:var(--ok);border-color:rgba(74,157,106,.3)}
+.api-panel .ap-status .dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0}
+.api-panel .ap-status.ok .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:1rem}
+.panel h2{display:flex;align-items:center;gap:.5rem}
+.panel .step-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--acc);color:var(--bg);font-size:.7rem;font-weight:700;flex-shrink:0}
+.row{margin-bottom:.9rem}
+.row:last-child{margin-bottom:0}
+label.lb{display:block;font-size:.7rem;color:var(--dim);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+
+input[type=text],input[type=password],input[type=number],textarea,select{width:100%;padding:.85rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:inherit;font-size:.92rem;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--acc)}
+textarea{resize:vertical;line-height:1.5;min-height:75px}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right 1rem center;background-size:10px;padding-right:2rem;cursor:pointer}
+select option{background:var(--bg2);color:var(--ink)}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+
+.btn{width:100%;padding:.95rem 1.2rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:inherit;font-size:.88rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;min-height:48px;display:flex;align-items:center;justify-content:center;gap:.5rem;-webkit-appearance:none;appearance:none}
+.btn:hover:not(:disabled){background:var(--bg3);border-color:var(--acc)}
+.btn:active:not(:disabled){transform:scale(.98)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary{border-color:var(--acc);background:linear-gradient(135deg,rgba(232,123,53,.2),rgba(229,193,90,.15));color:var(--acc);font-size:1rem;padding:1.15rem;letter-spacing:.15em}
+.btn-mini{padding:.5rem .8rem;font-size:.7rem;min-height:auto;width:auto;display:inline-flex;letter-spacing:.08em}
+.btn-danger{border-color:var(--err);color:var(--err)}
+.btn-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.btn-row .btn{flex:1;min-width:120px}
+
+.status{font-size:.75rem;padding:.55rem .85rem;border-radius:8px;display:flex;align-items:center;gap:.6rem;background:var(--bg2);color:var(--dim);border:1px solid var(--border);margin-bottom:.5rem;font-family:var(--fm);display:none}
+.status.visible{display:flex}
+.status.ok{background:rgba(74,157,106,.08);color:var(--ok);border-color:rgba(74,157,106,.3)}
+.status.err{background:rgba(200,90,74,.08);color:var(--err);border-color:rgba(200,90,74,.3)}
+.status .dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0}
+.status.ok .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.status.err .dot{background:var(--err);box-shadow:0 0 8px var(--err)}
+
+/* Timeline de progression */
+.pipeline{margin-top:.8rem}
+.pipeline-step{display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:.4rem;font-size:.82rem;transition:all .3s}
+.pipeline-step .ps-icon{width:26px;height:26px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;font-weight:700;color:var(--faint)}
+.pipeline-step .ps-label{flex:1;font-weight:600;color:var(--dim)}
+.pipeline-step .ps-status{font-size:.68rem;font-family:var(--fm);color:var(--faint)}
+.pipeline-step.active{border-color:var(--acc);background:rgba(229,193,90,.05)}
+.pipeline-step.active .ps-icon{background:var(--acc);color:var(--bg)}
+.pipeline-step.active .ps-label{color:var(--ink)}
+.pipeline-step.active .ps-status{color:var(--acc)}
+.pipeline-step.done{border-color:rgba(74,157,106,.4);background:rgba(74,157,106,.05)}
+.pipeline-step.done .ps-icon{background:var(--ok);color:#fff}
+.pipeline-step.done .ps-label{color:var(--ok)}
+.pipeline-step.done .ps-status{color:var(--ok)}
+.pipeline-step.err{border-color:rgba(200,90,74,.4);background:rgba(200,90,74,.05)}
+.pipeline-step.err .ps-icon{background:var(--err);color:#fff}
+.pipeline-step.err .ps-label{color:var(--err)}
+.pipeline-step.err .ps-status{color:var(--err)}
+
+/* Cartes scènes */
+.scenes-list{margin-top:1rem}
+.scene-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.7rem;transition:border-color .3s}
+.scene-card.loading{border-color:var(--acc)}
+.scene-card.done{border-color:var(--ok)}
+.scene-card.error{border-color:var(--err)}
+.sc-header{display:flex;justify-content:space-between;align-items:center;gap:.5rem;margin-bottom:.6rem}
+.sc-num{font-size:.78rem;font-weight:700;color:var(--acc);letter-spacing:.05em}
+.sc-status{font-size:.68rem;font-family:var(--fm);color:var(--dim)}
+.sc-status.running{color:var(--acc)}
+.sc-status.ok{color:var(--ok)}
+.sc-status.err{color:var(--err)}
+.sc-desc{font-size:.8rem;color:var(--dim);line-height:1.5;margin-bottom:.6rem}
+.sc-progress{display:none;margin-bottom:.6rem}
+.sc-progress.visible{display:block}
+.sc-progress .sp-info{font-size:.68rem;font-family:var(--fm);color:var(--dim);display:flex;justify-content:space-between;margin-bottom:.35rem}
+.pbar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.pbar .pfill{height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));border-radius:3px;transition:width .4s;width:0%}
+.sc-video{display:none;margin-top:.6rem;border-radius:6px;overflow:hidden;background:#000}
+.sc-video.visible{display:block}
+.sc-video video{width:100%;display:block;background:#000;aspect-ratio:9/16;object-fit:contain;max-height:520px}
+.sc-video .sv-meta{padding:.5rem .7rem;background:var(--bg3);font-size:.68rem;color:var(--dim);font-family:var(--fm);display:flex;justify-content:space-between;gap:.3rem;flex-wrap:wrap}
+.sc-video .sv-actions{padding:.5rem .7rem;background:var(--panel);display:flex;gap:.4rem;border-top:1px solid var(--border)}
+.sc-video .sv-actions .btn{margin-bottom:0;flex:1;min-width:90px;padding:.45rem;font-size:.68rem;min-height:auto}
+.sc-error{padding:.6rem;background:rgba(200,90,74,.1);border:1px solid rgba(200,90,74,.3);border-radius:6px;font-size:.75rem;color:var(--err);display:none;margin-top:.5rem}
+.sc-error.visible{display:block}
+
+.script-view{background:#05050a;border:1px solid var(--border);border-radius:8px;padding:.9rem;margin-top:.6rem;font-size:.82rem;line-height:1.6;color:var(--ink);white-space:pre-wrap;max-height:280px;overflow-y:auto;font-family:var(--fm)}
+
+/* Player overlay */
+.player-overlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;align-items:center;justify-content:center;cursor:pointer}
+.player-overlay.visible{display:flex}
+#player-canvas{display:block;max-width:100vw;max-height:100vh;background:#000}
+.player-hint{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.55);font-size:.75rem;font-family:var(--fm);letter-spacing:.15em;text-transform:uppercase;pointer-events:none;background:rgba(0,0,0,.5);padding:.35rem .8rem;border-radius:3px}
+
+/* Debug */
+.debug-toggle{position:fixed;bottom:1rem;right:1rem;z-index:300;width:44px;height:44px;border-radius:50%;background:var(--acc);color:var(--bg);border:none;cursor:pointer;font-size:1.1rem;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.debug-panel{position:fixed;bottom:0;left:0;right:0;height:200px;background:#05050a;border-top:2px solid var(--acc);z-index:250;display:none;flex-direction:column;font-family:var(--fm);box-shadow:0 -8px 32px rgba(0,0,0,.7)}
+.debug-panel.visible{display:flex}
+.debug-header{display:flex;justify-content:space-between;align-items:center;padding:.4rem .7rem;background:linear-gradient(90deg,#0f0f18,#1a1a28);border-bottom:1px solid var(--border);flex-shrink:0}
+.debug-title{font-size:.72rem;color:var(--acc);letter-spacing:.15em;text-transform:uppercase;font-weight:600}
+.debug-actions{display:flex;gap:.3rem}
+.debug-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:.62rem;padding:.28rem .55rem;border-radius:2px;cursor:pointer;font-family:inherit}
+.debug-body{flex:1;overflow-y:auto;padding:.5rem .7rem 1rem;font-size:.72rem;line-height:1.45;color:#c8c8d0}
+.debug-entry{margin-bottom:.25rem;padding:.2rem .4rem;border-left:2px solid transparent;word-break:break-word}
+.debug-entry.info{border-left-color:var(--faint)}
+.debug-entry.success{border-left-color:var(--ok);background:rgba(74,157,106,.04)}
+.debug-entry.warn{border-left-color:var(--warn);background:rgba(212,160,23,.04)}
+.debug-entry.error{border-left-color:var(--err);background:rgba(200,90,74,.06);color:#f0a0a0}
+.debug-time{color:var(--faint);margin-right:.4rem;font-size:.62rem}
+.debug-cat{color:var(--acc);font-weight:600;margin-right:.4rem;font-size:.62rem}
+.debug-msg{color:#d8d8e0}
+
+/* Toast */
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--bg3);color:var(--ink);border:1px solid var(--border);border-left:3px solid var(--acc);padding:.8rem 1.3rem;border-radius:var(--r);font-size:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:1000;opacity:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.2),opacity .35s;max-width:90vw;text-align:center;display:flex;align-items:center;gap:.5rem}
+.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{border-left-color:var(--ok)}
+.toast.error{border-left-color:var(--err)}
+.toast.warn{border-left-color:var(--warn)}
+
+.spinner{width:14px;height:14px;border:2px solid rgba(229,193,90,.2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.hint{font-size:.72rem;color:var(--dim);margin-top:.5rem;line-height:1.5}
+.hint a{color:var(--acc);text-decoration:none;border-bottom:1px dotted var(--acc)}
+
+@media(max-width:480px){
+body{padding-bottom:8rem}
+.row-2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Fiverr · Ad Production</div>
+  <h1>Pub Factory</h1>
+  <p class="sub">Du brief client à la pub vidéo, en un clic</p>
+</header>
+
+<!-- Clé API -->
+<div class="api-panel" id="api-panel">
+  <div class="ap-head">
+    <div class="ap-title">🔑 Clé API Agnes</div>
+    <a href="https://platform.agnes-ai.com" target="_blank" rel="noopener" class="ap-link">🌐 Ouvrir Agnes</a>
+  </div>
+  <input type="password" id="api-key-input" placeholder="sk-..." autocomplete="off" spellcheck="false">
+  <div class="ap-actions">
+    <button type="button" class="btn btn-mini" id="api-key-save">💾 Enregistrer</button>
+    <button type="button" class="btn btn-mini" id="api-key-toggle">👁</button>
+  </div>
+  <div class="ap-status" id="api-status"><span class="dot"></span><span id="api-status-text">Aucune clé</span></div>
+</div>
+
+<!-- ÉTAPE 1 : BRIEF -->
+<div class="panel">
+  <h2><span class="step-num">1</span> Le brief du client</h2>
+  <div class="row">
+    <label class="lb">Nom du client / marque</label>
+    <input type="text" id="b-brand" placeholder="ex : Kaya Café">
+  </div>
+  <div class="row">
+    <label class="lb">Produit à vendre</label>
+    <textarea id="b-product" placeholder="ex : Café éthiopien de spécialité, torréfié artisanalement"></textarea>
+  </div>
+  <div class="row">
+    <label class="lb">Public cible</label>
+    <input type="text" id="b-audience" placeholder="ex : Amateurs de café 25-40 ans">
+  </div>
+  <div class="row row-2">
+    <div>
+      <label class="lb">Ton</label>
+      <select id="b-tone">
+        <option value="luxe">✨ Luxe / Premium</option>
+        <option value="fun">😄 Fun / Décalé</option>
+        <option value="dramatique">🎬 Dramatique</option>
+        <option value="minimaliste">◻️ Minimaliste</option>
+        <option value="energique">⚡ Énergique</option>
+      </select>
+    </div>
+    <div>
+      <label class="lb">Plateforme</label>
+      <select id="b-platform">
+        <option value="tiktok">📱 TikTok</option>
+        <option value="reels">📷 Instagram Reels</option>
+        <option value="shorts">▶️ YouTube Shorts</option>
+        <option value="youtube">📺 YouTube</option>
+      </select>
+    </div>
+  </div>
+  <div class="row row-2">
+    <div>
+      <label class="lb">Format</label>
+      <select id="b-format">
+        <option value="9:16">9:16 (vertical)</option>
+        <option value="1:1">1:1 (carré)</option>
+        <option value="16:9">16:9 (paysage)</option>
+      </select>
+    </div>
+    <div>
+      <label class="lb">Durée</label>
+      <select id="b-duration">
+        <option value="3">3 plans — ~15s</option>
+        <option value="4" selected>4 plans — ~20s</option>
+        <option value="5">5 plans — ~25s</option>
+        <option value="6">6 plans — ~30s</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <label class="lb">Langue du texte à l'écran</label>
+    <select id="b-lang">
+      <option value="fr">Français</option>
+      <option value="en">Anglais</option>
+      <option value="es">Espagnol</option>
+      <option value="de">Allemand</option>
+      <option value="it">Italien</option>
+      <option value="pt">Portugais</option>
+    </select>
+  </div>
+</div>
+
+<!-- ÉTAPE 2 : LANCEMENT -->
+<div class="panel">
+  <h2><span class="step-num">2</span> Générer la pub</h2>
+  <p class="hint" style="margin-bottom:.8rem">L'IA va écrire le script, découper en plans, générer les images et créer les vidéos — tout automatiquement.</p>
+  <button type="button" class="btn btn-primary" id="generate-btn" disabled>
+    🎬 Générer ma pub
+  </button>
+  <button type="button" class="btn btn-mini btn-danger hidden" id="stop-btn" style="width:100%;margin-top:.5rem">⏹ Arrêter</button>
+  <div class="status" id="global-status"><span class="dot"></span><span id="global-status-text"></span></div>
+  <div class="pipeline" id="pipeline" style="display:none">
+    <div class="pipeline-step" data-step="script">
+      <div class="ps-icon">1</div>
+      <div class="ps-label">Script publicitaire</div>
+      <div class="ps-status">En attente</div>
+    </div>
+    <div class="pipeline-step" data-step="plans">
+      <div class="ps-icon">2</div>
+      <div class="ps-label">Découpage en plans</div>
+      <div class="ps-status">En attente</div>
+    </div>
+    <div class="pipeline-step" data-step="videos">
+      <div class="ps-icon">3</div>
+      <div class="ps-label">Génération vidéo</div>
+      <div class="ps-status">En attente</div>
+    </div>
+  </div>
+</div>
+
+<!-- Script (masqué au départ) -->
+<div class="panel hidden" id="script-panel">
+  <h2>📜 Script de la pub</h2>
+  <div class="script-view" id="script-view"></div>
+</div>
+
+<!-- Scènes (masqué au départ) -->
+<div class="panel hidden" id="scenes-panel">
+  <h2>🎞️ Plans de la pub <span id="scenes-count" style="color:var(--acc);font-size:.85rem;font-weight:400">0/0</span></h2>
+  <div class="scenes-list" id="scenes-list"></div>
+</div>
+
+<!-- Livraison (masqué au départ) -->
+<div class="panel hidden" id="delivery-panel">
+  <h2>📤 Livraison</h2>
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" id="play-film-btn" disabled>▶ Lire la pub</button>
+    <button type="button" class="btn" id="copy-message-btn">📋 Copier message client</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:.5rem;margin-top:.7rem;font-size:.78rem;color:var(--dim)">
+    <input type="checkbox" id="voice-toggle" checked style="width:auto;margin:0;accent-color:var(--acc)">
+    <label for="voice-toggle">Narration TTS française</label>
+  </div>
+</div>
+
+<!-- Player overlay -->
+<div class="player-overlay" id="player-overlay">
+  <canvas id="player-canvas"></canvas>
+  <div class="player-hint">Échap ou clic pour quitter</div>
+</div>
+
+<!-- Debug -->
+<button type="button" class="debug-toggle" id="debug-toggle">🖥️</button>
+<div class="debug-panel" id="debug-panel">
+  <div class="debug-header">
+    <div class="debug-title">Console · <span id="debug-count">0</span></div>
+    <div class="debug-actions">
+      <button type="button" id="debug-copy-btn">Copier</button>
+      <button type="button" id="debug-clear-btn">Effacer</button>
+      <button type="button" id="debug-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="debug-body" id="debug-body"></div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG — Identique à Portrait Film Studio (qui marche)
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+
+const API_KEY_STORAGE = 'pub_factory_key_v1';
+const DEBUG_MAX = 400;
+
+// Frames valides chez Agnes
+const VALID_FRAMES = [121, 145, 169, 241];
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  apiKey: '',
+  isRunning: false,
+  stopRequested: false,
+  script: null,
+  scenes: [],
+  isPlayingFilm: false,
+  playRAF: null,
+  voiceEnabled: true,
+  workingPollUrlBuilder: null
+};
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function nowTime(){return new Date().toLocaleTimeString('fr-FR',{hour12:false})}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+function sanitizeForApi(text){
+  if(text==null)return '';
+  return String(text)
+    .replace(/[\u2018\u2019\u201B\u2032\u02BC]/g, "'")
+    .replace(/[\u201C\u201D\u201F\u2033]/g, '"')
+    .replace(/\u2013/g, '-').replace(/\u2014/g, '--').replace(/\u2026/g, '...')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\u00A0/g, ' ').replace(/\u202F/g, ' ');
+}
+
+function snapToValidFrames(nf){
+  nf = parseInt(nf, 10) || 121;
+  return VALID_FRAMES.reduce((prev, curr) => Math.abs(curr - nf) < Math.abs(prev - nf) ? curr : prev);
+}
+
+let toastTimeout=null;
+function showToast(message,type='success',duration=2800){
+  const t=document.getElementById('toast');const i=document.getElementById('toast-icon');const x=document.getElementById('toast-text');
+  if(!t)return;
+  t.classList.remove('visible','success','error','warn');void t.offsetWidth;
+  const icons={success:'✓',error:'✕',warn:'⚠'};
+  i.textContent=icons[type]||'✓';x.textContent=message;t.classList.add(type);
+  requestAnimationFrame(()=>t.classList.add('visible'));
+  if(toastTimeout)clearTimeout(toastTimeout);
+  toastTimeout=setTimeout(()=>t.classList.remove('visible'),duration);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DEBUG
+// ══════════════════════════════════════════════════════════════════
+let debugCount=0,debugEntries=[];
+function debugLog(level,category,message){
+  const body=document.getElementById('debug-body');if(!body)return;
+  const time=nowTime();
+  const entry=document.createElement('div');
+  entry.className='debug-entry '+level;
+  entry.innerHTML='<span class="debug-time">'+time+'</span><span class="debug-cat">['+esc(category)+']</span><span class="debug-msg">'+esc(message)+'</span>';
+  body.appendChild(entry);
+  debugEntries.push({time,level,category,message});
+  if(debugEntries.length>DEBUG_MAX)debugEntries.shift();
+  while(body.children.length>DEBUG_MAX)body.removeChild(body.firstChild);
+  body.scrollTop=body.scrollHeight;
+  debugCount++;
+  const c=document.getElementById('debug-count');if(c)c.textContent=debugCount;
+}
+function clearDebug(){const b=document.getElementById('debug-body');if(b)b.innerHTML='';debugEntries=[];debugCount=0;const c=document.getElementById('debug-count');if(c)c.textContent='0'}
+function copyDebug(){
+  const lines=debugEntries.map(e=>e.time+' ['+e.category+'] '+e.message).join('\n');
+  const finish=(ok)=>showToast(ok?'Console copiée':'Copie impossible',ok?'success':'error');
+  try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(lines).then(()=>finish(true)).catch(()=>legacyCopy(lines,finish));return}}catch(e){}
+  legacyCopy(lines,finish);
+}
+function legacyCopy(text,cb){
+  const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  let ok=false;try{ok=document.execCommand('copy')}catch(e){}
+  document.body.removeChild(ta);cb(ok);
+}
+async function copyToClipboard(text){
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return true}}catch(e){}
+  return new Promise(r=>legacyCopy(text,r));
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PARSER JSON 5 STRATÉGIES
+// ══════════════════════════════════════════════════════════════════
+function balanceJson(text){
+  let ob=0,ok=0,inString=false,escape=false;
+  for(let i=0;i<text.length;i++){const ch=text[i];
+    if(escape){escape=false;continue}
+    if(ch==='\\'){escape=true;continue}
+    if(ch==='"'){inString=!inString;continue}
+    if(inString)continue;
+    if(ch==='{')ob++;else if(ch==='}')ob--;else if(ch==='[')ok++;else if(ch===']')ok--;
+  }
+  let r=text;if(inString)r+='"';
+  while(ok>0){r+=']';ok--}
+  while(ob>0){r+='}';ob--}
+  return r;
+}
+function fixUnquotedKeys(text){
+  let out='';let i=0;const n=text.length;let inString=false;let escape=false;const stack=[];let lastStructural='{';
+  while(i<n){const ch=text[i];
+    if(escape){out+=ch;escape=false;i++;continue}
+    if(ch==='\\'){out+=ch;escape=true;i++;continue}
+    if(inString){out+=ch;if(ch==='"')inString=false;i++;continue}
+    if(ch==='"'){inString=true;out+=ch;i++;continue}
+    if(ch==='{'){stack.push('{');lastStructural='{';out+=ch;i++;continue}
+    if(ch==='['){stack.push('[');lastStructural='[';out+=ch;i++;continue}
+    if(ch==='}'){if(stack.length)stack.pop();lastStructural='}';out+=ch;i++;continue}
+    if(ch===']'){if(stack.length)stack.pop();lastStructural=']';out+=ch;i++;continue}
+    if(ch===','){lastStructural=',';out+=ch;i++;continue}
+    if(ch===':'){lastStructural=':';out+=ch;i++;continue}
+    if(/\s/.test(ch)){out+=ch;i++;continue}
+    const top=stack[stack.length-1];
+    if((lastStructural==='{'||lastStructural===',') && top==='{' && /[A-Za-z_$]/.test(ch)){
+      let j=i;while(j<n && /[A-Za-z0-9_$]/.test(text[j]))j++;
+      let k=j;while(k<n && /\s/.test(text[k]))k++;
+      if(text[k]===':'){out+='"'+text.slice(i,j)+'"';i=j;continue}
+    }
+    out+=ch;i++;
+  }
+  return out;
+}
+function fixMissingCommas(text){
+  let out='';let i=0;const n=text.length;let inString=false;let escape=false;let justClosedValue=false;
+  while(i<n){const ch=text[i];
+    if(escape){out+=ch;escape=false;i++;continue}
+    if(ch==='\\'){out+=ch;escape=true;i++;continue}
+    if(inString){out+=ch;if(ch==='"'){inString=false;let j=i+1;while(j<n&&/\s/.test(text[j]))j++;justClosedValue=(text[j]!==':')}i++;continue}
+    if(/\s/.test(ch)){out+=ch;i++;continue}
+    if(justClosedValue && ch!==',' && ch!=='}' && ch!==']' && ch!==':'){out+=',';justClosedValue=false}
+    if(ch==='"'){inString=true;justClosedValue=false;out+=ch;i++;continue}
+    if(ch==='{'){justClosedValue=false;out+=ch;i++;continue}
+    if(ch==='['){justClosedValue=false;out+=ch;i++;continue}
+    if(ch==='}'){justClosedValue=true;out+=ch;i++;continue}
+    if(ch===']'){justClosedValue=true;out+=ch;i++;continue}
+    if(ch===','){justClosedValue=false;out+=ch;i++;continue}
+    if(ch===':'){justClosedValue=false;out+=ch;i++;continue}
+    justClosedValue=false;out+=ch;i++;
+  }
+  return out;
+}
+function repairJson(text){
+  if(!text)return null;
+  let c=String(text).trim();
+  const fm=c.match(/```(?:json)?\s*([\s\S]*?)```/);if(fm)c=fm[1].trim();
+  const fb=c.indexOf('{');if(fb<0)return null;
+  c=c.slice(fb);
+  const lb=c.lastIndexOf('}');if(lb>0)c=c.slice(0,lb+1);
+  let out='';let inString=false;let strDelim='"';let escape=false;
+  for(let i=0;i<c.length;i++){const ch=c[i];
+    if(escape){if('"\\/bfnrtu'.includes(ch))out+='\\'+ch;else out+=ch;escape=false;continue}
+    if(ch==='\\'){escape=true;continue}
+    if(ch==='"'||ch==="'"){
+      if(!inString){inString=true;strDelim=ch;out+='"';continue}
+      if(ch===strDelim){inString=false;out+='"';continue}
+      if(ch==='"'){out+='\\"';continue}
+      out+="'";continue;
+    }
+    if(inString){if(ch==='\n'){out+='\\n';continue}if(ch==='\r'){out+='\\r';continue}if(ch==='\t'){out+='\\t';continue}const code=ch.charCodeAt(0);if(code<32){out+='\\u'+code.toString(16).padStart(4,'0');continue}}
+    out+=ch;
+  }
+  if(escape)out+='\\';if(inString)out+='"';
+  try{out=fixUnquotedKeys(out)}catch(e){}
+  try{out=fixMissingCommas(out)}catch(e){}
+  out=out.replace(/,\s*([}\]])/g,'$1');
+  return out;
+}
+function extractJson(text){
+  if(!text)return null;
+  const repaired=repairJson(text);
+  if(!repaired){debugLog('error','PARSE','Aucun { trouvé');return null}
+  try{return JSON.parse(repaired)}
+  catch(e1){
+    debugLog('warn','PARSE','S1 échouée : '+e1.message.slice(0,80));
+    try{return JSON.parse(balanceJson(repaired))}
+    catch(e2){debugLog('error','PARSE','S2 échouée : '+e2.message.slice(0,80));return null}
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// APPEL TEXTE AGNES (identique à Portrait Film Studio)
+// ══════════════════════════════════════════════════════════════════
+async function callAgnes(systemPrompt, userPrompt, maxTokens=2000, temperature=0.8){
+  const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
+  if(!key) throw new Error('Clé API Agnes manquante');
+  const body = {
+    model: MODEL_TEXT,
+    messages: [
+      {role:'system', content: sanitizeForApi(systemPrompt) || 'Assistant.'},
+      {role:'user', content: sanitizeForApi(userPrompt)}
+    ],
+    temperature,
+    max_tokens: maxTokens,
+    response_format: {type: 'json_object'}
+  };
+  debugLog('info','TEXTE','POST /chat/completions');
+  const res = await fetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: {'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+  });
+  debugLog('info','TEXTE','HTTP '+res.status);
+  if(!res.ok){let err='';try{err=(await res.text()).slice(0,300)}catch(e){}throw new Error('HTTP '+res.status+' — '+err.slice(0,150))}
+  const data = await res.json();
+  const choice = data.choices && data.choices[0];
+  const msg = choice && choice.message;
+  let content = msg && msg.content;
+  if(!content && msg && msg.reasoning_content) content = msg.reasoning_content;
+  if(!content) throw new Error('Réponse vide');
+  debugLog('success','TEXTE','Reçu '+content.length+' chars');
+  return content;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// IMAGE
+// ══════════════════════════════════════════════════════════════════
+async function generateImage(prompt, ratio){
+  const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
+  const body = {
+    model: MODEL_IMAGE,
+    prompt: sanitizeForApi(prompt),
+    n: 1,
+    size: '1K',
+    ratio: ratio || '9:16'
+  };
+  debugLog('info','IMAGE','POST /images/generations');
+  const res = await fetch(API_BASE + '/images/generations', {
+    method: 'POST',
+    headers: {'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+  });
+  debugLog('info','IMAGE','HTTP '+res.status);
+  if(!res.ok){let err='';try{err=(await res.text()).slice(0,300)}catch(e){}throw new Error('HTTP '+res.status+' — '+err.slice(0,150))}
+  const data = await res.json();
+  const item = data.data && data.data[0];
+  if(!item) throw new Error('Pas d\'image retournée');
+  if(item.url) return item.url;
+  if(item.b64_json) return 'data:image/png;base64,'+item.b64_json;
+  throw new Error('Format image inconnu');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIDÉO — IDENTIQUE à Portrait Film Studio
+// ══════════════════════════════════════════════════════════════════
+function decodeCompositeId(composite){
+  if(!composite||typeof composite!=='string')return null;
+  if(!composite.startsWith('video_'))return null;
+  let b64=composite.slice(6);
+  while(b64.length%4)b64+='=';
+  try{const d=atob(b64);const m=d.match(/video_id:([^;]+)/);if(m&&m[1])return m[1].trim()}catch(e){}
+  return null;
+}
+
+async function createVideoTask(prompt, imageUrl, numFrames){
+  const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
+  const nf = snapToValidFrames(numFrames);
+  const body = {
+    model: MODEL_VIDEO,
+    prompt: sanitizeForApi(prompt),
+    num_frames: nf,
+    frame_rate: FRAME_RATE
+  };
+  if(imageUrl) body.image = imageUrl;
+  debugLog('info','VIDÉO','POST /videos · '+nf+' frames');
+  const res = await fetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: {'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    let err='';try{err=(await res.text()).slice(0,400)}catch(e){}
+    if(res.status===401) throw new Error('Clé API invalide (401)');
+    if(res.status===402) throw new Error('Crédits Agnes épuisés (402)');
+    if(res.status===403) throw new Error('Contenu refusé (403)');
+    if(res.status===429) throw new Error('Trop de requêtes — attends 1 min (429)');
+    throw new Error('HTTP '+res.status+' — '+err.slice(0,200));
+  }
+  const data = await res.json();
+  const compositeId = data.video_id || data.id || data.task_id;
+  if(!compositeId) throw new Error('Pas de video_id');
+  const innerId = decodeCompositeId(compositeId);
+  debugLog('success','VIDÉO','Tâche créée : '+String(compositeId).slice(0,30)+'…');
+  return { compositeId: String(compositeId), innerId };
+}
+
+function buildIdCandidates(videoIdObj){
+  const ids=[];
+  if(typeof videoIdObj==='string'){
+    ids.push({label:'composite',value:videoIdObj});
+    const inner=decodeCompositeId(videoIdObj);
+    if(inner&&inner!==videoIdObj)ids.push({label:'inner',value:inner});
+  } else if(videoIdObj&&typeof videoIdObj==='object'){
+    if(videoIdObj.compositeId)ids.push({label:'composite',value:videoIdObj.compositeId});
+    if(videoIdObj.innerId)ids.push({label:'inner',value:videoIdObj.innerId});
+  }
+  const seen=new Set();
+  return ids.filter(x=>{if(seen.has(x.value))return false;seen.add(x.value);return true});
+}
+
+const POLL_URL_BUILDERS=[
+  {name:'agnesapi',build:(id)=>POLL_BASE+'?video_id='+encodeURIComponent(id)+'&model_name='+encodeURIComponent(MODEL_VIDEO)},
+  {name:'v1-rest',build:(id)=>API_BASE+'/videos/'+encodeURIComponent(id)},
+  {name:'v1-status',build:(id)=>API_BASE+'/videos/'+encodeURIComponent(id)+'/status'},
+  {name:'v1-model',build:(id)=>API_BASE+'/videos/'+encodeURIComponent(id)+'?model_name='+encodeURIComponent(MODEL_VIDEO)}
+];
+
+async function pollVideo(videoIdObj, onProgress){
+  const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
+  const candidates = buildIdCandidates(videoIdObj);
+  if(!candidates.length) throw new Error('Aucun ID exploitable');
+
+  // Attente initiale 40s
+  let rem = 40;
+  while(rem>0){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+    onProgress('Préparation — '+rem+'s', 5);
+    await sleep(1000); rem--;
+  }
+
+  const intervals = [8,8,12,12,20,20,25];
+  let working = {builder: state.workingPollUrlBuilder || null, id: null};
+
+  for(let attempt=0; attempt<100; attempt++){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+
+    if(attempt>0){
+      const idx=Math.min(attempt-1,intervals.length-1);
+      let r=intervals[idx];
+      while(r>0){
+        if(state.stopRequested) throw new Error('Arrêt demandé');
+        onProgress('Création — '+r+'s', Math.min(95, 30+attempt*3));
+        await sleep(1000); r--;
+      }
+    }
+
+    const approaches=[];
+    if(working.builder && working.id){
+      approaches.push({builder:working.builder, id:working.id, priority:true});
+    }
+    for(const builder of POLL_URL_BUILDERS){
+      for(const cand of candidates){
+        if(!approaches.some(a=>a.builder===builder && a.id===cand.value)){
+          approaches.push({builder, id:cand.value});
+        }
+      }
+    }
+
+    for(const ap of approaches){
+      if(state.stopRequested) throw new Error('Arrêt demandé');
+      const url = ap.builder.build(ap.id);
+      try{
+        const res = await fetch(url, {headers:{'Authorization':'Bearer '+key}});
+        if(!res.ok) continue;
+        const d = await res.json();
+        if(!working.builder || !working.id){
+          working.builder = ap.builder;
+          working.id = ap.id;
+          state.workingPollUrlBuilder = ap.builder;
+          debugLog('success','POLL','Route OK : '+ap.builder.name);
+        }
+        const status = d.status || 'unknown';
+        const progress = d.progress || 0;
+        onProgress('Création — '+progress+'%', progress);
+        if(status==='completed' || status==='succeeded' || status==='done'){
+          const videoUrl = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+          if(!videoUrl) throw new Error('Terminé mais pas d\'URL');
+          return videoUrl;
+        }
+        if(status==='failed' || status==='error' || status==='cancelled'){
+          throw new Error('Échec Agnes ('+status+')');
+        }
+        break;
+      }catch(e){
+        if(e.message==='Arrêt demandé') throw e;
+        if(e.message.startsWith('Échec Agnes')) throw e;
+        if(e.message==='Terminé mais pas d\'URL') throw e;
+        continue;
+      }
+    }
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE : SCRIPT
+// ══════════════════════════════════════════════════════════════════
+async function generateScript(brief){
+  const prompt = [
+    'Tu es un publicitaire professionnel qui écrit des scripts de pubs courtes pour les réseaux sociaux.',
+    '',
+    'BRIEF CLIENT :',
+    '- Marque : '+brief.brand,
+    '- Produit : '+brief.product,
+    '- Public cible : '+brief.audience,
+    '- Ton : '+brief.tone,
+    '- Plateforme : '+brief.platform,
+    '- Format : '+brief.format,
+    '- Nombre de plans : '+brief.duration,
+    '',
+    'Écris une pub percutante avec cette structure :',
+    '- Accroche (1 seconde, doit captiver immédiatement)',
+    '- Développement (montre le produit, son bénéfice)',
+    '- Appel à l\'action (explicite, direct)',
+    '',
+    'Découpe aussi en '+brief.duration+' plans de 3-5 secondes chacun.',
+    '',
+    'JSON UNIQUEMENT (pas de markdown) :',
+    '{',
+    '  "title": "titre court de la pub",',
+    '  "hook": "phrase d\'accroche",',
+    '  "body": "développement en 15-25 mots",',
+    '  "cta": "appel à l\'action",',
+    '  "plans": [',
+    '    {',
+    '      "num": 1,',
+    '      "duration": 4,',
+    '      "description": "description visuelle en FR (ce qu\'on voit)",',
+    '      "imagePrompt": "prompt en anglais pour la première image",',
+    '      "videoPrompt": "prompt en anglais pour l\'animation entre les deux frames",',
+    '      "onScreenText": "texte court à afficher (3-6 mots)"',
+    '    }',
+    '    ... exactement '+brief.duration+' plans ...',
+    '  ]',
+    '}',
+    '',
+    'Règles : pas de présentateur parlant, pas de dialogue. Uniquement visuel + texte à l\'écran.'
+  ].join('\n');
+
+  const text = await callAgnes(
+    'Tu es un publicitaire. Tu réponds UNIQUEMENT en JSON valide, sans markdown. Toutes les chaînes sur une seule ligne.',
+    prompt, 3000, 0.8
+  );
+  const parsed = extractJson(text);
+  if(!parsed || !parsed.plans || !Array.isArray(parsed.plans)) throw new Error('Script invalide');
+  return parsed;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════════════════════════════
+function setPipelineStep(stepKey, status, statusText){
+  const el = document.querySelector('.pipeline-step[data-step="'+stepKey+'"]');
+  if(!el) return;
+  el.classList.remove('active','done','err');
+  if(status==='active') el.classList.add('active');
+  if(status==='done') el.classList.add('done');
+  if(status==='err') el.classList.add('err');
+  const s = el.querySelector('.ps-status');
+  if(s && statusText) s.textContent = statusText;
+}
+function showGlobalStatus(text, type){
+  const el = document.getElementById('global-status');
+  const tx = document.getElementById('global-status-text');
+  el.classList.remove('visible','ok','err');
+  if(!text){ el.classList.remove('visible'); return; }
+  el.classList.add('visible');
+  if(type==='ok') el.classList.add('ok');
+  if(type==='err') el.classList.add('err');
+  tx.textContent = text;
+}
+function renderScenes(){
+  const container = document.getElementById('scenes-list');
+  const countEl = document.getElementById('scenes-count');
+  if(!state.scenes.length){ container.innerHTML = ''; return; }
+  const done = state.scenes.filter(s=>s.status==='done').length;
+  if(countEl) countEl.textContent = done+'/'+state.scenes.length;
+
+  container.innerHTML = state.scenes.map((sc, i)=>{
+    const st = sc.status || 'pending';
+    const cls = st==='pending'?'':st==='loading'?'loading':st==='done'?'done':'error';
+    const stText = st==='pending'?'En attente':st==='loading'?'Génération…':st==='done'?'Terminé':'Erreur';
+    const stCls = st==='loading'?'running':st==='done'?'ok':'err';
+
+    let videoHTML = '';
+    if(st==='done' && sc.videoUrl){
+      videoHTML = '<div class="sc-video visible">'+
+        '<video src="'+esc(sc.videoUrl)+'" controls playsinline preload="metadata"></video>'+
+        '<div class="sv-meta"><span>Plan '+(i+1)+' · '+sc.duration+'s</span><span>'+(sc.onScreenText||'')+'</span></div>'+
+        '<div class="sv-actions">'+
+          '<a class="btn btn-mini" href="'+esc(sc.videoUrl)+'" download="plan_'+(i+1)+'.mp4" target="_blank" rel="noopener">⬇ Télécharger</a>'+
+        '</div>'+
+      '</div>';
+    }
+
+    const progHTML = (st==='loading')?
+      '<div class="sc-progress visible">'+
+        '<div class="sp-info"><span>'+(sc.progressMsg||'')+'</span><span>'+(sc.progress||0)+'%</span></div>'+
+        '<div class="pbar"><div class="pfill" style="width:'+(sc.progress||0)+'%"></div></div>'+
+      '</div>' : '';
+
+    const errHTML = (st==='error' && sc.error)?
+      '<div class="sc-error visible">✕ '+esc(sc.error)+'</div>' : '';
+
+    return '<div class="scene-card '+cls+'">'+
+      '<div class="sc-header"><div class="sc-num">🎬 Plan '+(i+1)+' · '+sc.duration+'s</div>'+
+      '<div class="sc-status '+stCls+'">'+stText+'</div></div>'+
+      '<div class="sc-desc">'+esc(sc.description||'')+'</div>'+
+      progHTML + errHTML + videoHTML+
+    '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIPELINE PRINCIPAL
+// ══════════════════════════════════════════════════════════════════
+async function generateAd(){
+  if(state.isRunning) return;
+  const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
+  if(!key){ showToast('Colle ta clé Agnes en haut','warn'); document.getElementById('api-key-input').focus(); return; }
+
+  const brief = {
+    brand: document.getElementById('b-brand').value.trim() || 'Marque',
+    product: document.getElementById('b-product').value.trim(),
+    audience: document.getElementById('b-audience').value.trim() || 'Grand public',
+    tone: document.getElementById('b-tone').value,
+    platform: document.getElementById('b-platform').value,
+    format: document.getElementById('b-format').value,
+    duration: parseInt(document.getElementById('b-duration').value, 10),
+    lang: document.getElementById('b-lang').value
+  };
+  if(!brief.product){ showToast('Renseigne le produit','warn'); document.getElementById('b-product').focus(); return; }
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  state.script = null;
+  state.scenes = [];
+  state.workingPollUrlBuilder = null;
+
+  document.getElementById('generate-btn').disabled = true;
+  document.getElementById('stop-btn').classList.remove('hidden');
+  document.getElementById('pipeline').style.display = 'block';
+  document.getElementById('script-panel').classList.add('hidden');
+  document.getElementById('scenes-panel').classList.add('hidden');
+  document.getElementById('delivery-panel').classList.add('hidden');
+  document.getElementById('scenes-list').innerHTML = '';
+
+  // Reset pipeline
+  ['script','plans','videos'].forEach(k=>{
+    const el = document.querySelector('.pipeline-step[data-step="'+k+'"]');
+    el.classList.remove('active','done','err');
+    el.querySelector('.ps-status').textContent = 'En attente';
+  });
+
+  try{
+    // ─── ÉTAPE 1 : SCRIPT ───
+    setPipelineStep('script','active','Génération…');
+    showGlobalStatus('L\'IA écrit le script publicitaire…');
+    debugLog('info','PIPELINE','Étape 1 : Script');
+
+    const script = await generateScript(brief);
+    state.script = script;
+
+    setPipelineStep('script','done', script.plans.length+' plans');
+    document.getElementById('script-view').innerHTML =
+      '<strong>'+esc(script.title || 'Publicité')+'</strong>\n\n'+
+      '🎯 Accroche : '+esc(script.hook||'')+'\n\n'+
+      '📢 Développement : '+esc(script.body||'')+'\n\n'+
+      '🎬 Appel à l\'action : '+esc(script.cta||'');
+    document.getElementById('script-panel').classList.remove('hidden');
+
+    // ─── ÉTAPE 2 : PLANS ───
+    setPipelineStep('plans','active','Préparation…');
+    showGlobalStatus('Découpage en plans…');
+    debugLog('info','PIPELINE','Étape 2 : Plans');
+
+    const plans = script.plans.slice(0, brief.duration);
+    state.scenes = plans.map(p=>({
+      num: p.num,
+      duration: Math.max(3, Math.min(5, parseInt(p.duration, 10) || 4)),
+      description: p.description || '',
+      imagePrompt: p.imagePrompt || p.description || '',
+      videoPrompt: p.videoPrompt || 'slow cinematic movement',
+      onScreenText: p.onScreenText || '',
+      status: 'pending',
+      progress: 0,
+      progressMsg: '',
+      imageUrl: null,
+      videoUrl: null,
+      error: null
+    }));
+    document.getElementById('scenes-panel').classList.remove('hidden');
+    renderScenes();
+
+    setPipelineStep('plans','done', plans.length+' plans');
+
+    // ─── ÉTAPE 3 : VIDÉOS ───
+    setPipelineStep('videos','active','Génération…');
+    debugLog('info','PIPELINE','Étape 3 : '+plans.length+' vidéos');
+
+    for(let i=0;i<state.scenes.length;i++){
+      if(state.stopRequested) break;
+      const sc = state.scenes[i];
+
+      try{
+        // Image de départ
+        sc.status = 'loading';
+        sc.progressMsg = 'Image…';
+        sc.progress = 5;
+        renderScenes();
+        showGlobalStatus('Plan '+(i+1)+'/'+state.scenes.length+' — image de départ…');
+
+        debugLog('info','PLAN '+(i+1),'Génération image');
+        const imgUrl = await generateImage(sc.imagePrompt, brief.format);
+        sc.imageUrl = imgUrl;
+        sc.progress = 25;
+        sc.progressMsg = 'Vidéo…';
+        renderScenes();
+
+        // Vidéo
+        const videoPrompt = [
+          'Cinematic advertising shot. '+sc.videoPrompt+'.',
+          'Professional product commercial style. High quality, modern, elegant.',
+          'Format: '+brief.format+'. No text overlay, no subtitles, no watermark.'
+        ].join(' ');
+
+        const numFrames = sc.duration * 24 + 1;
+        const idObj = await createVideoTask(videoPrompt, imgUrl, numFrames);
+        const videoUrl = await pollVideo(idObj, (msg, pct)=>{
+          sc.progressMsg = msg;
+          sc.progress = Math.max(sc.progress, pct || 0);
+          renderScenes();
+        });
+
+        sc.videoUrl = videoUrl;
+        sc.status = 'done';
+        sc.progress = 100;
+        sc.progressMsg = 'Terminé';
+        renderScenes();
+        debugLog('success','PLAN '+(i+1),'Vidéo prête');
+
+      }catch(e){
+        if(e.message==='Arrêt demandé') break;
+        debugLog('error','PLAN '+(i+1), e.message);
+        sc.status = 'error';
+        sc.error = e.message;
+        renderScenes();
+      }
+
+      // Pause entre plans (rate limit Agnes)
+      if(i < state.scenes.length-1 && !state.stopRequested){
+        for(let r=62;r>0;r--){
+          if(state.stopRequested) break;
+          showGlobalStatus('Pause '+r+'s avant le prochain plan…');
+          await sleep(1000);
+        }
+      }
+    }
+
+    setPipelineStep('videos','done', state.scenes.filter(s=>s.status==='done').length+'/'+state.scenes.length);
+
+    // ─── LIVRAISON ───
+    const doneCount = state.scenes.filter(s=>s.status==='done').length;
+    if(doneCount > 0){
+      document.getElementById('delivery-panel').classList.remove('hidden');
+      document.getElementById('play-film-btn').disabled = false;
+      showGlobalStatus('✓ Pub générée ('+doneCount+'/'+state.scenes.length+' plans)', 'ok');
+      showToast(doneCount+' plans générés ✓','success',4000);
+    } else {
+      showGlobalStatus('Aucun plan généré','err');
+      showToast('Aucun plan généré','error');
+    }
+
+  }catch(e){
+    debugLog('error','PIPELINE', e.message);
+    showGlobalStatus('Erreur : '+e.message.slice(0,80), 'err');
+    showToast('Erreur : '+e.message.slice(0,80),'error',4000);
+  }
+
+  state.isRunning = false;
+  state.stopRequested = false;
+  document.getElementById('generate-btn').disabled = false;
+  document.getElementById('stop-btn').classList.add('hidden');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PLAYER + TTS
+// ══════════════════════════════════════════════════════════════════
+let ttsVoice = null;
+function initTTS(){
+  if(!('speechSynthesis' in window)) return;
+  const update = ()=>{
+    const v = window.speechSynthesis.getVoices();
+    const fr = v.filter(x=>x.lang && x.lang.toLowerCase().startsWith('fr'));
+    ttsVoice = fr.find(x=>/premium|enhanced|amelie|thomas|audrey/i.test(x.name)) || fr[0] || null;
+    if(ttsVoice) debugLog('success','TTS','Voix : '+ttsVoice.name);
+  };
+  update();
+  window.speechSynthesis.onvoiceschanged = update;
+}
+function speakFR(text){
+  if(!state.voiceEnabled || !text) return;
+  if(!('speechSynthesis' in window)) return;
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR'; u.rate = 1.0; u.pitch = 1.0;
+    if(ttsVoice) u.voice = ttsVoice;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function stopTTS(){ try{ if('speechSynthesis' in window) window.speechSynthesis.cancel(); }catch(e){} }
+
+async function playFilm(){
+  const ready = state.scenes.filter(s=>s.status==='done' && s.videoUrl);
+  if(!ready.length){ showToast('Aucune vidéo','warn'); return; }
+  if(state.isPlayingFilm) return;
+
+  state.isPlayingFilm = true;
+  const overlay = document.getElementById('player-overlay');
+  const canvas = document.getElementById('player-canvas');
+  if(!overlay || !canvas) return;
+
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  canvas.width = Math.round(window.innerWidth * dpr);
+  canvas.height = Math.round(window.innerHeight * dpr);
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  const ctx = canvas.getContext('2d');
+  overlay.classList.add('visible');
+
+  try{
+    if('speechSynthesis' in window){
+      const u0 = new SpeechSynthesisUtterance(' ');
+      u0.volume = 0;
+      window.speechSynthesis.speak(u0);
+    }
+  }catch(e){}
+
+  for(let i=0;i<ready.length;i++){
+    if(!state.isPlayingFilm) break;
+    await playOneScene(ready[i], ctx, canvas, dpr);
+  }
+
+  stopFilmPlayback();
+  showToast('Lecture terminée');
+}
+
+function playOneScene(sc, ctx, canvas, dpr){
+  return new Promise((resolve)=>{
+    const video = document.createElement('video');
+    video.src = sc.videoUrl;
+    video.playsInline = true; video.muted = true;
+    let ttsFired = false, finished = false;
+    const finish = ()=>{ if(finished) return; finished = true; resolve(); };
+    const startTTS = ()=>{
+      if(ttsFired) return; ttsFired = true;
+      if(sc.onScreenText) speakFR(sc.onScreenText);
+    };
+    const ttsGuard = setTimeout(startTTS, 1500);
+
+    const drawOverlay = (w, h)=>{
+      const t = video.currentTime || 0;
+      const dur = video.duration || 6;
+      let alpha = 1;
+      if(t < 0.4) alpha = t/0.4;
+      else if(dur - t < 0.5) alpha = Math.max(0, (dur - t)/0.5);
+      if(alpha <= 0 || !sc.onScreenText) return;
+      const pad = Math.round(Math.min(30*dpr, w*0.03));
+      const bandH = Math.round(Math.min(100*dpr, h*0.17));
+      const bandY = h - bandH - pad;
+      const bandX = pad;
+      const bandW = w - pad*2;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      const grad = ctx.createLinearGradient(bandX, bandY, bandX, bandY + bandH);
+      grad.addColorStop(0, 'rgba(10,10,18,0)');
+      grad.addColorStop(0.35, 'rgba(10,10,18,0.85)');
+      grad.addColorStop(1, 'rgba(10,10,18,0.95)');
+      ctx.fillStyle = grad; ctx.fillRect(bandX, bandY, bandW, bandH);
+      ctx.fillStyle = '#e5c15a';
+      ctx.fillRect(bandX, bandY + Math.round(bandH*0.15), Math.round(5*dpr), bandH - Math.round(bandH*0.3));
+      const ts = Math.round(Math.min(22*dpr, h*0.032));
+      ctx.fillStyle = '#f5f0e1';
+      ctx.font = '500 ' + ts + 'px -apple-system, BlinkMacSystemFont, Helvetica, Arial';
+      ctx.textBaseline = 'top';
+      let txt = sc.onScreenText;
+      const maxW = bandW - Math.round(bandH*0.4);
+      while(ctx.measureText(txt).width > maxW && txt.length > 4){ txt = txt.slice(0,-4) + '…'; }
+      ctx.fillText(txt, bandX + Math.round(bandH*0.22), bandY + Math.round(bandH*0.35));
+      ctx.restore();
+    };
+    const draw = ()=>{
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const vw = video.videoWidth || 720, vh = video.videoHeight || 1280;
+      const ar = vw/vh, car = canvas.width/canvas.height;
+      let dw, dh, dx, dy;
+      if(ar > car){ dw = canvas.width; dh = canvas.width/ar; dx = 0; dy = (canvas.height - dh)/2; }
+      else { dh = canvas.height; dw = canvas.height*ar; dx = (canvas.width - dw)/2; dy = 0; }
+      try{ ctx.drawImage(video, dx, dy, dw, dh); }catch(e){}
+      drawOverlay(canvas.width, canvas.height);
+    };
+    const loop = ()=>{
+      if(!state.isPlayingFilm){ clearTimeout(ttsGuard); finish(); return; }
+      if(video.paused || video.ended){ clearTimeout(ttsGuard); finish(); return; }
+      draw();
+      state.playRAF = requestAnimationFrame(loop);
+    };
+    video.onloadedmetadata = ()=>{
+      clearTimeout(ttsGuard);
+      startTTS();
+      video.play().then(loop).catch(()=>{ startTTS(); finish(); });
+    };
+    video.oncanplay = startTTS;
+    video.onended = ()=>{ clearTimeout(ttsGuard); finish(); };
+    video.onerror = ()=>{ startTTS(); clearTimeout(ttsGuard); finish(); };
+    video.load();
+  });
+}
+function stopFilmPlayback(){
+  state.isPlayingFilm = false;
+  if(state.playRAF) cancelAnimationFrame(state.playRAF);
+  state.playRAF = null;
+  stopTTS();
+  const o = document.getElementById('player-overlay');
+  if(o) o.classList.remove('visible');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MESSAGE CLIENT
+// ══════════════════════════════════════════════════════════════════
+async function copyMessage(){
+  const brand = document.getElementById('b-brand').value.trim() || 'votre marque';
+  const product = document.getElementById('b-product').value.trim();
+  const doneCount = state.scenes.filter(s=>s.status==='done').length;
+  const totalDur = state.scenes.reduce((s,x)=>s+(parseInt(x.duration,10)||0), 0);
+
+  const msg = [
+    'Bonjour,',
+    '',
+    'Voici votre publicité finalisée :',
+    '',
+    '🎬 '+product,
+    '📱 '+doneCount+' plans · '+totalDur+' secondes',
+    '',
+    'Structure :',
+    '• Accroche : '+(state.script?.hook || ''),
+    '• Message : '+(state.script?.body || ''),
+    '• Appel à l\'action : '+(state.script?.cta || ''),
+    '',
+    'Chaque plan est livré en MP4. N\'hésitez pas à me faire un retour, je peux ajuster le montage, la musique ou le rythme rapidement.',
+    '',
+    'Merci pour votre confiance !',
+    'Bien à vous,'
+  ].join('\n');
+
+  const ok = await copyToClipboard(msg);
+  showToast(ok ? 'Message copié ✓' : 'Copie impossible', ok ? 'success' : 'error');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CLÉ API
+// ══════════════════════════════════════════════════════════════════
+function updateApiUI(){
+  const panel = document.getElementById('api-panel');
+  const input = document.getElementById('api-key-input');
+  const status = document.getElementById('api-status');
+  const text = document.getElementById('api-status-text');
+  const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
+  if(key){
+    input.value = key; panel.classList.add('ok'); status.classList.add('ok');
+    text.textContent = 'Clé active · '+key.slice(0,10)+'…'+key.slice(-4);
+  } else {
+    input.value = ''; panel.classList.remove('ok'); status.classList.remove('ok');
+    text.textContent = 'Aucune clé';
+  }
+  updateGenerateBtn();
+}
+function saveApiKey(){
+  const input = document.getElementById('api-key-input');
+  const key = input.value.trim();
+  if(!key){
+    localStorage.removeItem(API_KEY_STORAGE);
+    state.apiKey = '';
+    updateApiUI();
+    showToast('Clé supprimée','warn');
+    return;
+  }
+  if(!key.startsWith('sk-')){ if(!confirm('La clé ne commence pas par "sk-". Sauvegarder ?')) return; }
+  try{
+    localStorage.setItem(API_KEY_STORAGE, key);
+    state.apiKey = key;
+    updateApiUI();
+    debugLog('success','API','Clé enregistrée');
+    showToast('Clé enregistrée ✓');
+  }catch(e){ showToast('Erreur','error'); }
+}
+function updateGenerateBtn(){
+  const hasKey = !!(state.apiKey || localStorage.getItem(API_KEY_STORAGE));
+  const hasProduct = document.getElementById('b-product').value.trim().length > 0;
+  document.getElementById('generate-btn').disabled = !hasKey || !hasProduct || state.isRunning;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init(){
+  state.apiKey = localStorage.getItem(API_KEY_STORAGE) || '';
+  updateApiUI();
+  initTTS();
+
+  debugLog('success','INIT','Pub Factory prêt');
+  debugLog('info','INIT','Modèle texte : '+MODEL_TEXT);
+  debugLog('info','INIT','Modèle vidéo : '+MODEL_VIDEO);
+
+  document.getElementById('api-key-save').addEventListener('click', saveApiKey);
+  document.getElementById('api-key-input').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); saveApiKey(); }
+  });
+  document.getElementById('api-key-toggle').addEventListener('click', ()=>{
+    const inp = document.getElementById('api-key-input');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  });
+
+  document.getElementById('generate-btn').addEventListener('click', generateAd);
+  document.getElementById('stop-btn').addEventListener('click', ()=>{
+    state.stopRequested = true;
+    showGlobalStatus('Arrêt demandé…');
+    debugLog('warn','STOP','Arrêt demandé');
+  });
+
+  document.getElementById('play-film-btn').addEventListener('click', playFilm);
+  document.getElementById('player-overlay').addEventListener('click', stopFilmPlayback);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && state.isPlayingFilm) stopFilmPlayback(); });
+  document.getElementById('voice-toggle').addEventListener('change', e=>{
+    state.voiceEnabled = e.target.checked;
+    if(!state.voiceEnabled) stopTTS();
+  });
+  document.getElementById('copy-message-btn').addEventListener('click', copyMessage);
+
+  // Auto-update du bouton Generate
+  ['b-brand','b-product','b-audience'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', updateGenerateBtn);
+  });
+
+  document.getElementById('debug-toggle').addEventListener('click', ()=>document.getElementById('debug-panel').classList.toggle('visible'));
+  document.getElementById('debug-close-btn').addEventListener('click', ()=>document.getElementById('debug-panel').classList.remove('visible'));
+  document.getElementById('debug-clear-btn').addEventListener('click', clearDebug);
+  document.getElementById('debug-copy-btn').addEventListener('click', copyDebug);
+
+  document.addEventListener('submit', e=>{ e.preventDefault(); return false; }, true);
+})();
+</script>
+</body>
+</html>
