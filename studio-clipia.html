@@ -19,178 +19,80 @@
   --fm:ui-monospace,'SF Mono',Menlo,monospace;
 }
 html,body{background:var(--bg);overscroll-behavior:none}
-body{
-  font-family:var(--fs);background:var(--bg);color:var(--ink);
-  min-height:100vh;padding:1rem .8rem 8rem;font-size:15px;line-height:1.55;
-  max-width:900px;margin:0 auto;
-}
+body{font-family:var(--fs);background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem .8rem 8rem;font-size:15px;line-height:1.55;max-width:900px;margin:0 auto}
 h1,h2,h3{font-weight:500;letter-spacing:-.01em}
 h1{font-size:1.4rem}
 h2{font-size:1.05rem;color:var(--acc);margin-bottom:.7rem}
 h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.15em;color:var(--dim);margin-bottom:.6rem}
 
-header{
-  text-align:center;padding:.8rem 0 1.2rem;margin-bottom:.8rem;
-  border-bottom:1px solid var(--border);position:relative;
-}
-header .brand{
-  font-size:.62rem;letter-spacing:.3em;color:var(--acc);
-  text-transform:uppercase;opacity:.75;margin-bottom:.3rem;
-}
-header h1{
-  background:linear-gradient(135deg,var(--acc2),var(--acc));
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-}
+header{text-align:center;padding:.8rem 0 1.2rem;margin-bottom:.8rem;border-bottom:1px solid var(--border);position:relative}
+header .brand{font-size:.62rem;letter-spacing:.3em;color:var(--acc);text-transform:uppercase;opacity:.75;margin-bottom:.3rem}
+header h1{background:linear-gradient(135deg,var(--acc2),var(--acc));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 header .sub{font-size:.75rem;color:var(--dim);font-style:italic;margin-top:.2rem}
+header .settings-btn{
+  position:absolute;top:.5rem;right:0;background:transparent;border:1px solid var(--border);
+  color:var(--dim);width:40px;height:40px;border-radius:50%;cursor:pointer;
+  font-size:1.1rem;font-family:inherit;
+}
+header .settings-btn:hover{color:var(--acc);border-color:var(--acc)}
 
-/* ══════════ PANNEAU CLÉ API VISIBLE ══════════ */
-.api-key-panel{
-  background:linear-gradient(135deg,rgba(232,123,53,.08),rgba(229,193,90,.05));
-  border:1px solid var(--acc2);border-radius:var(--r);
-  padding:1rem 1.1rem;margin-bottom:1rem;position:relative;
-}
-.api-key-panel.ok{
-  background:linear-gradient(135deg,rgba(74,157,106,.08),rgba(74,157,106,.04));
-  border-color:var(--ok);
-}
-.api-key-panel .akp-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:.6rem;gap:.5rem;flex-wrap:wrap;
-}
-.api-key-panel .akp-title{
-  font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;
-  color:var(--acc);font-weight:700;display:flex;align-items:center;gap:.4rem;
-}
+/* ═══ PANNEAU CLÉ API ═══ */
+.api-key-panel{background:linear-gradient(135deg,rgba(232,123,53,.08),rgba(229,193,90,.05));border:1px solid var(--acc2);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:1rem}
+.api-key-panel.ok{background:linear-gradient(135deg,rgba(74,157,106,.08),rgba(74,157,106,.04));border-color:var(--ok)}
+.api-key-panel .akp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;gap:.5rem;flex-wrap:wrap}
+.api-key-panel .akp-title{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);font-weight:700}
 .api-key-panel.ok .akp-title{color:var(--ok)}
-.api-key-panel .akp-agness-link{
-  font-size:.68rem;color:var(--acc2);text-decoration:none;
-  border:1px solid var(--acc2);padding:.3rem .6rem;border-radius:4px;
-  display:inline-flex;align-items:center;gap:.3rem;transition:all .15s;
-  background:rgba(232,123,53,.06);font-weight:600;
-}
-.api-key-panel .akp-agness-link:hover{background:rgba(232,123,53,.15)}
-.api-key-panel input{
-  width:100%;padding:.85rem 1rem;border-radius:8px;
-  border:1px solid var(--border);background:var(--bg2);color:var(--ink);
-  font-family:var(--fm);font-size:.82rem;
-}
+.api-key-panel .akp-link{font-size:.68rem;color:var(--acc2);text-decoration:none;border:1px solid var(--acc2);padding:.3rem .6rem;border-radius:4px;background:rgba(232,123,53,.06);font-weight:600}
+.api-key-panel input{width:100%;padding:.85rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:var(--fm);font-size:.82rem}
 .api-key-panel input:focus{border-color:var(--acc);outline:none}
-.api-key-panel .akp-actions{
-  display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap;
-}
-.api-key-panel .akp-actions .btn{
-  flex:1;min-width:120px;margin-bottom:0;
-}
-.api-key-panel .akp-status{
-  font-size:.72rem;padding:.55rem .8rem;border-radius:6px;
-  background:var(--bg2);color:var(--dim);border:1px solid var(--border);
-  margin-top:.6rem;font-family:var(--fm);
-  display:flex;align-items:center;gap:.5rem;
-}
-.api-key-panel .akp-status.ok{
-  background:rgba(74,157,106,.08);color:var(--ok);
-  border-color:rgba(74,157,106,.3);
-}
-.api-key-panel .akp-status .dot{
-  width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0;
-}
-.api-key-panel .akp-status.ok .dot{
-  background:var(--ok);box-shadow:0 0 8px var(--ok);
-}
-.api-key-panel .akp-hint{
-  font-size:.7rem;color:var(--dim);margin-top:.6rem;line-height:1.5;
-}
-.api-key-panel .akp-hint ol{
-  padding-left:1.2rem;margin:.4rem 0 0;
-}
-.api-key-panel .akp-hint li{margin-bottom:.15rem}
+.api-key-panel .akp-actions{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
+.api-key-panel .akp-actions .btn{flex:1;min-width:120px;margin-bottom:0}
+.api-key-panel .akp-status{font-size:.72rem;padding:.55rem .8rem;border-radius:6px;background:var(--bg2);color:var(--dim);border:1px solid var(--border);margin-top:.6rem;font-family:var(--fm);display:flex;align-items:center;gap:.5rem}
+.api-key-panel .akp-status.ok{background:rgba(74,157,106,.08);color:var(--ok);border-color:rgba(74,157,106,.3)}
+.api-key-panel .akp-status .dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0}
+.api-key-panel .akp-status.ok .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.api-key-panel .akp-hint{font-size:.7rem;color:var(--dim);margin-top:.6rem;line-height:1.5}
+.api-key-panel .akp-hint ol{padding-left:1.2rem;margin:.4rem 0 0}
 .api-key-panel .akp-hint a{color:var(--acc);text-decoration:none;border-bottom:1px dotted var(--acc)}
 
-/* ══════════ PROGRESS ══════════ */
+/* ═══ PROGRESS ═══ */
 .progress-wrap{display:flex;gap:.3rem;margin:1rem 0 1.4rem;justify-content:space-between}
-.progress-step{
-  flex:1;text-align:center;padding:.55rem .3rem;border-radius:var(--r);
-  background:var(--panel);border:1px solid var(--border);
-  font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--faint);font-weight:600;cursor:pointer;transition:all .2s;
-}
+.progress-step{flex:1;text-align:center;padding:.55rem .3rem;border-radius:var(--r);background:var(--panel);border:1px solid var(--border);font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:600;cursor:pointer;transition:all .2s}
 .progress-step.active{color:var(--acc);border-color:var(--acc);background:rgba(229,193,90,.08)}
 .progress-step.done{color:var(--ok);border-color:rgba(74,157,106,.4);background:rgba(74,157,106,.08)}
 
-.panel{
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
-  padding:1rem 1.1rem;margin-bottom:.9rem;
-}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:.9rem}
 .panel.ok{box-shadow:inset 3px 0 0 var(--ok)}
 .panel .row{margin-bottom:.9rem}
 .panel .row:last-child{margin-bottom:0}
 
-label.lb{
-  display:block;font-size:.7rem;color:var(--dim);margin-bottom:.4rem;
-  text-transform:uppercase;letter-spacing:.12em;font-weight:600;
-}
+label.lb{display:block;font-size:.7rem;color:var(--dim);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
 
-input[type=text],input[type=password],input[type=number],textarea,select{
-  width:100%;padding:.85rem 1rem;border-radius:8px;
-  border:1px solid var(--border);background:var(--bg2);color:var(--ink);
-  font-family:inherit;font-size:.92rem;outline:none;transition:border-color .15s;
-  -webkit-appearance:none;appearance:none;
-}
+input[type=text],input[type=password],input[type=number],textarea,select{width:100%;padding:.85rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:inherit;font-size:.92rem;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
 input:focus,textarea:focus,select:focus{border-color:var(--acc)}
 textarea{resize:vertical;line-height:1.5;min-height:80px}
-select{
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>");
-  background-repeat:no-repeat;background-position:right 1rem center;background-size:10px;
-  padding-right:2rem;cursor:pointer;
-}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right 1rem center;background-size:10px;padding-right:2rem;cursor:pointer}
 select option{background:var(--bg2);color:var(--ink)}
 .row-2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 
-.btn{
-  width:100%;padding:.95rem 1.2rem;border-radius:var(--r);
-  border:1px solid var(--border);background:var(--bg2);color:var(--ink);
-  font-family:inherit;font-size:.88rem;font-weight:600;letter-spacing:.06em;
-  text-transform:uppercase;cursor:pointer;transition:all .15s;
-  min-height:48px;display:flex;align-items:center;justify-content:center;gap:.5rem;
-  -webkit-appearance:none;appearance:none;
-}
+.btn{width:100%;padding:.95rem 1.2rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:inherit;font-size:.88rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;min-height:48px;display:flex;align-items:center;justify-content:center;gap:.5rem;-webkit-appearance:none;appearance:none}
 .btn:hover:not(:disabled){background:var(--bg3);border-color:var(--acc)}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.35;cursor:not-allowed}
-.btn-primary{
-  border-color:var(--acc);
-  background:linear-gradient(135deg,rgba(232,123,53,.2),rgba(229,193,90,.15));
-  color:var(--acc);font-size:1rem;padding:1.1rem;letter-spacing:.15em;
-}
-.btn-mini{
-  padding:.5rem .8rem;font-size:.7rem;min-height:auto;width:auto;
-  display:inline-flex;letter-spacing:.08em;
-}
+.btn-primary{border-color:var(--acc);background:linear-gradient(135deg,rgba(232,123,53,.2),rgba(229,193,90,.15));color:var(--acc);font-size:1rem;padding:1.1rem;letter-spacing:.15em}
+.btn-mini{padding:.5rem .8rem;font-size:.7rem;min-height:auto;width:auto;display:inline-flex;letter-spacing:.08em}
+.btn-danger{border-color:var(--err);color:var(--err)}
 .btn-row{display:flex;gap:.5rem;flex-wrap:wrap}
 .btn-row .btn{flex:1;min-width:140px}
-.btn-danger{border-color:var(--err);color:var(--err)}
-.btn-danger:hover:not(:disabled){background:rgba(200,90,74,.08);border-color:var(--err)}
 
-.status{
-  font-size:.75rem;padding:.55rem .85rem;border-radius:8px;
-  display:flex;align-items:center;gap:.6rem;
-  background:var(--bg2);color:var(--dim);border:1px solid var(--border);
-  margin-bottom:.5rem;font-family:var(--fm);
-}
+.status{font-size:.75rem;padding:.55rem .85rem;border-radius:8px;display:flex;align-items:center;gap:.6rem;background:var(--bg2);color:var(--dim);border:1px solid var(--border);margin-bottom:.5rem;font-family:var(--fm)}
 .status.ok{background:rgba(74,157,106,.08);color:var(--ok);border-color:rgba(74,157,106,.3)}
 .status.err{background:rgba(200,90,74,.08);color:var(--err);border-color:rgba(200,90,74,.3)}
 .status .dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0}
 .status.ok .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
 .status.err .dot{background:var(--err);box-shadow:0 0 8px var(--err)}
 
-.toast{
-  position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-120px);
-  background:var(--bg3);color:var(--ink);border:1px solid var(--border);
-  border-left:3px solid var(--acc);padding:.8rem 1.3rem;border-radius:var(--r);
-  font-size:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.6);
-  z-index:1000;opacity:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.2),opacity .35s;
-  max-width:90vw;text-align:center;display:flex;align-items:center;gap:.5rem;
-}
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--bg3);color:var(--ink);border:1px solid var(--border);border-left:3px solid var(--acc);padding:.8rem 1.3rem;border-radius:var(--r);font-size:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:1000;opacity:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.2),opacity .35s;max-width:90vw;text-align:center;display:flex;align-items:center;gap:.5rem}
 .toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
 .toast.success{border-left-color:var(--ok)}
 .toast.error{border-left-color:var(--err)}
@@ -200,160 +102,116 @@ select option{background:var(--bg2);color:var(--ink)}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.screen-title{
-  display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;
-  font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--dim);font-weight:600;
-}
-.screen-title .num{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:26px;height:26px;border-radius:50%;
-  background:var(--acc);color:var(--bg);font-size:.72rem;font-weight:700;
-}
+.screen-title{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);font-weight:600}
+.screen-title .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--acc);color:var(--bg);font-size:.72rem;font-weight:700}
 
 .projects-panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);margin-bottom:1rem;overflow:hidden}
 .projects-header{padding:.8rem 1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
-.projects-header:active{background:var(--panel-2)}
 .projects-header .ptitle{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);font-weight:600}
 .projects-header .chev{font-size:.7rem;color:var(--faint);transition:transform .25s}
 .projects-panel.open .projects-header .chev{transform:rotate(180deg);color:var(--acc)}
 .projects-body{max-height:0;overflow:hidden;transition:max-height .3s}
-.projects-panel.open .projects-body{max-height:1200px}
+.projects-panel.open .projects-body{max-height:1400px}
 .projects-content{padding:.5rem 1rem 1rem}
-.project-item{
-  display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;
-  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
-  margin-bottom:.4rem;cursor:pointer;transition:all .15s;
-}
+.project-item{display:flex;align-items:center;gap:.7rem;padding:.7rem .8rem;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:.4rem;cursor:pointer;transition:all .15s}
 .project-item:hover{border-color:var(--acc)}
 .project-item.current{border-color:var(--acc);background:rgba(229,193,90,.06)}
 .project-item .pinfo{flex:1;min-width:0}
 .project-item .pname{font-size:.88rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .project-item .pmeta{font-size:.68rem;color:var(--faint);font-family:var(--fm);margin-top:.15rem}
-.project-item .pstatus{
-  font-size:.6rem;padding:.15rem .5rem;border-radius:3px;
-  text-transform:uppercase;letter-spacing:.08em;font-weight:700;flex-shrink:0;
-}
+.project-item .pstatus{font-size:.6rem;padding:.15rem .5rem;border-radius:3px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;flex-shrink:0}
 .pstatus.brief{background:rgba(138,136,150,.15);color:var(--dim);border:1px solid var(--border)}
 .pstatus.script{background:rgba(229,193,90,.15);color:var(--acc);border:1px solid rgba(229,193,90,.3)}
 .pstatus.plans{background:rgba(232,123,53,.15);color:var(--acc2);border:1px solid rgba(232,123,53,.3)}
 .pstatus.encours{background:rgba(74,123,200,.15);color:#6a9be0;border:1px solid rgba(74,123,200,.3)}
 .pstatus.livre{background:rgba(74,157,106,.15);color:var(--ok);border:1px solid rgba(74,157,106,.3)}
 .project-actions{display:flex;gap:.3rem;flex-shrink:0}
-.project-actions button{
-  background:transparent;border:1px solid var(--border);color:var(--dim);
-  padding:.3rem .5rem;border-radius:5px;font-size:.7rem;cursor:pointer;
-  font-family:inherit;
-}
+.project-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);padding:.3rem .5rem;border-radius:5px;font-size:.7rem;cursor:pointer;font-family:inherit}
 .project-actions button:hover{color:var(--acc);border-color:var(--acc)}
 
-.variant-card{
-  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
-  padding:.9rem;margin-bottom:.7rem;cursor:pointer;transition:all .15s;
-}
+.variant-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;margin-bottom:.7rem;cursor:pointer;transition:all .15s}
 .variant-card:hover{border-color:var(--acc2)}
 .variant-card.selected{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
-.variant-card .vhead{
-  display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;
-  font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--acc);font-weight:600;
-}
+.variant-card .vhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--acc);font-weight:600}
 .variant-card .vsection{margin-bottom:.4rem;font-size:.85rem}
-.variant-card .vsection strong{
-  display:inline-block;min-width:90px;font-size:.65rem;color:var(--faint);
-  text-transform:uppercase;letter-spacing:.08em;font-weight:600;
-}
+.variant-card .vsection strong{display:inline-block;min-width:90px;font-size:.65rem;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 
-.plan-card{
-  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
-  padding:.9rem 1rem;margin-bottom:.6rem;position:relative;
-}
+.plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;margin-bottom:.6rem;position:relative}
 .plan-card.dragging{opacity:.4}
 .plan-card.dragover{border-color:var(--acc);border-style:dashed}
-.plan-header{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:.7rem;padding-bottom:.5rem;border-bottom:1px dashed var(--border);
-}
-.plan-num{
-  font-size:.75rem;font-weight:700;color:var(--acc);
-  text-transform:uppercase;letter-spacing:.12em;
-  display:flex;align-items:center;gap:.5rem;
-}
+.plan-card.generating{border-color:var(--acc);box-shadow:0 0 0 2px rgba(229,193,90,.2)}
+.plan-card.done{border-color:var(--ok)}
+.plan-card.failed{border-color:var(--err)}
+.plan-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem;padding-bottom:.5rem;border-bottom:1px dashed var(--border)}
+.plan-num{font-size:.75rem;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:.5rem}
 .plan-drag{cursor:grab;color:var(--faint);font-size:1rem;padding:0 .3rem}
 .plan-actions{display:flex;gap:.3rem}
-.plan-actions button{
-  background:transparent;border:1px solid var(--border);color:var(--dim);
-  width:28px;height:28px;border-radius:5px;cursor:pointer;font-family:inherit;
-  font-size:.75rem;
-}
+.plan-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);width:28px;height:28px;border-radius:5px;cursor:pointer;font-family:inherit;font-size:.75rem}
 .plan-actions button:hover:not(:disabled){color:var(--acc);border-color:var(--acc)}
 .plan-actions button:disabled{opacity:.3;cursor:not-allowed}
 
-.prompt-block{
-  background:#05050a;border:1px solid var(--border);border-radius:8px;
-  padding:.7rem .85rem;margin-bottom:.6rem;font-family:var(--fm);font-size:.72rem;
-  line-height:1.5;color:#a8d8b0;white-space:pre-wrap;word-break:break-word;
-  max-height:220px;overflow-y:auto;position:relative;
-}
-.prompt-block .pb-label{
-  display:block;font-size:.62rem;color:var(--acc);letter-spacing:.12em;
-  text-transform:uppercase;font-weight:700;margin-bottom:.4rem;
-}
-.prompt-block .pb-copy{
-  position:absolute;top:.5rem;right:.5rem;
-  background:rgba(229,193,90,.15);border:1px solid var(--acc);
-  color:var(--acc);padding:.25rem .55rem;border-radius:4px;
-  font-size:.65rem;cursor:pointer;font-family:inherit;font-weight:600;
-}
-.prompt-block .pb-copy:hover{background:rgba(229,193,90,.25)}
-.prompt-block .pb-copy.copied{background:var(--ok);border-color:var(--ok);color:#fff}
+/* ═══ VIDÉO DE PLAN ═══ */
+.plan-video-area{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--border)}
+.plan-video-actions{display:flex;gap:.4rem;flex-wrap:wrap}
+.plan-video-actions .btn{margin-bottom:0;flex:1;min-width:100px;min-height:auto;padding:.6rem .8rem;font-size:.72rem}
+.plan-progress{margin-top:.6rem;display:none}
+.plan-progress.visible{display:block}
+.progress-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));border-radius:4px;transition:width .3s;width:0%}
+.progress-status{font-size:.7rem;color:var(--dim);font-family:var(--fm);margin-bottom:.4rem;display:flex;justify-content:space-between}
+.progress-status.ok{color:var(--ok)}
+.progress-status.err{color:var(--err)}
+.plan-video-preview{margin-top:.6rem;border-radius:6px;overflow:hidden;background:#000;display:none}
+.plan-video-preview.visible{display:block}
+.plan-video-preview video{width:100%;display:block;background:#000;max-height:400px}
+.plan-video-preview .video-meta{padding:.4rem .6rem;background:var(--bg3);font-size:.68rem;color:var(--dim);font-family:var(--fm);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.3rem}
+.plan-video-preview .video-actions{padding:.4rem .6rem;background:var(--panel);display:flex;gap:.4rem;flex-wrap:wrap;border-top:1px solid var(--border)}
+.plan-video-preview .video-actions .btn{margin-bottom:0;flex:1;min-width:100px;padding:.5rem .7rem;font-size:.7rem;min-height:auto}
+.plan-video-preview .video-actions .btn.validated{border-color:var(--ok);color:var(--ok);background:rgba(74,157,106,.08)}
+.plan-video-preview .video-actions .btn.rejected{border-color:var(--err);color:var(--err);background:rgba(200,90,74,.08)}
+.video-error{margin-top:.5rem;padding:.6rem .8rem;background:rgba(200,90,74,.1);border:1px solid rgba(200,90,74,.3);border-radius:6px;font-size:.75rem;color:var(--err);display:none}
+.video-error.visible{display:block}
 
-.checklist-item{
-  display:flex;align-items:center;gap:.7rem;padding:.75rem .9rem;
-  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
-  margin-bottom:.4rem;cursor:pointer;user-select:none;transition:all .15s;
-}
-.checklist-item:hover{border-color:var(--acc2)}
-.checklist-item.done{background:rgba(74,157,106,.06);border-color:rgba(74,157,106,.4)}
-.checklist-item .chk{
-  width:24px;height:24px;border-radius:6px;border:2px solid var(--faint);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-size:14px;color:transparent;transition:all .15s;
-}
-.checklist-item.done .chk{background:var(--ok);border-color:var(--ok);color:#fff}
-.checklist-item .chk-label{flex:1;font-size:.88rem}
+/* ═══ ASSEMBLAGE ═══ */
+.audio-drop{border:2px dashed var(--border);border-radius:8px;padding:1.2rem;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg2);margin-top:.6rem}
+.audio-drop:hover{border-color:var(--acc);background:rgba(229,193,90,.03)}
+.audio-drop input{display:none}
+.audio-drop .ad-icon{font-size:1.6rem;opacity:.6;margin-bottom:.3rem}
+.audio-drop .ad-title{font-size:.85rem;color:var(--ink)}
+.audio-drop .ad-hint{font-size:.7rem;color:var(--dim);margin-top:.2rem}
+.audio-loaded{padding:.6rem .8rem;background:rgba(74,157,106,.08);border:1px solid rgba(74,157,106,.3);border-radius:6px;font-size:.78rem;color:var(--ok);display:flex;justify-content:space-between;align-items:center;gap:.5rem;margin-top:.6rem}
+.audio-loaded button{background:transparent;border:1px solid var(--err);color:var(--err);padding:.2rem .5rem;border-radius:4px;font-size:.65rem;cursor:pointer;font-family:inherit}
+.final-preview{margin-top:.8rem;border-radius:8px;overflow:hidden;background:#000;display:none}
+.final-preview.visible{display:block}
+.final-preview video{width:100%;display:block;background:#000}
+.final-preview .fp-actions{background:var(--panel);padding:.6rem .8rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.final-preview .fp-actions .btn{margin-bottom:0;flex:1;min-width:140px}
 
-.delivery-text{
-  background:#05050a;border:1px solid var(--border);border-radius:8px;
-  padding:1rem;font-family:var(--fm);font-size:.75rem;line-height:1.6;
-  color:#c8d8c8;white-space:pre-wrap;word-break:break-word;
-  max-height:340px;overflow-y:auto;margin-bottom:.6rem;
-}
+/* ═══ PARAMÈTRES MODAL ═══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.visible{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);max-width:600px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{margin:0;font-size:1rem}
+.modal-header button{background:transparent;border:none;color:var(--dim);font-size:1.4rem;cursor:pointer;padding:0;width:32px;height:32px;border-radius:50%;font-family:inherit}
+.modal-header button:hover{background:var(--bg3);color:var(--acc)}
+.modal-body{padding:1.2rem}
+.modal-body .setting-row{display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:1px dashed var(--border);font-size:.85rem;gap:.6rem;flex-wrap:wrap}
+.modal-body .setting-row:last-child{border-bottom:none}
+.modal-body .setting-row .label-col{flex:1;min-width:160px}
+.modal-body .setting-row .label-col strong{display:block;color:var(--ink);font-weight:600}
+.modal-body .setting-row .label-col small{display:block;color:var(--dim);font-size:.72rem;margin-top:.15rem}
+.modal-body .badge-ok{padding:.2rem .6rem;background:rgba(74,157,106,.15);color:var(--ok);border:1px solid rgba(74,157,106,.4);border-radius:4px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm)}
+.modal-body .badge-err{padding:.2rem .6rem;background:rgba(200,90,74,.15);color:var(--err);border:1px solid rgba(200,90,74,.4);border-radius:4px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm)}
+.modal-body .modal-note{font-size:.72rem;color:var(--dim);padding:.7rem .9rem;background:var(--bg2);border-radius:6px;margin-top:.6rem;line-height:1.5;border-left:3px solid var(--acc2)}
 
-.debug-toggle{
-  position:fixed;bottom:1rem;right:1rem;z-index:300;
-  width:44px;height:44px;border-radius:50%;
-  background:var(--acc);color:var(--bg);border:none;cursor:pointer;
-  font-size:1.1rem;box-shadow:0 4px 20px rgba(0,0,0,.6);
-}
-.debug-panel{
-  position:fixed;bottom:0;left:0;right:0;height:200px;
-  background:#05050a;border-top:2px solid var(--acc);
-  z-index:250;display:none;flex-direction:column;
-  font-family:var(--fm);box-shadow:0 -8px 32px rgba(0,0,0,.7);
-}
+.debug-toggle{position:fixed;bottom:1rem;right:1rem;z-index:300;width:44px;height:44px;border-radius:50%;background:var(--acc);color:var(--bg);border:none;cursor:pointer;font-size:1.1rem;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.debug-panel{position:fixed;bottom:0;left:0;right:0;height:200px;background:#05050a;border-top:2px solid var(--acc);z-index:250;display:none;flex-direction:column;font-family:var(--fm);box-shadow:0 -8px 32px rgba(0,0,0,.7)}
 .debug-panel.visible{display:flex}
-.debug-header{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:.4rem .7rem;background:linear-gradient(90deg,#0f0f18,#1a1a28);
-  border-bottom:1px solid var(--border);flex-shrink:0;
-}
+.debug-header{display:flex;justify-content:space-between;align-items:center;padding:.4rem .7rem;background:linear-gradient(90deg,#0f0f18,#1a1a28);border-bottom:1px solid var(--border);flex-shrink:0}
 .debug-title{font-size:.72rem;color:var(--acc);letter-spacing:.15em;text-transform:uppercase;font-weight:600}
 .debug-actions{display:flex;gap:.3rem}
-.debug-actions button{
-  background:transparent;border:1px solid var(--border);color:var(--dim);
-  font-size:.62rem;padding:.28rem .55rem;border-radius:2px;cursor:pointer;
-  font-family:inherit;
-}
+.debug-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:.62rem;padding:.28rem .55rem;border-radius:2px;cursor:pointer;font-family:inherit}
 .debug-body{flex:1;overflow-y:auto;padding:.5rem .7rem 1rem;font-size:.72rem;line-height:1.45;color:#c8c8d0}
 .debug-entry{margin-bottom:.25rem;padding:.2rem .4rem;border-left:2px solid transparent;word-break:break-word}
 .debug-entry.info{border-left-color:var(--faint)}
@@ -367,36 +225,32 @@ select option{background:var(--bg2);color:var(--ink)}
 .hint{font-size:.72rem;color:var(--dim);margin-top:.5rem;line-height:1.5}
 .hint a{color:var(--acc);text-decoration:none;border-bottom:1px dotted var(--acc)}
 .empty{text-align:center;color:var(--faint);font-size:.82rem;padding:2rem 1rem;font-style:italic}
-.spinner{
-  width:14px;height:14px;border:2px solid rgba(229,193,90,.2);
-  border-top-color:var(--acc);border-radius:50%;
-  animation:spin .8s linear infinite;display:inline-block;
-}
+.spinner{width:14px;height:14px;border:2px solid rgba(229,193,90,.2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 .hidden{display:none!important}
 
 @media(max-width:480px){
   body{padding-bottom:9rem}
   .row-2{grid-template-columns:1fr}
+  .modal-body .setting-row{flex-direction:column;align-items:flex-start}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════ HEADER ═══════════ -->
+<!-- ═══ HEADER ═══ -->
 <header>
+  <button type="button" class="settings-btn" id="open-settings" title="Paramètres">⚙️</button>
   <div class="brand">Fiverr · Freelance Studio</div>
   <h1>Studio Clip IA</h1>
   <p class="sub">Du brief client à la livraison · Propulsé par Agnes AI</p>
 </header>
 
-<!-- ═══════════ CLÉ API AGNES — VISIBLE EN PERMANENCE ═══════════ -->
+<!-- ═══ CLÉ API AGNES (texte) ═══ -->
 <div class="api-key-panel" id="api-key-panel">
   <div class="akp-header">
-    <div class="akp-title">🔑 Clé API Agnes</div>
-    <a href="https://platform.agnes-ai.com" target="_blank" rel="noopener" class="akp-agness-link">
-      🌐 Ouvrir Agnes
-    </a>
+    <div class="akp-title">🔑 Clé API Agnes (texte)</div>
+    <a href="https://platform.agnes-ai.com" target="_blank" rel="noopener" class="akp-link">🌐 Ouvrir Agnes</a>
   </div>
   <input type="password" id="api-key-input" placeholder="Colle ta clé ici (sk-...)" autocomplete="off" spellcheck="false">
   <div class="akp-actions">
@@ -404,111 +258,84 @@ select option{background:var(--bg2);color:var(--ink)}
     <button type="button" class="btn btn-mini" id="api-key-toggle">👁 Afficher</button>
   </div>
   <div class="akp-status" id="api-key-status">
-    <span class="dot"></span>
-    <span id="api-key-status-text">Aucune clé enregistrée</span>
+    <span class="dot"></span><span id="api-key-status-text">Aucune clé enregistrée</span>
   </div>
   <div class="akp-hint">
-    <strong>Comment obtenir ta clé gratuite :</strong>
-    <ol>
-      <li>Va sur <a href="https://platform.agnes-ai.com" target="_blank" rel="noopener">platform.agnes-ai.com</a></li>
-      <li>Connecte-toi ou crée un compte</li>
-      <li><strong>Settings → API Keys → Create</strong></li>
-      <li>Copie la clé (commence par <code>sk-</code>) et colle-la ci-dessus</li>
-    </ol>
-    Ta clé reste dans ton navigateur, jamais envoyée ailleurs qu'à Agnes.
+    <strong>Cette clé sert au texte</strong> (script, plans, prompts). La clé pour la <strong>génération vidéo</strong> est configurée côté serveur (fichier <code>.env</code>).
   </div>
 </div>
 
-<!-- ═══════════ PROGRESS BAR ═══════════ -->
+<!-- ═══ PROGRESS ═══ -->
 <div class="progress-wrap" id="progress-wrap">
   <div class="progress-step" data-step="0">1 · Brief</div>
   <div class="progress-step" data-step="1">2 · Script</div>
   <div class="progress-step" data-step="2">3 · Plans</div>
-  <div class="progress-step" data-step="3">4 · Prompts</div>
-  <div class="progress-step" data-step="4">5 · Livraison</div>
+  <div class="progress-step" data-step="3">4 · Vidéo</div>
+  <div class="progress-step" data-step="4">5 · Prompts</div>
+  <div class="progress-step" data-step="5">6 · Livraison</div>
 </div>
 
-<!-- ═══════════ PROJETS ═══════════ -->
+<!-- ═══ PROJETS ═══ -->
 <div class="projects-panel" id="projects-panel">
   <div class="projects-header" id="projects-header">
     <span class="ptitle">📁 Mes projets <span id="projects-count" style="color:var(--acc)">(0)</span></span>
     <span class="chev">▼</span>
   </div>
-  <div class="projects-body">
-    <div class="projects-content">
-      <div class="btn-row" style="margin-bottom:.7rem">
-        <button type="button" class="btn btn-mini" id="new-project-btn">＋ Nouveau projet</button>
-        <button type="button" class="btn btn-mini" id="export-all-btn">⬇ Export JSON</button>
-        <button type="button" class="btn btn-mini" id="import-btn">⬆ Import</button>
-        <input type="file" id="import-file" accept="application/json" class="hidden">
-      </div>
-      <div id="projects-list"></div>
+  <div class="projects-body"><div class="projects-content">
+    <div class="btn-row" style="margin-bottom:.7rem">
+      <button type="button" class="btn btn-mini" id="new-project-btn">＋ Nouveau projet</button>
+      <button type="button" class="btn btn-mini" id="export-all-btn">⬇ Export JSON</button>
+      <button type="button" class="btn btn-mini" id="import-btn">⬆ Import</button>
+      <input type="file" id="import-file" accept="application/json" class="hidden">
     </div>
-  </div>
+    <div id="projects-list"></div>
+  </div></div>
 </div>
 
-<!-- ═══════════ ÉCRAN 1 : BRIEF ═══════════ -->
+<!-- ═══ ÉCRAN 1 : BRIEF ═══ -->
 <div class="screen active" id="screen-brief">
   <div class="screen-title"><span class="num">1</span> Brief client</div>
-
   <div class="panel">
-    <div class="row">
-      <label class="lb">Nom du client</label>
-      <input type="text" id="b-client" placeholder="ex : Marie Dupont / Marque Kaya">
-    </div>
-    <div class="row">
-      <label class="lb">Produit / sujet</label>
-      <textarea id="b-product" placeholder="ex : Une montre connectée élégante, un festival de jazz, une formation en ligne…"></textarea>
-    </div>
-    <div class="row">
-      <label class="lb">Public cible</label>
-      <input type="text" id="b-audience" placeholder="ex : jeunes actifs urbains 25-35 ans">
-    </div>
+    <div class="row"><label class="lb">Nom du client</label>
+      <input type="text" id="b-client" placeholder="ex : Marie Dupont / Marque Kaya"></div>
+    <div class="row"><label class="lb">Produit / sujet</label>
+      <textarea id="b-product" placeholder="ex : Une montre connectée élégante, un festival de jazz…"></textarea></div>
+    <div class="row"><label class="lb">Public cible</label>
+      <input type="text" id="b-audience" placeholder="ex : jeunes actifs urbains 25-35 ans"></div>
     <div class="row row-2">
-      <div>
-        <label class="lb">Objectif</label>
+      <div><label class="lb">Objectif</label>
         <select id="b-objective">
           <option value="vendre">💰 Vendre</option>
           <option value="connaitre">📢 Faire connaître</option>
           <option value="divertir">🎭 Divertir</option>
-        </select>
-      </div>
-      <div>
-        <label class="lb">Ton</label>
+        </select></div>
+      <div><label class="lb">Ton</label>
         <select id="b-tone">
           <option value="luxe">✨ Luxe</option>
           <option value="fun">😄 Fun</option>
           <option value="dramatique">🎬 Dramatique</option>
           <option value="minimaliste">◻️ Minimaliste</option>
-        </select>
-      </div>
+        </select></div>
     </div>
     <div class="row row-2">
-      <div>
-        <label class="lb">Plateforme</label>
+      <div><label class="lb">Plateforme</label>
         <select id="b-platform">
           <option value="reels">📱 Reels</option>
           <option value="tiktok">🎵 TikTok</option>
           <option value="shorts">▶️ Shorts</option>
           <option value="youtube">📺 YouTube</option>
-        </select>
-      </div>
-      <div>
-        <label class="lb">Format</label>
+        </select></div>
+      <div><label class="lb">Format</label>
         <select id="b-format">
           <option value="9:16">9:16 (vertical)</option>
           <option value="1:1">1:1 (carré)</option>
           <option value="16:9">16:9 (paysage)</option>
-        </select>
-      </div>
+        </select></div>
     </div>
     <div class="row row-2">
-      <div>
-        <label class="lb">Durée totale (5 à 60 s)</label>
-        <input type="number" id="b-duration" min="5" max="60" value="15">
-      </div>
-      <div>
-        <label class="lb">Langue du texte à l'écran</label>
+      <div><label class="lb">Durée totale (5-60 s)</label>
+        <input type="number" id="b-duration" min="5" max="60" value="15"></div>
+      <div><label class="lb">Langue du texte</label>
         <select id="b-lang">
           <option value="fr">Français</option>
           <option value="en">Anglais</option>
@@ -516,92 +343,143 @@ select option{background:var(--bg2);color:var(--ink)}
           <option value="de">Allemand</option>
           <option value="it">Italien</option>
           <option value="pt">Portugais</option>
-        </select>
-      </div>
+        </select></div>
     </div>
   </div>
-
   <button type="button" class="btn btn-primary" id="goto-script">➜ Générer le script narratif</button>
 </div>
 
-<!-- ═══════════ ÉCRAN 2 : SCRIPT ═══════════ -->
+<!-- ═══ ÉCRAN 2 : SCRIPT ═══ -->
 <div class="screen" id="screen-script">
   <div class="screen-title"><span class="num">2</span> Script narratif</div>
-
   <div class="panel">
     <h2>🎬 Mini-histoire en 3 temps</h2>
-    <p class="hint">L'IA propose 3 variantes : accroche (1ère seconde), progression, chute avec CTA. Clique sur celle que tu préfères, ou modifie le texte.</p>
+    <p class="hint">L'IA propose 3 variantes : accroche, progression, chute avec CTA. Clique sur celle que tu préfères.</p>
     <div class="btn-row" style="margin-top:.8rem">
       <button type="button" class="btn btn-primary" id="gen-script-btn">✨ Générer 3 variantes</button>
       <button type="button" class="btn btn-mini" id="manual-script-btn">✎ Saisie manuelle</button>
     </div>
     <div class="status hidden" id="script-status"><span class="dot"></span><span id="script-status-text"></span></div>
   </div>
-
   <div id="script-variants"></div>
-
   <div class="btn-row" style="margin-top:1rem">
     <button type="button" class="btn" id="back-to-brief">← Retour</button>
     <button type="button" class="btn btn-primary" id="goto-plans">➜ Découpage en plans</button>
   </div>
 </div>
 
-<!-- ═══════════ ÉCRAN 3 : PLANS ═══════════ -->
+<!-- ═══ ÉCRAN 3 : PLANS ═══ -->
 <div class="screen" id="screen-plans">
   <div class="screen-title"><span class="num">3</span> Découpage en plans</div>
-
   <div class="panel">
     <h2>🎞️ Plans du clip</h2>
-    <p class="hint">Chaque plan dure 3 à 5 s. Glisse-dépose pour réordonner (ou utilise les flèches ↑ ↓ sur mobile).</p>
+    <p class="hint">Chaque plan dure 3 à 5 s. Glisse-dépose pour réordonner.</p>
     <div class="btn-row" style="margin-top:.8rem">
       <button type="button" class="btn btn-primary" id="gen-plans-btn">✨ Générer les plans</button>
       <button type="button" class="btn btn-mini" id="add-plan-btn">＋ Ajouter un plan</button>
     </div>
     <div class="status hidden" id="plans-status"><span class="dot"></span><span id="plans-status-text"></span></div>
   </div>
-
   <div id="plans-list"></div>
-
   <div class="btn-row" style="margin-top:1rem">
     <button type="button" class="btn" id="back-to-script">← Retour</button>
-    <button type="button" class="btn btn-primary" id="goto-prompts">➜ Prompts prêts</button>
+    <button type="button" class="btn btn-primary" id="goto-video">➜ Générer les vidéos</button>
   </div>
 </div>
 
-<!-- ═══════════ ÉCRAN 4 : PROMPTS ═══════════ -->
-<div class="screen" id="screen-prompts">
-  <div class="screen-title"><span class="num">4</span> Prompts prêts à copier</div>
+<!-- ═══ ÉCRAN 4 : GÉNÉRATION VIDÉO (NOUVEAU) ═══ -->
+<div class="screen" id="screen-video">
+  <div class="screen-title"><span class="num">4</span> Génération vidéo</div>
 
   <div class="panel">
+    <h2>🎥 Génération des clips IA</h2>
+    <p class="hint">Chaque plan est envoyé à Agnes Video. Les vidéos sont générées une par une (rate limit : 1 vidéo / 60 s).</p>
+    <div class="btn-row" style="margin-top:.8rem">
+      <button type="button" class="btn btn-primary" id="gen-all-videos-btn">▶ Tout générer</button>
+      <button type="button" class="btn btn-mini" id="refresh-cost-btn">💰 Estimation</button>
+    </div>
+    <div class="status" id="video-status-global" style="margin-top:.6rem">
+      <span class="dot"></span>
+      <span id="video-status-global-text">En attente</span>
+    </div>
+    <div class="modal-note" id="cost-estimate" style="display:none;margin-top:.7rem"></div>
+  </div>
+
+  <div class="panel">
+    <h3>📋 Actions groupées</h3>
+    <div class="btn-row">
+      <button type="button" class="btn btn-mini" id="validate-all-btn">✔ Tout valider</button>
+      <button type="button" class="btn btn-mini" id="reset-videos-btn">↺ Réinitialiser</button>
+    </div>
+  </div>
+
+  <div id="video-plans-list"></div>
+
+  <div class="btn-row" style="margin-top:1rem">
+    <button type="button" class="btn" id="back-to-plans">← Retour</button>
+    <button type="button" class="btn btn-primary" id="goto-assembly">➜ Assemblage final</button>
+  </div>
+</div>
+
+<!-- ═══ ÉCRAN 5 : PROMPTS ═══ -->
+<div class="screen" id="screen-prompts">
+  <div class="screen-title"><span class="num">5</span> Prompts prêts à copier</div>
+  <div class="panel">
     <h2>🎨 Bloc de style commun</h2>
-    <p class="hint">Ce bloc est répété dans tous les plans pour garantir la cohérence visuelle du clip.</p>
+    <p class="hint">Ce bloc est répété dans tous les plans pour garantir la cohérence visuelle.</p>
     <div class="btn-row" style="margin-top:.8rem">
       <button type="button" class="btn btn-primary" id="gen-prompts-btn">✨ Générer tous les prompts</button>
       <button type="button" class="btn btn-mini" id="copy-all-btn">📋 Tout copier</button>
     </div>
     <div class="status hidden" id="prompts-status"><span class="dot"></span><span id="prompts-status-text"></span></div>
   </div>
-
   <div class="panel hidden" id="common-style-panel">
     <h3>Style commun</h3>
-    <div class="prompt-block" id="common-style-block">
-      <button type="button" class="pb-copy" data-copy="common-style-block">Copier</button>
-      <span class="pb-label">Style commun (à réutiliser dans chaque prompt)</span>
+    <div class="prompt-block" id="common-style-block" style="background:#05050a;border:1px solid var(--border);border-radius:8px;padding:.7rem .85rem;font-family:var(--fm);font-size:.72rem;line-height:1.5;color:#a8d8b0;white-space:pre-wrap;position:relative">
+      <button type="button" class="pb-copy" data-copy="common-style-block" style="position:absolute;top:.5rem;right:.5rem;background:rgba(229,193,90,.15);border:1px solid var(--acc);color:var(--acc);padding:.25rem .55rem;border-radius:4px;font-size:.65rem;cursor:pointer;font-family:inherit;font-weight:600">Copier</button>
+      <span style="display:block;font-size:.62rem;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:.4rem">Style commun</span>
       <span id="common-style-text"></span>
     </div>
   </div>
-
   <div id="prompts-list"></div>
-
   <div class="btn-row" style="margin-top:1rem">
-    <button type="button" class="btn" id="back-to-plans">← Retour</button>
+    <button type="button" class="btn" id="back-to-video">← Retour</button>
     <button type="button" class="btn btn-primary" id="goto-montage">➜ Montage & livraison</button>
   </div>
 </div>
 
-<!-- ═══════════ ÉCRAN 5 : MONTAGE ═══════════ -->
+<!-- ═══ ÉCRAN 6 : ASSEMBLAGE & LIVRAISON ═══ -->
 <div class="screen" id="screen-montage">
-  <div class="screen-title"><span class="num">5</span> Montage & livraison</div>
+  <div class="screen-title"><span class="num">6</span> Assemblage & livraison</div>
+
+  <div class="panel">
+    <h2>🎵 Piste audio finale</h2>
+    <p class="hint">Importe la musique ou la voix off. Elle sera mixée avec les vidéos lors de l'assemblage.</p>
+    <div class="audio-drop" id="audio-drop">
+      <input type="file" id="audio-input" accept="audio/*">
+      <div class="ad-icon">🎵</div>
+      <div class="ad-title">Clique pour ajouter un fichier audio</div>
+      <div class="ad-hint">MP3, WAV, M4A — max 50 Mo</div>
+    </div>
+    <div id="audio-loaded-container"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🎬 Assemblage final</h2>
+    <p class="hint">Assemble les plans validés dans l'ordre, avec l'audio si fourni. FFmpeg côté serveur.</p>
+    <div class="btn-row" style="margin-top:.8rem">
+      <button type="button" class="btn btn-primary" id="assemble-btn">🎞️ Lancer l'assemblage</button>
+    </div>
+    <div class="status hidden" id="assemble-status"><span class="dot"></span><span id="assemble-status-text"></span></div>
+    <div class="progress-bar" id="assemble-progress" style="margin-top:.7rem;display:none"><div class="fill" id="assemble-fill"></div></div>
+    <div class="final-preview" id="final-preview">
+      <video id="final-video" controls playsinline></video>
+      <div class="fp-actions">
+        <a class="btn btn-primary" id="download-final" href="#" download>⬇ Télécharger en MP4</a>
+        <button type="button" class="btn" id="copy-final-url">📋 Copier le lien</button>
+      </div>
+    </div>
+  </div>
 
   <div class="panel">
     <h2>✅ Checklist de production</h2>
@@ -610,7 +488,7 @@ select option{background:var(--bg2);color:var(--ink)}
 
   <div class="panel">
     <h2>🎵 Suggestions de musique & ambiance</h2>
-    <p class="hint">Descriptions uniquement — à rechercher dans ta bibliothèque (Epidemic Sound, Artlist, YouTube Audio Library…).</p>
+    <p class="hint">Descriptions uniquement — à rechercher dans ta bibliothèque.</p>
     <div class="btn-row" style="margin-top:.8rem">
       <button type="button" class="btn btn-primary" id="gen-music-btn">✨ Générer suggestions</button>
     </div>
@@ -619,12 +497,11 @@ select option{background:var(--bg2);color:var(--ink)}
 
   <div class="panel">
     <h2>📤 Texte de livraison au client</h2>
-    <p class="hint">Message prêt à copier-coller dans la commande Fiverr.</p>
     <div class="btn-row" style="margin-top:.8rem">
       <button type="button" class="btn btn-primary" id="gen-delivery-btn">✨ Générer le message</button>
       <button type="button" class="btn btn-mini" id="copy-delivery-btn">📋 Copier</button>
     </div>
-    <div class="delivery-text hidden" id="delivery-text" style="margin-top:.8rem"></div>
+    <div class="delivery-text hidden" id="delivery-text" style="background:#05050a;border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:var(--fm);font-size:.75rem;line-height:1.6;color:#c8d8c8;white-space:pre-wrap;max-height:340px;overflow-y:auto;margin-top:.6rem"></div>
   </div>
 
   <div class="panel">
@@ -640,7 +517,48 @@ select option{background:var(--bg2);color:var(--ink)}
   </div>
 </div>
 
-<!-- ═══════════ TOAST + DEBUG ═══════════ -->
+<!-- ═══ MODAL PARAMÈTRES ═══ -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>⚙️ Paramètres</h2>
+      <button type="button" id="close-settings">✕</button>
+    </div>
+    <div class="modal-body">
+      <h3>Fournisseur vidéo</h3>
+      <div class="setting-row">
+        <div class="label-col">
+          <strong id="cfg-provider-name">Chargement…</strong>
+          <small id="cfg-provider-model">—</small>
+        </div>
+        <span id="cfg-provider-badge" class="badge-err">—</span>
+      </div>
+      <div class="setting-row">
+        <div class="label-col">
+          <strong>Clé API Agnes (vidéo)</strong>
+          <small id="cfg-key-preview">—</small>
+        </div>
+        <span id="cfg-key-badge" class="badge-err">—</span>
+      </div>
+      <div class="setting-row">
+        <div class="label-col">
+          <strong>Limite de générations simultanées</strong>
+          <small>Protection anti-dépense accidentelle</small>
+        </div>
+        <span id="cfg-max-concurrent" class="badge-ok">—</span>
+      </div>
+      <div class="modal-note" id="cfg-note">
+        Configure ta clé dans le fichier <code>.env</code> à la racine du serveur :
+        <br><br>
+        <code>AGNES_API_KEY=sk-...</code>
+        <br><br>
+        Puis redémarre le serveur : <code>npm start</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST + DEBUG ═══ -->
 <div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-text">Message</span></div>
 
 <button type="button" class="debug-toggle" id="debug-toggle">🖥️</button>
@@ -658,13 +576,14 @@ select option{background:var(--bg2);color:var(--ink)}
 
 <script>
 // ══════════════════════════════════════════════════════════════════
-// CONFIG — AGNES AI
+// CONFIG
 // ══════════════════════════════════════════════════════════════════
 const API_BASE = 'https://apihub.agnes-ai.com/v1';
 const MODEL_TEXT = 'agnes-2.5-flash';
 const STORAGE_KEY = 'studio_clip_ia_projects_v1';
 const API_KEY_STORAGE = 'studio_clip_ia_agnes_key_v1';
 const DEBUG_MAX = 500;
+const BACKEND_URL = window.location.origin;
 
 // ══════════════════════════════════════════════════════════════════
 // STATE
@@ -674,7 +593,12 @@ const state = {
   projects: [],
   currentProjectId: null,
   apiKey: '',
-  isGenerating: false
+  isGenerating: false,
+  backendHealth: null,
+  activeJobId: null,
+  jobPollTimer: null,
+  audioFile: null,
+  assemblyInProgress: false
 };
 
 // ══════════════════════════════════════════════════════════════════
@@ -690,32 +614,24 @@ function sanitizeForApi(text){
   return String(text)
     .replace(/[\u2018\u2019\u201B\u2032\u02BC]/g, "'")
     .replace(/[\u201C\u201D\u201F\u2033]/g, '"')
-    .replace(/\u2013/g, '-')
-    .replace(/\u2014/g, '--')
-    .replace(/\u2026/g, '...')
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\u202F/g, ' ');
+    .replace(/\u2013/g, '-').replace(/\u2014/g, '--').replace(/\u2026/g, '...')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\u00A0/g, ' ').replace(/\u202F/g, ' ');
 }
 
 let toastTimeout=null;
 function showToast(message,type='success',duration=2800){
-  const t=document.getElementById('toast');
-  const i=document.getElementById('toast-icon');
-  const x=document.getElementById('toast-text');
+  const t=document.getElementById('toast');const i=document.getElementById('toast-icon');const x=document.getElementById('toast-text');
   if(!t)return;
   t.classList.remove('visible','success','error','warn');void t.offsetWidth;
   const icons={success:'✓',error:'✕',warn:'⚠'};
-  i.textContent=icons[type]||'✓';
-  x.textContent=message;
-  t.classList.add(type);
+  i.textContent=icons[type]||'✓';x.textContent=message;t.classList.add(type);
   requestAnimationFrame(()=>t.classList.add('visible'));
   if(toastTimeout)clearTimeout(toastTimeout);
   toastTimeout=setTimeout(()=>t.classList.remove('visible'),duration);
 }
 
 // ══════════════════════════════════════════════════════════════════
-// DEBUG CONSOLE
+// DEBUG
 // ══════════════════════════════════════════════════════════════════
 let debugCount=0,debugEntries=[];
 function debugLog(level,category,message,data){
@@ -746,10 +662,8 @@ function legacyCopy(text,cb){
   document.body.removeChild(ta);cb(ok);
 }
 async function copyToClipboard(text){
-  try{
-    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return true}
-  }catch(e){}
-  return new Promise(resolve=>{legacyCopy(text,resolve)});
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return true}}catch(e){}
+  return new Promise(r=>legacyCopy(text,r));
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -788,10 +702,8 @@ function fixUnquotedKeys(text){
     if(/\s/.test(ch)){out+=ch;i++;continue}
     const top=stack[stack.length-1];
     if((lastStructural==='{'||lastStructural===',') && top==='{' && /[A-Za-z_$]/.test(ch)){
-      let j=i;
-      while(j<n && /[A-Za-z0-9_$]/.test(text[j]))j++;
-      let k=j;
-      while(k<n && /\s/.test(text[k]))k++;
+      let j=i;while(j<n && /[A-Za-z0-9_$]/.test(text[j]))j++;
+      let k=j;while(k<n && /\s/.test(text[k]))k++;
       if(text[k]===':'){out+='"'+text.slice(i,j)+'"';i=j;continue}
     }
     out+=ch;i++;
@@ -825,14 +737,10 @@ function fixMissingCommas(text){
 function repairJson(text){
   if(!text)return null;
   let c=String(text).trim();
-  const fm=c.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if(fm)c=fm[1].trim();
-  const fb=c.indexOf('{');
-  if(fb<0)return null;
+  const fm=c.match(/```(?:json)?\s*([\s\S]*?)```/);if(fm)c=fm[1].trim();
+  const fb=c.indexOf('{');if(fb<0)return null;
   c=c.slice(fb);
-  const lb=c.lastIndexOf('}');
-  if(lb>0)c=c.slice(0,lb+1);
-
+  const lb=c.lastIndexOf('}');if(lb>0)c=c.slice(0,lb+1);
   let out='';let inString=false;let strDelim='"';let escape=false;
   for(let i=0;i<c.length;i++){
     const ch=c[i];
@@ -848,13 +756,11 @@ function repairJson(text){
       if(ch==='\n'){out+='\\n';continue}
       if(ch==='\r'){out+='\\r';continue}
       if(ch==='\t'){out+='\\t';continue}
-      const code=ch.charCodeAt(0);
-      if(code<32){out+='\\u'+code.toString(16).padStart(4,'0');continue}
+      const code=ch.charCodeAt(0);if(code<32){out+='\\u'+code.toString(16).padStart(4,'0');continue}
     }
     out+=ch;
   }
-  if(escape)out+='\\';
-  if(inString)out+='"';
+  if(escape)out+='\\';if(inString)out+='"';
   try{out=fixUnquotedKeys(out)}catch(e){}
   try{out=fixMissingCommas(out)}catch(e){}
   out=out.replace(/,\s*([}\]])/g,'$1');
@@ -868,203 +774,155 @@ function extractJson(text){
   catch(e1){
     debugLog('warn','PARSE','S1 échouée : '+e1.message.slice(0,120));
     try{return JSON.parse(balanceJson(repaired))}
-    catch(e2){
-      debugLog('error','PARSE','S2 échouée : '+e2.message.slice(0,120));
-      return null;
-    }
+    catch(e2){debugLog('error','PARSE','S2 échouée : '+e2.message.slice(0,120));return null}
   }
 }
 
 // ══════════════════════════════════════════════════════════════════
-// APPEL API AGNES
+// APPEL API AGNES (texte)
 // ══════════════════════════════════════════════════════════════════
 async function callAgnes(systemPrompt, userPrompt, maxTokens=4000, temperature=0.7){
   const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
   if(!key) throw new Error('Clé API Agnes manquante');
-
   const body = {
     model: MODEL_TEXT,
     messages: [
       {role:'system', content: sanitizeForApi(systemPrompt) || 'Assistant.'},
       {role:'user', content: sanitizeForApi(userPrompt)}
     ],
-    temperature: temperature,
-    max_tokens: maxTokens || 4000,
+    temperature, max_tokens: maxTokens || 4000,
     response_format: {type: 'json_object'}
   };
-
-  debugLog('api','REQ','POST '+API_BASE+'/chat/completions · max_tokens='+body.max_tokens);
-
+  debugLog('api','REQ','POST '+API_BASE+'/chat/completions');
   const res = await fetch(API_BASE + '/chat/completions', {
     method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + key,
-      'Content-Type': 'application/json'
-    },
+    headers: {'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'},
     body: JSON.stringify(body)
   });
-
   debugLog('info','API','Réponse HTTP '+res.status);
-
-  if(!res.ok){
-    let err = '';
-    try{ err = (await res.text()).slice(0,500); }catch(e){}
-    throw new Error('HTTP '+res.status+' — '+err);
-  }
-
+  if(!res.ok){let err='';try{err=(await res.text()).slice(0,500)}catch(e){}throw new Error('HTTP '+res.status+' — '+err)}
   const data = await res.json();
   const choice = data.choices && data.choices[0];
   const msg = choice && choice.message;
   let content = msg && msg.content;
-  if(!content && msg && msg.reasoning_content){
-    debugLog('warn','API','content vide → fallback reasoning_content');
-    content = msg.reasoning_content;
-  }
+  if(!content && msg && msg.reasoning_content){debugLog('warn','API','fallback reasoning_content');content = msg.reasoning_content}
   if(!content) throw new Error('Réponse vide');
-  debugLog('success','API','Réponse reçue ('+content.length+' chars · finish='+((choice&&choice.finish_reason)||'?')+')');
+  debugLog('success','API','Réponse ('+content.length+' chars)');
   return content;
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PROJETS — STORAGE
+// APPEL BACKEND VIDÉO
 // ══════════════════════════════════════════════════════════════════
-function loadProjects(){
+async function backendFetch(path, options={}){
+  const url = BACKEND_URL + path;
+  debugLog('api','BACKEND','→ '+options.method||'GET'+' '+path);
+  const res = await fetch(url, {
+    headers: {'Content-Type':'application/json', ...(options.headers||{})},
+    ...options
+  });
+  if(!res.ok){
+    let errData = {};
+    try{errData = await res.json()}catch(e){}
+    throw new Error(errData.error || ('HTTP '+res.status));
+  }
+  return await res.json();
+}
+
+async function checkBackendHealth(){
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return [];
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  }catch(e){ return []; }
+    const data = await backendFetch('/api/health');
+    state.backendHealth = data;
+    debugLog('success','BACKEND','Health OK · clé '+(data.provider.keyConfigured?'✓':'✗'));
+    return data;
+  }catch(e){
+    debugLog('warn','BACKEND','Backend inaccessible : '+e.message);
+    state.backendHealth = null;
+    return null;
+  }
 }
-function saveProjects(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.projects)); }
-  catch(e){ debugLog('error','STORAGE',e.message); }
-}
+
+// ══════════════════════════════════════════════════════════════════
+// PROJETS
+// ══════════════════════════════════════════════════════════════════
+function loadProjects(){try{const r=localStorage.getItem(STORAGE_KEY);if(!r)return[];const a=JSON.parse(r);return Array.isArray(a)?a:[]}catch(e){return[]}}
+function saveProjects(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state.projects))}catch(e){debugLog('error','STORAGE',e.message)}}
 function createProject(){
   const p = {
-    id: uid(),
-    name: 'Nouveau projet',
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    status: 'brief',
+    id: uid(), name: 'Nouveau projet', createdAt: Date.now(), updatedAt: Date.now(), status: 'brief',
     brief: {clientName:'', product:'', audience:'', objective:'vendre', tone:'luxe', platform:'reels', format:'9:16', duration:15, lang:'fr'},
-    scripts: [],
-    selectedScriptIndex: 0,
-    plans: [],
+    scripts: [], selectedScriptIndex: 0, plans: [], videos: [],
     prompts: {commonStyle:'', byPlan:[]},
     checklist: {generated:false, validated:false, audio:false, subtitles:false, exported:false, formatChecked:false},
-    musicSuggestions: [],
-    deliveryText: ''
+    musicSuggestions: [], deliveryText: '', audioUrl: null, finalVideoUrl: null
   };
   state.projects.unshift(p);
   state.currentProjectId = p.id;
   saveProjects();
   return p;
 }
-function getCurrentProject(){ return state.projects.find(p=>p.id===state.currentProjectId); }
-function updateCurrentProject(updater){
-  const p = getCurrentProject();
-  if(!p) return;
-  updater(p);
-  p.updatedAt = Date.now();
-  saveProjects();
-}
-function refreshProjectName(){
-  const p = getCurrentProject();
-  if(!p) return;
-  const name = (p.brief.clientName || '').trim() || (p.brief.product||'').trim() || 'Sans titre';
-  p.name = name.length > 40 ? name.slice(0,40)+'…' : name;
-}
+function getCurrentProject(){return state.projects.find(p=>p.id===state.currentProjectId)}
+function updateCurrentProject(updater){const p=getCurrentProject();if(!p)return;updater(p);p.updatedAt=Date.now();saveProjects()}
+function refreshProjectName(){const p=getCurrentProject();if(!p)return;const n=(p.brief.clientName||'').trim()||(p.brief.product||'').trim()||'Sans titre';p.name=n.length>40?n.slice(0,40)+'…':n}
 
 function renderProjects(){
-  const list = document.getElementById('projects-list');
-  const count = document.getElementById('projects-count');
-  if(count) count.textContent = '('+state.projects.length+')';
-  if(!state.projects.length){
-    list.innerHTML = '<div class="empty">Aucun projet. Clique sur + Nouveau projet.</div>';
-    return;
-  }
-  const statusLabel = {brief:'Brief', script:'Script', plans:'Plans', encours:'En cours', livre:'Livré'};
+  const list=document.getElementById('projects-list');
+  const count=document.getElementById('projects-count');
+  if(count)count.textContent='('+state.projects.length+')';
+  if(!state.projects.length){list.innerHTML='<div class="empty">Aucun projet.</div>';return}
+  const statusLabel={brief:'Brief',script:'Script',plans:'Plans',encours:'En cours',livre:'Livré'};
   list.innerHTML = state.projects.map(p=>{
-    const cur = p.id===state.currentProjectId?' current':'';
-    const date = new Date(p.updatedAt).toLocaleDateString('fr-FR');
+    const cur=p.id===state.currentProjectId?' current':'';
+    const date=new Date(p.updatedAt).toLocaleDateString('fr-FR');
     return '<div class="project-item'+cur+'" data-pid="'+p.id+'">'+
-      '<div class="pinfo">'+
-        '<div class="pname">'+esc(p.name)+'</div>'+
-        '<div class="pmeta">'+date+' · '+esc(p.brief.platform||'')+' · '+esc(p.brief.format||'')+'</div>'+
-      '</div>'+
+      '<div class="pinfo"><div class="pname">'+esc(p.name)+'</div>'+
+      '<div class="pmeta">'+date+' · '+esc(p.brief.platform||'')+' · '+esc(p.brief.format||'')+'</div></div>'+
       '<span class="pstatus '+p.status+'">'+statusLabel[p.status]+'</span>'+
-      '<div class="project-actions">'+
-        '<button data-act="dup" data-pid="'+p.id+'" title="Dupliquer">📄</button>'+
-      '</div>'+
+      '<div class="project-actions"><button data-act="dup" data-pid="'+p.id+'" title="Dupliquer">📄</button></div>'+
     '</div>';
   }).join('');
-
   list.querySelectorAll('.project-item').forEach(el=>{
-    el.addEventListener('click',e=>{
-      if(e.target.closest('.project-actions')) return;
-      openProject(el.dataset.pid);
-    });
+    el.addEventListener('click',e=>{if(e.target.closest('.project-actions'))return;openProject(el.dataset.pid)});
   });
   list.querySelectorAll('[data-act="dup"]').forEach(btn=>{
-    btn.addEventListener('click',e=>{ e.stopPropagation(); duplicateProject(btn.dataset.pid); });
+    btn.addEventListener('click',e=>{e.stopPropagation();duplicateProject(btn.dataset.pid)});
   });
 }
-function openProject(id){
-  state.currentProjectId = id;
-  saveProjects();
-  loadProjectIntoUI();
-  goToScreen(0);
-  showToast('Projet ouvert');
-}
+function openProject(id){state.currentProjectId=id;saveProjects();loadProjectIntoUI();goToScreen(0);showToast('Projet ouvert')}
 function duplicateProject(id){
-  const src = state.projects.find(p=>p.id===id);
-  if(!src) return;
-  const copy = JSON.parse(JSON.stringify(src));
-  copy.id = uid();
-  copy.name = src.name + ' (copie)';
-  copy.createdAt = Date.now();
-  copy.updatedAt = Date.now();
-  state.projects.unshift(copy);
-  state.currentProjectId = copy.id;
-  saveProjects(); renderProjects(); loadProjectIntoUI();
-  showToast('Projet dupliqué');
+  const src=state.projects.find(p=>p.id===id);if(!src)return;
+  const copy=JSON.parse(JSON.stringify(src));
+  copy.id=uid();copy.name=src.name+' (copie)';copy.createdAt=Date.now();copy.updatedAt=Date.now();
+  state.projects.unshift(copy);state.currentProjectId=copy.id;
+  saveProjects();renderProjects();loadProjectIntoUI();showToast('Projet dupliqué');
 }
 function deleteCurrentProject(){
-  const p = getCurrentProject();
-  if(!p) return;
-  if(!confirm('Supprimer définitivement ce projet ?')) return;
-  state.projects = state.projects.filter(x=>x.id!==p.id);
-  state.currentProjectId = state.projects[0] ? state.projects[0].id : null;
-  if(!state.currentProjectId) createProject();
-  saveProjects(); renderProjects(); loadProjectIntoUI(); goToScreen(0);
-  showToast('Projet supprimé','warn');
+  const p=getCurrentProject();if(!p)return;
+  if(!confirm('Supprimer définitivement ce projet ?'))return;
+  state.projects=state.projects.filter(x=>x.id!==p.id);
+  state.currentProjectId=state.projects[0]?state.projects[0].id:null;
+  if(!state.currentProjectId)createProject();
+  saveProjects();renderProjects();loadProjectIntoUI();goToScreen(0);showToast('Projet supprimé','warn');
 }
 function exportAllProjects(){
-  const data = JSON.stringify(state.projects, null, 2);
-  const blob = new Blob([data], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'studio-clip-ia-projets-'+new Date().toISOString().slice(0,10)+'.json';
+  const data=JSON.stringify(state.projects,null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='studio-clip-ia-'+new Date().toISOString().slice(0,10)+'.json';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-  showToast('Export téléchargé');
+  setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('Export téléchargé');
 }
 function importProjects(file){
-  const reader = new FileReader();
-  reader.onload = e => {
+  const reader=new FileReader();
+  reader.onload=e=>{
     try{
-      const arr = JSON.parse(e.target.result);
-      if(!Array.isArray(arr)) throw new Error('Format invalide');
-      arr.forEach(p=>{ if(!p.id) p.id = uid(); state.projects.unshift(p); });
-      state.currentProjectId = state.projects[0].id;
-      saveProjects(); renderProjects(); loadProjectIntoUI();
+      const arr=JSON.parse(e.target.result);
+      if(!Array.isArray(arr))throw new Error('Format invalide');
+      arr.forEach(p=>{if(!p.id)p.id=uid();state.projects.unshift(p)});
+      state.currentProjectId=state.projects[0].id;
+      saveProjects();renderProjects();loadProjectIntoUI();
       showToast(arr.length+' projet(s) importé(s)','success');
-    }catch(err){
-      debugLog('error','IMPORT',err.message);
-      showToast('Import impossible : '+err.message,'error');
-    }
+    }catch(err){showToast('Import impossible','error')}
   };
   reader.readAsText(file);
 }
@@ -1073,60 +931,55 @@ function importProjects(file){
 // NAVIGATION
 // ══════════════════════════════════════════════════════════════════
 function goToScreen(n){
-  state.currentScreen = n;
+  state.currentScreen=n;
   document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===n));
   document.querySelectorAll('.progress-step').forEach((el,i)=>{
     el.classList.toggle('active',i===n);
-    el.classList.toggle('done', i<n);
+    el.classList.toggle('done',i<n);
   });
   window.scrollTo({top:0,behavior:'smooth'});
   debugLog('info','NAV','Écran '+(n+1));
+  // Actions spécifiques à l'écran
+  if(n===3)renderVideoPlansList();
+  if(n===5)renderAudioAndAssemble();
 }
 
 // ══════════════════════════════════════════════════════════════════
 // CHARGEMENT UI
 // ══════════════════════════════════════════════════════════════════
 function loadProjectIntoUI(){
-  const p = getCurrentProject();
-  if(!p) return;
-  document.getElementById('b-client').value = p.brief.clientName || '';
-  document.getElementById('b-product').value = p.brief.product || '';
-  document.getElementById('b-audience').value = p.brief.audience || '';
-  document.getElementById('b-objective').value = p.brief.objective || 'vendre';
-  document.getElementById('b-tone').value = p.brief.tone || 'luxe';
-  document.getElementById('b-platform').value = p.brief.platform || 'reels';
-  document.getElementById('b-format').value = p.brief.format || '9:16';
-  document.getElementById('b-duration').value = p.brief.duration || 15;
-  document.getElementById('b-lang').value = p.brief.lang || 'fr';
-  renderScriptVariants();
-  renderPlans();
-  renderPrompts();
-  renderChecklist();
-  renderMusicSuggestions();
-  renderDelivery();
+  const p=getCurrentProject();if(!p)return;
+  document.getElementById('b-client').value=p.brief.clientName||'';
+  document.getElementById('b-product').value=p.brief.product||'';
+  document.getElementById('b-audience').value=p.brief.audience||'';
+  document.getElementById('b-objective').value=p.brief.objective||'vendre';
+  document.getElementById('b-tone').value=p.brief.tone||'luxe';
+  document.getElementById('b-platform').value=p.brief.platform||'reels';
+  document.getElementById('b-format').value=p.brief.format||'9:16';
+  document.getElementById('b-duration').value=p.brief.duration||15;
+  document.getElementById('b-lang').value=p.brief.lang||'fr';
+  if(!p.videos)p.videos=[];
+  renderScriptVariants();renderPlans();renderVideoPlansList();renderPrompts();
+  renderChecklist();renderMusicSuggestions();renderDelivery();renderAudioAndAssemble();
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ÉCRAN 1 : BRIEF
+// ÉCRAN 1
 // ══════════════════════════════════════════════════════════════════
 function collectBrief(){
-  const brief = {
-    clientName: document.getElementById('b-client').value.trim(),
-    product: document.getElementById('b-product').value.trim(),
-    audience: document.getElementById('b-audience').value.trim(),
-    objective: document.getElementById('b-objective').value,
-    tone: document.getElementById('b-tone').value,
-    platform: document.getElementById('b-platform').value,
-    format: document.getElementById('b-format').value,
-    duration: Math.max(5, Math.min(60, parseInt(document.getElementById('b-duration').value,10)||15)),
-    lang: document.getElementById('b-lang').value
+  const brief={
+    clientName:document.getElementById('b-client').value.trim(),
+    product:document.getElementById('b-product').value.trim(),
+    audience:document.getElementById('b-audience').value.trim(),
+    objective:document.getElementById('b-objective').value,
+    tone:document.getElementById('b-tone').value,
+    platform:document.getElementById('b-platform').value,
+    format:document.getElementById('b-format').value,
+    duration:Math.max(5,Math.min(60,parseInt(document.getElementById('b-duration').value,10)||15)),
+    lang:document.getElementById('b-lang').value
   };
-  updateCurrentProject(p=>{
-    p.brief = brief;
-    if(p.status === 'brief' || !p.status) p.status = 'brief';
-  });
-  refreshProjectName();
-  renderProjects();
+  updateCurrentProject(p=>{p.brief=brief;if(p.status==='brief'||!p.status)p.status='brief'});
+  refreshProjectName();renderProjects();
   return brief;
 }
 
@@ -1134,93 +987,61 @@ function collectBrief(){
 // ÉCRAN 2 : SCRIPT
 // ══════════════════════════════════════════════════════════════════
 function buildScriptPrompt(brief){
-  const toneMap = {luxe:'élégant, luxueux, contemplatif', fun:'drôle, énergique, léger', dramatique:'tendu, émotionnel, intense', minimaliste:'épuré, calme, factuel'};
-  const objMap = {vendre:'VENDRE le produit, convertir en achat', connaitre:'FAIRE CONNAÎTRE la marque/sujet, notoriété', divertir:'DIVERTIR, susciter l\'émotion et le partage'};
+  const toneMap={luxe:'élégant, luxueux, contemplatif',fun:'drôle, énergique, léger',dramatique:'tendu, émotionnel, intense',minimaliste:'épuré, calme, factuel'};
+  const objMap={vendre:'VENDRE le produit, convertir en achat',connaitre:'FAIRE CONNAÎTRE la marque/sujet, notoriété',divertir:'DIVERTIR, susciter l\'émotion et le partage'};
   return [
     'Tu es scénariste de spots vidéo IA courts pour réseaux sociaux.',
     'Écris 3 variantes narratives différentes pour ce brief client.',
     '',
-    'BRIEF :',
-    '- Client : '+brief.clientName,
-    '- Produit / sujet : '+brief.product,
-    '- Public cible : '+brief.audience,
-    '- Objectif : '+objMap[brief.objective],
-    '- Ton : '+toneMap[brief.tone],
-    '- Plateforme : '+brief.platform+' ('+brief.format+')',
-    '- Durée totale cible : '+brief.duration+' secondes',
-    '- Langue du texte à l\'écran : '+brief.lang,
+    'BRIEF :','- Client : '+brief.clientName,'- Produit / sujet : '+brief.product,
+    '- Public cible : '+brief.audience,'- Objectif : '+objMap[brief.objective],
+    '- Ton : '+toneMap[brief.tone],'- Plateforme : '+brief.platform+' ('+brief.format+')',
+    '- Durée totale cible : '+brief.duration+' secondes','- Langue du texte à l\'écran : '+brief.lang,
     '',
     'CONTRAINTES :',
-    '- Chaque variante est une MINI-HISTOIRE en 3 temps : ACCROCHE (première seconde, doit capter), PROGRESSION (corps du récit), CHUTE avec APPEL À L\'ACTION.',
-    '- Aucun présentateur, aucun avatar. On décrit seulement ce qu\'on VOIT et ce qui se PASSE.',
+    '- Chaque variante est une MINI-HISTOIRE en 3 temps : ACCROCHE, PROGRESSION, CHUTE avec APPEL À L\'ACTION.',
+    '- Aucun présentateur, aucun avatar.',
     '- Texte à l\'écran : 1 à 6 mots par plan, très impactant.',
-    '- Ton et style en accord avec le brief.',
     '',
-    'RÉPONSE : retourne UNIQUEMENT ce JSON valide (aucun markdown, aucune phrase avant/après) :',
+    'RÉPONSE : retourne UNIQUEMENT ce JSON valide :',
     '{',
     '  "variants": [',
-    '    { "hook": "phrase d\'accroche en 5-10 mots", "progression": "description de la progression en 20-40 mots", "cta": "appel à l\'action en 3-8 mots", "tone_notes": "1 phrase sur le ton dominant" },',
+    '    { "hook": "accroche 5-10 mots", "progression": "progression 20-40 mots", "cta": "appel à l\'action 3-8 mots", "tone_notes": "1 phrase" },',
     '    { "hook": "...", "progression": "...", "cta": "...", "tone_notes": "..." },',
     '    { "hook": "...", "progression": "...", "cta": "...", "tone_notes": "..." }',
     '  ]',
     '}'
   ].join('\n');
 }
-
 async function generateScript(){
-  if(state.isGenerating) return;
-  const brief = collectBrief();
-  if(!brief.product){ showToast('Renseigne au moins le produit / sujet','warn'); return; }
-  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){
-    showToast('Colle ta clé Agnes en haut 👆','warn');
-    const inp = document.getElementById('api-key-input');
-    if(inp){ inp.focus(); inp.scrollIntoView({behavior:'smooth',block:'center'}); }
-    return;
-  }
-
-  state.isGenerating = true;
-  const btn = document.getElementById('gen-script-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Génération…';
-  const statusEl = document.getElementById('script-status');
-  const statusTx = document.getElementById('script-status-text');
-  statusEl.classList.remove('hidden','ok','err');
-  statusTx.textContent = 'Agnes rédige les 3 variantes…';
-
+  if(state.isGenerating)return;
+  const brief=collectBrief();
+  if(!brief.product){showToast('Renseigne le produit','warn');return}
+  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){showToast('Colle ta clé Agnes en haut','warn');document.getElementById('api-key-input').focus();return}
+  state.isGenerating=true;
+  const btn=document.getElementById('gen-script-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Génération…';
+  const statusEl=document.getElementById('script-status');const statusTx=document.getElementById('script-status-text');
+  statusEl.classList.remove('hidden','ok','err');statusTx.textContent='Agnes rédige…';
   try{
-    const systemPrompt = 'Tu es un scénariste professionnel. Tu réponds UNIQUEMENT en JSON valide, sans markdown, sans commentaire.';
-    const userPrompt = buildScriptPrompt(brief);
-    const text = await callAgnes(systemPrompt, userPrompt, 2000, 0.8);
-    const parsed = extractJson(text);
-    if(!parsed || !parsed.variants || !Array.isArray(parsed.variants)) throw new Error('Réponse invalide');
-    updateCurrentProject(p=>{
-      p.scripts = parsed.variants.slice(0,3);
-      p.selectedScriptIndex = 0;
-      p.status = 'script';
-    });
+    const text=await callAgnes('Tu es un scénariste professionnel. Tu réponds UNIQUEMENT en JSON valide, sans markdown.',buildScriptPrompt(brief),2000,0.8);
+    const parsed=extractJson(text);
+    if(!parsed||!parsed.variants||!Array.isArray(parsed.variants))throw new Error('Réponse invalide');
+    updateCurrentProject(p=>{p.scripts=parsed.variants.slice(0,3);p.selectedScriptIndex=0;p.status='script'});
     renderScriptVariants();
-    statusEl.classList.add('ok');
-    statusTx.textContent = '3 variantes générées ✓';
-    showToast('3 variantes prêtes');
+    statusEl.classList.add('ok');statusTx.textContent='3 variantes générées ✓';showToast('3 variantes prêtes');
   }catch(e){
-    debugLog('error','SCRIPT',e.message);
-    statusEl.classList.add('err');
-    statusTx.textContent = 'Erreur : '+e.message.slice(0,80);
+    debugLog('error','SCRIPT',e.message);statusEl.classList.add('err');statusTx.textContent='Erreur : '+e.message.slice(0,80);
     showToast('Erreur : '+e.message.slice(0,60),'error',4000);
   }
-  state.isGenerating = false;
-  btn.disabled = false; btn.innerHTML = '✨ Générer 3 variantes';
+  state.isGenerating=false;btn.disabled=false;btn.innerHTML='✨ Générer 3 variantes';
 }
-
 function renderScriptVariants(){
-  const p = getCurrentProject();
-  const container = document.getElementById('script-variants');
-  if(!p || !p.scripts || !p.scripts.length){
-    container.innerHTML = '<div class="empty">Aucune variante. Clique sur Générer 3 variantes ou passe en saisie manuelle.</div>';
-    return;
-  }
-  const labels = ['A','B','C'];
+  const p=getCurrentProject();const container=document.getElementById('script-variants');
+  if(!p||!p.scripts||!p.scripts.length){container.innerHTML='<div class="empty">Aucune variante.</div>';return}
+  const labels=['A','B','C'];
   container.innerHTML = p.scripts.map((v,i)=>{
-    const sel = i===p.selectedScriptIndex ? ' selected' : '';
+    const sel=i===p.selectedScriptIndex?' selected':'';
     return '<div class="variant-card'+sel+'" data-idx="'+i+'">'+
       '<div class="vhead"><span>Variante '+labels[i]+'</span>'+(sel?'<span>✓ Choisie</span>':'')+'</div>'+
       '<div class="vsection"><strong>Accroche</strong>'+esc(v.hook||'')+'</div>'+
@@ -1231,130 +1052,91 @@ function renderScriptVariants(){
   }).join('');
   container.querySelectorAll('.variant-card').forEach(el=>{
     el.addEventListener('click',()=>{
-      const idx = parseInt(el.dataset.idx,10);
-      updateCurrentProject(pp=>{pp.selectedScriptIndex = idx;});
-      renderScriptVariants();
-      showToast('Variante '+labels[idx]+' sélectionnée');
+      const idx=parseInt(el.dataset.idx,10);
+      updateCurrentProject(pp=>{pp.selectedScriptIndex=idx});
+      renderScriptVariants();showToast('Variante '+labels[idx]+' sélectionnée');
     });
   });
 }
-
 function manualScript(){
-  const p = getCurrentProject();
-  if(!p) return;
-  const hook = prompt('Accroche (première seconde) :', p.scripts[p.selectedScriptIndex]?.hook || '');
-  if(hook === null) return;
-  const prog = prompt('Progression (corps du récit) :', p.scripts[p.selectedScriptIndex]?.progression || '');
-  if(prog === null) return;
-  const cta = prompt('Appel à l\'action :', p.scripts[p.selectedScriptIndex]?.cta || '');
-  if(cta === null) return;
-  const idx = p.selectedScriptIndex || 0;
-  const existing = p.scripts[idx] || {hook:'',progression:'',cta:'',tone_notes:''};
-  const updated = {hook, progression:prog, cta, tone_notes:existing.tone_notes||''};
+  const p=getCurrentProject();if(!p)return;
+  const hook=prompt('Accroche :',p.scripts[p.selectedScriptIndex]?.hook||'');
+  if(hook===null)return;
+  const prog=prompt('Progression :',p.scripts[p.selectedScriptIndex]?.progression||'');
+  if(prog===null)return;
+  const cta=prompt('CTA :',p.scripts[p.selectedScriptIndex]?.cta||'');
+  if(cta===null)return;
+  const idx=p.selectedScriptIndex||0;
+  const existing=p.scripts[idx]||{hook:'',progression:'',cta:'',tone_notes:''};
+  const updated={hook,progression:prog,cta,tone_notes:existing.tone_notes||''};
   updateCurrentProject(pp=>{
-    if(!pp.scripts.length) pp.scripts = [updated];
-    else pp.scripts[pp.selectedScriptIndex] = updated;
-    pp.status = 'script';
+    if(!pp.scripts.length)pp.scripts=[updated];else pp.scripts[pp.selectedScriptIndex]=updated;
+    pp.status='script';
   });
-  renderScriptVariants();
-  showToast('Script mis à jour');
+  renderScriptVariants();showToast('Script mis à jour');
 }
 
 // ══════════════════════════════════════════════════════════════════
 // ÉCRAN 3 : PLANS
 // ══════════════════════════════════════════════════════════════════
-function buildPlansPrompt(brief, script){
-  const scriptText = 'Accroche : '+script.hook+'\nProgression : '+script.progression+'\nCTA : '+script.cta;
-  const planCount = Math.max(2, Math.min(8, Math.round(brief.duration / 4)));
+function buildPlansPrompt(brief,script){
+  const scriptText='Accroche : '+script.hook+'\nProgression : '+script.progression+'\nCTA : '+script.cta;
+  const planCount=Math.max(2,Math.min(8,Math.round(brief.duration/4)));
   return [
-    'Tu es réalisateur de clips IA. À partir d\'un script narratif, découpe le clip en plans techniques.',
+    'Tu es réalisateur de clips IA. À partir d\'un script, découpe en plans techniques.',
     '',
     'BRIEF : '+brief.product+' — '+brief.audience+' — '+brief.platform+' ('+brief.format+')',
-    'TON : '+brief.tone,
-    'DURÉE TOTALE CIBLE : '+brief.duration+' secondes',
-    'LANGUE DU TEXTE À L\'ÉCRAN : '+brief.lang,
-    'NOMBRE DE PLANS CIBLE : environ '+planCount+' plans (entre 3 et 5 secondes chacun)',
+    'TON : '+brief.tone,'DURÉE TOTALE CIBLE : '+brief.duration+' s','LANGUE : '+brief.lang,
+    'NOMBRE DE PLANS CIBLE : environ '+planCount+' plans',
     '',
-    'SCRIPT :',
-    scriptText,
+    'SCRIPT :',scriptText,
     '',
     'CONTRAINTES :',
-    '- Chaque plan dure entre 3 et 5 secondes.',
-    '- La somme des durées doit être proche de '+brief.duration+' s.',
-    '- Aucun présentateur, aucun visage parlant. Descriptions VISUELLES uniquement.',
-    '- Le texte à l\'écran (on-screen text) est très court : 1 à 6 mots.',
+    '- Chaque plan dure 3 à 5 secondes.',
+    '- Somme des durées ≈ '+brief.duration+' s.',
+    '- Aucun présentateur, aucun visage parlant.',
+    '- Texte à l\'écran : 1 à 6 mots.',
     '',
-    'RÉPONSE : retourne UNIQUEMENT ce JSON valide (aucun markdown) :',
-    '{',
-    '  "plans": [',
-    '    {',
-    '      "num": 1,',
-    '      "duration": 4,',
-    '      "description": "description visuelle en français du plan (ce qu\'on voit, pas ce qui est dit)",',
-    '      "camera": "mouvement de caméra (ex : dolly-in lent, panoramique, plan fixe)",',
-    '      "light": "ambiance lumineuse (ex : golden hour, néon froid, contre-jour)",',
-    '      "onScreenText": "1 à 6 mots en '+brief.lang+'"',
-    '    },',
-    '    ... autant de plans que nécessaire ...',
-    '  ]',
-    '}'
+    'RÉPONSE : JSON valide uniquement :',
+    '{ "plans": [ { "num": 1, "duration": 4, "description": "visuel en FR", "camera": "mouvement", "light": "lumière", "onScreenText": "1-6 mots en '+brief.lang+'" } ] }'
   ].join('\n');
 }
-
 async function generatePlans(){
-  if(state.isGenerating) return;
-  const p = getCurrentProject();
-  if(!p) return;
-  const script = p.scripts[p.selectedScriptIndex];
-  if(!script){ showToast('Choisis d\'abord une variante de script','warn'); return; }
-  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){ showToast('Colle ta clé Agnes en haut','warn'); document.getElementById('api-key-input').focus(); return; }
-
-  state.isGenerating = true;
-  const btn = document.getElementById('gen-plans-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Génération…';
-  const statusEl = document.getElementById('plans-status');
-  const statusTx = document.getElementById('plans-status-text');
-  statusEl.classList.remove('hidden','ok','err');
-  statusTx.textContent = 'Découpage en plans…';
-
+  if(state.isGenerating)return;
+  const p=getCurrentProject();if(!p)return;
+  const script=p.scripts[p.selectedScriptIndex];
+  if(!script){showToast('Choisis un script','warn');return}
+  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){showToast('Colle ta clé Agnes','warn');return}
+  state.isGenerating=true;
+  const btn=document.getElementById('gen-plans-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Génération…';
+  const statusEl=document.getElementById('plans-status');const statusTx=document.getElementById('plans-status-text');
+  statusEl.classList.remove('hidden','ok','err');statusTx.textContent='Découpage…';
   try{
-    const systemPrompt = 'Tu es réalisateur professionnel. Tu réponds UNIQUEMENT en JSON valide, sans markdown.';
-    const userPrompt = buildPlansPrompt(p.brief, script);
-    const text = await callAgnes(systemPrompt, userPrompt, 3000, 0.7);
-    const parsed = extractJson(text);
-    if(!parsed || !parsed.plans || !Array.isArray(parsed.plans)) throw new Error('Réponse invalide');
+    const text=await callAgnes('Tu es réalisateur professionnel. Tu réponds UNIQUEMENT en JSON valide, sans markdown.',buildPlansPrompt(p.brief,script),3000,0.7);
+    const parsed=extractJson(text);
+    if(!parsed||!parsed.plans||!Array.isArray(parsed.plans))throw new Error('Réponse invalide');
     updateCurrentProject(pp=>{
-      pp.plans = parsed.plans.map((pl,i)=>({
-        num: i+1,
-        duration: Math.max(3, Math.min(5, parseInt(pl.duration,10)||4)),
-        description: pl.description||'',
-        camera: pl.camera||'',
-        light: pl.light||'',
-        onScreenText: pl.onScreenText||''
+      pp.plans=parsed.plans.map((pl,i)=>({
+        num:i+1,
+        duration:Math.max(3,Math.min(5,parseInt(pl.duration,10)||4)),
+        description:pl.description||'',camera:pl.camera||'',light:pl.light||'',onScreenText:pl.onScreenText||''
       }));
-      pp.status = 'plans';
+      pp.status='plans';
+      // Réinitialiser les vidéos
+      pp.videos=pp.plans.map((pl,i)=>({index:i,status:'pending',progress:0,url:null,localUrl:null,validated:false,rejected:false,error:null}));
     });
-    renderPlans();
-    statusEl.classList.add('ok');
-    statusTx.textContent = parsed.plans.length+' plans générés ✓';
-    showToast(parsed.plans.length+' plans générés');
+    renderPlans();renderVideoPlansList();
+    statusEl.classList.add('ok');statusTx.textContent=parsed.plans.length+' plans générés ✓';showToast('Plans générés');
   }catch(e){
-    debugLog('error','PLANS',e.message);
-    statusEl.classList.add('err');
-    statusTx.textContent = 'Erreur : '+e.message.slice(0,80);
-    showToast('Erreur : '+e.message.slice(0,60),'error',4000);
+    debugLog('error','PLANS',e.message);statusEl.classList.add('err');statusTx.textContent='Erreur : '+e.message.slice(0,80);
+    showToast('Erreur','error',4000);
   }
-  state.isGenerating = false;
-  btn.disabled = false; btn.innerHTML = '✨ Générer les plans';
+  state.isGenerating=false;btn.disabled=false;btn.innerHTML='✨ Générer les plans';
 }
-
 function renderPlans(){
-  const p = getCurrentProject();
-  const container = document.getElementById('plans-list');
-  if(!p || !p.plans.length){
-    container.innerHTML = '<div class="empty">Aucun plan. Clique sur Générer les plans ou ajoute-les manuellement.</div>';
-    return;
-  }
+  const p=getCurrentProject();const container=document.getElementById('plans-list');
+  if(!p||!p.plans.length){container.innerHTML='<div class="empty">Aucun plan.</div>';return}
   container.innerHTML = p.plans.map((pl,i)=>{
     return '<div class="plan-card" data-idx="'+i+'" draggable="true">'+
       '<div class="plan-header">'+
@@ -1362,642 +1144,888 @@ function renderPlans(){
         '<div class="plan-actions">'+
           '<button data-act="up" data-idx="'+i+'" '+(i===0?'disabled':'')+'>↑</button>'+
           '<button data-act="down" data-idx="'+i+'" '+(i===p.plans.length-1?'disabled':'')+'>↓</button>'+
-          '<button data-act="del" data-idx="'+i+'" title="Supprimer">🗑</button>'+
+          '<button data-act="del" data-idx="'+i+'">🗑</button>'+
         '</div>'+
       '</div>'+
-      '<div class="row" style="margin-bottom:.5rem">'+
-        '<label class="lb">Durée (3 à 5 s)</label>'+
-        '<input type="number" min="3" max="5" value="'+pl.duration+'" data-field="duration" data-idx="'+i+'">'+
-      '</div>'+
-      '<div class="row" style="margin-bottom:.5rem">'+
-        '<label class="lb">Description visuelle</label>'+
-        '<textarea data-field="description" data-idx="'+i+'">'+esc(pl.description)+'</textarea>'+
-      '</div>'+
-      '<div class="row" style="margin-bottom:.5rem">'+
-        '<label class="lb">Mouvement de caméra</label>'+
-        '<input type="text" data-field="camera" data-idx="'+i+'" value="'+esc(pl.camera)+'">'+
-      '</div>'+
-      '<div class="row" style="margin-bottom:.5rem">'+
-        '<label class="lb">Ambiance lumineuse</label>'+
-        '<input type="text" data-field="light" data-idx="'+i+'" value="'+esc(pl.light)+'">'+
-      '</div>'+
-      '<div class="row">'+
-        '<label class="lb">Texte à l\'écran</label>'+
-        '<input type="text" data-field="onScreenText" data-idx="'+i+'" value="'+esc(pl.onScreenText)+'">'+
-      '</div>'+
+      '<div class="row" style="margin-bottom:.5rem"><label class="lb">Durée (3-5 s)</label>'+
+        '<input type="number" min="3" max="5" value="'+pl.duration+'" data-field="duration" data-idx="'+i+'"></div>'+
+      '<div class="row" style="margin-bottom:.5rem"><label class="lb">Description</label>'+
+        '<textarea data-field="description" data-idx="'+i+'">'+esc(pl.description)+'</textarea></div>'+
+      '<div class="row" style="margin-bottom:.5rem"><label class="lb">Caméra</label>'+
+        '<input type="text" data-field="camera" data-idx="'+i+'" value="'+esc(pl.camera)+'"></div>'+
+      '<div class="row" style="margin-bottom:.5rem"><label class="lb">Lumière</label>'+
+        '<input type="text" data-field="light" data-idx="'+i+'" value="'+esc(pl.light)+'"></div>'+
+      '<div class="row"><label class="lb">Texte à l\'écran</label>'+
+        '<input type="text" data-field="onScreenText" data-idx="'+i+'" value="'+esc(pl.onScreenText)+'"></div>'+
     '</div>';
   }).join('');
-
   container.querySelectorAll('[data-act]').forEach(btn=>{
     btn.addEventListener('click',e=>{
       e.stopPropagation();
-      const idx = parseInt(btn.dataset.idx,10);
-      const act = btn.dataset.act;
+      const idx=parseInt(btn.dataset.idx,10);const act=btn.dataset.act;
       updateCurrentProject(pp=>{
-        if(act==='up' && idx>0){ [pp.plans[idx-1],pp.plans[idx]] = [pp.plans[idx],pp.plans[idx-1]]; }
-        else if(act==='down' && idx<pp.plans.length-1){ [pp.plans[idx+1],pp.plans[idx]] = [pp.plans[idx],pp.plans[idx+1]]; }
-        else if(act==='del'){ pp.plans.splice(idx,1); }
+        if(act==='up'&&idx>0){[pp.plans[idx-1],pp.plans[idx]]=[pp.plans[idx],pp.plans[idx-1]]}
+        else if(act==='down'&&idx<pp.plans.length-1){[pp.plans[idx+1],pp.plans[idx]]=[pp.plans[idx],pp.plans[idx+1]]}
+        else if(act==='del'){pp.plans.splice(idx,1)}
         pp.plans.forEach((x,i)=>x.num=i+1);
       });
-      renderPlans();
+      renderPlans();renderVideoPlansList();
     });
   });
   container.querySelectorAll('[data-field]').forEach(inp=>{
     inp.addEventListener('change',()=>{
-      const idx = parseInt(inp.dataset.idx,10);
-      const field = inp.dataset.field;
-      let val = inp.value;
-      if(field==='duration') val = Math.max(3, Math.min(5, parseInt(val,10)||4));
-      updateCurrentProject(pp=>{ pp.plans[idx][field] = val; });
+      const idx=parseInt(inp.dataset.idx,10);const field=inp.dataset.field;
+      let val=inp.value;
+      if(field==='duration')val=Math.max(3,Math.min(5,parseInt(val,10)||4));
+      updateCurrentProject(pp=>{pp.plans[idx][field]=val});
     });
   });
-  let dragIdx = null;
+  let dragIdx=null;
   container.querySelectorAll('.plan-card').forEach(el=>{
-    el.addEventListener('dragstart',e=>{
-      dragIdx = parseInt(el.dataset.idx,10);
-      el.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    el.addEventListener('dragend',()=>{ el.classList.remove('dragging'); });
-    el.addEventListener('dragover',e=>{ e.preventDefault(); el.classList.add('dragover'); });
-    el.addEventListener('dragleave',()=>{ el.classList.remove('dragover'); });
+    el.addEventListener('dragstart',()=>{dragIdx=parseInt(el.dataset.idx,10);el.classList.add('dragging')});
+    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dragover')});
+    el.addEventListener('dragleave',()=>el.classList.remove('dragover'));
     el.addEventListener('drop',e=>{
-      e.preventDefault();
-      el.classList.remove('dragover');
-      const target = parseInt(el.dataset.idx,10);
-      if(dragIdx===null||dragIdx===target) return;
+      e.preventDefault();el.classList.remove('dragover');
+      const target=parseInt(el.dataset.idx,10);
+      if(dragIdx===null||dragIdx===target)return;
       updateCurrentProject(pp=>{
-        const [moved] = pp.plans.splice(dragIdx,1);
+        const [moved]=pp.plans.splice(dragIdx,1);
         pp.plans.splice(target,0,moved);
         pp.plans.forEach((x,i)=>x.num=i+1);
       });
-      dragIdx = null;
-      renderPlans();
+      dragIdx=null;renderPlans();
     });
   });
 }
-
 function addManualPlan(){
-  const p = getCurrentProject();
-  if(!p) return;
+  const p=getCurrentProject();if(!p)return;
   updateCurrentProject(pp=>{
-    pp.plans.push({num:pp.plans.length+1, duration:4, description:'', camera:'', light:'', onScreenText:''});
+    pp.plans.push({num:pp.plans.length+1,duration:4,description:'',camera:'',light:'',onScreenText:''});
+    if(!pp.videos)pp.videos=[];
+    pp.videos.push({index:pp.plans.length-1,status:'pending',progress:0,url:null,localUrl:null,validated:false,rejected:false,error:null});
   });
-  renderPlans();
-  showToast('Plan ajouté');
+  renderPlans();renderVideoPlansList();showToast('Plan ajouté');
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ÉCRAN 4 : PROMPTS
+// ÉCRAN 4 : GÉNÉRATION VIDÉO — NOUVEAU
 // ══════════════════════════════════════════════════════════════════
-function buildPromptsPrompt(brief, script, plans){
-  const plansBlock = plans.map((pl,i)=>'Plan '+(i+1)+' ('+pl.duration+'s) : '+pl.description+' | Caméra : '+pl.camera+' | Lumière : '+pl.light).join('\n');
-  return [
-    'Tu es prompt engineer pour générateurs vidéo IA (Runway, Kling, Sora, Pika).',
-    'À partir de ce découpage, produis un bloc de style commun + un prompt vidéo et un prompt image par plan.',
-    '',
-    'BRIEF : '+brief.product+' — '+brief.audience,
-    'TON : '+brief.tone,
-    'PLATEFORME : '+brief.platform+' — FORMAT : '+brief.format,
-    '',
-    'SCRIPT : '+script.hook+' / '+script.progression+' / '+script.cta,
-    '',
-    'PLANS À DÉCRIRE :',
-    plansBlock,
-    '',
-    'RÈGLES DE PROMPT :',
-    '- Style commun : 25-45 mots en anglais, purement visuel (lumière, caméra, texture, colorimétrie, référence cinéma).',
-    '- Prompt image (par plan) : 30-60 mots en anglais, décrit le PREMIER FRAME du plan.',
-    '- Prompt vidéo (par plan) : 50-90 mots en anglais, décrit l\'action continue + mouvement caméra + durée.',
-    '- Pas de présentateur, pas de face parlante, pas de dialogue.',
-    '- Format : '+brief.format+'.',
-    '',
-    'RÉPONSE : retourne UNIQUEMENT ce JSON valide (aucun markdown) :',
-    '{',
-    '  "commonStyle": "anglais, 25-45 mots",',
-    '  "byPlan": [',
-    '    { "imagePrompt": "anglais, 30-60 mots", "videoPrompt": "anglais, 50-90 mots" },',
-    '    ... un objet par plan ...',
-    '  ]',
-    '}'
-  ].join('\n');
-}
+function renderVideoPlansList(){
+  const p=getCurrentProject();
+  const container=document.getElementById('video-plans-list');
+  if(!container)return;
+  if(!p||!p.plans.length){container.innerHTML='<div class="empty">Aucun plan. Va à l\'écran précédent pour les générer.</div>';return}
 
-async function generatePrompts(){
-  if(state.isGenerating) return;
-  const p = getCurrentProject();
-  if(!p) return;
-  if(!p.plans.length){ showToast('Génère d\'abord les plans','warn'); return; }
-  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){ showToast('Colle ta clé Agnes en haut','warn'); document.getElementById('api-key-input').focus(); return; }
-  const script = p.scripts[p.selectedScriptIndex];
-  if(!script){ showToast('Choisis une variante de script','warn'); return; }
-
-  state.isGenerating = true;
-  const btn = document.getElementById('gen-prompts-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Génération…';
-  const statusEl = document.getElementById('prompts-status');
-  const statusTx = document.getElementById('prompts-status-text');
-  statusEl.classList.remove('hidden','ok','err');
-  statusTx.textContent = 'Agnes rédige les prompts…';
-
-  try{
-    const systemPrompt = 'Tu es prompt engineer pour générateurs vidéo IA. Tu réponds UNIQUEMENT en JSON valide, sans markdown.';
-    const userPrompt = buildPromptsPrompt(p.brief, script, p.plans);
-    const text = await callAgnes(systemPrompt, userPrompt, 4000, 0.7);
-    const parsed = extractJson(text);
-    if(!parsed || !parsed.byPlan || !Array.isArray(parsed.byPlan)) throw new Error('Réponse invalide');
-    updateCurrentProject(pp=>{
-      pp.prompts = {
-        commonStyle: parsed.commonStyle || '',
-        byPlan: parsed.byPlan.map(x=>({imagePrompt:x.imagePrompt||'', videoPrompt:x.videoPrompt||''}))
-      };
+  // S'assurer que state.videos est aligné avec plans
+  if(!p.videos||p.videos.length!==p.plans.length){
+    p.videos=p.plans.map((pl,i)=>{
+      const existing=p.videos&&p.videos[i];
+      return existing||{index:i,status:'pending',progress:0,url:null,localUrl:null,validated:false,rejected:false,error:null};
     });
-    renderPrompts();
-    statusEl.classList.add('ok');
-    statusTx.textContent = parsed.byPlan.length+' prompts générés ✓';
-    showToast('Prompts prêts');
-  }catch(e){
-    debugLog('error','PROMPTS',e.message);
-    statusEl.classList.add('err');
-    statusTx.textContent = 'Erreur : '+e.message.slice(0,80);
-    showToast('Erreur : '+e.message.slice(0,60),'error',4000);
+    saveProjects();
   }
-  state.isGenerating = false;
-  btn.disabled = false; btn.innerHTML = '✨ Générer tous les prompts';
-}
 
-function renderPrompts(){
-  const p = getCurrentProject();
-  const list = document.getElementById('prompts-list');
-  const commonPanel = document.getElementById('common-style-panel');
-  if(!p || !p.prompts || !p.prompts.byPlan || !p.prompts.byPlan.length){
-    list.innerHTML = '<div class="empty">Aucun prompt. Clique sur Générer tous les prompts.</div>';
-    commonPanel.classList.add('hidden');
-    return;
-  }
-  if(p.prompts.commonStyle){
-    commonPanel.classList.remove('hidden');
-    document.getElementById('common-style-text').textContent = p.prompts.commonStyle;
-  }
-  list.innerHTML = p.plans.map((pl,i)=>{
-    const pb = p.prompts.byPlan[i] || {imagePrompt:'', videoPrompt:''};
-    return '<div class="panel">'+
-      '<h3>Plan '+(i+1)+'</h3>'+
-      '<div class="prompt-block" id="img-prompt-'+i+'">'+
-        '<button type="button" class="pb-copy" data-copy="img-prompt-'+i+'">Copier</button>'+
-        '<span class="pb-label">Prompt image (first frame)</span>'+
-        '<span id="img-prompt-'+i+'-text">'+esc(pb.imagePrompt)+'</span>'+
+  container.innerHTML = p.plans.map((pl,i)=>{
+    const v=p.videos[i]||{};
+    const st=v.status||'pending';
+    const cardClass = st==='done'?'done':st==='failed'?'failed':(st==='creating'||st==='processing')?'generating':'';
+    const statusText = st==='pending'?'En attente'
+      :st==='queued'?'En file'
+      :st==='creating'?'Création…'
+      :st==='processing'?'En cours… '+(v.progress||0)+'%'
+      :st==='done'?'Terminé'
+      :st==='failed'?'Échec'
+      :st;
+
+    let videoBlock='';
+    if(v.localUrl||v.url){
+      const src = v.localUrl || v.url;
+      videoBlock =
+        '<div class="plan-video-preview visible">'+
+          '<video src="'+esc(src)+'" controls playsinline preload="metadata"></video>'+
+          '<div class="video-meta">'+
+            '<span>Plan '+(i+1)+' · '+pl.duration+'s</span>'+
+            '<span>'+(v.validated?'✓ Validé':v.rejected?'✕ Rejeté':'⏳ À valider')+'</span>'+
+          '</div>'+
+          '<div class="video-actions">'+
+            '<button class="btn btn-mini'+(v.validated?' validated':'')+'" data-action="validate" data-idx="'+i+'">'+(v.validated?'✓ Validé':'Valider')+'</button>'+
+            '<button class="btn btn-mini'+(v.rejected?' rejected':'')+'" data-action="reject" data-idx="'+i+'">'+(v.rejected?'✕ Rejeté':'Rejeter')+'</button>'+
+            '<button class="btn btn-mini" data-action="regen" data-idx="'+i+'">↺ Régénérer</button>'+
+            '<button class="btn btn-mini" data-action="edit" data-idx="'+i+'">✎ Modifier prompt</button>'+
+            '<a class="btn btn-mini" href="'+esc(src)+'" download="plan_'+(i+1)+'.mp4">⬇</a>'+
+          '</div>'+
+        '</div>';
+    }
+
+    const progressBlock = (st==='creating'||st==='processing')?
+      '<div class="plan-progress visible">'+
+        '<div class="progress-status"><span>'+esc(statusText)+'</span><span>'+(v.progress||0)+'%</span></div>'+
+        '<div class="progress-bar"><div class="fill" style="width:'+(v.progress||0)+'%"></div></div>'+
+      '</div>' : '';
+
+    const errorBlock = (st==='failed'&&v.error)?
+      '<div class="video-error visible">✕ '+esc(v.error)+'</div>' : '';
+
+    return '<div class="plan-card '+cardClass+'" data-plan-idx="'+i+'">'+
+      '<div class="plan-header">'+
+        '<div class="plan-num">🎬 Plan '+(i+1)+' · '+pl.duration+'s</div>'+
+        '<div style="font-size:.68rem;color:var(--dim);font-family:var(--fm)">'+esc(statusText)+'</div>'+
       '</div>'+
-      '<div class="prompt-block" id="vid-prompt-'+i+'">'+
-        '<button type="button" class="pb-copy" data-copy="vid-prompt-'+i+'">Copier</button>'+
-        '<span class="pb-label">Prompt vidéo</span>'+
-        '<span id="vid-prompt-'+i+'-text">'+esc(pb.videoPrompt)+'</span>'+
+      '<div style="font-size:.78rem;color:var(--dim);margin-bottom:.5rem">'+esc(pl.description||'(pas de description)')+'</div>'+
+      '<div class="plan-video-actions">'+
+        (st==='done'
+          ? ''
+          : '<button class="btn btn-primary" data-action="gen" data-idx="'+i+'" '+(st==='creating'||st==='processing'?'disabled':'')+'>'+
+              (st==='creating'||st==='processing'?'⏳ En cours…':st==='failed'?'↻ Réessayer':'▶ Générer ce plan')+
+            '</button>')+
       '</div>'+
+      progressBlock+errorBlock+videoBlock+
     '</div>';
   }).join('');
 
+  container.querySelectorAll('[data-action]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const idx=parseInt(btn.dataset.idx,10);
+      const action=btn.dataset.action;
+      if(action==='gen')generateOneVideo(idx);
+      else if(action==='regen')regenerateOneVideo(idx);
+      else if(action==='validate')toggleValidated(idx,true);
+      else if(action==='reject')toggleValidated(idx,false);
+      else if(action==='edit')editVideoPrompt(idx);
+    });
+  });
+
+  updateVideoGlobalStatus();
+}
+
+function updateVideoGlobalStatus(){
+  const p=getCurrentProject();
+  const el=document.getElementById('video-status-global-text');
+  const box=document.getElementById('video-status-global');
+  if(!el||!p)return;
+  const total=p.plans.length;
+  const done=(p.videos||[]).filter(v=>v.status==='done').length;
+  const failed=(p.videos||[]).filter(v=>v.status==='failed').length;
+  const running=(p.videos||[]).filter(v=>v.status==='creating'||v.status==='processing').length;
+  if(!total){el.textContent='Aucun plan';box.classList.remove('ok','err');return}
+  if(running>0){el.textContent=running+' en cours · '+done+'/'+total+' terminés';box.classList.remove('ok','err')}
+  else if(done===total){el.textContent='Tous les plans générés ('+done+'/'+total+')';box.classList.add('ok');box.classList.remove('err')}
+  else if(failed>0){el.textContent=done+'/'+total+' terminés · '+failed+' échec(s)';box.classList.add('err');box.classList.remove('ok')}
+  else{el.textContent=done+'/'+total+' terminés';box.classList.remove('ok','err')}
+}
+
+async function refreshCostEstimate(showToastMsg=true){
+  const p=getCurrentProject();if(!p)return null;
+  const box=document.getElementById('cost-estimate');
+  if(!p.plans.length){box.style.display='none';return null}
+  try{
+    const data=await backendFetch('/api/estimate',{
+      method:'POST',
+      body:JSON.stringify({plans:p.plans.map(pl=>({duration:pl.duration})),format:p.brief.format})
+    });
+    const mins=Math.ceil(data.estimatedSeconds/60);
+    box.style.display='block';
+    box.innerHTML='💰 <strong>'+data.planCount+' plans</strong> · '+data.totalSeconds+'s de vidéo · ≈ '+data.estimatedCredits+' crédits · durée estimée ≈ '+mins+' min'+
+      '<br><small style="opacity:.7">'+esc(data.note||'')+'</small>';
+    return data;
+  }catch(e){
+    debugLog('warn','COST','Estimation échouée : '+e.message);
+    box.style.display='block';
+    box.innerHTML='⚠️ Estimation indisponible — vérifie que le backend est démarré.';
+    return null;
+  }
+}
+
+async function generateOneVideo(idx){
+  const p=getCurrentProject();if(!p)return;
+  const plan=p.plans[idx];if(!plan)return;
+  if(!p.videos) p.videos=[];
+  if(!p.videos[idx]) p.videos[idx]={index:idx,status:'pending',progress:0,url:null,localUrl:null,validated:false,rejected:false,error:null};
+
+  const health = state.backendHealth || await checkBackendHealth();
+  if(!health){showToast('Backend inaccessible — vérifie que node server.js tourne','error',4000);return}
+  if(!health.provider.keyConfigured){showToast('Clé Agnes non configurée côté serveur (.env)','error',4000);return}
+
+  // Construire le prompt vidéo final
+  const commonStyle = (p.prompts && p.prompts.commonStyle) || '';
+  const planPrompt = {
+    index: idx,
+    numFrames: numFramesFromDuration(plan.duration),
+    format: p.brief.format,
+    videoPrompt: plan.description + '. Camera : ' + (plan.camera||'slow dolly-in') + '. Lighting : ' + (plan.light||'natural'),
+    startImageUrl: null
+  };
+
+  // Le plan est traité côté backend, le frontend poll le job
+  try{
+    p.videos[idx].status='creating';
+    p.videos[idx].progress=0;
+    p.videos[idx].error=null;
+    renderVideoPlansList();
+    showToast('Envoi du plan '+(idx+1)+' à Agnes…');
+
+    const result = await backendFetch('/api/regenerate', {
+      method:'POST',
+      body:JSON.stringify({
+        plan: planPrompt,
+        format: p.brief.format,
+        commonStyle: commonStyle
+      })
+    });
+
+    debugLog('info','VIDEO','Job '+(idx+1)+' → '+result.jobId);
+    await pollVideoJob(result.jobId, idx);
+  }catch(e){
+    debugLog('error','VIDEO','Plan '+(idx+1)+' : '+e.message);
+    p.videos[idx].status='failed';
+    p.videos[idx].error=e.message;
+    renderVideoPlansList();
+    showToast('Erreur : '+e.message.slice(0,60),'error',4000);
+  }
+}
+
+async function regenerateOneVideo(idx){
+  const p=getCurrentProject();if(!p)return;
+  if(p.videos[idx]){p.videos[idx].status='pending';p.videos[idx].progress=0;p.videos[idx].error=null}
+  await generateOneVideo(idx);
+}
+
+async function pollVideoJob(jobId, planIdx){
+  const p=getCurrentProject();if(!p)return;
+  const startTime=Date.now();
+  const maxWait=20*60*1000;
+
+  while(Date.now()-startTime<maxWait){
+    await sleep(4000);
+    try{
+      const job=await backendFetch('/api/job/'+jobId);
+      const slot=job.plans[0];
+      if(!slot) break;
+
+      if(!p.videos[planIdx]) p.videos[planIdx]={index:planIdx};
+      p.videos[planIdx].status=slot.status;
+      p.videos[planIdx].progress=slot.progress||0;
+      p.videos[planIdx].url=slot.videoUrl||null;
+      p.videos[planIdx].localUrl=slot.localUrl||null;
+      if(slot.error) p.videos[planIdx].error=slot.error;
+      saveProjects();
+      renderVideoPlansList();
+
+      if(slot.status==='done'){
+        showToast('Plan '+(planIdx+1)+' généré ✓','success');
+        return;
+      }
+      if(slot.status==='failed'){
+        showToast('Échec plan '+(planIdx+1)+' : '+slot.error,'error',4000);
+        return;
+      }
+    }catch(e){
+      debugLog('warn','POLL','Erreur : '+e.message);
+    }
+  }
+  if(p.videos[planIdx]) p.videos[planIdx].status='failed';
+  p.videos[planIdx].error='Délai maximal dépassé';
+  renderVideoPlansList();
+}
+
+async function generateAllVideos(){
+  const p=getCurrentProject();if(!p||!p.plans.length)return;
+  const health = state.backendHealth || await checkBackendHealth();
+  if(!health){showToast('Backend inaccessible','error',4000);return}
+  if(!health.provider.keyConfigured){showToast('Clé Agnes non configurée (.env)','error',4000);return}
+
+  const estimate=await refreshCostEstimate(false);
+  const confirmMsg='Lancer la génération de '+p.plans.length+' plans ?\n\n'+
+    (estimate?('≈ '+estimate.estimatedCredits+' crédits · durée ≈ '+Math.ceil(estimate.estimatedSeconds/60)+' min\n\n'):'')+
+    'Cette opération consomme des crédits Agnes.';
+  if(!confirm(confirmMsg))return;
+
+  const btn=document.getElementById('gen-all-videos-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> En cours…';
+  showToast('Génération groupée lancée');
+
+  // Lancer la génération séquentiellement (limite côté serveur)
+  for(let i=0;i<p.plans.length;i++){
+    const already=p.videos[i] && p.videos[i].status==='done';
+    if(already) continue;
+    await generateOneVideo(i);
+  }
+
+  btn.disabled=false;btn.innerHTML='▶ Tout générer';
+  showToast('Génération groupée terminée','success',4000);
+}
+
+function toggleValidated(idx, yes){
+  const p=getCurrentProject();if(!p||!p.videos[idx])return;
+  p.videos[idx].validated=!!yes;
+  p.videos[idx].rejected=!yes;
+  saveProjects();
+  renderVideoPlansList();
+  showToast(yes?'Plan '+(idx+1)+' validé':'Plan '+(idx+1)+' rejeté',yes?'success':'warn');
+}
+
+function editVideoPrompt(idx){
+  const p=getCurrentProject();if(!p)return;
+  const pl=p.plans[idx];
+  const newDesc=prompt('Description du plan :',pl.description||'');
+  if(newDesc===null)return;
+  const newCamera=prompt('Mouvement caméra :',pl.camera||'');
+  if(newCamera===null)return;
+  const newLight=prompt('Ambiance lumineuse :',pl.light||'');
+  if(newLight===null)return;
+  p.plans[idx].description=newDesc;
+  p.plans[idx].camera=newCamera;
+  p.plans[idx].light=newLight;
+  saveProjects();
+  renderVideoPlansList();
+  showToast('Prompt mis à jour');
+}
+
+function validateAllVideos(){
+  const p=getCurrentProject();if(!p)return;
+  let n=0;
+  (p.videos||[]).forEach(v=>{
+    if(v.status==='done'){v.validated=true;v.rejected=false;n++}
+  });
+  saveProjects();renderVideoPlansList();
+  showToast(n+' plan(s) validé(s)');
+}
+
+function resetAllVideos(){
+  const p=getCurrentProject();if(!p)return;
+  if(!confirm('Réinitialiser tous les états de génération ?'))return;
+  p.videos=p.plans.map((_,i)=>({index:i,status:'pending',progress:0,url:null,localUrl:null,validated:false,rejected:false,error:null}));
+  saveProjects();renderVideoPlansList();
+  showToast('Réinitialisé','warn');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ÉCRAN 5 : PROMPTS
+// ══════════════════════════════════════════════════════════════════
+function buildPromptsPrompt(brief,script,plans){
+  const plansBlock=plans.map((pl,i)=>'Plan '+(i+1)+' ('+pl.duration+'s) : '+pl.description+' | Caméra : '+pl.camera+' | Lumière : '+pl.light).join('\n');
+  return [
+    'Tu es prompt engineer pour générateurs vidéo IA. À partir de ce découpage, produis un bloc de style commun + un prompt vidéo et un prompt image par plan.',
+    '','BRIEF : '+brief.product+' — '+brief.audience,'TON : '+brief.tone,
+    'PLATEFORME : '+brief.platform+' — FORMAT : '+brief.format,
+    '','SCRIPT : '+script.hook+' / '+script.progression+' / '+script.cta,
+    '','PLANS À DÉCRIRE :',plansBlock,
+    '','RÈGLES :',
+    '- Style commun : 25-45 mots en anglais (lumière, caméra, texture, colorimétrie).',
+    '- Prompt image : 30-60 mots en anglais, décrit le PREMIER FRAME.',
+    '- Prompt vidéo : 50-90 mots en anglais (action + caméra + durée).',
+    '- Format : '+brief.format+'.',
+    '','RÉPONSE : JSON valide uniquement :',
+    '{ "commonStyle": "anglais, 25-45 mots", "byPlan": [ { "imagePrompt": "anglais, 30-60 mots", "videoPrompt": "anglais, 50-90 mots" } ] }'
+  ].join('\n');
+}
+async function generatePrompts(){
+  if(state.isGenerating)return;
+  const p=getCurrentProject();if(!p)return;
+  if(!p.plans.length){showToast('Génère les plans','warn');return}
+  const script=p.scripts[p.selectedScriptIndex];
+  if(!script){showToast('Choisis un script','warn');return}
+  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){showToast('Clé Agnes requise','warn');return}
+  state.isGenerating=true;
+  const btn=document.getElementById('gen-prompts-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Génération…';
+  const statusEl=document.getElementById('prompts-status');const statusTx=document.getElementById('prompts-status-text');
+  statusEl.classList.remove('hidden','ok','err');statusTx.textContent='Agnes rédige…';
+  try{
+    const text=await callAgnes('Tu es prompt engineer. Tu réponds UNIQUEMENT en JSON valide, sans markdown.',buildPromptsPrompt(p.brief,script,p.plans),4000,0.7);
+    const parsed=extractJson(text);
+    if(!parsed||!parsed.byPlan)throw new Error('Réponse invalide');
+    updateCurrentProject(pp=>{
+      pp.prompts={commonStyle:parsed.commonStyle||'',byPlan:parsed.byPlan.map(x=>({imagePrompt:x.imagePrompt||'',videoPrompt:x.videoPrompt||''}))};
+    });
+    renderPrompts();statusEl.classList.add('ok');statusTx.textContent='✓';showToast('Prompts prêts');
+  }catch(e){debugLog('error','PROMPTS',e.message);statusEl.classList.add('err');statusTx.textContent='Erreur : '+e.message.slice(0,80);showToast('Erreur','error',4000)}
+  state.isGenerating=false;btn.disabled=false;btn.innerHTML='✨ Générer tous les prompts';
+}
+function renderPrompts(){
+  const p=getCurrentProject();
+  const list=document.getElementById('prompts-list');
+  const commonPanel=document.getElementById('common-style-panel');
+  if(!p||!p.prompts||!p.prompts.byPlan||!p.prompts.byPlan.length){list.innerHTML='<div class="empty">Aucun prompt.</div>';commonPanel.classList.add('hidden');return}
+  if(p.prompts.commonStyle){commonPanel.classList.remove('hidden');document.getElementById('common-style-text').textContent=p.prompts.commonStyle}
+  list.innerHTML=p.plans.map((pl,i)=>{
+    const pb=p.prompts.byPlan[i]||{};
+    return '<div class="panel"><h3>Plan '+(i+1)+'</h3>'+
+      '<div class="prompt-block" id="img-prompt-'+i+'" style="background:#05050a;border:1px solid var(--border);border-radius:8px;padding:.7rem .85rem;font-family:var(--fm);font-size:.72rem;line-height:1.5;color:#a8d8b0;white-space:pre-wrap;margin-bottom:.6rem;position:relative">'+
+        '<button class="pb-copy" data-copy="img-prompt-'+i+'" style="position:absolute;top:.5rem;right:.5rem;background:rgba(229,193,90,.15);border:1px solid var(--acc);color:var(--acc);padding:.25rem .55rem;border-radius:4px;font-size:.65rem;cursor:pointer;font-family:inherit;font-weight:600">Copier</button>'+
+        '<span style="display:block;font-size:.62rem;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:.4rem">Prompt image</span>'+
+        '<span id="img-prompt-'+i+'-text">'+esc(pb.imagePrompt||'')+'</span></div>'+
+      '<div class="prompt-block" id="vid-prompt-'+i+'" style="background:#05050a;border:1px solid var(--border);border-radius:8px;padding:.7rem .85rem;font-family:var(--fm);font-size:.72rem;line-height:1.5;color:#a8d8b0;white-space:pre-wrap;position:relative">'+
+        '<button class="pb-copy" data-copy="vid-prompt-'+i+'" style="position:absolute;top:.5rem;right:.5rem;background:rgba(229,193,90,.15);border:1px solid var(--acc);color:var(--acc);padding:.25rem .55rem;border-radius:4px;font-size:.65rem;cursor:pointer;font-family:inherit;font-weight:600">Copier</button>'+
+        '<span style="display:block;font-size:.62rem;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:.4rem">Prompt vidéo</span>'+
+        '<span id="vid-prompt-'+i+'-text">'+esc(pb.videoPrompt||'')+'</span></div>'+
+    '</div>';
+  }).join('');
   list.querySelectorAll('[data-copy]').forEach(btn=>{
     btn.addEventListener('click',async e=>{
       e.stopPropagation();
-      const id = btn.dataset.copy;
-      const txt = document.getElementById(id+'-text').textContent;
-      const ok = await copyToClipboard(txt);
-      if(ok){
-        btn.textContent = 'Copié ✓';
-        btn.classList.add('copied');
-        setTimeout(()=>{btn.textContent='Copier';btn.classList.remove('copied')},1500);
-      } else showToast('Copie impossible','error');
+      const id=btn.dataset.copy;
+      const txt=document.getElementById(id+'-text').textContent;
+      const ok=await copyToClipboard(txt);
+      if(ok){btn.textContent='Copié ✓';btn.style.background='var(--ok)';btn.style.color='#fff';setTimeout(()=>{btn.textContent='Copier';btn.style.background='rgba(229,193,90,.15)';btn.style.color='var(--acc)'},1500)}
     });
   });
 }
-
 async function copyAllPrompts(){
-  const p = getCurrentProject();
-  if(!p || !p.prompts || !p.prompts.byPlan.length){ showToast('Rien à copier','warn'); return; }
-  let out = '# STYLE COMMUN\n'+p.prompts.commonStyle+'\n\n';
+  const p=getCurrentProject();if(!p||!p.prompts||!p.prompts.byPlan.length){showToast('Rien à copier','warn');return}
+  let out='# STYLE COMMUN\n'+p.prompts.commonStyle+'\n\n';
   p.plans.forEach((pl,i)=>{
-    const pb = p.prompts.byPlan[i] || {};
-    out += '---\n## PLAN '+(i+1)+' ('+pl.duration+'s)\n';
-    out += 'Texte à l\'écran : '+(pl.onScreenText||'—')+'\n';
-    out += '\nIMAGE PROMPT:\n'+(pb.imagePrompt||'')+'\n';
-    out += '\nVIDEO PROMPT:\n'+(pb.videoPrompt||'')+'\n\n';
+    const pb=p.prompts.byPlan[i]||{};
+    out+='---\n## PLAN '+(i+1)+' ('+pl.duration+'s)\nTexte à l\'écran : '+(pl.onScreenText||'—')+'\n\nIMAGE PROMPT:\n'+(pb.imagePrompt||'')+'\n\nVIDEO PROMPT:\n'+(pb.videoPrompt||'')+'\n\n';
   });
-  const ok = await copyToClipboard(out);
-  if(ok) showToast('Tous les prompts copiés');
-  else showToast('Copie impossible','error');
+  const ok=await copyToClipboard(out);
+  showToast(ok?'Prompts copiés':'Copie impossible',ok?'success':'error');
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ÉCRAN 5 : CHECKLIST / MUSIQUE / LIVRAISON
+// ÉCRAN 6 : ASSEMBLAGE & LIVRAISON
 // ══════════════════════════════════════════════════════════════════
-const CHECKLIST_ITEMS = [
-  {key:'generated', label:'Tous les plans générés (vidéos IA produites)'},
-  {key:'validated', label:'Plans validés (visionnés et retenus)'},
-  {key:'audio', label:'Voix off ou musique ajoutée'},
-  {key:'subtitles', label:'Sous-titres intégrés'},
-  {key:'exported', label:'Export final (MP4 / format plateforme)'},
-  {key:'formatChecked', label:'Format et durée vérifiés pour la plateforme'}
+function renderAudioAndAssemble(){
+  const p=getCurrentProject();if(!p)return;
+  const c=document.getElementById('audio-loaded-container');
+  if(p.audioUrl){
+    c.innerHTML='<div class="audio-loaded">🎵 Audio chargé : <strong>'+(p.audioName||'audio')+'</strong> <button type="button" id="remove-audio">✕</button></div>';
+    c.querySelector('#remove-audio').addEventListener('click',()=>{
+      updateCurrentProject(pp=>{pp.audioUrl=null;pp.audioName=null});
+      renderAudioAndAssemble();showToast('Audio retiré','warn');
+    });
+  } else { c.innerHTML='' }
+
+  // Afficher la vidéo finale si elle existe
+  const fp=document.getElementById('final-preview');
+  if(p.finalVideoUrl){
+    fp.classList.add('visible');
+    document.getElementById('final-video').src=p.finalVideoUrl;
+    const dl=document.getElementById('download-final');
+    dl.href=p.finalVideoUrl;dl.download=p.name.replace(/[^a-z0-9_-]/gi,'_')+'.mp4';
+  } else {
+    fp.classList.remove('visible');
+  }
+}
+
+const CHECKLIST_ITEMS=[
+  {key:'generated',label:'Tous les plans générés (vidéos IA produites)'},
+  {key:'validated',label:'Plans validés (visionnés et retenus)'},
+  {key:'audio',label:'Voix off ou musique ajoutée'},
+  {key:'subtitles',label:'Sous-titres intégrés'},
+  {key:'exported',label:'Export final (MP4 / format plateforme)'},
+  {key:'formatChecked',label:'Format et durée vérifiés pour la plateforme'}
 ];
 function renderChecklist(){
-  const p = getCurrentProject();
-  const c = document.getElementById('checklist');
-  if(!p){ c.innerHTML=''; return; }
-  if(!p.checklist) p.checklist = {};
-  c.innerHTML = CHECKLIST_ITEMS.map(it=>{
-    const done = p.checklist[it.key] ? ' done' : '';
-    return '<div class="checklist-item'+done+'" data-key="'+it.key+'">'+
-      '<div class="chk">✓</div>'+
-      '<div class="chk-label">'+esc(it.label)+'</div>'+
-    '</div>';
+  const p=getCurrentProject();const c=document.getElementById('checklist');
+  if(!p){c.innerHTML='';return}
+  if(!p.checklist)p.checklist={};
+  c.innerHTML=CHECKLIST_ITEMS.map(it=>{
+    const done=p.checklist[it.key]?' done':'';
+    return '<div class="checklist-item'+done+'" data-key="'+it.key+'" style="display:flex;align-items:center;gap:.7rem;padding:.75rem .9rem;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:.4rem;cursor:pointer;user-select:none"><div class="chk" style="width:24px;height:24px;border-radius:6px;border:2px solid var(--faint);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:transparent;transition:all .15s;'+(p.checklist[it.key]?'background:var(--ok);border-color:var(--ok);color:#fff':'')+'">✓</div><div style="flex:1;font-size:.88rem">'+esc(it.label)+'</div></div>';
   }).join('');
   c.querySelectorAll('.checklist-item').forEach(el=>{
     el.addEventListener('click',()=>{
-      const key = el.dataset.key;
+      const key=el.dataset.key;
       updateCurrentProject(pp=>{
-        if(!pp.checklist) pp.checklist = {};
-        pp.checklist[key] = !pp.checklist[key];
-        const allDone = CHECKLIST_ITEMS.every(it=>pp.checklist[it.key]);
-        if(allDone) pp.status = 'livre';
-        else if(pp.status==='plans' || pp.status==='script' || pp.status==='brief') pp.status = 'encours';
-        else pp.status = 'encours';
+        if(!pp.checklist)pp.checklist={};
+        pp.checklist[key]=!pp.checklist[key];
+        const all=CHECKLIST_ITEMS.every(it=>pp.checklist[it.key]);
+        pp.status=all?'livre':(pp.status==='livre'?'encours':pp.status);
       });
-      renderChecklist();
-      renderProjects();
+      renderChecklist();renderProjects();
     });
   });
 }
 
-async function generateMusicSuggestions(){
-  const p = getCurrentProject();
-  if(!p) return;
-  if(!p.brief.product){ showToast('Renseigne le brief','warn'); return; }
-  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){
-    updateCurrentProject(pp=>{ pp.musicSuggestions = generateMusicFallback(pp.brief); });
-    renderMusicSuggestions();
-    showToast('Suggestions proposées (mode local)','warn');
-    return;
-  }
-  const btn = document.getElementById('gen-music-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Génération…';
+// Audio upload
+async function handleAudioUpload(file){
+  if(!file)return;
+  if(!file.type.startsWith('audio/')){showToast('Fichier audio requis','error');return}
+  const formData=new FormData();
+  formData.append('audio',file);
+  setStatus(document.getElementById('assemble-status'),'assemble-status-text','Upload audio…',null);
   try{
-    const systemPrompt = 'Tu es directeur musical pour spots publicitaires courts. Tu réponds UNIQUEMENT en JSON valide.';
-    const userPrompt = [
-      'Pour ce spot : '+p.brief.product+' — public : '+p.brief.audience+' — ton : '+p.brief.tone+' — durée '+p.brief.duration+'s.',
-      '',
-      'Propose 3 pistes musicales (descriptions, pas de fichiers) + 1 ambiance sonore.',
-      '',
-      'RÉPONSE : JSON valide uniquement :',
-      '{',
-      '  "tracks": [',
-      '    { "name": "nom évocateur", "mood": "ambiance en 3-5 mots", "tempo": "ex : 90 BPM, montée progressive", "where": "où la trouver (ex : Epidemic Sound, Artlist, YouTube Audio Library)" },',
-      '    { "name": "...", "mood": "...", "tempo": "...", "where": "..." },',
-      '    { "name": "...", "mood": "...", "tempo": "...", "where": "..." }',
-      '  ],',
-      '  "ambience": "description d\'ambiance sonore (foley, bruitages, atmosphère)"',
-      '}'
-    ].join('\n');
-    const text = await callAgnes(systemPrompt, userPrompt, 1500, 0.8);
-    const parsed = extractJson(text);
-    if(parsed && parsed.tracks){
-      updateCurrentProject(pp=>{ pp.musicSuggestions = {tracks: parsed.tracks, ambience: parsed.ambience || ''}; });
-      renderMusicSuggestions();
-      showToast('Suggestions prêtes');
-    } else throw new Error('Réponse invalide');
+    const res=await fetch(BACKEND_URL+'/api/upload/audio',{method:'POST',body:formData});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    updateCurrentProject(pp=>{pp.audioUrl=data.url;pp.audioName=data.name});
+    renderAudioAndAssemble();
+    showToast('Audio uploadé ✓','success');
+    document.getElementById('assemble-status').classList.add('hidden');
   }catch(e){
-    debugLog('error','MUSIC',e.message);
-    updateCurrentProject(pp=>{ pp.musicSuggestions = generateMusicFallback(pp.brief); });
-    renderMusicSuggestions();
-    showToast('Mode local utilisé','warn');
+    debugLog('error','AUDIO',e.message);
+    showToast('Upload échoué : '+e.message,'error',4000);
+    document.getElementById('assemble-status').classList.add('hidden');
   }
-  btn.disabled = false; btn.innerHTML = '✨ Générer suggestions';
 }
 
+function setStatus(el, txEl, text, type){
+  if(!el||!txEl)return;
+  el.classList.remove('hidden','ok','err');
+  if(text)el.classList.remove('hidden');
+  if(type==='ok')el.classList.add('ok');
+  if(type==='err')el.classList.add('err');
+  document.getElementById(txEl).textContent=text||'';
+}
+
+async function assembleFinalVideo(){
+  const p=getCurrentProject();if(!p)return;
+  const validated=(p.videos||[]).filter(v=>v.status==='done' && (v.validated!==false));
+  if(!validated.length){showToast('Aucun plan validé','warn');return}
+
+  // Trier selon l'ordre des plans
+  const ordered = p.plans.map((pl,i)=>{
+    const v=p.videos[i];
+    return (v&&v.status==='done')?v:null;
+  }).filter(Boolean);
+
+  if(ordered.length!==p.plans.length){
+    if(!confirm('Tous les plans ne sont pas générés ('+ordered.length+'/'+p.plans.length+'). Continuer avec ceux disponibles ?'))return;
+  }
+
+  const btn=document.getElementById('assemble-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Assemblage…';
+  const statusEl=document.getElementById('assemble-status');
+  setStatus(statusEl,'assemble-status-text','Assemblage FFmpeg en cours…',null);
+  document.getElementById('assemble-progress').style.display='block';
+  document.getElementById('assemble-fill').style.width='20%';
+
+  try{
+    const clips=ordered.map(v=>({localUrl:v.localUrl, videoUrl:v.url}));
+    const texts=p.plans.map(pl=>pl.onScreenText||'');
+    const payload={clips,audioUrl:p.audioUrl,texts,format:p.brief.format};
+
+    document.getElementById('assemble-fill').style.width='60%';
+    const result=await backendFetch('/api/assemble',{method:'POST',body:JSON.stringify(payload)});
+    document.getElementById('assemble-fill').style.width='100%';
+
+    updateCurrentProject(pp=>{pp.finalVideoUrl=result.url});
+    renderAudioAndAssemble();
+    setStatus(statusEl,'assemble-status-text','✓ Assemblage terminé',('ok'));
+    showToast('Vidéo finale prête ✓','success',4000);
+    setTimeout(()=>document.getElementById('assemble-progress').style.display='none',3000);
+  }catch(e){
+    debugLog('error','ASSEMBLE',e.message);
+    setStatus(statusEl,'assemble-status-text','Erreur : '+e.message.slice(0,80),'err');
+    showToast('Assemblage échoué','error',4000);
+    document.getElementById('assemble-progress').style.display='none';
+  }
+  btn.disabled=false;btn.innerHTML='🎞️ Lancer l\'assemblage';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MUSIQUE / LIVRAISON
+// ══════════════════════════════════════════════════════════════════
+async function generateMusicSuggestions(){
+  const p=getCurrentProject();if(!p)return;
+  if(!p.brief.product){showToast('Renseigne le brief','warn');return}
+  if(!state.apiKey && !localStorage.getItem(API_KEY_STORAGE)){
+    updateCurrentProject(pp=>{pp.musicSuggestions=generateMusicFallback(pp.brief)});
+    renderMusicSuggestions();showToast('Suggestions locales','warn');return;
+  }
+  const btn=document.getElementById('gen-music-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Génération…';
+  try{
+    const prompt=[
+      'Spot : '+p.brief.product+' — public : '+p.brief.audience+' — ton : '+p.brief.tone+' — durée '+p.brief.duration+'s.',
+      'Propose 3 pistes musicales (descriptions) + 1 ambiance sonore.',
+      'JSON : { "tracks":[{"name":"...","mood":"...","tempo":"...","where":"..."}],"ambience":"..." }'
+    ].join('\n');
+    const text=await callAgnes('Tu es directeur musical. Tu réponds UNIQUEMENT en JSON.',prompt,1500,0.8);
+    const parsed=extractJson(text);
+    if(parsed&&parsed.tracks){
+      updateCurrentProject(pp=>{pp.musicSuggestions={tracks:parsed.tracks,ambience:parsed.ambience||''}});
+      renderMusicSuggestions();showToast('Suggestions prêtes');
+    } else throw new Error('Invalide');
+  }catch(e){
+    updateCurrentProject(pp=>{pp.musicSuggestions=generateMusicFallback(pp.brief)});
+    renderMusicSuggestions();showToast('Mode local','warn');
+  }
+  btn.disabled=false;btn.innerHTML='✨ Générer suggestions';
+}
 function generateMusicFallback(brief){
-  const tone = brief.tone || 'luxe';
-  const map = {
-    luxe: {tracks:[
-      {name:'Velvet Minimal', mood:'luxueux, épuré, intemporel', tempo:'70 BPM, piano solo + nappe', where:'Epidemic Sound / Artlist'},
-      {name:'Golden Hour', mood:'chaleureux, doré, contemplatif', tempo:'80 BPM, cordes douces', where:'YouTube Audio Library'},
-      {name:'Modern Couture', mood:'élégant, rythmé, chic', tempo:'95 BPM, beat discret', where:'Artlist'}
-    ], ambience:'Foley discret : froissement de tissu, tintement de verre, respiration d\'air ambiant.'},
-    fun: {tracks:[
-      {name:'Bubble Pop', mood:'joyeux, rebondissant, coloré', tempo:'120 BPM, synthés ludiques', where:'Epidemic Sound'},
-      {name:'Sunny Bounce', mood:'énergique, estival, léger', tempo:'115 BPM, ukulélé + claps', where:'YouTube Audio Library'},
-      {name:'Cartoon Vibes', mood:'espiègle, cartoon, expressif', tempo:'125 BPM, percussions pétillantes', where:'Artlist'}
-    ], ambience:'Foley marqué : whooshes, pop, rires discrets, bouncing.'},
-    dramatique: {tracks:[
-      {name:'Red Horizon', mood:'intense, tendu, cinématographique', tempo:'Lent 60 BPM, cordes graves', where:'Artlist'},
-      {name:'Rise of Tension', mood:'dramatique, montée en puissance', tempo:'Progression 70→120 BPM', where:'Epidemic Sound'},
-      {name:'Cinematic Pulse', mood:'héroïque, profond, épique', tempo:'85 BPM, percussions lourdes', where:'YouTube Audio Library'}
-    ], ambience:'Foley : respirations, basses profondes, impulsions sonores.'},
-    minimaliste: {tracks:[
-      {name:'Blank Space', mood:'calme, épuré, silencieux', tempo:'60 BPM, piano notes espacées', where:'Epidemic Sound'},
-      {name:'Ambient Line', mood:'minimal, méditatif', tempo:'55 BPM, drone continu', where:'YouTube Audio Library'},
-      {name:'Neutral Groove', mood:'discret, régulier, sobre', tempo:'75 BPM, beat léger', where:'Artlist'}
-    ], ambience:'Foley minimal : un seul son marquant par plan, silence respiré.'}
+  const tone=brief.tone||'luxe';
+  const map={
+    luxe:{tracks:[{name:'Velvet Minimal',mood:'luxueux',tempo:'70 BPM',where:'Epidemic Sound'},{name:'Golden Hour',mood:'chaleureux',tempo:'80 BPM',where:'YouTube Audio Library'},{name:'Modern Couture',mood:'chic',tempo:'95 BPM',where:'Artlist'}],ambience:'Foley discret.'},
+    fun:{tracks:[{name:'Bubble Pop',mood:'joyeux',tempo:'120 BPM',where:'Epidemic Sound'},{name:'Sunny Bounce',mood:'énergique',tempo:'115 BPM',where:'YouTube Audio Library'},{name:'Cartoon Vibes',mood:'espiègle',tempo:'125 BPM',where:'Artlist'}],ambience:'Whooshes, pop.'},
+    dramatique:{tracks:[{name:'Red Horizon',mood:'intense',tempo:'60 BPM',where:'Artlist'},{name:'Rise of Tension',mood:'dramatique',tempo:'70→120 BPM',where:'Epidemic Sound'},{name:'Cinematic Pulse',mood:'héroïque',tempo:'85 BPM',where:'YouTube Audio Library'}],ambience:'Respirations.'},
+    minimaliste:{tracks:[{name:'Blank Space',mood:'calme',tempo:'60 BPM',where:'Epidemic Sound'},{name:'Ambient Line',mood:'minimal',tempo:'55 BPM',where:'YouTube Audio Library'},{name:'Neutral Groove',mood:'sobre',tempo:'75 BPM',where:'Artlist'}],ambience:'Son unique par plan.'}
   };
-  return map[tone] || map.luxe;
+  return map[tone]||map.luxe;
 }
-
 function renderMusicSuggestions(){
-  const p = getCurrentProject();
-  const c = document.getElementById('music-suggestions');
-  if(!p || !p.musicSuggestions || !p.musicSuggestions.tracks){
-    c.innerHTML = '<div class="empty">Aucune suggestion pour l\'instant.</div>';
-    return;
-  }
-  c.innerHTML = p.musicSuggestions.tracks.map((t,i)=>
-    '<div class="variant-card" style="cursor:default">'+
-      '<div class="vhead"><span>Piste '+(i+1)+'</span></div>'+
-      '<div class="vsection"><strong>Nom</strong>'+esc(t.name)+'</div>'+
-      '<div class="vsection"><strong>Ambiance</strong>'+esc(t.mood||'')+'</div>'+
-      '<div class="vsection"><strong>Tempo</strong>'+esc(t.tempo||'')+'</div>'+
-      '<div class="vsection" style="opacity:.75;font-size:.78rem;"><strong>Où</strong>'+esc(t.where||'')+'</div>'+
-    '</div>'
-  ).join('') + (p.musicSuggestions.ambience?
-    '<div class="panel" style="margin-top:.6rem;margin-bottom:0;padding:.8rem 1rem;">'+
-      '<h3 style="margin-bottom:.3rem">Ambiance sonore</h3>'+
-      '<p style="font-size:.85rem;color:var(--ink)">'+esc(p.musicSuggestions.ambience)+'</p>'+
-    '</div>' : '');
+  const p=getCurrentProject();const c=document.getElementById('music-suggestions');
+  if(!p||!p.musicSuggestions||!p.musicSuggestions.tracks){c.innerHTML='<div class="empty">Aucune suggestion.</div>';return}
+  c.innerHTML=p.musicSuggestions.tracks.map((t,i)=>
+    '<div class="variant-card" style="cursor:default"><div class="vhead"><span>Piste '+(i+1)+'</span></div>'+
+    '<div class="vsection"><strong>Nom</strong>'+esc(t.name)+'</div>'+
+    '<div class="vsection"><strong>Ambiance</strong>'+esc(t.mood||'')+'</div>'+
+    '<div class="vsection"><strong>Tempo</strong>'+esc(t.tempo||'')+'</div>'+
+    '<div class="vsection" style="opacity:.75;font-size:.78rem;"><strong>Où</strong>'+esc(t.where||'')+'</div></div>'
+  ).join('')+(p.musicSuggestions.ambience?'<div class="panel" style="margin-top:.6rem;margin-bottom:0;padding:.8rem 1rem;"><h3 style="margin-bottom:.3rem">Ambiance sonore</h3><p style="font-size:.85rem">'+esc(p.musicSuggestions.ambience)+'</p></div>':'');
 }
 
 function buildDeliveryText(){
-  const p = getCurrentProject();
-  if(!p) return '';
-  const brief = p.brief;
-  const planCount = p.plans.length;
-  const totalDur = p.plans.reduce((s,x)=>s+(parseInt(x.duration,10)||0),0);
-  const platformLabel = {reels:'Instagram Reels',tiktok:'TikTok',shorts:'YouTube Shorts',youtube:'YouTube'}[brief.platform]||brief.platform;
+  const p=getCurrentProject();if(!p)return '';
+  const brief=p.brief;
+  const totalDur=p.plans.reduce((s,x)=>s+(parseInt(x.duration,10)||0),0);
+  const platformLabel={reels:'Instagram Reels',tiktok:'TikTok',shorts:'YouTube Shorts',youtube:'YouTube'}[brief.platform]||brief.platform;
   return [
-    'Bonjour '+(brief.clientName||'')+',',
-    '',
-    'Voici votre clip finalisé :',
-    '',
+    'Bonjour '+(brief.clientName||'')+',','',
+    'Voici votre clip finalisé :','',
     '🎬 '+brief.product,
     '📱 Plateforme : '+platformLabel+' ('+brief.format+')',
-    '⏱ Durée : '+totalDur+' secondes · '+planCount+' plans',
-    '🎨 Ton : '+brief.tone+' · Objectif : '+brief.objective,
-    '',
+    '⏱ Durée : '+totalDur+' secondes · '+p.plans.length+' plans',
+    '🎨 Ton : '+brief.tone+' · Objectif : '+brief.objective,'',
     'Structure narrative :',
     '• Accroche : '+(p.scripts[p.selectedScriptIndex]?.hook||'—'),
     '• Progression : '+(p.scripts[p.selectedScriptIndex]?.progression||'—'),
-    '• Appel à l\'action : '+(p.scripts[p.selectedScriptIndex]?.cta||'—'),
-    '',
-    'Le fichier est livré au format demandé. N\'hésitez pas à me faire un retour, je peux ajuster le montage, la musique ou le rythme très rapidement.',
-    '',
-    'Merci pour votre confiance 🙏',
-    'Bien à vous,'
-  ].join('\n');
+    '• Appel à l\'action : '+(p.scripts[p.selectedScriptIndex]?.cta||'—'),'',
+    p.finalVideoUrl?'🎥 Vidéo finale : '+window.location.origin+p.finalVideoUrl:'',
+    '','N\'hésitez pas à me faire un retour, je peux ajuster rapidement.',
+    '','Merci pour votre confiance 🙏','Bien à vous,'
+  ].filter(Boolean).join('\n');
 }
-
 function renderDelivery(){
-  const p = getCurrentProject();
-  const el = document.getElementById('delivery-text');
-  if(!p){ el.classList.add('hidden'); return; }
-  if(!p.deliveryText){ el.classList.add('hidden'); return; }
-  el.classList.remove('hidden');
-  el.textContent = p.deliveryText;
+  const p=getCurrentProject();const el=document.getElementById('delivery-text');
+  if(!p||!p.deliveryText){el.classList.add('hidden');return}
+  el.classList.remove('hidden');el.textContent=p.deliveryText;
 }
-
 function generateDelivery(){
-  const p = getCurrentProject();
-  if(!p){ showToast('Aucun projet','warn'); return; }
-  const txt = buildDeliveryText();
-  updateCurrentProject(pp=>{ pp.deliveryText = txt; });
-  renderDelivery();
-  showToast('Message généré');
+  const p=getCurrentProject();if(!p){showToast('Aucun projet','warn');return}
+  updateCurrentProject(pp=>{pp.deliveryText=buildDeliveryText()});
+  renderDelivery();showToast('Message généré');
 }
-
 async function copyDelivery(){
-  const p = getCurrentProject();
-  if(!p || !p.deliveryText){ showToast('Génère d\'abord le message','warn'); return; }
-  const ok = await copyToClipboard(p.deliveryText);
-  if(ok) showToast('Copié');
-  else showToast('Copie impossible','error');
+  const p=getCurrentProject();
+  if(!p||!p.deliveryText){showToast('Génère d\'abord','warn');return}
+  const ok=await copyToClipboard(p.deliveryText);
+  showToast(ok?'Copié':'Impossible',ok?'success':'error');
 }
+function markDelivered(){const p=getCurrentProject();if(!p)return;updateCurrentProject(pp=>{pp.status='livre'});renderProjects();showToast('Livré ✓')}
 
-function markDelivered(){
-  const p = getCurrentProject();
-  if(!p) return;
-  updateCurrentProject(pp=>{ pp.status = 'livre'; });
-  renderProjects();
-  showToast('Projet marqué comme livré','success');
+// ══════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════════════
+function numFramesFromDuration(seconds){
+  // Agnes : num_frames = secondes * 24 + 1 (approximatif)
+  const s=Math.max(3,Math.min(10,seconds));
+  const map={3:73,4:97,5:121,6:145,7:169,8:193,9:217,10:241};
+  return map[s]||Math.round(s*24)+1;
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GESTION CLÉ API AGNES (champ visible)
+// CLÉ API TEXTE
 // ══════════════════════════════════════════════════════════════════
 function updateApiKeyUI(){
-  const panel = document.getElementById('api-key-panel');
-  const input = document.getElementById('api-key-input');
-  const statusEl = document.getElementById('api-key-status');
-  const statusTx = document.getElementById('api-key-status-text');
-  if(!panel || !input || !statusEl || !statusTx) return;
-  const key = state.apiKey || localStorage.getItem(API_KEY_STORAGE) || '';
+  const panel=document.getElementById('api-key-panel');
+  const input=document.getElementById('api-key-input');
+  const statusEl=document.getElementById('api-key-status');
+  const statusTx=document.getElementById('api-key-status-text');
+  if(!panel||!input||!statusEl||!statusTx)return;
+  const key=state.apiKey||localStorage.getItem(API_KEY_STORAGE)||'';
   if(key){
-    input.value = key;
-    panel.classList.add('ok');
-    statusEl.classList.add('ok');
-    statusTx.textContent = 'Clé active · ' + key.slice(0,10) + '…' + key.slice(-4);
+    input.value=key;panel.classList.add('ok');statusEl.classList.add('ok');
+    statusTx.textContent='Clé texte active · '+key.slice(0,10)+'…'+key.slice(-4);
   } else {
-    input.value = '';
-    panel.classList.remove('ok');
-    statusEl.classList.remove('ok');
-    statusTx.textContent = 'Aucune clé enregistrée';
+    input.value='';panel.classList.remove('ok');statusEl.classList.remove('ok');
+    statusTx.textContent='Aucune clé texte enregistrée';
   }
 }
-
 function saveApiKeyFromUI(){
-  const input = document.getElementById('api-key-input');
-  if(!input) return;
-  const key = input.value.trim();
-  if(!key){
-    localStorage.removeItem(API_KEY_STORAGE);
-    state.apiKey = '';
-    updateApiKeyUI();
-    showToast('Clé supprimée','warn');
+  const input=document.getElementById('api-key-input');if(!input)return;
+  const key=input.value.trim();
+  if(!key){localStorage.removeItem(API_KEY_STORAGE);state.apiKey='';updateApiKeyUI();showToast('Clé supprimée','warn');return}
+  if(!key.startsWith('sk-')){if(!confirm('La clé ne commence pas par "sk-". Sauvegarder ?'))return}
+  try{localStorage.setItem(API_KEY_STORAGE,key);state.apiKey=key;updateApiKeyUI();debugLog('success','API','Clé texte enregistrée');showToast('Clé enregistrée ✓')}
+  catch(e){showToast('Erreur','error')}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PARAMÈTRES MODAL
+// ══════════════════════════════════════════════════════════════════
+async function openSettings(){
+  document.getElementById('settings-modal').classList.add('visible');
+  const health = await checkBackendHealth();
+  const nameEl=document.getElementById('cfg-provider-name');
+  const modelEl=document.getElementById('cfg-provider-model');
+  const badgeEl=document.getElementById('cfg-provider-badge');
+  const keyPreview=document.getElementById('cfg-key-preview');
+  const keyBadge=document.getElementById('cfg-key-badge');
+  const maxEl=document.getElementById('cfg-max-concurrent');
+
+  if(!health){
+    nameEl.textContent='Backend inaccessible';
+    modelEl.textContent='—';
+    badgeEl.textContent='✕ Erreur';
+    badgeEl.className='badge-err';
+    keyPreview.textContent='Démarre le serveur : node server.js';
+    keyBadge.textContent='✕';
+    keyBadge.className='badge-err';
+    maxEl.textContent='—';
     return;
   }
-  if(!key.startsWith('sk-')){
-    if(!confirm('La clé ne commence pas par "sk-".\n\nSur Agnes, elle commence toujours par "sk-".\n\nLa sauvegarder quand même ?')) return;
-  }
-  try{
-    localStorage.setItem(API_KEY_STORAGE, key);
-    state.apiKey = key;
-    updateApiKeyUI();
-    debugLog('success','API','Clé Agnes enregistrée ('+key.slice(0,10)+'…'+key.slice(-4)+')');
-    showToast('Clé Agnes enregistrée ✓');
-  }catch(e){
-    showToast('Erreur sauvegarde','error');
-  }
-}
+  nameEl.textContent=health.provider.name||'—';
+  modelEl.textContent='Modèle : '+(health.provider.model||'—');
+  badgeEl.textContent='✓ OK';badgeEl.className='badge-ok';
 
-function askApiKey(){
-  const input = document.getElementById('api-key-input');
-  if(input){
-    input.focus();
-    input.scrollIntoView({behavior:'smooth',block:'center'});
-    showToast('Saisis ta clé Agnes ci-dessus 👆','warn');
+  if(health.provider.keyConfigured){
+    keyPreview.textContent='Clé : '+health.provider.keyPreview;
+    keyBadge.textContent='✓ Configurée';keyBadge.className='badge-ok';
+  } else {
+    keyPreview.textContent='Aucune clé côté serveur';
+    keyBadge.textContent='✕ Manquante';keyBadge.className='badge-err';
   }
+  maxEl.textContent=health.limits.maxConcurrent+' simultané(s)';
 }
+function closeSettings(){document.getElementById('settings-modal').classList.remove('visible')}
 
 // ══════════════════════════════════════════════════════════════════
 // INITIALISATION
 // ══════════════════════════════════════════════════════════════════
 (function init(){
-  state.apiKey = localStorage.getItem(API_KEY_STORAGE) || '';
+  state.apiKey=localStorage.getItem(API_KEY_STORAGE)||'';
+  state.projects=loadProjects();
+  if(!state.projects.length)createProject();
+  else state.currentProjectId=state.projects[0].id;
 
-  state.projects = loadProjects();
-  if(!state.projects.length) createProject();
-  else state.currentProjectId = state.projects[0].id;
+  renderProjects();loadProjectIntoUI();updateApiKeyUI();
 
-  renderProjects();
-  loadProjectIntoUI();
-  updateApiKeyUI();
+  debugLog('success','INIT','Studio Clip IA prêt');
+  debugLog('info','INIT','Backend : '+BACKEND_URL);
 
-  debugLog('success','INIT','Studio Clip IA prêt · '+state.projects.length+' projet(s)');
-  debugLog('info','INIT','API : Agnes · '+API_BASE+' · modèle '+MODEL_TEXT);
-
-  // ══════ CHAMP CLÉ API ══════
-  const apiSaveBtn = document.getElementById('api-key-save');
-  if(apiSaveBtn) apiSaveBtn.addEventListener('click', saveApiKeyFromUI);
-
-  const apiInputEl = document.getElementById('api-key-input');
-  if(apiInputEl){
-    apiInputEl.addEventListener('keydown', e => {
-      if(e.key === 'Enter'){ e.preventDefault(); saveApiKeyFromUI(); }
-    });
-    // Sauvegarde auto si format valide pendant la saisie
-    apiInputEl.addEventListener('change', () => {
-      const v = apiInputEl.value.trim();
-      if(v && v.startsWith('sk-')){
-        try{
-          localStorage.setItem(API_KEY_STORAGE, v);
-          state.apiKey = v;
-          updateApiKeyUI();
-        }catch(e){}
-      }
-    });
-  }
-
-  const apiToggleBtn = document.getElementById('api-key-toggle');
-  if(apiToggleBtn){
-    apiToggleBtn.addEventListener('click', () => {
-      const inp = document.getElementById('api-key-input');
-      if(!inp) return;
-      const isPwd = inp.type === 'password';
-      inp.type = isPwd ? 'text' : 'password';
-      apiToggleBtn.textContent = isPwd ? '🙈 Masquer' : '👁 Afficher';
-    });
-  }
-
-  // ══════ NAVIGATION ══════
-  document.querySelectorAll('.progress-step').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const step = parseInt(el.dataset.step,10);
-      goToScreen(step);
-    });
+  // Vérifier backend au démarrage
+  checkBackendHealth().then(h=>{
+    if(h)debugLog('success','BACKEND','Backend prêt · clé '+(h.provider.keyConfigured?'✓':'✗'));
+    else debugLog('warn','BACKEND','Backend non détecté');
   });
 
-  // ══════ PROJETS ══════
+  // Clé API texte
+  document.getElementById('api-key-save').addEventListener('click',saveApiKeyFromUI);
+  const apiInput=document.getElementById('api-key-input');
+  if(apiInput)apiInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveApiKeyFromUI()}});
+  const apiToggle=document.getElementById('api-key-toggle');
+  if(apiToggle)apiToggle.addEventListener('click',()=>{
+    const inp=document.getElementById('api-key-input');
+    const isPwd=inp.type==='password';inp.type=isPwd?'text':'password';
+    apiToggle.textContent=isPwd?'🙈 Masquer':'👁 Afficher';
+  });
+
+  // Navigation
+  document.querySelectorAll('.progress-step').forEach(el=>{
+    el.addEventListener('click',()=>{goToScreen(parseInt(el.dataset.step,10))});
+  });
+
+  // Projets
   document.getElementById('projects-header').addEventListener('click',()=>{
     document.getElementById('projects-panel').classList.toggle('open');
   });
   document.getElementById('projects-panel').classList.add('open');
   document.getElementById('new-project-btn').addEventListener('click',()=>{
-    createProject();
-    renderProjects();
-    loadProjectIntoUI();
-    goToScreen(0);
-    showToast('Nouveau projet créé');
+    createProject();renderProjects();loadProjectIntoUI();goToScreen(0);showToast('Nouveau projet');
   });
   document.getElementById('export-all-btn').addEventListener('click',exportAllProjects);
-  document.getElementById('import-btn').addEventListener('click',()=>{
-    document.getElementById('import-file').click();
-  });
+  document.getElementById('import-btn').addEventListener('click',()=>document.getElementById('import-file').click());
   document.getElementById('import-file').addEventListener('change',e=>{
-    const f = e.target.files && e.target.files[0];
-    if(f) importProjects(f);
-    e.target.value = '';
+    const f=e.target.files&&e.target.files[0];if(f)importProjects(f);e.target.value='';
   });
 
-  // ══════ ÉCRAN 1 → 2 ══════
+  // Écran 1
   document.getElementById('goto-script').addEventListener('click',()=>{
-    const b = collectBrief();
-    if(!b.product){ showToast('Renseigne le produit / sujet','warn'); return; }
-    goToScreen(1);
+    const b=collectBrief();if(!b.product){showToast('Renseigne le produit','warn');return}goToScreen(1);
   });
 
-  // ══════ ÉCRAN 2 ══════
+  // Écran 2
   document.getElementById('gen-script-btn').addEventListener('click',generateScript);
   document.getElementById('manual-script-btn').addEventListener('click',manualScript);
   document.getElementById('back-to-brief').addEventListener('click',()=>goToScreen(0));
   document.getElementById('goto-plans').addEventListener('click',()=>{
-    const p = getCurrentProject();
-    if(!p.scripts.length){ showToast('Génère ou saisis un script','warn'); return; }
-    goToScreen(2);
+    const p=getCurrentProject();if(!p.scripts.length){showToast('Script requis','warn');return}goToScreen(2);
   });
 
-  // ══════ ÉCRAN 3 ══════
+  // Écran 3
   document.getElementById('gen-plans-btn').addEventListener('click',generatePlans);
   document.getElementById('add-plan-btn').addEventListener('click',addManualPlan);
   document.getElementById('back-to-script').addEventListener('click',()=>goToScreen(1));
-  document.getElementById('goto-prompts').addEventListener('click',()=>{
-    const p = getCurrentProject();
-    if(!p.plans.length){ showToast('Génère ou ajoute au moins un plan','warn'); return; }
-    goToScreen(3);
+  document.getElementById('goto-video').addEventListener('click',()=>{
+    const p=getCurrentProject();if(!p.plans.length){showToast('Plans requis','warn');return}goToScreen(3);
   });
 
-  // ══════ ÉCRAN 4 ══════
+  // Écran 4 (vidéo)
+  document.getElementById('gen-all-videos-btn').addEventListener('click',generateAllVideos);
+  document.getElementById('refresh-cost-btn').addEventListener('click',()=>refreshCostEstimate(true));
+  document.getElementById('validate-all-btn').addEventListener('click',validateAllVideos);
+  document.getElementById('reset-videos-btn').addEventListener('click',resetAllVideos);
+  document.getElementById('back-to-plans').addEventListener('click',()=>goToScreen(2));
+  document.getElementById('goto-assembly').addEventListener('click',()=>goToScreen(5));
+
+  // Écran 5 (prompts)
   document.getElementById('gen-prompts-btn').addEventListener('click',generatePrompts);
   document.getElementById('copy-all-btn').addEventListener('click',copyAllPrompts);
-  document.getElementById('back-to-plans').addEventListener('click',()=>goToScreen(2));
-  document.getElementById('goto-montage').addEventListener('click',()=>goToScreen(4));
+  document.getElementById('back-to-video').addEventListener('click',()=>goToScreen(3));
+  document.getElementById('goto-montage').addEventListener('click',()=>goToScreen(5));
 
-  // ══════ ÉCRAN 5 ══════
+  // Écran 6 (livraison)
   document.getElementById('gen-music-btn').addEventListener('click',generateMusicSuggestions);
   document.getElementById('gen-delivery-btn').addEventListener('click',generateDelivery);
   document.getElementById('copy-delivery-btn').addEventListener('click',copyDelivery);
   document.getElementById('mark-delivered').addEventListener('click',markDelivered);
   document.getElementById('delete-project-btn').addEventListener('click',deleteCurrentProject);
-  document.getElementById('back-to-prompts').addEventListener('click',()=>goToScreen(3));
+  document.getElementById('back-to-prompts').addEventListener('click',()=>goToScreen(4));
 
-  // ══════ DEBUG ══════
-  document.getElementById('debug-toggle').addEventListener('click',()=>{
-    document.getElementById('debug-panel').classList.toggle('visible');
+  // Upload audio
+  const audioDrop=document.getElementById('audio-drop');
+  const audioInput=document.getElementById('audio-input');
+  if(audioDrop&&audioInput){
+    audioDrop.addEventListener('click',()=>audioInput.click());
+    audioInput.addEventListener('change',e=>{
+      const f=e.target.files&&e.target.files[0];
+      if(f)handleAudioUpload(f);
+      e.target.value='';
+    });
+  }
+
+  // Assemblage
+  document.getElementById('assemble-btn').addEventListener('click',assembleFinalVideo);
+  const copyFinalBtn=document.getElementById('copy-final-url');
+  if(copyFinalBtn)copyFinalBtn.addEventListener('click',async()=>{
+    const p=getCurrentProject();if(!p||!p.finalVideoUrl){showToast('Aucune vidéo finale','warn');return}
+    const ok=await copyToClipboard(window.location.origin+p.finalVideoUrl);
+    showToast(ok?'Lien copié':'Impossible',ok?'success':'error');
   });
-  document.getElementById('debug-close-btn').addEventListener('click',()=>{
-    document.getElementById('debug-panel').classList.remove('visible');
+
+  // Settings
+  document.getElementById('open-settings').addEventListener('click',openSettings);
+  document.getElementById('close-settings').addEventListener('click',closeSettings);
+  document.getElementById('settings-modal').addEventListener('click',e=>{
+    if(e.target.id==='settings-modal')closeSettings();
   });
+
+  // Debug
+  document.getElementById('debug-toggle').addEventListener('click',()=>document.getElementById('debug-panel').classList.toggle('visible'));
+  document.getElementById('debug-close-btn').addEventListener('click',()=>document.getElementById('debug-panel').classList.remove('visible'));
   document.getElementById('debug-clear-btn').addEventListener('click',clearDebug);
   document.getElementById('debug-copy-btn').addEventListener('click',copyDebug);
 
-  // ══════ SAUVEGARDE AUTO DU BRIEF ══════
+  // Auto-save brief
   ['b-client','b-product','b-audience','b-objective','b-tone','b-platform','b-format','b-duration','b-lang'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.addEventListener('change',()=>{ collectBrief(); });
+    const el=document.getElementById(id);if(el)el.addEventListener('change',()=>collectBrief());
   });
 
-  // ══════ RACCOURCI Ctrl+K → focus clé ══════
+  // Raccourci
   document.addEventListener('keydown',e=>{
-    if((e.ctrlKey||e.metaKey) && e.key==='k'){
-      e.preventDefault();
-      askApiKey();
+    if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();
+      const inp=document.getElementById('api-key-input');if(inp){inp.focus();inp.scrollIntoView({behavior:'smooth',block:'center'})}
     }
   });
 
-  // ══════ ANTI-SUBMIT ══════
-  document.addEventListener('submit',e=>{e.preventDefault();return false;},true);
+  document.addEventListener('submit',e=>{e.preventDefault();return false},true);
 
-  debugLog('info','INIT','Raccourci Ctrl+K : focus sur le champ clé API');
-  debugLog('info','INIT','Bouton "Ouvrir Agnes" : accès direct à platform.agnes-ai.com');
-
-  // Message d'accueil si pas de clé
-  if(!state.apiKey){
-    setTimeout(()=>{
-      debugLog('warn','INIT','Aucune clé Agnes — colle-la en haut de l\'écran');
-    }, 500);
-  }
+  debugLog('info','INIT','Pipeline : BRIEF → SCRIPT → PLANS → VIDÉO → PROMPTS → ASSEMBLAGE');
 })();
 </script>
 </body>
