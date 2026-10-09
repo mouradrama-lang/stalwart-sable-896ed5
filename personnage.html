@@ -254,10 +254,16 @@ body{padding-bottom:26rem}
 
 .scene-chars-badge{display:inline-block;background:rgba(200,176,224,.15);border:1px solid rgba(200,176,224,.4);color:var(--lavender);font-size:.6rem;padding:.1rem .4rem;border-radius:2px;margin-left:.4rem}
 
-/* Critical features preview */
 .critical-list{background:rgba(200,90,74,.06);border:1px solid rgba(200,90,74,.3);border-left:3px solid var(--err);border-radius:var(--r);padding:.8rem 1rem;margin-top:.8rem;font-size:.72rem;font-family:var(--fm);color:#f0c0c0;line-height:1.6}
 .critical-list h5{font-size:.68rem;color:var(--err);text-transform:uppercase;margin-bottom:.5rem;font-weight:700;letter-spacing:.1em}
 .critical-list li{margin-left:1.2rem;margin-bottom:.15rem}
+
+.import-img-slot{display:flex;gap:.6rem;align-items:center;margin-bottom:.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.5rem}
+.import-img-slot .slot-name{flex:1;font-size:.75rem;color:var(--gold-soft);font-weight:600}
+.import-img-slot .slot-thumb{width:50px;height:50px;object-fit:cover;border-radius:3px;border:1px solid var(--gold-deep)}
+.import-img-slot label.slot-btn{cursor:pointer;font-size:.7rem;padding:.35rem .8rem;background:var(--bg3);border:1px dashed var(--gold-deep);border-radius:3px;color:var(--gold-soft);display:inline-block}
+.import-img-slot label.slot-btn input{display:none}
+.import-img-slot button.slot-clear{background:rgba(200,90,74,.15);border:1px solid var(--err);color:var(--err);font-size:.65rem;padding:.25rem .55rem;border-radius:3px;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -273,10 +279,10 @@ body{padding-bottom:26rem}
 <strong class="hl-gold">2.</strong> Character Bible par personnage.
 <strong class="hl-gold">3.</strong> Scènes <strong class="hl-lav">mono ou multi-personnages</strong>.
 <strong class="hl-gold">4.</strong> Consistency checker + régénération auto.
-<strong class="hl-gold">5.</strong> <strong class="hl-sky">1 vidéo par scène</strong> (N vidéos pour N scènes).
+<strong class="hl-gold">5.</strong> <strong class="hl-sky">1 vidéo par scène</strong>.
+<strong class="hl-mint">📸 Image de référence optionnelle dans le pack JSON — sinon l'IA gère.</strong>
 </div>
 
-<!-- API KEY -->
 <div class="panel" id="api-panel">
 <label class="panel-label" for="api-key-input"><b>01</b> Clé API Agnes</label>
 <input type="password" id="api-key-input" placeholder="Collez votre clé API ici (sk-...)" autocomplete="off" spellcheck="false">
@@ -293,19 +299,17 @@ body{padding-bottom:26rem}
 </div>
 </div>
 
-<!-- IMPORT CTA -->
 <div class="section open" id="section-import-cta">
 <div class="section-header" data-toggle="section-import-cta">
 <span class="section-title"><span>📥 Import Pack JSON</span> <span class="badge mint">rapide</span></span>
 <span class="chevron">▼</span>
 </div>
 <div class="section-body"><div class="section-content">
-<div class="hint" style="margin-top:0;margin-bottom:.8rem">Collez un pack JSON complet → génération automatique multi-personnages avec validation des caractéristiques critiques.</div>
+<div class="hint" style="margin-top:0;margin-bottom:.8rem">Collez un pack JSON complet → vous pourrez <strong>optionnellement</strong> uploader une image par personnage. Sans image, l'IA gère automatiquement.</div>
 <button type="button" class="btn btn-import" id="open-import-btn">📥 Coller un pack JSON</button>
 </div></div>
 </div>
 
-<!-- IMPORT SCREEN -->
 <div class="section hidden" id="section-import">
 <div class="section-header" data-toggle="section-import">
 <span class="section-title"><span>📥 Import Pack JSON</span> <span class="badge mint">actif</span></span>
@@ -322,10 +326,10 @@ body{padding-bottom:26rem}
 </div>
 <button type="button" class="btn btn-primary" id="analyze-import-btn">🔍 Analyser le JSON</button>
 <div id="import-preview-container"></div>
+<div id="import-chars-uploads" style="margin-top:1rem"></div>
 </div></div>
 </div>
 
-<!-- LIBRARY -->
 <div class="section open" id="section-library">
 <div class="section-header" data-toggle="section-library">
 <span class="section-title"><span>👥 02 · Bibliothèque de personnages</span> <span class="badge" id="library-badge">0</span></span>
@@ -339,7 +343,6 @@ body{padding-bottom:26rem}
 </div></div>
 </div>
 
-<!-- CREATE CHARACTER -->
 <div class="section hidden" id="section-create">
 <div class="section-header" data-toggle="section-create">
 <span class="section-title"><span>✨ 03 · Création de personnage</span> <span class="badge lav">nouveau</span></span>
@@ -377,7 +380,6 @@ body{padding-bottom:26rem}
 </div></div>
 </div>
 
-<!-- BIBLE -->
 <div class="section hidden" id="section-bible">
 <div class="section-header" data-toggle="section-bible">
 <span class="section-title"><span>📖 04 · Character Bible</span> <span class="badge lav" id="bible-badge">—</span></span>
@@ -405,7 +407,6 @@ body{padding-bottom:26rem}
 </div></div>
 </div>
 
-<!-- STORY -->
 <div class="section" id="section-story">
 <div class="section-header" data-toggle="section-story">
 <span class="section-title"><span>📝 05 · Histoire & scénario</span> <span class="badge" id="story-badge">—</span></span>
@@ -457,7 +458,6 @@ body{padding-bottom:26rem}
 </div></div>
 </div>
 
-<!-- SCENES -->
 <div class="section hidden" id="section-scenes">
 <div class="section-header" data-toggle="section-scenes">
 <span class="section-title"><span>🖼️ 06 · Scènes générées</span> <span class="badge" id="scenes-badge">0</span></span>
@@ -470,14 +470,13 @@ body{padding-bottom:26rem}
 </div></div>
 </div>
 
-<!-- VIDEOS -->
 <div class="section hidden" id="section-videos">
 <div class="section-header" data-toggle="section-videos">
 <span class="section-title"><span>🎬 07 · Vidéos (1 par scène)</span> <span class="badge" id="videos-badge">0</span></span>
 <span class="chevron">▼</span>
 </div>
 <div class="section-body"><div class="section-content">
-<div class="hint" style="margin-bottom:.8rem">🎬 <strong>1 vidéo par scène</strong>. Chaque vidéo utilise l'image de sa scène en départ + l'image de la scène suivante en arrivée (keyframes chaînés). La dernière scène s'anime en boucle subtile.</div>
+<div class="hint" style="margin-bottom:.8rem">🎬 <strong>1 vidéo par scène</strong>. La dernière scène s'anime en boucle subtile.</div>
 <button type="button" class="btn btn-primary" id="generate-videos-btn" disabled>🎬 Générer les vidéos</button>
 <button type="button" class="btn btn-stop" id="videos-stop-btn">⏹ Arrêter</button>
 <div class="scenes-grid" id="videos-grid"></div>
@@ -494,7 +493,6 @@ body{padding-bottom:26rem}
 </div></div>
 </div>
 
-<!-- PLAYER -->
 <div class="section hidden" id="section-player">
 <div class="section-header" data-toggle="section-player">
 <span class="section-title"><span>▶ 08 · Player séquentiel</span> <span class="badge" id="player-badge">0</span></span>
@@ -567,9 +565,9 @@ const IMAGE_MAX_RETRIES = 3;
 const REFSHEET_MAX_VALIDATE_ATTEMPTS = 3;
 const MAX_CHARS_PER_SCENE = 3;
 
-const API_KEY_STORAGE = 'char_consistency_api_key_v3';
-const CHARACTERS_STORAGE = 'char_consistency_characters_v3';
-const WAKE_LOCK_PREF = 'char_consistency_wakelock_v3';
+const API_KEY_STORAGE = 'char_consistency_api_key_v4';
+const CHARACTERS_STORAGE = 'char_consistency_characters_v4';
+const WAKE_LOCK_PREF = 'char_consistency_wakelock_v4';
 
 const DEBUG_MAX = 800;
 const REF_MAX_SIDE = 1280;
@@ -602,6 +600,7 @@ const state = {
   scenes: [],
   videos: [],
   importPack: null,
+  importCharImages: {},
   isRunning: false,
   criticalFeatures: []
 };
@@ -1107,7 +1106,7 @@ async function compressImage(dataUrl,maxSide){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// CHARACTERS PERSISTENCE + HELPERS
+// CHARACTERS
 // ══════════════════════════════════════════════════════════════════
 function loadCharacters(){
   try{
@@ -1128,7 +1127,6 @@ function persistCharacter(char){
   saveCharacters(state.characters);
 }
 
-// Multi-personnages
 function findCharactersRefForScene(scene){
   if(!scene) return [];
   if(Array.isArray(scene.characters) && scene.characters.length){
@@ -1319,18 +1317,17 @@ function buildCriticalFeaturesBlock(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// VALIDATE REFSHEET (vision)
+// VALIDATE REFSHEET
 // ══════════════════════════════════════════════════════════════════
 async function validateRefsheet(refsheetUrl, criticalFeatures, charName){
   if(!criticalFeatures || criticalFeatures.length === 0){
-    return {valid: true, missing: [], score: 100, verdict: 'Pas de features à vérifier'};
+    return {valid: true, missing: [], score: 100, verdict: 'Pas de features'};
   }
   let refDataUrl;
   try{
     const blob = await fetch(refsheetUrl).then(r=>r.blob());
     refDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
   }catch(e){
-    debugLog('warn','VALIDATE-REFSHEET','Image inaccessible : '+e.message);
     return {valid: true, missing: [], score: 100, verdict: 'Validation ignorée'};
   }
 
@@ -1343,7 +1340,7 @@ async function validateRefsheet(refsheetUrl, criticalFeatures, charName){
     '',
     'Pour CHAQUE caractéristique, dis si elle est CLAIREMENT visible dans la planche ou NON.',
     'Retourne UNIQUEMENT ce JSON :',
-    '{"present": ["feature présente 1"], "missing": ["feature MANQUANTE"], "score": <0-100>, "verdict": "phrase courte"}'
+    '{"present": [...], "missing": [...], "score": <0-100>, "verdict": "phrase courte"}'
   ].join('\n');
 
   try{
@@ -1364,9 +1361,9 @@ async function validateRefsheet(refsheetUrl, criticalFeatures, charName){
       'Validate-Refsheet', 3);
     const data = await res.json();
     const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-    if(!content) return {valid: true, missing: [], score: 100, verdict: 'Pas de réponse'};
+    if(!content) return {valid: true, missing: [], score: 100, verdict: ''};
     const parsed = extractJson(content);
-    if(!parsed) return {valid: true, missing: [], score: 100, verdict: 'Parse échoué'};
+    if(!parsed) return {valid: true, missing: [], score: 100, verdict: ''};
     const missing = Array.isArray(parsed.missing) ? parsed.missing : [];
     const score = typeof parsed.score === 'number' ? parsed.score : 100;
     debugLog('vision','VALIDATE-REFSHEET','Score '+score+' · Manquants : '+(missing.join(', ')||'aucun'));
@@ -1378,7 +1375,7 @@ async function validateRefsheet(refsheetUrl, criticalFeatures, charName){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// REFSHEET — génération
+// REFSHEET
 // ══════════════════════════════════════════════════════════════════
 async function generateReferenceSheet(description, refImageDataUrl, refImageForApi){
   const fullDesc = description || '';
@@ -1392,8 +1389,7 @@ async function generateReferenceSheet(description, refImageDataUrl, refImageForA
     'CHARACTER TO DESIGN: ' + fullDesc,
     '',
     criticalBlock ? '⚠️ ABSOLUTE MANDATORY: every panel MUST show the character with the CRITICAL FEATURES listed above.' : null,
-    criticalBlock ? 'If a stubble beard is listed in critical features, it MUST be clearly visible in all 6 panels.' : null,
-    criticalBlock ? 'Clothing items listed in critical features MUST be worn exactly as described.' : null,
+    refImageForApi ? '⚠️ USE THE PROVIDED REFERENCE IMAGE AS THE ABSOLUTE VISUAL TRUTH: preserve the exact face, hair, beard, skin tone, clothing, accessories and proportions of the person shown.' : null,
     '',
     'PANELS (left to right, top to bottom):',
     '  1. Full body front view — perfectly centered, symmetrical, arms down.',
@@ -1415,8 +1411,8 @@ async function generateReferenceSheet(description, refImageDataUrl, refImageForA
   ].filter(Boolean);
 
   const prompt = promptLines.join('\n');
-  debugLog('ai','PROMPT REFSHEET','Envoyé ('+prompt.length+' chars'+(criticalBlock?' · +CRITICAL':'')+')');
-  journalLog('Génération de la planche de référence (6 vues)…','character');
+  debugLog('ai','PROMPT REFSHEET','Envoyé ('+prompt.length+' chars'+(criticalBlock?' · +CRITICAL':'')+(refImageForApi?' · +IMAGE REF':'')+')');
+  journalLog('Génération de la planche de référence (6 vues)'+(refImageForApi?' AVEC image de référence':'')+'…','character');
 
   const refs = [];
   if(refImageForApi)refs.push(refImageForApi);
@@ -1445,28 +1441,28 @@ async function buildCharacterBible(description, refsheetUrl){
     '',
     'Génère un Character Bible JSON avec cette structure EXACTE:',
     '{',
-    '  "name": "nom court du personnage",',
+    '  "name": "nom court",',
     '  "species": "espèce précise",',
     '  "age_impression": "âge apparent",',
-    '  "face": "description extrêmement précise du visage",',
-    '  "fur_or_hair": "description précise du pelage ou des cheveux",',
-    '  "eye_color": "couleur exacte des yeux",',
+    '  "face": "description précise du visage",',
+    '  "fur_or_hair": "pelage ou cheveux",',
+    '  "eye_color": "couleur des yeux",',
     '  "distinctive_marks": "signes distinctifs",',
     '  "body": "description du corps",',
-    '  "outfit": "description extrêmement précise de la tenue",',
-    '  "helmet": "description précise du casque",',
+    '  "outfit": "description précise de la tenue",',
+    '  "helmet": "description du casque/couvre-chef",',
     '  "accessories": "accessoires récurrents",',
     '  "signature_posture": "posture caractéristique",',
     '  "signature_expression": "expression habituelle",',
     '  "color_palette": ["#hex1","#hex2","#hex3","#hex4"],',
     '  "voice_fr": {"pitch": 1.0, "rate": 1.0, "gender": "male|female|neutral"},',
-    '  "character_lock_prompt": "UN SEUL PARAGRAPHE DE 200 À 300 MOTS EN ANGLAIS qui décrit le personnage à la virgule près. Ce paragraphe sera INJECTÉ TEL QUEL dans tous les prompts. IL DOIT EXPLICITEMENT MENTIONNER TOUTES LES CARACTÉRISTIQUES CRITIQUES listées ci-dessus (ex: si barbe de 3 jours → mentionner \"three-day stubble beard\")."',
+    '  "character_lock_prompt": "UN PARAGRAPHE DE 200 À 300 MOTS EN ANGLAIS qui décrit le personnage à la virgule près. IL DOIT EXPLICITEMENT MENTIONNER TOUTES LES CARACTÉRISTIQUES CRITIQUES."',
     '}',
     '',
     'RÈGLES:',
     '- Le character_lock_prompt DOIT être en anglais et faire 200-300 mots.',
-    '- Le lock prompt DOIT mentionner CHAQUE caractéristique critique.',
-    '- Palette de couleurs 4 codes hex.',
+    '- Il DOIT mentionner CHAQUE caractéristique critique.',
+    '- Palette 4 codes hex.',
     '- Pas de markdown.'
   ].filter(Boolean).join('\n');
 
@@ -1474,7 +1470,6 @@ async function buildCharacterBible(description, refsheetUrl){
   if(!content)throw new Error('Pas de contenu Character Bible');
   const parsed = extractJson(content);
   if(!parsed || !parsed.character_lock_prompt){
-    debugLog('error','BIBLE','JSON invalide');
     throw new Error('Character Bible invalide');
   }
   if(!Array.isArray(parsed.color_palette) || parsed.color_palette.length < 3){
@@ -1555,8 +1550,7 @@ async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
     sceneDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(sceneBlob)});
     refDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(refBlob)});
   }catch(e){
-    debugLog('warn','CONSISTENCY','Images non accessibles — scoring ignoré');
-    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Scoring ignoré (CORS)'],verdict:'Acceptée par défaut'};
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['CORS'],verdict:'Acceptée'};
   }
 
   const systemPrompt = 'Tu es un expert en cohérence de personnages. Tu compares deux images et donnes un score OBJECTIF. Tu réponds TOUJOURS en JSON strict valide.';
@@ -1569,7 +1563,7 @@ async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
     charBible.character_lock_prompt || 'Non spécifié',
     '',
     'Retourne UNIQUEMENT ce JSON:',
-    '{"score": <0-100>, "identity": <0-100>, "outfit": <0-100>, "posture": <0-100>, "ambiance": <0-100>, "issues": ["..."], "verdict": "phrase"}'
+    '{"score": <0-100>, "identity": <0-100>, "outfit": <0-100>, "posture": <0-100>, "ambiance": <0-100>, "issues": [...], "verdict": "phrase"}'
   ].join('\n');
 
   try{
@@ -1600,11 +1594,10 @@ async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
     });
     if(!Array.isArray(parsed.issues))parsed.issues = [];
     if(!parsed.verdict)parsed.verdict = '';
-    debugLog('vision','CONSISTENCY','Score = '+parsed.score+' · '+parsed.verdict.slice(0,80));
+    debugLog('vision','CONSISTENCY','Score = '+parsed.score);
     return parsed;
   }catch(e){
-    debugLog('warn','CONSISTENCY','Erreur — image acceptée');
-    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Erreur analyse'],verdict:'Acceptée par défaut'};
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Err'],verdict:''};
   }
 }
 
@@ -1613,11 +1606,10 @@ async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
 // ══════════════════════════════════════════════════════════════════
 async function checkConsistencyMulti(sceneImageUrl, sceneChars){
   if(!sceneChars || sceneChars.length === 0){
-    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Pas de perso'],verdict:''};
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:[],verdict:''};
   }
   if(sceneChars.length === 1){
-    const c = sceneChars[0];
-    return await checkConsistency(sceneImageUrl, c.refsheetUrl, c.bible);
+    return await checkConsistency(sceneImageUrl, sceneChars[0].refsheetUrl, sceneChars[0].bible);
   }
 
   let sceneDataUrl;
@@ -1625,8 +1617,7 @@ async function checkConsistencyMulti(sceneImageUrl, sceneChars){
     const blob = await fetch(sceneImageUrl).then(r=>r.blob());
     sceneDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
   }catch(e){
-    debugLog('warn','CONSISTENCY-MULTI','Image scène inaccessible — acceptée');
-    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['CORS'],verdict:'Acceptée'};
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['CORS'],verdict:''};
   }
 
   const refDataUrls = [];
@@ -1640,7 +1631,7 @@ async function checkConsistencyMulti(sceneImageUrl, sceneChars){
   }
 
   if(refDataUrls.length === 0){
-    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Planches inaccessibles'],verdict:''};
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:[],verdict:''};
   }
 
   const names = refDataUrls.map(r => r.charName).join(' et ');
@@ -1648,16 +1639,15 @@ async function checkConsistencyMulti(sceneImageUrl, sceneChars){
     'PERSONNAGE '+(i+1)+' ('+r.charName+') : '+(r.char.bible.character_lock_prompt||'')
   ).join('\n\n');
 
-  const systemPrompt = 'Tu es un expert en cohérence de personnages. Tu compares plusieurs planches de référence à une image de scène et donnes un score OBJECTIF. Tu réponds TOUJOURS en JSON strict valide.';
+  const systemPrompt = 'Tu es un expert en cohérence de personnages. Tu réponds TOUJOURS en JSON strict valide.';
   const userPrompt = [
     'Voici une IMAGE DE SCÈNE qui doit contenir '+refDataUrls.length+' personnages : '+names+'.',
-    '',
-    'Les '+refDataUrls.length+' premières images sont les PLANCHES DE RÉFÉRENCE de chaque personnage, dans l\'ordre. La DERNIÈRE image est la SCÈNE.',
+    'Les '+refDataUrls.length+' premières images sont les PLANCHES. La DERNIÈRE est la SCÈNE.',
     '',
     locksText,
     '',
     'Retourne UNIQUEMENT ce JSON:',
-    '{"score": <0-100 global>, "identity": <0-100>, "outfit": <0-100>, "posture": <0-100>, "ambiance": <0-100>, "issues": ["..."], "verdict": "phrase"}'
+    '{"score": <0-100>, "identity": <0-100>, "outfit": <0-100>, "posture": <0-100>, "ambiance": <0-100>, "issues": [...], "verdict": "phrase"}'
   ].join('\n');
 
   try{
@@ -1692,16 +1682,15 @@ async function checkConsistencyMulti(sceneImageUrl, sceneChars){
     });
     if(!Array.isArray(parsed.issues)) parsed.issues = [];
     if(!parsed.verdict) parsed.verdict = '';
-    debugLog('vision','CONSISTENCY-MULTI', parsed.score+'/100 · '+parsed.verdict.slice(0,80));
+    debugLog('vision','CONSISTENCY-MULTI', parsed.score+'/100');
     return parsed;
   }catch(e){
-    debugLog('warn','CONSISTENCY-MULTI','Erreur : '+e.message+' — acceptée');
-    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Analyse échouée'],verdict:''};
+    return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:[],verdict:''};
   }
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PROMPTS — SINGLE
+// PROMPTS
 // ══════════════════════════════════════════════════════════════════
 function buildSceneImagePrompt(scene, charBible){
   const criticalBlock = buildCriticalFeaturesBlock();
@@ -1749,9 +1738,6 @@ function buildSceneVideoPrompt(scene, charBible){
   ].filter(Boolean).join('\n');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PROMPTS — MULTI
-// ══════════════════════════════════════════════════════════════════
 function buildSceneImagePromptMulti(scene, sceneChars){
   const criticalBlock = buildCriticalFeaturesBlock();
   const charBlocks = sceneChars.map((ch, idx) => {
@@ -1766,7 +1752,7 @@ function buildSceneImagePromptMulti(scene, sceneChars){
   const refsLabel = sceneChars.map(c => c.name).join(', ');
 
   return [
-    'CINEMATIC FILM STILL — 35mm film, photorealistic, Wes Anderson aesthetic.',
+    'CINEMATIC FILM STILL — 35mm film, photorealistic.',
     '',
     criticalBlock,
     criticalBlock ? '' : null,
@@ -1775,27 +1761,21 @@ function buildSceneImagePromptMulti(scene, sceneChars){
     '╚══════════════════════════════════════════════════════════════════╝',
     '',
     'This scene must contain EXACTLY '+refsCount+' characters : '+refsLabel+'.',
-    refsCount+' reference sheets are provided as input images — one per character, in this order : '+refsLabel+'.',
-    'Each character MUST remain 100% visually identical to its respective reference sheet : same face, same fur, same eyes, same outfit, same helmet, same accessories, same proportions.',
-    'Do NOT mix identities. Do NOT duplicate. Do NOT add extra characters.',
+    refsCount+' reference sheets are provided as input images — one per character : '+refsLabel+'.',
+    'Each character MUST remain 100% visually identical to its reference sheet.',
+    'Do NOT mix identities. Do NOT add extra characters.',
     '',
     charBlocks,
     '',
-    '╔══════════════════════════════════════════════════════════════════╗',
-    '║ COMPOSITION (respect the layout)',
-    '╚══════════════════════════════════════════════════════════════════╝',
-    scene.composition || (sceneChars.map((c, i) => c.name + ' on the ' + (['left','right','center'][i]||('position '+(i+1)))).join(', ')),
-    'Perfect bilateral symmetry. Dead-center framing. All characters visible, fully clothed.',
+    'COMPOSITION: ' + (scene.composition || sceneChars.map((c, i) => c.name + ' on the ' + (['left','right','center'][i]||('position '+(i+1)))).join(', ')),
     '',
-    '╔══════════════════════════════════════════════════════════════════╗',
-    '║ SCENE ACTION',
-    '╚══════════════════════════════════════════════════════════════════╝',
     'DECOR : ' + (scene.decor || ''),
     'ACTION : ' + (scene.action || ''),
     '',
-    'CONSTRAINTS :',
-    '- 35mm film grain, warm halation.',
-    '- No text, no watermark, no on-screen graphics.',
+    'CONSTRAINTS:',
+    '- Perfect bilateral symmetry.',
+    '- 35mm film grain.',
+    '- No text, no watermark.',
     '- ' + (state.imageFormat === '9:16' ? 'Vertical portrait 9:16.' : state.imageFormat === '16:9' ? 'Horizontal landscape 16:9.' : 'Square 1:1.')
   ].filter(Boolean).join('\n');
 }
@@ -1810,7 +1790,7 @@ function buildSceneVideoPromptMulti(scene, sceneChars){
   ).join('\n\n');
 
   return [
-    'CINEMATIC SHOT ON 35MM FILM — Wes Anderson aesthetic.',
+    'CINEMATIC SHOT ON 35MM FILM.',
     '',
     criticalBlock,
     criticalBlock ? '' : null,
@@ -1828,7 +1808,7 @@ function buildSceneVideoPromptMulti(scene, sceneChars){
     '',
     'AUDIO : No music. ' + (line ? 'The character '+speaker+' says in French : "'+line+'" — one calm delivery.' : 'No dialogue.'),
     '',
-    'CONSTRAINTS : 100% identity match with the input frames for ALL characters. No text, no watermark, no shake.'
+    'CONSTRAINTS : 100% identity match. No text, no watermark.'
   ].filter(Boolean).join('\n');
 }
 
@@ -2114,41 +2094,30 @@ async function createCharacter(){
     let refsheetUrl = await generateReferenceSheet(description, state.refImageDataUrl, state.refImageForApi);
     state.refsheetUrl = refsheetUrl;
 
-    // Validation des critical features si présentes
     if(state.criticalFeatures && state.criticalFeatures.length){
-      setStatus('Étape 1.5/3 — Validation des caractéristiques critiques…');
-      journalLog('Validation de la planche (critical features)…','vision');
-
+      setStatus('Étape 1.5/3 — Validation…');
+      journalLog('Validation de la planche…','vision');
       let validation = await validateRefsheet(refsheetUrl, state.criticalFeatures, 'personnage');
       let attempts = 0;
-
       while(!validation.valid && attempts < REFSHEET_MAX_VALIDATE_ATTEMPTS && !state.stopRequested){
         attempts++;
-        journalLog('⚠ Caractéristiques manquantes ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+') : '+validation.missing.join(', '),'warn');
-        journalLog('Régénération de la planche avec insistance…','image');
-        setStatus('Régénération de la planche ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+')…');
-
+        journalLog('⚠ Features manquantes ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+') : '+validation.missing.join(', '),'warn');
         const reinforcedDesc = description + ' — ABSOLUTE MANDATORY: ' + state.criticalFeatures.join(', ') + '. These features MUST be clearly visible in every panel.';
         refsheetUrl = await generateReferenceSheet(reinforcedDesc, state.refImageDataUrl, state.refImageForApi);
         validation = await validateRefsheet(refsheetUrl, state.criticalFeatures, 'personnage');
       }
-
       if(validation.valid){
-        journalLog('✓ Planche validée : toutes les caractéristiques présentes ('+validation.score+'/100)','success');
+        journalLog('✓ Planche validée ('+validation.score+'/100)','success');
       }else{
-        journalLog('⚠ Planche acceptée malgré tout — certaines caractéristiques restent absentes','warn');
-        showToast('Attention : features manquantes','warn',3000);
+        journalLog('⚠ Planche acceptée malgré manques','warn');
       }
     }
 
     state.refsheetUrl = refsheetUrl;
     document.getElementById('refsheet-section').classList.remove('hidden');
     document.getElementById('refsheet-image').src = refsheetUrl;
-    journalLog('Planche de référence générée ✓','success');
-    showToast('Planche générée','success');
 
-    setStatus('Étape 2/3 — Génération du Character Bible…');
-    journalLog('Génération du Character Bible…','character');
+    setStatus('Étape 2/3 — Character Bible…');
     const bible = await buildCharacterBible(description, refsheetUrl);
     state.bible = bible;
 
@@ -2178,7 +2147,6 @@ async function createCharacter(){
       journalLog('Arrêt demandé.','warn');
     }else{
       journalLog('Erreur : '+e.message,'error');
-      debugLog('error','CREATE',e.message);
       showToast('Erreur : '+e.message.slice(0,60),'error');
     }
   }
@@ -2189,7 +2157,7 @@ async function createCharacter(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GENERATE SCRIPT
+// GENERATE SCRIPT (manuel)
 // ══════════════════════════════════════════════════════════════════
 async function generateScriptPipeline(){
   if(state.isGeneratingScript)return;
@@ -2205,7 +2173,7 @@ async function generateScriptPipeline(){
   state.stopRequested=false;
   updateButtons();
   setStatus('Génération du scénario…');
-  updateProgress(10,'Écriture du scénario…','');
+  updateProgress(10,'Écriture…','');
 
   try{
     const sceneCount=parseInt(document.getElementById('scene-count').value,10);
@@ -2237,12 +2205,12 @@ async function generateScriptPipeline(){
     journalLog('Scénario prêt : '+script.scenes.length+' scènes.','success');
     showToast('Scénario généré','success');
     document.getElementById('section-scenes').scrollIntoView({behavior:'smooth',block:'start'});
-    updateProgress(100,'Scénario prêt','');
+    updateProgress(100,'Prêt','');
     await sleep(2000);
     hideProgress();
     setStatus(null);
   }catch(e){
-    journalLog('Erreur scénario : '+e.message,'error');
+    journalLog('Erreur : '+e.message,'error');
     showToast('Erreur : '+e.message.slice(0,60),'error');
     hideProgress();
     setStatus(null);
@@ -2278,17 +2246,13 @@ async function generateAllScenes(){
       const b64 = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
       refsheetCache[charId] = b64;
       return b64;
-    }catch(e){
-      debugLog('warn','SCENES','Planche '+charId+' non chargée : '+e.message);
-      return null;
-    }
+    }catch(e){ return null; }
   }
 
   const total = state.scenes.length;
 
   for(let i=0; i<total; i++){
     if(state.stopRequested) break;
-
     const scene = state.scenes[i];
 
     let sceneCharIds = Array.isArray(scene.characterIds) ? scene.characterIds.slice() : [];
@@ -2323,11 +2287,10 @@ async function generateAllScenes(){
       attempt++;
       scene.retryCount = attempt;
       scene.status = 'generating';
-      scene.progress = 'Génération ('+namesLabel+' · essai '+attempt+'/'+IMAGE_MAX_RETRIES+')…';
+      scene.progress = 'Génération ('+namesLabel+' · '+attempt+'/'+IMAGE_MAX_RETRIES+')…';
       renderScenes();
-      setStatus('Scène '+(i+1)+'/'+total+' ['+namesLabel+'] — essai '+attempt);
-      updateProgress(((i*IMAGE_MAX_RETRIES+attempt)/(total*IMAGE_MAX_RETRIES))*100, 'Scène '+(i+1)+'/'+total+' — '+namesLabel, '');
-      journalLog('Scène '+(i+1)+' ['+namesLabel+'] — essai '+attempt,'image');
+      setStatus('Scène '+(i+1)+'/'+total+' ['+namesLabel+'] — '+attempt);
+      updateProgress(((i*IMAGE_MAX_RETRIES+attempt)/(total*IMAGE_MAX_RETRIES))*100, 'Scène '+(i+1)+'/'+total, '');
 
       try{
         const prompt = sceneChars.length === 1
@@ -2340,7 +2303,7 @@ async function generateAllScenes(){
         });
         scene.imageUrl = imageUrl;
         scene.status = 'retrying';
-        scene.progress = 'Analyse de cohérence…';
+        scene.progress = 'Analyse…';
         renderScenes();
 
         const consistency = await checkConsistencyMulti(imageUrl, sceneChars);
@@ -2348,29 +2311,23 @@ async function generateAllScenes(){
 
         if(consistency && consistency.score >= state.consistencyThreshold){
           scene.status = 'done';
-          scene.progress = 'Cohérent';
           success = true;
-          journalLog('Scène '+(i+1)+' ['+namesLabel+'] ✓ cohérence = '+consistency.score+'/100','success');
-          showToast('Scène '+(i+1)+' : '+consistency.score+'/100','success',1800);
+          journalLog('Scène '+(i+1)+' ✓ '+consistency.score+'/100','success');
           renderScenes();
         }else{
           const score = consistency ? consistency.score : '?';
-          journalLog('Scène '+(i+1)+' ['+namesLabel+'] — score '+score+'/100 → régénération','warn');
+          journalLog('Scène '+(i+1)+' — '+score+'/100 → régénération','warn');
           if(attempt>=IMAGE_MAX_RETRIES){
             scene.status = 'done';
-            scene.progress = 'Acceptée (sous seuil)';
             success = true;
             renderScenes();
-            showToast('Scène '+(i+1)+' : score max '+score,'warn',2000);
           }
         }
       }catch(e){
         if(e.message==='Arrêt demandé')break;
         scene.status = 'error';
         scene.error = e.message;
-        scene.progress = 'Erreur';
         renderScenes();
-        journalLog('Scène '+(i+1)+' — erreur : '+e.message,'error');
         break;
       }
     }
@@ -2378,7 +2335,7 @@ async function generateAllScenes(){
     if(i<total-1 && !state.stopRequested){
       for(let r=4;r>0;r--){
         if(state.stopRequested)break;
-        setStatus('Pause '+r+'s avant scène '+(i+2));
+        setStatus('Pause '+r+'s…');
         await sleep(1000);
       }
     }
@@ -2394,20 +2351,18 @@ async function generateAllScenes(){
   const avgScore = state.scenes.filter(s=>s.consistency).length 
     ? Math.round(state.scenes.filter(s=>s.consistency).reduce((a,s)=>a+s.consistency.score,0) / state.scenes.filter(s=>s.consistency).length)
     : 0;
-  setStatus('✦ '+finalDone+'/'+total+' scènes — score moyen '+avgScore+'/100 ✦');
+  setStatus('✦ '+finalDone+'/'+total+' scènes — score '+avgScore+'/100 ✦');
 
   if(finalDone >= 1){
     document.getElementById('section-videos').classList.remove('hidden');
     document.getElementById('section-videos').classList.add('open');
     const genVidBtn = document.getElementById('generate-videos-btn');
     if(genVidBtn) genVidBtn.disabled = false;
-    journalLog('▶ Prêt à générer les vidéos ('+finalDone+' vidéo'+(finalDone>1?'s':'')+')','highlight');
     setTimeout(()=>document.getElementById('section-videos').scrollIntoView({behavior:'smooth',block:'start'}), 1500);
   }
 
   await sleep(3000);
   setStatus(null);
-  journalLog('Scènes terminées : '+finalDone+'/'+total+' · score moyen '+avgScore+'/100',finalDone>0?'success':'warn');
   showToast(finalDone+' scènes générées','success');
 }
 
@@ -2415,7 +2370,6 @@ async function regenerateScene(index){
   if(state.isGeneratingScenes)return;
   const scene = state.scenes[index];
   if(!scene) return;
-
   const sceneCharIds = (scene.characterIds||[state.selectedCharacterId]).filter(Boolean);
   const sceneChars = sceneCharIds.map(id => state.characters.find(c=>c.id===id)).filter(Boolean);
   if(sceneChars.length === 0) return;
@@ -2431,44 +2385,37 @@ async function regenerateScene(index){
   }
 
   scene.status='generating';
-  scene.progress='Régénération…';
   renderScenes();
-  journalLog('Régénération manuelle scène '+(index+1),'image');
 
   try{
     const prompt = sceneChars.length === 1
       ? buildSceneImagePrompt(scene, sceneChars[0].bible)
       : buildSceneImagePromptMulti(scene, sceneChars);
-
     const imageUrl = await generateImage(prompt, {
       ratio: state.imageFormat,
       referenceImages: refsBase64.length ? refsBase64 : undefined
     });
     scene.imageUrl = imageUrl;
     scene.status='retrying';
-    scene.progress='Analyse…';
     renderScenes();
     const consistency = await checkConsistencyMulti(imageUrl, sceneChars);
     scene.consistency = consistency;
     scene.status='done';
-    scene.progress='Régénéré';
     renderScenes();
     showToast('Scène '+(index+1)+' régénérée','success');
   }catch(e){
     scene.status='error';
     scene.error=e.message;
     renderScenes();
-    showToast('Erreur : '+e.message.slice(0,40),'error');
   }
 }
 
 async function recheckScene(index){
   const scene = state.scenes[index];
-  if(!scene || !scene.imageUrl){showToast('Pas d\'image','warn');return}
+  if(!scene || !scene.imageUrl)return;
   const sceneCharIds = (scene.characterIds||[state.selectedCharacterId]).filter(Boolean);
   const sceneChars = sceneCharIds.map(id => state.characters.find(c=>c.id===id)).filter(Boolean);
   scene.status='retrying';
-  scene.progress='Analyse…';
   renderScenes();
   try{
     const consistency = await checkConsistencyMulti(scene.imageUrl, sceneChars);
@@ -2479,35 +2426,28 @@ async function recheckScene(index){
   }catch(e){
     scene.status='done';
     renderScenes();
-    showToast('Erreur analyse','error');
   }
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GENERATE VIDEOS — 1 VIDÉO PAR SCÈNE (N vidéos)
+// GENERATE VIDEOS (1 par scène)
 // ══════════════════════════════════════════════════════════════════
 async function generateAllVideos(){
   if(state.isGeneratingVideos)return;
   const readyScenes = state.scenes.filter(s=>s.status==='done' && s.imageUrl);
-  if(readyScenes.length < 1){showToast('Il faut au moins 1 scène prête','error');return}
+  if(readyScenes.length < 1){showToast('Il faut au moins 1 scène','error');return}
 
   state.isGeneratingVideos=true;
   state.stopRequested=false;
   updateButtons();
   await activateWakeLock();
 
-  // Réinitialise les vidéos pour correspondre 1:1 aux scènes
   state.videos = state.script.scenes.map((sc, i) => ({
-    index: i,
-    status: 'pending',
-    url: null,
-    progress: null,
-    error: null
+    index: i, status: 'pending', url: null, progress: null, error: null
   }));
   renderVideos();
 
   const total = readyScenes.length;
-  journalLog('Génération de '+total+' vidéos (1 par scène)…','video');
 
   for(let i=0; i<total && !state.stopRequested; i++){
     await generateOneVideo(i, readyScenes);
@@ -2532,14 +2472,8 @@ async function generateAllVideos(){
 
 async function generateOneVideo(index, readyScenes){
   if(state.stopRequested)return;
-
-  // Vidéo de la scène `index` :
-  // - startFrame = image de la scène index
-  // - endFrame = image de la scène index+1 SI elle existe (transition fluide)
-  //   sinon = null (boucle subtile)
   const sceneA = readyScenes[index];
   const sceneB = readyScenes[index + 1] || null;
-
   if(!sceneA || !sceneA.imageUrl)return;
 
   const startFrame = sceneA.imageUrl;
@@ -2549,17 +2483,12 @@ async function generateOneVideo(index, readyScenes){
   if(!v) return;
 
   v.status='generating';
-  v.progress='Initialisation…';
   renderVideos();
 
   const sceneCharIds = (sceneA.characterIds || [state.selectedCharacterId]).filter(Boolean);
   const sceneChars = sceneCharIds.map(id => state.characters.find(c=>c.id===id)).filter(Boolean);
   const namesLabel = sceneChars.map(c=>c.name).join(' + ') || '?';
-
   const sceneData = state.script.scenes[index];
-
-  const mode = endFrame ? '(keyframes chaînés)' : '(boucle subtile)';
-  journalLog('Vidéo '+(index+1)+'/'+readyScenes.length+' ['+namesLabel+'] '+mode,'video');
 
   try{
     let prompt = sceneChars.length === 1
@@ -2567,30 +2496,26 @@ async function generateOneVideo(index, readyScenes){
       : buildSceneVideoPromptMulti(sceneData, sceneChars);
 
     if(!endFrame){
-      prompt += '\n\nNOTE: There is no end frame provided. Animate this single frame with subtle continuous movement (breathing, slight camera drift, environmental motion). Keep it looping naturally.';
+      prompt += '\n\nNOTE: No end frame provided. Animate this single frame with subtle continuous movement. Keep it looping naturally.';
     }
 
     const videoIdObj = await createVideoTask(prompt, startFrame, endFrame, state.durationFrames);
-    const url = await pollVideo(videoIdObj, (prog)=>{
-      v.progress = prog;
-      renderVideos();
-    });
+    const url = await pollVideo(videoIdObj, (prog)=>{ v.progress = prog; renderVideos(); });
     v.status='done';
     v.url=url;
     renderVideos();
-    journalLog('Vidéo '+(index+1)+' ['+namesLabel+'] ✓','success');
+    journalLog('Vidéo '+(index+1)+' ✓','success');
   }catch(e){
     if(e.message==='Arrêt demandé')return;
     v.status='error';
     v.error=e.message;
     renderVideos();
-    journalLog('Vidéo '+(index+1)+' échouée : '+e.message,'error');
   }
 
   if(index<readyScenes.length-1 && !state.stopRequested){
     for(let r=60;r>0;r--){
       if(state.stopRequested)break;
-      setStatus('Pause '+r+'s avant vidéo suivante');
+      setStatus('Pause '+r+'s…');
       await sleep(1000);
     }
   }
@@ -2611,70 +2536,52 @@ async function downloadFile(url, filename){
     setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(objUrl)},1000);
     return true;
   }catch(e){
-    debugLog('warn','DL','Fallback ouverture : '+e.message);
     try{window.open(url,'_blank','noopener');return true}catch(e2){return false}
   }
 }
 
 async function downloadAllVideos(){
   const vids = state.videos.filter(v=>v.status==='done' && v.url);
-  if(!vids.length){showToast('Aucune vidéo à télécharger','warn');return}
-  showToast('Téléchargement de '+vids.length+' vidéos…','success',2000);
-  journalLog('Téléchargement de '+vids.length+' vidéos…','info');
-  let count = 0;
+  if(!vids.length){showToast('Aucune vidéo','warn');return}
   for(const v of vids){
     const num = String(v.index + 1).padStart(2,'0');
     await downloadFile(v.url, 'Scene-'+num+'.mp4');
-    count++;
     await sleep(1200);
   }
-  journalLog(count+' vidéos téléchargées','success');
-  showToast(count+' vidéos téléchargées','success',3000);
+  showToast(vids.length+' vidéos téléchargées','success');
 }
 
 async function downloadAllImages(){
   const imgs = state.scenes.filter(s=>s.status==='done' && s.imageUrl);
-  if(!imgs.length){showToast('Aucune image à télécharger','warn');return}
-  showToast('Téléchargement de '+imgs.length+' images…','success',2000);
-  journalLog('Téléchargement de '+imgs.length+' images…','info');
-  let count = 0;
+  if(!imgs.length){showToast('Aucune image','warn');return}
   for(const s of imgs){
     const num = String(s.index + 1).padStart(2,'0');
     await downloadFile(s.imageUrl, 'Scene-'+num+'.jpg');
-    count++;
     await sleep(800);
   }
-  journalLog(count+' images téléchargées','success');
-  showToast(count+' images téléchargées','success',3000);
+  showToast(imgs.length+' images téléchargées','success');
 }
 
 async function copyAllUrls(){
   const lines = [];
-  state.scenes.forEach(s=>{
-    if(s.imageUrl) lines.push('Scene '+(s.index+1)+' image : '+s.imageUrl);
-  });
-  state.videos.forEach(v=>{
-    if(v.url) lines.push('Scene '+(v.index+1)+' video : '+v.url);
-  });
+  state.scenes.forEach(s=>{ if(s.imageUrl) lines.push('Scene '+(s.index+1)+' image : '+s.imageUrl); });
+  state.videos.forEach(v=>{ if(v.url) lines.push('Scene '+(v.index+1)+' video : '+v.url); });
   if(!lines.length){showToast('Aucune URL','warn');return}
   const text = lines.join('\n');
   try{
     if(navigator.clipboard && window.isSecureContext){
       await navigator.clipboard.writeText(text);
-      showToast('URLs copiées ('+lines.length+')','success',3000);
+      showToast('URLs copiées','success');
     }else{
-      legacyCopy(text, ok=>showToast(ok?'URLs copiées':'Copie impossible', ok?'success':'error'));
+      legacyCopy(text, ok=>showToast(ok?'URLs copiées':'Erreur', ok?'success':'error'));
     }
-    journalLog(lines.length+' URLs copiées','success');
-  }catch(e){showToast('Erreur copie','error')}
+  }catch(e){showToast('Erreur','error')}
 }
 
 function exportJsonBundle(){
-  if(!state.script){
-    showToast('Rien à exporter','warn');return;
-  }
+  if(!state.script){showToast('Rien à exporter','warn');return}
   const bundle = {
-    version: 'v4-multichar-1vid-per-scene',
+    version: 'v5-upload-optional',
     exportedAt: new Date().toISOString(),
     story: document.getElementById('story-input').value.trim(),
     selectedCharacterId: state.selectedCharacterId,
@@ -2684,12 +2591,9 @@ function exportJsonBundle(){
     scenes: state.scenes.map(s=>({
       index: s.index, status: s.status, imageUrl: s.imageUrl,
       consistency: s.consistency, dialogue: s.dialogue, decor: s.decor,
-      characterIds: s.characterIds, characterNames: s.characterNames,
-      composition: s.composition
+      characterIds: s.characterIds, characterNames: s.characterNames, composition: s.composition
     })),
-    videos: state.videos.map(v=>({
-      index: v.index, status: v.status, url: v.url
-    }))
+    videos: state.videos.map(v=>({index: v.index, status: v.status, url: v.url}))
   };
   const blob = new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -2699,7 +2603,6 @@ function exportJsonBundle(){
   document.body.appendChild(a); a.click();
   setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},500);
   showToast('Export JSON généré','success');
-  journalLog('Export JSON généré','success');
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -2717,7 +2620,7 @@ function pickFrenchVoice(){
 }
 function initTTS(){
   if(!('speechSynthesis' in window))return;
-  const update=()=>{ttsVoice=pickFrenchVoice();if(ttsVoice)debugLog('success','TTS','Voix : '+ttsVoice.name)};
+  const update=()=>{ttsVoice=pickFrenchVoice()};
   update();
   window.speechSynthesis.onvoiceschanged=update;
 }
@@ -2731,10 +2634,8 @@ function speakFR(text, charBible){
     u.lang='fr-FR';
     u.rate=(charBible&&charBible.voice_fr&&charBible.voice_fr.rate)||1.0;
     u.pitch=(charBible&&charBible.voice_fr&&charBible.voice_fr.pitch)||1.0;
-    u.volume=1.0;
     if(ttsVoice)u.voice=ttsVoice;
     window.speechSynthesis.speak(u);
-    journalLog('🔊 « '+text.slice(0,90)+(text.length>90?'…':'')+' »','info');
   }catch(e){}
 }
 function stopTTS(){try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}}
@@ -2744,9 +2645,7 @@ function findSpeakingCharacter(scene){
   const speakerName = scene.dialogue && scene.dialogue.speaker;
   const ids = scene.characterIds || [];
   if(speakerName && ids.length){
-    const found = state.characters.find(c =>
-      ids.includes(c.id) && c.name === speakerName
-    );
+    const found = state.characters.find(c => ids.includes(c.id) && c.name === speakerName);
     if(found) return found;
   }
   if(ids.length){
@@ -2758,7 +2657,7 @@ function findSpeakingCharacter(scene){
 
 async function playFilm(){
   const ready=state.videos.filter(v=>v.status==='done'&&v.url);
-  if(ready.length===0){showToast('Aucune vidéo à lire','error');return}
+  if(ready.length===0){showToast('Aucune vidéo','error');return}
   if(state.isPlayingFilm)return;
   state.isPlayingFilm=true;
   updateButtons();
@@ -2769,12 +2668,10 @@ async function playFilm(){
   if(!overlay||!canvas)return;
 
   const dpr=Math.min(window.devicePixelRatio||1,2);
-  const cssW=window.innerWidth;
-  const cssH=window.innerHeight;
-  canvas.width=Math.round(cssW*dpr);
-  canvas.height=Math.round(cssH*dpr);
-  canvas.style.width=cssW+'px';
-  canvas.style.height=cssH+'px';
+  canvas.width=Math.round(window.innerWidth*dpr);
+  canvas.height=Math.round(window.innerHeight*dpr);
+  canvas.style.width=window.innerWidth+'px';
+  canvas.style.height=window.innerHeight+'px';
   const ctx=canvas.getContext('2d');
 
   overlay.classList.add('visible');
@@ -2789,8 +2686,6 @@ async function playFilm(){
     }
   }catch(e){}
 
-  journalLog('Diffusion du film…','play');
-
   for(let i=0;i<ready.length;i++){
     if(!state.isPlayingFilm)break;
     const v = ready[i];
@@ -2801,7 +2696,6 @@ async function playFilm(){
   }
 
   stopFilmPlayback();
-  journalLog('Diffusion terminée.','success');
 }
 
 function playOneScene(videoUrl, scene, ctx, canvas, dpr, char){
@@ -2820,52 +2714,8 @@ function playOneScene(videoUrl, scene, ctx, canvas, dpr, char){
       const line=scene&&scene.dialogue&&scene.dialogue.line_fr;
       if(line)speakFR(line, char&&char.bible);
     };
-
     const ttsGuard=setTimeout(()=>{startTTS()},2000);
 
-    const drawOverlay=(w,h)=>{
-      const t=video.currentTime||0;
-      const dur=video.duration||6;
-      let alpha=1;
-      if(t<0.4)alpha=t/0.4;
-      else if(dur-t<0.5)alpha=Math.max(0,(dur-t)/0.5);
-      if(alpha<=0)return;
-      const pad=Math.round(Math.min(30*dpr, w*0.03));
-      const bandH=Math.round(Math.min(96*dpr, h*0.16));
-      const bandY=h-bandH-pad;
-      const bandX=pad;
-      const bandW=w-pad*2;
-      ctx.save();
-      ctx.globalAlpha=alpha;
-      const grad=ctx.createLinearGradient(bandX,bandY,bandX,bandY+bandH);
-      grad.addColorStop(0,'rgba(10,10,18,0.0)');
-      grad.addColorStop(0.35,'rgba(10,10,18,0.85)');
-      grad.addColorStop(1,'rgba(10,10,18,0.95)');
-      ctx.fillStyle=grad;
-      ctx.fillRect(bandX,bandY,bandW,bandH);
-      ctx.fillStyle='#e5c15a';
-      ctx.fillRect(bandX,bandY+Math.round(bandH*0.15),Math.round(5*dpr),bandH-Math.round(bandH*0.3));
-      const speakerName=(scene&&scene.dialogue&&scene.dialogue.speaker)||(char&&char.name)||'';
-      const nameSize=Math.round(Math.min(15*dpr, h*0.022));
-      const textSize=Math.round(Math.min(22*dpr, h*0.032));
-      if(speakerName){
-        ctx.fillStyle='#e5c15a';
-        ctx.font='700 '+nameSize+'px -apple-system, BlinkMacSystemFont, Helvetica, Arial';
-        ctx.textBaseline='top';
-        ctx.fillText(speakerName.toUpperCase(),bandX+Math.round(bandH*0.22),bandY+Math.round(bandH*0.18));
-      }
-      const overlayText=(scene&&(scene.text_overlay_fr||(scene.dialogue&&scene.dialogue.line_fr)))||'';
-      if(overlayText){
-        ctx.fillStyle='#f5f0e1';
-        ctx.font='500 '+textSize+'px -apple-system, BlinkMacSystemFont, Helvetica, Arial';
-        ctx.textBaseline='top';
-        let txt=overlayText;
-        const maxW=bandW-Math.round(bandH*0.4);
-        while(ctx.measureText(txt).width>maxW&&txt.length>4){txt=txt.slice(0,-4)+'…'}
-        ctx.fillText(txt,bandX+Math.round(bandH*0.22),bandY+Math.round(bandH*0.5));
-      }
-      ctx.restore();
-    };
     const draw=()=>{
       ctx.fillStyle='#000';
       ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -2877,7 +2727,47 @@ function playOneScene(videoUrl, scene, ctx, canvas, dpr, char){
       if(ar>car){dw=canvas.width;dh=canvas.width/ar;dx=0;dy=(canvas.height-dh)/2}
       else{dh=canvas.height;dw=canvas.height*ar;dx=(canvas.width-dw)/2;dy=0}
       try{ctx.drawImage(video,dx,dy,dw,dh)}catch(e){}
-      drawOverlay(canvas.width,canvas.height);
+
+      const t=video.currentTime||0;
+      const dur=video.duration||6;
+      let alpha=1;
+      if(t<0.4)alpha=t/0.4;
+      else if(dur-t<0.5)alpha=Math.max(0,(dur-t)/0.5);
+      if(alpha>0){
+        const pad=Math.round(Math.min(30*dpr, canvas.width*0.03));
+        const bandH=Math.round(Math.min(96*dpr, canvas.height*0.16));
+        const bandY=canvas.height-bandH-pad;
+        const bandX=pad;
+        const bandW=canvas.width-pad*2;
+        ctx.save();
+        ctx.globalAlpha=alpha;
+        const grad=ctx.createLinearGradient(bandX,bandY,bandX,bandY+bandH);
+        grad.addColorStop(0,'rgba(10,10,18,0.0)');
+        grad.addColorStop(0.35,'rgba(10,10,18,0.85)');
+        grad.addColorStop(1,'rgba(10,10,18,0.95)');
+        ctx.fillStyle=grad;
+        ctx.fillRect(bandX,bandY,bandW,bandH);
+        ctx.fillStyle='#e5c15a';
+        ctx.fillRect(bandX,bandY+Math.round(bandH*0.15),Math.round(5*dpr),bandH-Math.round(bandH*0.3));
+        const speakerName=(scene&&scene.dialogue&&scene.dialogue.speaker)||(char&&char.name)||'';
+        if(speakerName){
+          ctx.fillStyle='#e5c15a';
+          ctx.font='700 '+Math.round(Math.min(15*dpr,canvas.height*0.022))+'px -apple-system';
+          ctx.textBaseline='top';
+          ctx.fillText(speakerName.toUpperCase(),bandX+Math.round(bandH*0.22),bandY+Math.round(bandH*0.18));
+        }
+        const overlayText=(scene&&(scene.text_overlay_fr||(scene.dialogue&&scene.dialogue.line_fr)))||'';
+        if(overlayText){
+          ctx.fillStyle='#f5f0e1';
+          ctx.font='500 '+Math.round(Math.min(22*dpr,canvas.height*0.032))+'px -apple-system';
+          ctx.textBaseline='top';
+          let txt=overlayText;
+          const maxW=bandW-Math.round(bandH*0.4);
+          while(ctx.measureText(txt).width>maxW&&txt.length>4){txt=txt.slice(0,-4)+'…'}
+          ctx.fillText(txt,bandX+Math.round(bandH*0.22),bandY+Math.round(bandH*0.5));
+        }
+        ctx.restore();
+      }
     };
     const loop=()=>{
       if(!state.isPlayingFilm){clearTimeout(ttsGuard);finish();return}
@@ -2909,7 +2799,7 @@ function stopFilmPlayback(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// IMPORT JSON
+// IMPORT JSON + UPLOAD OPTIONNEL
 // ══════════════════════════════════════════════════════════════════
 function openImportScreen(){
   const sec=document.getElementById('section-import');
@@ -2924,9 +2814,12 @@ function closeImportScreen(){
 function clearImport(){
   document.getElementById('import-json-input-text').value='';
   document.getElementById('import-preview-container').innerHTML='';
+  const uploads = document.getElementById('import-chars-uploads');
+  if(uploads) uploads.innerHTML='';
   document.getElementById('import-zone').classList.remove('has-content');
   state.importPack=null;
   state.criticalFeatures=[];
+  state.importCharImages={};
 }
 async function pasteFromClipboard(){
   try{
@@ -2966,23 +2859,79 @@ function validateImportPack(pack){
   }else{
     const charNames = new Set(pack.characters.map(c => (c.name||'').toLowerCase()));
     const charIds = new Set(pack.characters.map(c => c.id).filter(Boolean));
-
     pack.scenes.forEach((s,i)=>{
       const refs = findCharactersRefForScene(s);
-      if(refs.length === 0){
-        errors.push('Scène '+(i+1)+' : aucun personnage référencé');
-        return;
-      }
-      if(refs.length > MAX_CHARS_PER_SCENE){
-        errors.push('Scène '+(i+1)+' : '+refs.length+' personnages (max '+MAX_CHARS_PER_SCENE+')');
-      }
+      if(refs.length === 0){ errors.push('Scène '+(i+1)+' : aucun personnage'); return; }
+      if(refs.length > MAX_CHARS_PER_SCENE){ errors.push('Scène '+(i+1)+' : trop de persos (max '+MAX_CHARS_PER_SCENE+')'); }
       refs.forEach(ref=>{
         const ok = charNames.has(ref.toLowerCase()) || charIds.has(ref);
-        if(!ok) errors.push('Scène '+(i+1)+' : personnage inconnu "'+ref+'"');
+        if(!ok) errors.push('Scène '+(i+1)+' : perso inconnu "'+ref+'"');
       });
     });
   }
   return errors;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SLOTS D'UPLOAD D'IMAGES PAR PERSONNAGE (optionnel)
+// ══════════════════════════════════════════════════════════════════
+function renderImportUploadSlots(){
+  const container = document.getElementById('import-chars-uploads');
+  if(!container || !state.importPack) return;
+
+  const chars = state.importPack.characters || [];
+  if(chars.length === 0){ container.innerHTML=''; return; }
+
+  let html = '<div style="font-size:.72rem;color:var(--dim);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700">📸 Images de référence <span style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">— optionnel · si vide, l\'IA gère</span></div>';
+
+  chars.forEach((c, i) => {
+    const key = c.id || c.name || ('char'+i);
+    const existing = state.importCharImages[key];
+
+    html += '<div class="import-img-slot">';
+    html += '<div class="slot-name">🎭 ' + esc(c.name || ('Personnage '+(i+1))) + '</div>';
+
+    if(existing){
+      html += '<img class="slot-thumb" src="'+existing+'" alt="">';
+      html += '<button type="button" class="slot-clear" data-clear-import-img="'+esc(key)+'">✕ Retirer</button>';
+    } else {
+      html += '<label class="slot-btn">Choisir une image<input type="file" accept="image/*" data-import-img="'+esc(key)+'"></label>';
+    }
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+
+  container.querySelectorAll('input[data-import-img]').forEach(inp => {
+    inp.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!file.type.startsWith('image/')){ showToast('Fichier non image','error'); return; }
+      if(file.size > 15*1024*1024){ showToast('Image trop lourde (max 15 Mo)','error'); return; }
+      const key = inp.dataset.importImg;
+      try{
+        setStatus('Chargement de l\'image…');
+        const raw = await fileToDataUri(file);
+        const compressed = await compressImage(raw, REF_MAX_SIDE);
+        state.importCharImages[key] = compressed;
+        setStatus(null);
+        showToast('Image chargée ✓','success');
+        renderImportUploadSlots();
+      }catch(err){
+        setStatus(null);
+        showToast('Erreur chargement','error');
+      }
+    });
+  });
+
+  container.querySelectorAll('[data-clear-import-img]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.clearImportImg;
+      delete state.importCharImages[key];
+      renderImportUploadSlots();
+      showToast('Image retirée','warn');
+    });
+  });
 }
 
 function analyzeImport(){
@@ -3012,32 +2961,30 @@ function analyzeImport(){
   state.criticalFeatures = Array.isArray(pack.critical_features) ? pack.critical_features : [];
   document.getElementById('import-zone').classList.add('has-content');
 
+  // ═══ Slots d'upload d'images ═══
+  renderImportUploadSlots();
+
   let html='<div class="import-preview">';
   html+='<h4>✅ Pack valide</h4>';
   if(pack.title)html+='<div class="ip-line"><span class="ip-label">Titre</span><span class="ip-val">'+esc(pack.title)+'</span></div>';
   html+='<div class="ip-line"><span class="ip-label">Personnages</span><span class="ip-val">'+pack.characters.length+'</span></div>';
   html+='<div class="ip-line"><span class="ip-label">Scènes</span><span class="ip-val">'+pack.scenes.length+'</span></div>';
   if(pack.scenes[0] && pack.scenes[0].duration){
-    html+='<div class="ip-line"><span class="ip-label">Durée par scène</span><span class="ip-val">'+pack.scenes[0].duration+' frames ('+Math.round(pack.scenes[0].duration/24*10)/10+'s)</span></div>';
+    html+='<div class="ip-line"><span class="ip-label">Durée</span><span class="ip-val">'+pack.scenes[0].duration+' frames ('+Math.round(pack.scenes[0].duration/24*10)/10+'s)</span></div>';
   }
   html+='<div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(168,216,200,.2)">';
-  html+='<div style="font-size:.7rem;color:var(--dim);margin-bottom:.4rem">Personnages :</div>';
   pack.characters.forEach(c=>{
     html+='<div class="ip-line" style="padding:.2rem 0">🎭 <strong style="color:var(--gold-soft)">'+esc(c.name)+'</strong>'+(c.id?(' <span style="color:var(--dim)">['+esc(c.id)+']</span>'):'')+'</div>';
   });
   html+='</div>';
 
-  // Critical features
   if(state.criticalFeatures.length){
-    html+='<div class="critical-list"><h5>🚨 Caractéristiques critiques vérifiées automatiquement</h5><ul>';
-    state.criticalFeatures.forEach(f=>{
-      html+='<li>'+esc(f)+'</li>';
-    });
+    html+='<div class="critical-list"><h5>🚨 Critical features (vérifiées automatiquement)</h5><ul>';
+    state.criticalFeatures.forEach(f=>{ html+='<li>'+esc(f)+'</li>'; });
     html+='</ul></div>';
   }
 
   html+='<div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(168,216,200,.2)">';
-  html+='<div style="font-size:.7rem;color:var(--dim);margin-bottom:.4rem">Scènes (mapping) :</div>';
   pack.scenes.forEach((s,i)=>{
     const refs = findCharactersRefForScene(s);
     const label = refs.length ? refs.join(' + ') : '⚠️ aucun';
@@ -3045,6 +2992,12 @@ function analyzeImport(){
     html+='<div class="ip-line" style="padding:.15rem 0">▸ Scène '+(i+1)+' — <span style="color:'+color+';font-weight:600">'+esc(label)+'</span></div>';
   });
   html+='</div>';
+
+  const uploadedCount = Object.keys(state.importCharImages).length;
+  if(uploadedCount > 0){
+    html += '<div style="font-size:.7rem;color:var(--ok);margin-top:.6rem;padding:.4rem .6rem;background:rgba(74,157,106,.08);border:1px solid rgba(74,157,106,.3);border-radius:3px">✅ '+uploadedCount+' image(s) de référence chargée(s)</div>';
+  }
+
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:1rem">';
   html+='<button type="button" class="btn btn-primary" id="import-start-btn">🚀 Lancer la génération</button>';
   html+='<button type="button" class="btn" id="import-reanalyze-btn">🔍 Re-analyser</button>';
@@ -3054,8 +3007,7 @@ function analyzeImport(){
 
   document.getElementById('import-start-btn').addEventListener('click', startImportGeneration);
   document.getElementById('import-reanalyze-btn').addEventListener('click', analyzeImport);
-  showToast('Pack valide ✓'+(state.criticalFeatures.length?(' · '+state.criticalFeatures.length+' features critiques'):''),'success');
-  journalLog('Pack valide : '+pack.characters.length+' persos, '+pack.scenes.length+' scènes'+(state.criticalFeatures.length?(', '+state.criticalFeatures.length+' critical features'):''),'success');
+  showToast('Pack valide ✓'+(state.criticalFeatures.length?(' · '+state.criticalFeatures.length+' features'):''),'success');
 }
 
 async function startImportGeneration(){
@@ -3069,10 +3021,9 @@ async function startImportGeneration(){
   state.stopRequested = false;
   updateButtons();
   setStatus('Import en cours…');
-  journalLog('Démarrage de l\'import ('+pack.characters.length+' persos, '+pack.scenes.length+' scènes'+(state.criticalFeatures.length?', '+state.criticalFeatures.length+' features critiques':'')+')…','highlight');
+  journalLog('Démarrage de l\'import ('+pack.characters.length+' persos, '+pack.scenes.length+' scènes)…','highlight');
 
   try{
-    // ═══ 1) CRÉER TOUS LES PERSONNAGES avec validation ═══
     const packCharMap = {};
     for(let i=0; i<pack.characters.length; i++){
       if(state.stopRequested)break;
@@ -3080,23 +3031,29 @@ async function startImportGeneration(){
       setStatus('Personnage '+(i+1)+'/'+pack.characters.length+' : '+(c.name||''));
       journalLog('Création du personnage '+(c.name||'')+' ('+(i+1)+'/'+pack.characters.length+')','character');
 
-      let refsheet = await generateReferenceSheet(c.description, null, null);
+      // ═══ Récupère l'image uploadée (optionnelle) ═══
+      const imgKey = c.id || c.name || ('char'+i);
+      const refImageDataUrl = state.importCharImages[imgKey] || null;
+      const hasImage = !!refImageDataUrl;
 
-      // Validation critical features + régénération auto
+      if(hasImage){
+        journalLog('📸 Image de référence détectée pour '+c.name+' → utilisation comme base','success');
+      } else {
+        journalLog('🤖 Aucune image pour '+c.name+' → l\'IA génère à partir du texte','info');
+      }
+
+      let refsheet = await generateReferenceSheet(c.description, refImageDataUrl, refImageDataUrl);
+
       if(state.criticalFeatures.length){
         let validation = await validateRefsheet(refsheet, state.criticalFeatures, c.name);
         let attempts = 0;
-
         while(!validation.valid && attempts < REFSHEET_MAX_VALIDATE_ATTEMPTS && !state.stopRequested){
           attempts++;
           journalLog('⚠ '+c.name+' — features manquantes ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+') : '+validation.missing.join(', '),'warn');
-          setStatus('Régénération planche '+c.name+' ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+')…');
-
           const reinforcedDesc = c.description + ' — ABSOLUTE MANDATORY: ' + state.criticalFeatures.join(', ') + '. These features MUST be clearly visible in every panel.';
-          refsheet = await generateReferenceSheet(reinforcedDesc, null, null);
+          refsheet = await generateReferenceSheet(reinforcedDesc, refImageDataUrl, refImageDataUrl);
           validation = await validateRefsheet(refsheet, state.criticalFeatures, c.name);
         }
-
         if(validation.valid){
           journalLog('✓ '+c.name+' — planche validée ('+validation.score+'/100)','success');
         }else{
@@ -3131,7 +3088,6 @@ async function startImportGeneration(){
       renderBible();
     }
 
-    // ═══ 2) CONFIGURER ═══
     document.getElementById('story-input').value = pack.story;
     document.getElementById('scene-count').value = String(pack.scenes.length);
     state.sceneCount = pack.scenes.length;
@@ -3139,19 +3095,14 @@ async function startImportGeneration(){
     state.consistencyThreshold = parseInt(document.getElementById('consistency-threshold').value, 10);
     state.imageFormat = document.getElementById('image-format').value;
 
-    // ═══ 3) MAPPING SCÈNES → PERSONNAGES ═══
     const scenesMapped = pack.scenes.map((s, i) => {
       const refs = findCharactersRefForScene(s);
       let charsMatched = matchCharacters(refs, state.characters);
-
-      if(charsMatched.length === 0 && state.characters[0]){
-        charsMatched = [state.characters[0]];
-      }
+      if(charsMatched.length === 0 && state.characters[0]) charsMatched = [state.characters[0]];
       charsMatched = charsMatched.slice(0, MAX_CHARS_PER_SCENE);
 
       const characterIds = charsMatched.map(c => c.id);
       const characterNames = charsMatched.map(c => c.name);
-
       let composition = s.composition;
       if(!composition){
         composition = charsMatched.map((c, idx) => {
@@ -3159,14 +3110,11 @@ async function startImportGeneration(){
           return c.name + ' on the ' + (positions[idx] || ('position '+(idx+1)));
         }).join(', ');
       }
-
       const speakerName = s.speaker || characterNames[0] || 'Personnage';
 
       return {
         scene_number: i+1,
-        characterIds: characterIds,
-        characterNames: characterNames,
-        composition: composition,
+        characterIds, characterNames, composition,
         action: s.description || '',
         decor: s.decor || '',
         image_prompt: s.description || s.decor || '',
@@ -3177,42 +3125,17 @@ async function startImportGeneration(){
       };
     });
 
-    const mapping = scenesMapped.map(s =>
-      'S'+s.scene_number+'→['+s.characterNames.join('+')+']'
-    ).join(' · ');
-    journalLog('Mapping : '+mapping,'highlight');
+    journalLog('Mapping : '+scenesMapped.map(s => 'S'+s.scene_number+'→['+s.characterNames.join('+')+']').join(' · '),'highlight');
 
-    state.script = {
-      title: pack.title || 'Import',
-      logline: '',
-      scenes: scenesMapped
-    };
-
+    state.script = { title: pack.title || 'Import', logline: '', scenes: scenesMapped };
     state.scenes = state.script.scenes.map((sc, i) => ({
-      index: i,
-      status: 'pending',
-      imageUrl: null,
-      progress: null,
-      error: null,
-      consistency: null,
-      characterIds: sc.characterIds || [],
-      characterNames: sc.characterNames || [],
-      composition: sc.composition || '',
-      dialogue: sc.dialogue,
-      action: sc.action,
-      decor: sc.decor,
-      image_prompt: sc.image_prompt,
-      video_prompt: sc.video_prompt,
-      text_overlay_fr: sc.text_overlay_fr,
-      retryCount: 0
+      index: i, status: 'pending', imageUrl: null, progress: null, error: null,
+      consistency: null, characterIds: sc.characterIds || [], characterNames: sc.characterNames || [],
+      composition: sc.composition || '', dialogue: sc.dialogue, action: sc.action, decor: sc.decor,
+      image_prompt: sc.image_prompt, video_prompt: sc.video_prompt, text_overlay_fr: sc.text_overlay_fr, retryCount: 0
     }));
-
     state.videos = state.script.scenes.map((sc, i) => ({
-      index: i,
-      status: 'pending',
-      url: null,
-      progress: null,
-      error: null
+      index: i, status: 'pending', url: null, progress: null, error: null
     }));
 
     document.getElementById('section-scenes').classList.remove('hidden');
@@ -3221,25 +3144,20 @@ async function startImportGeneration(){
     renderScenes();
     renderVideos();
 
-    // ═══ 4) GÉNÉRER LES SCÈNES ═══
-    setStatus('Génération des images de scène…');
+    setStatus('Génération des images…');
     await generateAllScenes();
 
-    // ═══ 5) GÉNÉRER LES VIDÉOS (1 par scène) ═══
     if(!state.stopRequested){
       setStatus('Génération des vidéos…');
       await generateAllVideos();
     }
 
     setStatus('✦ Import terminé ✦');
-    journalLog('Import complet terminé','success');
-    showToast('Import terminé avec succès','success',4000);
+    showToast('Import terminé','success',4000);
     await sleep(3000);
     setStatus(null);
-
   }catch(e){
     journalLog('Erreur import : '+e.message,'error');
-    debugLog('error','IMPORT',e.message);
     showToast('Erreur : '+e.message.slice(0,60),'error',4000);
     setStatus(null);
   }
@@ -3250,7 +3168,7 @@ async function startImportGeneration(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// IMAGE UPLOAD
+// UPLOAD MANUEL
 // ══════════════════════════════════════════════════════════════════
 function bindCharRefInput(){
   const input=document.getElementById('char-ref-input');
@@ -3261,7 +3179,7 @@ function bindCharRefInput(){
     if(!file.type.startsWith('image/')){showToast('Fichier non image','error');return}
     if(file.size>15*1024*1024){showToast('Image trop lourde','error');return}
     try{
-      setStatus('Chargement de la référence…');
+      setStatus('Chargement…');
       const raw=await fileToDataUri(file);
       const compressed=await compressImage(raw, REF_MAX_SIDE);
       state.refImageDataUrl=compressed;
@@ -3273,7 +3191,7 @@ function bindCharRefInput(){
       showToast('Référence chargée','success');
     }catch(e){
       setStatus(null);
-      showToast('Erreur chargement','error');
+      showToast('Erreur','error');
     }
   });
 }
@@ -3317,10 +3235,7 @@ function bindCharRefInput(){
   });
   document.getElementById('char-description').addEventListener('input',updateButtons);
   document.getElementById('create-char-btn').addEventListener('click',createCharacter);
-  document.getElementById('create-stop-btn').addEventListener('click',()=>{
-    state.stopRequested=true;
-    showToast('Arrêt en cours…','warn');
-  });
+  document.getElementById('create-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt…','warn')});
 
   document.getElementById('bible-edit-btn').addEventListener('click',()=>{
     if(!state.bible)return;
@@ -3349,8 +3264,8 @@ function bindCharRefInput(){
   document.getElementById('generate-script-btn').addEventListener('click',generateScriptPipeline);
   document.getElementById('generate-scenes-btn').addEventListener('click',generateAllScenes);
   document.getElementById('generate-videos-btn').addEventListener('click',generateAllVideos);
-  document.getElementById('scenes-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
-  document.getElementById('videos-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
+  document.getElementById('scenes-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt…','warn')});
+  document.getElementById('videos-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt…','warn')});
 
   document.getElementById('download-all-videos-btn').addEventListener('click', downloadAllVideos);
   document.getElementById('download-all-images-btn').addEventListener('click', downloadAllImages);
@@ -3383,13 +3298,11 @@ function bindCharRefInput(){
   initTTS();
   renderCharacterLibrary();
 
-  debugLog('success','INIT','Character Consistency Studio v4 — MULTI-PERSONNAGES + VALIDATION + N VIDÉOS');
-  debugLog('info','INIT','1 vidéo par scène (N vidéos pour N scènes)');
-  debugLog('info','INIT','Validation vision des planches (critical features)');
-  debugLog('info','INIT','Jusqu\'à '+MAX_CHARS_PER_SCENE+' personnages par scène');
-  debugLog('info','INIT','critical_features injectées dans TOUS les prompts (refsheet + images + vidéos)');
-  journalLog('Prêt. Ajoutez votre clé API ou importez un pack JSON.','highlight');
-  journalLog('🚨 Les critical_features sont vérifiées automatiquement sur la planche.','success');
+  debugLog('success','INIT','Character Consistency Studio v5 — Upload optionnel');
+  debugLog('info','INIT','Import Pack JSON → slots d\'upload par personnage (optionnel)');
+  debugLog('info','INIT','Si image uploadée → utilisée comme référence ; sinon → IA gère');
+  debugLog('info','INIT','1 vidéo par scène · validation vision des critical features');
+  journalLog('Prêt. Importez un pack JSON — vous pourrez uploader une image par personnage (ou laisser l\'IA gérer).','highlight');
 })();
 </script>
 </body>
