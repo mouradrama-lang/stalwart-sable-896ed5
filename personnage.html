@@ -253,6 +253,11 @@ body{padding-bottom:26rem}
 .import-errors li{margin-left:1.2rem;margin-bottom:.25rem}
 
 .scene-chars-badge{display:inline-block;background:rgba(200,176,224,.15);border:1px solid rgba(200,176,224,.4);color:var(--lavender);font-size:.6rem;padding:.1rem .4rem;border-radius:2px;margin-left:.4rem}
+
+/* Critical features preview */
+.critical-list{background:rgba(200,90,74,.06);border:1px solid rgba(200,90,74,.3);border-left:3px solid var(--err);border-radius:var(--r);padding:.8rem 1rem;margin-top:.8rem;font-size:.72rem;font-family:var(--fm);color:#f0c0c0;line-height:1.6}
+.critical-list h5{font-size:.68rem;color:var(--err);text-transform:uppercase;margin-bottom:.5rem;font-weight:700;letter-spacing:.1em}
+.critical-list li{margin-left:1.2rem;margin-bottom:.15rem}
 </style>
 </head>
 <body>
@@ -264,11 +269,11 @@ body{padding-bottom:26rem}
 
 <div class="banner">
 <strong>🎯 Le pipeline :</strong>
-<strong class="hl-gold">1.</strong> Créer un ou plusieurs personnages → planche de référence 6 vues.
-<strong class="hl-gold">2.</strong> Character Bible par personnage (JSON + lock prompt).
-<strong class="hl-gold">3.</strong> Scènes <strong class="hl-lav">mono ou multi-personnages</strong> (jusqu'à 3 par scène).
-<strong class="hl-gold">4.</strong> Consistency Checker analyse chaque image.
-<strong class="hl-gold">5.</strong> Vidéos keyframes chaînées.
+<strong class="hl-gold">1.</strong> Créer un ou plusieurs personnages → planche de référence 6 vues <strong class="hl-lav">VALIDÉE par vision</strong>.
+<strong class="hl-gold">2.</strong> Character Bible par personnage.
+<strong class="hl-gold">3.</strong> Scènes <strong class="hl-lav">mono ou multi-personnages</strong>.
+<strong class="hl-gold">4.</strong> Consistency checker + régénération auto.
+<strong class="hl-gold">5.</strong> <strong class="hl-sky">1 vidéo par scène</strong> (N vidéos pour N scènes).
 </div>
 
 <!-- API KEY -->
@@ -295,7 +300,7 @@ body{padding-bottom:26rem}
 <span class="chevron">▼</span>
 </div>
 <div class="section-body"><div class="section-content">
-<div class="hint" style="margin-top:0;margin-bottom:.8rem">Collez un pack JSON complet → génération automatique multi-personnages.</div>
+<div class="hint" style="margin-top:0;margin-bottom:.8rem">Collez un pack JSON complet → génération automatique multi-personnages avec validation des caractéristiques critiques.</div>
 <button type="button" class="btn btn-import" id="open-import-btn">📥 Coller un pack JSON</button>
 </div></div>
 </div>
@@ -468,11 +473,11 @@ body{padding-bottom:26rem}
 <!-- VIDEOS -->
 <div class="section hidden" id="section-videos">
 <div class="section-header" data-toggle="section-videos">
-<span class="section-title"><span>🎬 07 · Vidéos (keyframes chaînés)</span> <span class="badge" id="videos-badge">0</span></span>
+<span class="section-title"><span>🎬 07 · Vidéos (1 par scène)</span> <span class="badge" id="videos-badge">0</span></span>
 <span class="chevron">▼</span>
 </div>
 <div class="section-body"><div class="section-content">
-<div class="hint" style="margin-bottom:.8rem">🎬 Chaque vidéo chaîne la <strong>dernière image d'une scène</strong> à la <strong>première image de la suivante</strong>.</div>
+<div class="hint" style="margin-bottom:.8rem">🎬 <strong>1 vidéo par scène</strong>. Chaque vidéo utilise l'image de sa scène en départ + l'image de la scène suivante en arrivée (keyframes chaînés). La dernière scène s'anime en boucle subtile.</div>
 <button type="button" class="btn btn-primary" id="generate-videos-btn" disabled>🎬 Générer les vidéos</button>
 <button type="button" class="btn btn-stop" id="videos-stop-btn">⏹ Arrêter</button>
 <div class="scenes-grid" id="videos-grid"></div>
@@ -559,11 +564,12 @@ const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
 const VIDEO_MAX_POLL_ATTEMPTS = 100;
 
 const IMAGE_MAX_RETRIES = 3;
+const REFSHEET_MAX_VALIDATE_ATTEMPTS = 3;
 const MAX_CHARS_PER_SCENE = 3;
 
-const API_KEY_STORAGE = 'char_consistency_api_key_v2';
-const CHARACTERS_STORAGE = 'char_consistency_characters_v2';
-const WAKE_LOCK_PREF = 'char_consistency_wakelock_v2';
+const API_KEY_STORAGE = 'char_consistency_api_key_v3';
+const CHARACTERS_STORAGE = 'char_consistency_characters_v3';
+const WAKE_LOCK_PREF = 'char_consistency_wakelock_v3';
 
 const DEBUG_MAX = 800;
 const REF_MAX_SIDE = 1280;
@@ -596,7 +602,8 @@ const state = {
   scenes: [],
   videos: [],
   importPack: null,
-  isRunning: false
+  isRunning: false,
+  criticalFeatures: []
 };
 
 // ══════════════════════════════════════════════════════════════════
@@ -1100,7 +1107,7 @@ async function compressImage(dataUrl,maxSide){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// CHARACTERS PERSISTENCE + HELPERS MULTI
+// CHARACTERS PERSISTENCE + HELPERS
 // ══════════════════════════════════════════════════════════════════
 function loadCharacters(){
   try{
@@ -1121,7 +1128,7 @@ function persistCharacter(char){
   saveCharacters(state.characters);
 }
 
-// ─── Multi-personnages : extraction des références d'une scène ────
+// Multi-personnages
 function findCharactersRefForScene(scene){
   if(!scene) return [];
   if(Array.isArray(scene.characters) && scene.characters.length){
@@ -1293,14 +1300,100 @@ async function pollVideo(videoIdObj,onProgress){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// REFSHEET
+// CRITICAL FEATURES BLOCK
+// ══════════════════════════════════════════════════════════════════
+function buildCriticalFeaturesBlock(){
+  const features = state.criticalFeatures && state.criticalFeatures.length
+    ? state.criticalFeatures
+    : (state.importPack && Array.isArray(state.importPack.critical_features) ? state.importPack.critical_features : []);
+  if(!features || features.length === 0) return '';
+  return [
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ 🚨 CRITICAL FEATURES — MUST APPEAR IN EVERY SINGLE FRAME          ║',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    'The following features are NON-NEGOTIABLE and MUST be present, visible and identical in every image:',
+    ...features.map(f => '  ✓ ' + f),
+    '',
+    'DO NOT omit any of these features. DO NOT modify them. They are absolute requirements.'
+  ].join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VALIDATE REFSHEET (vision)
+// ══════════════════════════════════════════════════════════════════
+async function validateRefsheet(refsheetUrl, criticalFeatures, charName){
+  if(!criticalFeatures || criticalFeatures.length === 0){
+    return {valid: true, missing: [], score: 100, verdict: 'Pas de features à vérifier'};
+  }
+  let refDataUrl;
+  try{
+    const blob = await fetch(refsheetUrl).then(r=>r.blob());
+    refDataUrl = await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob)});
+  }catch(e){
+    debugLog('warn','VALIDATE-REFSHEET','Image inaccessible : '+e.message);
+    return {valid: true, missing: [], score: 100, verdict: 'Validation ignorée'};
+  }
+
+  const systemPrompt = 'Tu es un expert en validation de cohérence de personnages. Tu examines une planche de référence et vérifies la présence de caractéristiques obligatoires. Tu réponds TOUJOURS en JSON strict valide.';
+  const userPrompt = [
+    'Voici une planche de référence du personnage "'+(charName||'personnage')+'".',
+    '',
+    'CARACTÉRISTIQUES OBLIGATOIRES À VÉRIFIER :',
+    ...criticalFeatures.map((f,i) => (i+1)+'. '+f),
+    '',
+    'Pour CHAQUE caractéristique, dis si elle est CLAIREMENT visible dans la planche ou NON.',
+    'Retourne UNIQUEMENT ce JSON :',
+    '{"present": ["feature présente 1"], "missing": ["feature MANQUANTE"], "score": <0-100>, "verdict": "phrase courte"}'
+  ].join('\n');
+
+  try{
+    const body = {
+      model: MODEL_TEXT,
+      messages: [
+        {role:'system', content: systemPrompt},
+        {role:'user', content: [
+          {type:'text', text: userPrompt},
+          {type:'image_url', image_url: {url: refDataUrl}}
+        ]}
+      ],
+      temperature: 0.1, max_tokens: 800,
+      reasoning_effort: 'none', chat_template_kwargs: {enable_thinking: false}
+    };
+    const res = await apiFetch(API_BASE+'/chat/completions',
+      {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)},
+      'Validate-Refsheet', 3);
+    const data = await res.json();
+    const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if(!content) return {valid: true, missing: [], score: 100, verdict: 'Pas de réponse'};
+    const parsed = extractJson(content);
+    if(!parsed) return {valid: true, missing: [], score: 100, verdict: 'Parse échoué'};
+    const missing = Array.isArray(parsed.missing) ? parsed.missing : [];
+    const score = typeof parsed.score === 'number' ? parsed.score : 100;
+    debugLog('vision','VALIDATE-REFSHEET','Score '+score+' · Manquants : '+(missing.join(', ')||'aucun'));
+    return {valid: missing.length === 0, missing, score, verdict: parsed.verdict || ''};
+  }catch(e){
+    debugLog('warn','VALIDATE-REFSHEET','Erreur : '+e.message);
+    return {valid: true, missing: [], score: 100, verdict: 'Validation échouée'};
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// REFSHEET — génération
 // ══════════════════════════════════════════════════════════════════
 async function generateReferenceSheet(description, refImageDataUrl, refImageForApi){
   const fullDesc = description || '';
+  const criticalBlock = buildCriticalFeaturesBlock();
+
   const promptLines = [
+    criticalBlock,
+    criticalBlock ? '' : null,
     'Character reference sheet — 6 panels on a single image, arranged in a 3x2 grid with perfect symmetry.',
     '',
     'CHARACTER TO DESIGN: ' + fullDesc,
+    '',
+    criticalBlock ? '⚠️ ABSOLUTE MANDATORY: every panel MUST show the character with the CRITICAL FEATURES listed above.' : null,
+    criticalBlock ? 'If a stubble beard is listed in critical features, it MUST be clearly visible in all 6 panels.' : null,
+    criticalBlock ? 'Clothing items listed in critical features MUST be worn exactly as described.' : null,
     '',
     'PANELS (left to right, top to bottom):',
     '  1. Full body front view — perfectly centered, symmetrical, arms down.',
@@ -1312,16 +1405,19 @@ async function generateReferenceSheet(description, refImageDataUrl, refImageForA
     '',
     'RULES:',
     '- ALL panels show the SAME character with ABSOLUTE CONSISTENCY.',
-    '- Same face, same fur, same colors, same outfit, same proportions, same accessories.',
+    '- Same face, same fur/hair, same colors, same outfit, same proportions, same accessories.',
+    criticalBlock ? '- CRITICAL FEATURES (listed above) MUST be visible in EVERY panel.' : null,
     '- Style: photorealistic 35mm film, pastel palette, symmetrical staging.',
     '- Clean neutral background (soft pastel) so the character pops.',
     '- Character is fully clothed. No nudity.',
     '- No text, no watermark, no subtitles.',
     '- Landscape 16:9 horizontal layout.'
-  ];
+  ].filter(Boolean);
+
   const prompt = promptLines.join('\n');
-  debugLog('ai','PROMPT REFSHEET','Envoyé ('+prompt.length+' chars)');
+  debugLog('ai','PROMPT REFSHEET','Envoyé ('+prompt.length+' chars'+(criticalBlock?' · +CRITICAL':'')+')');
   journalLog('Génération de la planche de référence (6 vues)…','character');
+
   const refs = [];
   if(refImageForApi)refs.push(refImageForApi);
   const url = await generateImage(prompt, {ratio: '16:9', referenceImages: refs.length ? refs : undefined});
@@ -1333,12 +1429,19 @@ async function generateReferenceSheet(description, refImageDataUrl, refImageForA
 // CHARACTER BIBLE
 // ══════════════════════════════════════════════════════════════════
 async function buildCharacterBible(description, refsheetUrl){
+  const criticalFeatures = state.criticalFeatures && state.criticalFeatures.length
+    ? state.criticalFeatures
+    : (state.importPack && Array.isArray(state.importPack.critical_features) ? state.importPack.critical_features : []);
+
   const systemPrompt = 'Tu es un directeur artistique spécialisé dans la cohérence de personnages pour la génération d\'images IA. Tu produis des descriptions hyper-précises qui figent l\'identité visuelle d\'un personnage. Tu réponds TOUJOURS en JSON strict, valide, sans markdown.';
   const userPrompt = [
     'Voici un personnage à décrire de manière EXTRÊMEMENT précise pour garantir sa cohérence à travers de nombreuses générations d\'images.',
     '',
     'DESCRIPTION FOURNIE:',
     description || '',
+    '',
+    criticalFeatures.length ? 'CARACTÉRISTIQUES CRITIQUES OBLIGATOIRES (à mentionner explicitement dans le lock prompt):' : '',
+    ...criticalFeatures.map(f => '- ' + f),
     '',
     'Génère un Character Bible JSON avec cette structure EXACTE:',
     '{',
@@ -1357,14 +1460,15 @@ async function buildCharacterBible(description, refsheetUrl){
     '  "signature_expression": "expression habituelle",',
     '  "color_palette": ["#hex1","#hex2","#hex3","#hex4"],',
     '  "voice_fr": {"pitch": 1.0, "rate": 1.0, "gender": "male|female|neutral"},',
-    '  "character_lock_prompt": "UN SEUL PARAGRAPHE DE 200 À 300 MOTS EN ANGLAIS qui décrit le personnage à la virgule près. Ce paragraphe sera INJECTÉ TEL QUEL dans tous les prompts."',
+    '  "character_lock_prompt": "UN SEUL PARAGRAPHE DE 200 À 300 MOTS EN ANGLAIS qui décrit le personnage à la virgule près. Ce paragraphe sera INJECTÉ TEL QUEL dans tous les prompts. IL DOIT EXPLICITEMENT MENTIONNER TOUTES LES CARACTÉRISTIQUES CRITIQUES listées ci-dessus (ex: si barbe de 3 jours → mentionner \"three-day stubble beard\")."',
     '}',
     '',
     'RÈGLES:',
     '- Le character_lock_prompt DOIT être en anglais et faire 200-300 mots.',
+    '- Le lock prompt DOIT mentionner CHAQUE caractéristique critique.',
     '- Palette de couleurs 4 codes hex.',
     '- Pas de markdown.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   const content = await callChatCompletion(systemPrompt, userPrompt, 'Character Bible', 4000, 0.6);
   if(!content)throw new Error('Pas de contenu Character Bible');
@@ -1505,20 +1609,17 @@ async function checkConsistency(sceneImageUrl, refsheetUrl, charBible){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// CONSISTENCY MULTI-PERSONNAGES
+// CONSISTENCY MULTI
 // ══════════════════════════════════════════════════════════════════
 async function checkConsistencyMulti(sceneImageUrl, sceneChars){
   if(!sceneChars || sceneChars.length === 0){
     return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['Pas de perso'],verdict:''};
   }
-
-  // Cas simple : un seul personnage
   if(sceneChars.length === 1){
     const c = sceneChars[0];
     return await checkConsistency(sceneImageUrl, c.refsheetUrl, c.bible);
   }
 
-  // Charge l'image de scène
   let sceneDataUrl;
   try{
     const blob = await fetch(sceneImageUrl).then(r=>r.blob());
@@ -1528,7 +1629,6 @@ async function checkConsistencyMulti(sceneImageUrl, sceneChars){
     return {score:100,identity:100,outfit:100,posture:100,ambiance:100,issues:['CORS'],verdict:'Acceptée'};
   }
 
-  // Charge toutes les planches
   const refDataUrls = [];
   for(const ch of sceneChars){
     if(!ch.refsheetUrl) continue;
@@ -1604,9 +1704,12 @@ async function checkConsistencyMulti(sceneImageUrl, sceneChars){
 // PROMPTS — SINGLE
 // ══════════════════════════════════════════════════════════════════
 function buildSceneImagePrompt(scene, charBible){
+  const criticalBlock = buildCriticalFeaturesBlock();
   return [
     'CINEMATIC FILM STILL — 35mm film, photorealistic.',
     '',
+    criticalBlock,
+    criticalBlock ? '' : null,
     'CHARACTER LOCK — IDENTITY MUST BE RESPECTED:',
     charBible.character_lock_prompt || 'No lock prompt.',
     '',
@@ -1622,13 +1725,16 @@ function buildSceneImagePrompt(scene, charBible){
     '- 35mm film grain.',
     '- ' + (state.imageFormat === '9:16' ? 'Vertical portrait 9:16.' : state.imageFormat === '16:9' ? 'Horizontal landscape 16:9.' : 'Square 1:1.'),
     '- No text, no watermark.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 function buildSceneVideoPrompt(scene, charBible){
   const line = (scene.dialogue && scene.dialogue.line_fr) || '';
+  const criticalBlock = buildCriticalFeaturesBlock();
   return [
     'CINEMATIC SHOT ON 35MM FILM.',
     '',
+    criticalBlock,
+    criticalBlock ? '' : null,
     'CHARACTER LOCK (identical to input frames):',
     charBible.character_lock_prompt || 'No lock prompt.',
     '',
@@ -1640,13 +1746,14 @@ function buildSceneVideoPrompt(scene, charBible){
     'AUDIO: No music. ' + (line ? 'Character says in French: "' + line + '" — one calm delivery.' : 'No dialogue.'),
     '',
     'CONSTRAINTS: 100% identity match. No text, no watermark.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 // ══════════════════════════════════════════════════════════════════
 // PROMPTS — MULTI
 // ══════════════════════════════════════════════════════════════════
 function buildSceneImagePromptMulti(scene, sceneChars){
+  const criticalBlock = buildCriticalFeaturesBlock();
   const charBlocks = sceneChars.map((ch, idx) => {
     const pos = ['left side of the frame', 'right side of the frame', 'center of the frame'][idx] || ('position '+(idx+1));
     return [
@@ -1661,6 +1768,8 @@ function buildSceneImagePromptMulti(scene, sceneChars){
   return [
     'CINEMATIC FILM STILL — 35mm film, photorealistic, Wes Anderson aesthetic.',
     '',
+    criticalBlock,
+    criticalBlock ? '' : null,
     '╔══════════════════════════════════════════════════════════════════╗',
     '║ MULTI-CHARACTER SCENE — '+refsCount+' DISTINCT CHARACTERS',
     '╚══════════════════════════════════════════════════════════════════╝',
@@ -1688,12 +1797,13 @@ function buildSceneImagePromptMulti(scene, sceneChars){
     '- 35mm film grain, warm halation.',
     '- No text, no watermark, no on-screen graphics.',
     '- ' + (state.imageFormat === '9:16' ? 'Vertical portrait 9:16.' : state.imageFormat === '16:9' ? 'Horizontal landscape 16:9.' : 'Square 1:1.')
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 function buildSceneVideoPromptMulti(scene, sceneChars){
   const line = (scene.dialogue && scene.dialogue.line_fr) || '';
   const speaker = (scene.dialogue && scene.dialogue.speaker) || (sceneChars[0] ? sceneChars[0].name : '');
+  const criticalBlock = buildCriticalFeaturesBlock();
 
   const charLocks = sceneChars.map((ch,i) =>
     'CHARACTER '+(i+1)+' — '+ch.name+' : '+(ch.bible.character_lock_prompt||'')
@@ -1702,6 +1812,8 @@ function buildSceneVideoPromptMulti(scene, sceneChars){
   return [
     'CINEMATIC SHOT ON 35MM FILM — Wes Anderson aesthetic.',
     '',
+    criticalBlock,
+    criticalBlock ? '' : null,
     '╔══════════════════════════════════════════════════════════════════╗',
     '║ '+sceneChars.length+' CHARACTERS — ALL IDENTICAL TO INPUT FRAMES',
     '╚══════════════════════════════════════════════════════════════════╝',
@@ -1717,7 +1829,7 @@ function buildSceneVideoPromptMulti(scene, sceneChars){
     'AUDIO : No music. ' + (line ? 'The character '+speaker+' says in French : "'+line+'" — one calm delivery.' : 'No dialogue.'),
     '',
     'CONSTRAINTS : 100% identity match with the input frames for ALL characters. No text, no watermark, no shake.'
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1735,7 +1847,6 @@ function updateButtons(){
   const hasSelectedChar=!!state.selectedCharacterId;
   const hasStory=document.getElementById('story-input').value.trim().length>10;
   const hasScript=!!state.script;
-  const hasScenes=state.scenes.filter(s=>s.status==='done').length>0;
   const hasVideos=state.videos.filter(v=>v.status==='done').length>0;
 
   if(createCharBtn){
@@ -1764,7 +1875,7 @@ function updateButtons(){
     genVideosBtn.disabled=!allScenesReady || state.isGeneratingVideos;
     if(state.isGeneratingVideos)genVideosBtn.textContent='⏳ Génération des vidéos…';
     else if(!allScenesReady)genVideosBtn.textContent='🎬 Générez d\'abord toutes les images';
-    else genVideosBtn.textContent='🎬 Générer les vidéos';
+    else genVideosBtn.textContent='🎬 Générer '+state.scenes.length+' vidéo'+(state.scenes.length>1?'s':'');
   }
   if(playBtn)playBtn.disabled=!hasVideos || state.isPlayingFilm;
   if(replayBtn)replayBtn.disabled=!hasVideos || state.isPlayingFilm;
@@ -1996,18 +2107,47 @@ async function createCharacter(){
   state.isCreating=true;
   state.stopRequested=false;
   updateButtons();
-  setStatus('Étape 1/2 — Génération de la planche de référence…');
+  setStatus('Étape 1/3 — Génération de la planche de référence…');
   journalLog('Création du personnage…','character');
 
   try{
-    const refsheetUrl = await generateReferenceSheet(description, state.refImageDataUrl, state.refImageForApi);
+    let refsheetUrl = await generateReferenceSheet(description, state.refImageDataUrl, state.refImageForApi);
+    state.refsheetUrl = refsheetUrl;
+
+    // Validation des critical features si présentes
+    if(state.criticalFeatures && state.criticalFeatures.length){
+      setStatus('Étape 1.5/3 — Validation des caractéristiques critiques…');
+      journalLog('Validation de la planche (critical features)…','vision');
+
+      let validation = await validateRefsheet(refsheetUrl, state.criticalFeatures, 'personnage');
+      let attempts = 0;
+
+      while(!validation.valid && attempts < REFSHEET_MAX_VALIDATE_ATTEMPTS && !state.stopRequested){
+        attempts++;
+        journalLog('⚠ Caractéristiques manquantes ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+') : '+validation.missing.join(', '),'warn');
+        journalLog('Régénération de la planche avec insistance…','image');
+        setStatus('Régénération de la planche ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+')…');
+
+        const reinforcedDesc = description + ' — ABSOLUTE MANDATORY: ' + state.criticalFeatures.join(', ') + '. These features MUST be clearly visible in every panel.';
+        refsheetUrl = await generateReferenceSheet(reinforcedDesc, state.refImageDataUrl, state.refImageForApi);
+        validation = await validateRefsheet(refsheetUrl, state.criticalFeatures, 'personnage');
+      }
+
+      if(validation.valid){
+        journalLog('✓ Planche validée : toutes les caractéristiques présentes ('+validation.score+'/100)','success');
+      }else{
+        journalLog('⚠ Planche acceptée malgré tout — certaines caractéristiques restent absentes','warn');
+        showToast('Attention : features manquantes','warn',3000);
+      }
+    }
+
     state.refsheetUrl = refsheetUrl;
     document.getElementById('refsheet-section').classList.remove('hidden');
     document.getElementById('refsheet-image').src = refsheetUrl;
     journalLog('Planche de référence générée ✓','success');
     showToast('Planche générée','success');
 
-    setStatus('Étape 2/2 — Génération du Character Bible…');
+    setStatus('Étape 2/3 — Génération du Character Bible…');
     journalLog('Génération du Character Bible…','character');
     const bible = await buildCharacterBible(description, refsheetUrl);
     state.bible = bible;
@@ -2114,7 +2254,7 @@ async function generateScriptPipeline(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GENERATE SCENES (multi-personnages)
+// GENERATE SCENES
 // ══════════════════════════════════════════════════════════════════
 async function generateAllScenes(){
   if(state.isGeneratingScenes)return;
@@ -2128,7 +2268,6 @@ async function generateAllScenes(){
   updateButtons();
   await activateWakeLock();
 
-  // Cache planches base64
   const refsheetCache = {};
   async function getRefsheetBase64(charId){
     if(refsheetCache[charId]) return refsheetCache[charId];
@@ -2152,7 +2291,6 @@ async function generateAllScenes(){
 
     const scene = state.scenes[i];
 
-    // Résoudre la liste des personnages
     let sceneCharIds = Array.isArray(scene.characterIds) ? scene.characterIds.slice() : [];
     if(sceneCharIds.length === 0) sceneCharIds = [defaultCharId];
     sceneCharIds = sceneCharIds.slice(0, MAX_CHARS_PER_SCENE);
@@ -2170,7 +2308,6 @@ async function generateAllScenes(){
 
     scene.characterNames = sceneChars.map(c => c.name);
 
-    // Charge toutes les planches
     const refsBase64 = [];
     for(const ch of sceneChars){
       const b64 = await getRefsheetBase64(ch.id);
@@ -2259,12 +2396,12 @@ async function generateAllScenes(){
     : 0;
   setStatus('✦ '+finalDone+'/'+total+' scènes — score moyen '+avgScore+'/100 ✦');
 
-  if(finalDone >= 2){
+  if(finalDone >= 1){
     document.getElementById('section-videos').classList.remove('hidden');
     document.getElementById('section-videos').classList.add('open');
     const genVidBtn = document.getElementById('generate-videos-btn');
     if(genVidBtn) genVidBtn.disabled = false;
-    journalLog('▶ Prêt à générer les vidéos','highlight');
+    journalLog('▶ Prêt à générer les vidéos ('+finalDone+' vidéo'+(finalDone>1?'s':'')+')','highlight');
     setTimeout(()=>document.getElementById('section-videos').scrollIntoView({behavior:'smooth',block:'start'}), 1500);
   }
 
@@ -2347,22 +2484,32 @@ async function recheckScene(index){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GENERATE VIDEOS
+// GENERATE VIDEOS — 1 VIDÉO PAR SCÈNE (N vidéos)
 // ══════════════════════════════════════════════════════════════════
 async function generateAllVideos(){
   if(state.isGeneratingVideos)return;
   const readyScenes = state.scenes.filter(s=>s.status==='done' && s.imageUrl);
-  if(readyScenes.length<2){showToast('Il faut au moins 2 scènes','error');return}
+  if(readyScenes.length < 1){showToast('Il faut au moins 1 scène prête','error');return}
 
   state.isGeneratingVideos=true;
   state.stopRequested=false;
   updateButtons();
   await activateWakeLock();
 
-  const total = readyScenes.length - 1;
-  journalLog('Génération de '+total+' vidéos (keyframes chaînés)…','video');
+  // Réinitialise les vidéos pour correspondre 1:1 aux scènes
+  state.videos = state.script.scenes.map((sc, i) => ({
+    index: i,
+    status: 'pending',
+    url: null,
+    progress: null,
+    error: null
+  }));
+  renderVideos();
 
-  for(let i=0;i<total && !state.stopRequested;i++){
+  const total = readyScenes.length;
+  journalLog('Génération de '+total+' vidéos (1 par scène)…','video');
+
+  for(let i=0; i<total && !state.stopRequested; i++){
     await generateOneVideo(i, readyScenes);
   }
 
@@ -2385,30 +2532,45 @@ async function generateAllVideos(){
 
 async function generateOneVideo(index, readyScenes){
   if(state.stopRequested)return;
+
+  // Vidéo de la scène `index` :
+  // - startFrame = image de la scène index
+  // - endFrame = image de la scène index+1 SI elle existe (transition fluide)
+  //   sinon = null (boucle subtile)
   const sceneA = readyScenes[index];
-  const sceneB = readyScenes[index+1];
-  if(!sceneA || !sceneB || !sceneA.imageUrl || !sceneB.imageUrl)return;
+  const sceneB = readyScenes[index + 1] || null;
+
+  if(!sceneA || !sceneA.imageUrl)return;
+
+  const startFrame = sceneA.imageUrl;
+  const endFrame = sceneB && sceneB.imageUrl ? sceneB.imageUrl : null;
 
   const v = state.videos[index];
+  if(!v) return;
+
   v.status='generating';
   v.progress='Initialisation…';
   renderVideos();
 
-  // Personnages de la scène de départ
   const sceneCharIds = (sceneA.characterIds || [state.selectedCharacterId]).filter(Boolean);
   const sceneChars = sceneCharIds.map(id => state.characters.find(c=>c.id===id)).filter(Boolean);
   const namesLabel = sceneChars.map(c=>c.name).join(' + ') || '?';
 
   const sceneData = state.script.scenes[index];
 
-  journalLog('Vidéo '+(index+1)+' (keyframes) ['+namesLabel+']','video');
+  const mode = endFrame ? '(keyframes chaînés)' : '(boucle subtile)';
+  journalLog('Vidéo '+(index+1)+'/'+readyScenes.length+' ['+namesLabel+'] '+mode,'video');
 
   try{
-    const prompt = sceneChars.length === 1
+    let prompt = sceneChars.length === 1
       ? buildSceneVideoPrompt(sceneData, sceneChars[0].bible)
       : buildSceneVideoPromptMulti(sceneData, sceneChars);
 
-    const videoIdObj = await createVideoTask(prompt, sceneA.imageUrl, sceneB.imageUrl, state.durationFrames);
+    if(!endFrame){
+      prompt += '\n\nNOTE: There is no end frame provided. Animate this single frame with subtle continuous movement (breathing, slight camera drift, environmental motion). Keep it looping naturally.';
+    }
+
+    const videoIdObj = await createVideoTask(prompt, startFrame, endFrame, state.durationFrames);
     const url = await pollVideo(videoIdObj, (prog)=>{
       v.progress = prog;
       renderVideos();
@@ -2425,10 +2587,10 @@ async function generateOneVideo(index, readyScenes){
     journalLog('Vidéo '+(index+1)+' échouée : '+e.message,'error');
   }
 
-  if(index<readyScenes.length-2 && !state.stopRequested){
+  if(index<readyScenes.length-1 && !state.stopRequested){
     for(let r=60;r>0;r--){
       if(state.stopRequested)break;
-      setStatus('Pause '+r+'s avant prochaine vidéo');
+      setStatus('Pause '+r+'s avant vidéo suivante');
       await sleep(1000);
     }
   }
@@ -2512,10 +2674,11 @@ function exportJsonBundle(){
     showToast('Rien à exporter','warn');return;
   }
   const bundle = {
-    version: 'v3-multichar',
+    version: 'v4-multichar-1vid-per-scene',
     exportedAt: new Date().toISOString(),
     story: document.getElementById('story-input').value.trim(),
     selectedCharacterId: state.selectedCharacterId,
+    criticalFeatures: state.criticalFeatures,
     characters: state.characters,
     script: state.script,
     scenes: state.scenes.map(s=>({
@@ -2576,7 +2739,6 @@ function speakFR(text, charBible){
 }
 function stopTTS(){try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}}
 
-// Trouve le personnage qui parle dans une scène multi
 function findSpeakingCharacter(scene){
   if(!scene) return null;
   const speakerName = scene.dialogue && scene.dialogue.speaker;
@@ -2764,6 +2926,7 @@ function clearImport(){
   document.getElementById('import-preview-container').innerHTML='';
   document.getElementById('import-zone').classList.remove('has-content');
   state.importPack=null;
+  state.criticalFeatures=[];
 }
 async function pasteFromClipboard(){
   try{
@@ -2798,7 +2961,6 @@ function validateImportPack(pack){
   }else if(pack.story.length<20){
     errors.push('"story" doit contenir au moins 20 caractères');
   }
-  // Vérification scènes
   if(!pack.scenes || !Array.isArray(pack.scenes)){
     errors.push('Champ "scenes" manquant');
   }else{
@@ -2842,10 +3004,12 @@ function analyzeImport(){
     container.innerHTML='<div class="import-errors"><h4>❌ '+errors.length+' erreur(s)</h4><ul>'+
       errors.map(err=>'<li>'+esc(err)+'</li>').join('')+'</ul></div>';
     state.importPack=null;
+    state.criticalFeatures=[];
     showToast(errors.length+' erreur(s)','error',4000);
     return;
   }
   state.importPack = pack;
+  state.criticalFeatures = Array.isArray(pack.critical_features) ? pack.critical_features : [];
   document.getElementById('import-zone').classList.add('has-content');
 
   let html='<div class="import-preview">';
@@ -2862,6 +3026,16 @@ function analyzeImport(){
     html+='<div class="ip-line" style="padding:.2rem 0">🎭 <strong style="color:var(--gold-soft)">'+esc(c.name)+'</strong>'+(c.id?(' <span style="color:var(--dim)">['+esc(c.id)+']</span>'):'')+'</div>';
   });
   html+='</div>';
+
+  // Critical features
+  if(state.criticalFeatures.length){
+    html+='<div class="critical-list"><h5>🚨 Caractéristiques critiques vérifiées automatiquement</h5><ul>';
+    state.criticalFeatures.forEach(f=>{
+      html+='<li>'+esc(f)+'</li>';
+    });
+    html+='</ul></div>';
+  }
+
   html+='<div style="margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(168,216,200,.2)">';
   html+='<div style="font-size:.7rem;color:var(--dim);margin-bottom:.4rem">Scènes (mapping) :</div>';
   pack.scenes.forEach((s,i)=>{
@@ -2880,8 +3054,8 @@ function analyzeImport(){
 
   document.getElementById('import-start-btn').addEventListener('click', startImportGeneration);
   document.getElementById('import-reanalyze-btn').addEventListener('click', analyzeImport);
-  showToast('Pack valide ✓','success');
-  journalLog('Pack JSON valide : '+pack.characters.length+' persos, '+pack.scenes.length+' scènes','success');
+  showToast('Pack valide ✓'+(state.criticalFeatures.length?(' · '+state.criticalFeatures.length+' features critiques'):''),'success');
+  journalLog('Pack valide : '+pack.characters.length+' persos, '+pack.scenes.length+' scènes'+(state.criticalFeatures.length?(', '+state.criticalFeatures.length+' critical features'):''),'success');
 }
 
 async function startImportGeneration(){
@@ -2890,14 +3064,15 @@ async function startImportGeneration(){
   if(!state.importPack){showToast('Analysez d\'abord le pack','error');return}
 
   const pack = state.importPack;
+  state.criticalFeatures = Array.isArray(pack.critical_features) ? pack.critical_features : [];
   state.isRunning = true;
   state.stopRequested = false;
   updateButtons();
   setStatus('Import en cours…');
-  journalLog('Démarrage de l\'import ('+pack.characters.length+' persos, '+pack.scenes.length+' scènes)…','highlight');
+  journalLog('Démarrage de l\'import ('+pack.characters.length+' persos, '+pack.scenes.length+' scènes'+(state.criticalFeatures.length?', '+state.criticalFeatures.length+' features critiques':'')+')…','highlight');
 
   try{
-    // ═══ 1) CRÉER TOUS LES PERSONNAGES ═══
+    // ═══ 1) CRÉER TOUS LES PERSONNAGES avec validation ═══
     const packCharMap = {};
     for(let i=0; i<pack.characters.length; i++){
       if(state.stopRequested)break;
@@ -2905,7 +3080,30 @@ async function startImportGeneration(){
       setStatus('Personnage '+(i+1)+'/'+pack.characters.length+' : '+(c.name||''));
       journalLog('Création du personnage '+(c.name||'')+' ('+(i+1)+'/'+pack.characters.length+')','character');
 
-      const refsheet = await generateReferenceSheet(c.description, null, null);
+      let refsheet = await generateReferenceSheet(c.description, null, null);
+
+      // Validation critical features + régénération auto
+      if(state.criticalFeatures.length){
+        let validation = await validateRefsheet(refsheet, state.criticalFeatures, c.name);
+        let attempts = 0;
+
+        while(!validation.valid && attempts < REFSHEET_MAX_VALIDATE_ATTEMPTS && !state.stopRequested){
+          attempts++;
+          journalLog('⚠ '+c.name+' — features manquantes ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+') : '+validation.missing.join(', '),'warn');
+          setStatus('Régénération planche '+c.name+' ('+attempts+'/'+REFSHEET_MAX_VALIDATE_ATTEMPTS+')…');
+
+          const reinforcedDesc = c.description + ' — ABSOLUTE MANDATORY: ' + state.criticalFeatures.join(', ') + '. These features MUST be clearly visible in every panel.';
+          refsheet = await generateReferenceSheet(reinforcedDesc, null, null);
+          validation = await validateRefsheet(refsheet, state.criticalFeatures, c.name);
+        }
+
+        if(validation.valid){
+          journalLog('✓ '+c.name+' — planche validée ('+validation.score+'/100)','success');
+        }else{
+          journalLog('⚠ '+c.name+' — planche acceptée malgré manques','warn');
+        }
+      }
+
       const bible = await buildCharacterBible(c.description, refsheet);
 
       const charObj = {
@@ -2941,7 +3139,7 @@ async function startImportGeneration(){
     state.consistencyThreshold = parseInt(document.getElementById('consistency-threshold').value, 10);
     state.imageFormat = document.getElementById('image-format').value;
 
-    // ═══ 3) MAPPING SCÈNES → PERSONNAGES (MULTI) ═══
+    // ═══ 3) MAPPING SCÈNES → PERSONNAGES ═══
     const scenesMapped = pack.scenes.map((s, i) => {
       const refs = findCharactersRefForScene(s);
       let charsMatched = matchCharacters(refs, state.characters);
@@ -2954,7 +3152,6 @@ async function startImportGeneration(){
       const characterIds = charsMatched.map(c => c.id);
       const characterNames = charsMatched.map(c => c.name);
 
-      // Composition explicite
       let composition = s.composition;
       if(!composition){
         composition = charsMatched.map((c, idx) => {
@@ -3028,7 +3225,7 @@ async function startImportGeneration(){
     setStatus('Génération des images de scène…');
     await generateAllScenes();
 
-    // ═══ 5) GÉNÉRER LES VIDÉOS ═══
+    // ═══ 5) GÉNÉRER LES VIDÉOS (1 par scène) ═══
     if(!state.stopRequested){
       setStatus('Génération des vidéos…');
       await generateAllVideos();
@@ -3099,14 +3296,12 @@ function bindCharRefInput(){
     });
   });
 
-  // IMPORT
   document.getElementById('open-import-btn').addEventListener('click', openImportScreen);
   document.getElementById('close-import-btn').addEventListener('click', closeImportScreen);
   document.getElementById('paste-clipboard-btn').addEventListener('click', pasteFromClipboard);
   document.getElementById('clear-import-btn').addEventListener('click', clearImport);
   document.getElementById('analyze-import-btn').addEventListener('click', analyzeImport);
 
-  // CREATE CHAR
   document.getElementById('new-char-btn').addEventListener('click',()=>{
     document.getElementById('section-create').classList.remove('hidden');
     document.getElementById('section-create').classList.add('open');
@@ -3127,7 +3322,6 @@ function bindCharRefInput(){
     showToast('Arrêt en cours…','warn');
   });
 
-  // BIBLE EDIT
   document.getElementById('bible-edit-btn').addEventListener('click',()=>{
     if(!state.bible)return;
     document.getElementById('bible-lock-edit').value = state.bible.character_lock_prompt || '';
@@ -3146,7 +3340,6 @@ function bindCharRefInput(){
     showToast('Bible sauvegardé','success');
   });
 
-  // STORY
   document.getElementById('story-input').addEventListener('input',updateButtons);
   document.getElementById('scene-count').addEventListener('change',e=>{state.sceneCount=parseInt(e.target.value,10)});
   document.getElementById('scene-duration').addEventListener('change',e=>{state.durationFrames=parseInt(e.target.value,10)});
@@ -3159,13 +3352,11 @@ function bindCharRefInput(){
   document.getElementById('scenes-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
   document.getElementById('videos-stop-btn').addEventListener('click',()=>{state.stopRequested=true;showToast('Arrêt en cours…','warn')});
 
-  // SAUVEGARDE
   document.getElementById('download-all-videos-btn').addEventListener('click', downloadAllVideos);
   document.getElementById('download-all-images-btn').addEventListener('click', downloadAllImages);
   document.getElementById('copy-all-urls-btn').addEventListener('click', copyAllUrls);
   document.getElementById('export-json-btn').addEventListener('click', exportJsonBundle);
 
-  // PLAYER
   document.getElementById('play-film-btn').addEventListener('click',playFilm);
   document.getElementById('replay-film-btn').addEventListener('click',playFilm);
   document.getElementById('player-overlay').addEventListener('click',stopFilmPlayback);
@@ -3175,12 +3366,10 @@ function bindCharRefInput(){
     if(!state.voiceEnabled)stopTTS();
   });
 
-  // WAKE
   document.getElementById('wake-toggle-btn').addEventListener('click',toggleWakeLock);
   try{ wakeLockEnabled = localStorage.getItem(WAKE_LOCK_PREF)==='1' }catch(e){}
   if(wakeLockEnabled)activateWakeLock().then(()=>updateWakeStatus());
 
-  // DEBUG
   document.getElementById('tab-journal').addEventListener('click',()=>switchTab('journal'));
   document.getElementById('tab-tech').addEventListener('click',()=>switchTab('tech'));
   document.getElementById('debug-header').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')return;toggleDebugCollapse()});
@@ -3194,12 +3383,13 @@ function bindCharRefInput(){
   initTTS();
   renderCharacterLibrary();
 
-  debugLog('success','INIT','Character Consistency Studio v3 — MULTI-PERSONNAGES');
+  debugLog('success','INIT','Character Consistency Studio v4 — MULTI-PERSONNAGES + VALIDATION + N VIDÉOS');
+  debugLog('info','INIT','1 vidéo par scène (N vidéos pour N scènes)');
+  debugLog('info','INIT','Validation vision des planches (critical features)');
   debugLog('info','INIT','Jusqu\'à '+MAX_CHARS_PER_SCENE+' personnages par scène');
-  debugLog('info','INIT','Champs supportés : character, character_id, characterId, character_name, characters[]');
-  debugLog('info','INIT','Composition explicite supportée via "composition"');
-  debugLog('info','INIT','Consistency checker groupé pour scènes multi');
-  journalLog('Prêt. Ajoutez votre clé API ou importez un pack JSON multi-personnages.','highlight');
+  debugLog('info','INIT','critical_features injectées dans TOUS les prompts (refsheet + images + vidéos)');
+  journalLog('Prêt. Ajoutez votre clé API ou importez un pack JSON.','highlight');
+  journalLog('🚨 Les critical_features sont vérifiées automatiquement sur la planche.','success');
 })();
 </script>
 </body>
