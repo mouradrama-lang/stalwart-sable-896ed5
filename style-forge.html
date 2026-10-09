@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Style Forge — 1 photo · 30 styles · identité préservée</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0a0a12;--bg2:#12121c;--bg3:#1a1a28;
+--panel:#16161f;--border:#2a2a3a;--border2:#23232f;
+--ink:#e8e6e0;--dim:#8a8896;--faint:#4a4858;
+--acc:#e5c15a;--acc2:#e87b35;--acc3:#8b5fc4;
+--ok:#4a9d6a;--err:#c85a4a;--warn:#d4a017;
+--r:6px;--fs:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+--fm:ui-monospace,'SF Mono',Menlo,monospace;
+}
+html,body{background:var(--bg)}
+body{font-family:var(--fs);background:var(--bg);color:var(--ink);min-height:100vh;padding:1.5rem 1rem 24rem;font-size:15px;line-height:1.55;max-width:1200px;margin:0 auto}
+header{margin-bottom:1.5rem;text-align:center;padding:1rem 0 1.4rem;position:relative}
+header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--acc),var(--acc3),transparent);opacity:.6}
+h1{font-size:2rem;font-weight:300;margin-bottom:.4rem;background:linear-gradient(135deg,var(--acc2),var(--acc),var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:.85rem;color:var(--dim);font-style:italic}
+.toast{position:fixed;top:1.5rem;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--bg3);color:var(--ink);border:1px solid var(--border);border-left:3px solid var(--acc);padding:.85rem 1.4rem;border-radius:var(--r);font-size:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:1000;opacity:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.2),opacity .35s;max-width:90vw;text-align:center;display:flex;align-items:center;gap:.6rem}
+.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{border-left-color:var(--ok)}.toast.error{border-left-color:var(--err)}.toast.warn{border-left-color:var(--warn)}
+.banner{background:linear-gradient(135deg,rgba(232,123,53,.06),rgba(139,95,196,.05));border:1px solid var(--border);border-left:2px solid var(--acc2);padding:1rem 1.15rem;border-radius:var(--r);font-size:.8rem;color:var(--dim);margin-bottom:1.2rem;line-height:1.6}
+.banner strong{color:var(--ink)}
+.banner .hl{color:var(--acc2);font-weight:600}
+.banner .hl2{color:var(--acc3);font-weight:600}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.3rem;margin-bottom:1rem}
+.panel.ok{box-shadow:inset 3px 0 0 var(--ok)}
+input[type=password],input[type=text],textarea{width:100%;padding:.85rem 1rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:var(--fm);font-size:.78rem;margin-bottom:.6rem}
+textarea{resize:vertical;min-height:70px;line-height:1.5;font-family:var(--fs);font-size:.86rem}
+input:focus,textarea:focus{outline:none;border-color:var(--acc)}
+.label{display:block;font-size:.72rem;color:var(--dim);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.15em;font-weight:600}
+.btn{width:100%;padding:.85rem 1.2rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-size:.85rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-bottom:.7rem;transition:all .2s;font-family:inherit}
+.btn:hover:not(:disabled){background:var(--bg3);border-color:var(--acc)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary{border-color:var(--acc);background:linear-gradient(135deg,rgba(232,123,53,.2),rgba(229,193,90,.15),rgba(139,95,196,.15));color:var(--acc);font-size:1.05rem;padding:1.3rem;letter-spacing:.22em}
+.btn-stop{border-color:var(--err);color:var(--err);background:transparent;display:none;margin-top:.5rem}
+.btn-stop.visible{display:block}
+.btn-mini{width:auto;padding:.45rem .85rem;font-size:.7rem;letter-spacing:.1em;margin-bottom:0;display:inline-block}
+.status{font-size:.75rem;padding:.6rem .9rem;border-radius:var(--r);margin-bottom:.5rem;display:flex;align-items:center;gap:.6rem;background:var(--bg2);color:var(--dim);border:1px solid var(--border)}
+.status.ok{background:rgba(74,157,106,.08);color:var(--ok);border-color:rgba(74,157,106,.3)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0}
+.status.ok .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.hint{font-size:.72rem;color:var(--dim);margin-top:.5rem}
+.hint a{color:var(--acc);text-decoration:none}
+.keys-list{margin-top:.7rem}
+.key-row{padding:.4rem .7rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:.35rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-family:var(--fm);font-size:.72rem}
+.key-row .key-id{color:var(--acc);font-weight:600}
+.key-row .key-state{font-size:.62rem;padding:.15rem .5rem;border-radius:2px;background:rgba(74,157,106,.15);color:var(--ok);border:1px solid rgba(74,157,106,.3);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.key-row .key-state.cool{background:rgba(212,160,23,.15);color:var(--warn);border-color:rgba(212,160,23,.3)}
+.key-row .key-state.dead{background:rgba(200,90,74,.15);color:var(--err);border-color:rgba(200,90,74,.3)}
+.section{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);margin-bottom:1rem;overflow:hidden}
+.section.hidden{display:none!important}
+.section-header{padding:1rem 1.2rem;cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center}
+.section-title{font-size:.85rem;text-transform:uppercase;letter-spacing:.2em;color:var(--ink);font-weight:500;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.badge{display:inline-block;padding:.15rem .55rem;background:transparent;color:var(--acc);border:1px solid var(--border);border-radius:2px;font-size:.6rem;letter-spacing:.15em;font-weight:600}
+.chevron{font-size:.7rem;color:var(--faint);transition:transform .3s}
+.section.open .chevron{transform:rotate(180deg);color:var(--acc)}
+.section-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.section.open .section-body{max-height:20000px}
+.section-content{padding:0 1.2rem 1.2rem}
+
+.ref-drop{border:2px dashed var(--border);border-radius:var(--r);padding:1.8rem 1rem;background:var(--bg2);text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.ref-drop:hover{border-color:var(--acc2);background:rgba(232,123,53,.03)}
+.ref-drop.has-image{padding:0;border-style:solid;border-color:var(--acc2)}
+.ref-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.ref-drop .ref-icon{font-size:2.4rem;color:var(--acc2);opacity:.6;margin-bottom:.6rem}
+.ref-drop .ref-text{font-size:.85rem;color:var(--dim);line-height:1.5}
+.ref-drop .ref-text strong{color:var(--acc2)}
+.ref-drop .ref-hint{font-size:.68rem;color:var(--faint);margin-top:.5rem;font-family:var(--fm)}
+.ref-preview{position:relative;display:block;width:100%;max-height:400px;overflow:hidden}
+.ref-preview img{width:100%;height:auto;display:block;max-height:400px;object-fit:contain;background:#000}
+.ref-preview .ref-remove{position:absolute;top:.6rem;right:.6rem;background:rgba(200,90,74,.9);color:#fff;border:none;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ref-preview .ref-label{position:absolute;bottom:0;left:0;right:0;padding:.5rem .8rem;background:linear-gradient(transparent,rgba(10,10,18,.9));font-size:.7rem;font-family:var(--fm);color:var(--acc2);letter-spacing:.05em}
+
+.analysis-panel{background:linear-gradient(135deg,rgba(168,216,200,.06),rgba(200,176,224,.04));border:1px solid var(--border);border-left:2px solid #a8d8c8;border-radius:var(--r);padding:1rem 1.15rem;margin-top:1rem;font-size:.78rem;line-height:1.6;display:none}
+.analysis-panel.visible{display:block}
+.analysis-panel .ap-title{font-size:.65rem;text-transform:uppercase;letter-spacing:.2em;color:#a8d8c8;font-weight:700;margin-bottom:.6rem}
+.analysis-panel .ap-row{display:flex;gap:.6rem;margin-bottom:.35rem;font-size:.76rem;line-height:1.5}
+.analysis-panel .ap-key{color:var(--dim);min-width:100px;flex-shrink:0;font-family:var(--fm);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}
+.analysis-panel .ap-val{color:var(--ink);flex:1}
+.analysis-panel .ap-badge{display:inline-block;padding:.15rem .5rem;background:rgba(232,123,53,.15);color:var(--acc2);border:1px solid rgba(232,123,53,.3);border-radius:2px;font-size:.62rem;font-weight:700;letter-spacing:.08em;margin-right:.3rem}
+
+.style-categories{margin-top:1rem}
+.style-cat{margin-bottom:1.2rem}
+.style-cat-title{font-size:.72rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.15em;padding:.5rem 0;border-bottom:1px solid var(--border);margin-bottom:.7rem;display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
+.style-cat-actions{display:flex;gap:.4rem}
+.style-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.5rem}
+.style-card{padding:.6rem .7rem;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.6rem;user-select:none;position:relative}
+.style-card:hover{border-color:var(--acc);background:var(--bg3)}
+.style-card.selected{background:linear-gradient(135deg,rgba(232,123,53,.15),rgba(139,95,196,.1));border-color:var(--acc2);color:#fff}
+.style-card.selected .sc-emoji{filter:drop-shadow(0 0 6px var(--acc2))}
+.style-card .sc-emoji{font-size:1.4rem;flex-shrink:0;transition:filter .2s}
+.style-card .sc-info{min-width:0;flex:1}
+.style-card .sc-name{font-size:.78rem;font-weight:600;line-height:1.2}
+.style-card .sc-desc{font-size:.62rem;opacity:.65;margin-top:.15rem;line-height:1.2}
+.style-card .sc-check{position:absolute;top:.35rem;right:.4rem;width:14px;height:14px;border-radius:50%;border:1px solid var(--faint);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
+.style-card.selected .sc-check{background:var(--acc2);color:#000;border-color:var(--acc2)}
+
+.toolbar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;padding:.7rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)}
+.toolbar .btn{margin-bottom:0;flex:1;min-width:120px;padding:.6rem .8rem;font-size:.72rem}
+
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1rem}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .3s;animation:fadeIn .4s ease}
+.result-card.loading{border-color:var(--acc)}
+.result-card.done{border-color:var(--ok)}
+.result-card.error{border-color:var(--err)}
+.result-card .rc-header{padding:.5rem .7rem;font-size:.68rem;font-family:var(--fm);color:var(--dim);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);gap:.5rem}
+.result-card .rc-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;display:flex;align-items:center;gap:.4rem}
+.result-card .rc-body{padding:.6rem}
+.result-card .rc-body img{width:100%;display:block;border-radius:3px;background:#000}
+.result-card .rc-comparison{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--border);border-radius:3px;overflow:hidden}
+.result-card .rc-comparison>div{position:relative;background:#000}
+.result-card .rc-comparison img{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;border-radius:0}
+.result-card .cmp-label{position:absolute;top:3px;left:3px;padding:1px 5px;background:rgba(0,0,0,.75);border-radius:2px;font-size:.58rem;font-family:var(--fm);color:var(--ink-dim);letter-spacing:.05em;text-transform:uppercase}
+.result-card .rc-placeholder{width:100%;aspect-ratio:9/16;background:#0a0a12;border-radius:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:.7rem;font-family:var(--fm);gap:.5rem;text-align:center;padding:.5rem}
+.spinner-mini{width:14px;height:14px;border:2px solid rgba(229,193,90,.2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+.result-card .rc-video-area{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)}
+.result-card .rc-video-area textarea{width:100%;padding:.45rem .55rem;border-radius:3px;border:1px solid var(--border);background:var(--bg3);color:var(--ink);font-size:.72rem;min-height:44px;resize:vertical;font-family:var(--fs)}
+.result-card .rc-video-area textarea:focus{outline:none;border-color:var(--acc2)}
+.result-card .rc-video-area .btn-video{width:100%;margin-top:.4rem;padding:.5rem;border-radius:3px;border:1px solid var(--acc2);background:rgba(232,123,53,.12);color:var(--acc2);font-size:.72rem;font-weight:600;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;font-family:inherit}
+.result-card .rc-video-area .btn-video:disabled{opacity:.4;cursor:not-allowed}
+.result-card video{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;background:#000;border-radius:3px;margin-top:.5rem}
+.result-card .rc-download{display:block;text-align:center;padding:.4rem;font-size:.68rem;color:var(--acc);text-decoration:none;border:1px solid var(--border);border-radius:3px;margin-top:.5rem;letter-spacing:.08em;transition:all .2s}
+.result-card .rc-download:hover{background:rgba(229,193,90,.08);border-color:var(--acc)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.progress-bar{width:100%;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin:.6rem 0;border:1px solid var(--border);display:none}
+.progress-bar.visible{display:block}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc),var(--acc3));width:0%;transition:width .4s;border-radius:3px}
+
+.status-bar{position:fixed;bottom:230px;left:0;right:0;background:var(--bg3);border-top:1px solid var(--border);color:var(--ink);padding:.75rem 1.1rem;font-size:.78rem;display:flex;align-items:center;gap:.7rem;transform:translateY(200%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:150;font-family:var(--fm);box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+.status-bar.visible{transform:translateY(0)}
+.spinner{width:12px;height:12px;border:2px solid rgba(229,193,90,.2);border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+
+.debug-panel{position:fixed;bottom:0;left:0;right:0;height:220px;background:#05050a;border-top:2px solid var(--acc);z-index:200;display:flex;flex-direction:column;font-family:var(--fm);box-shadow:0 -8px 32px rgba(0,0,0,.7);transition:height .3s ease}
+.debug-panel.collapsed{height:40px}
+.debug-header{display:flex;justify-content:space-between;align-items:center;padding:.5rem .8rem;background:linear-gradient(90deg,#0f0f18,#1a1a28);border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;user-select:none}
+.debug-title{font-size:.72rem;color:var(--acc);letter-spacing:.15em;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:.5rem}
+.debug-badge{font-size:.6rem;padding:.1rem .4rem;background:var(--acc);color:var(--bg);border-radius:2px;font-weight:700}
+.debug-actions{display:flex;gap:.3rem}
+.debug-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:.62rem;padding:.28rem .55rem;border-radius:2px;cursor:pointer;font-family:inherit}
+.debug-actions button:hover{color:var(--acc);border-color:var(--acc)}
+.debug-body{flex:1;overflow-y:auto;padding:.5rem .7rem 1rem;font-size:.72rem;line-height:1.45;color:#c8c8d0}
+.debug-entry{margin-bottom:.3rem;padding:.25rem .4rem;border-left:2px solid transparent;border-radius:2px;word-break:break-word}
+.debug-entry.info{border-left-color:var(--faint)}
+.debug-entry.success{border-left-color:var(--ok);background:rgba(74,157,106,.04)}
+.debug-entry.warn{border-left-color:var(--warn);background:rgba(212,160,23,.04)}
+.debug-entry.error{border-left-color:var(--err);background:rgba(200,90,74,.06);color:#f0a0a0}
+.debug-entry.api{border-left-color:var(--acc)}
+.debug-entry.response{border-left-color:var(--acc2)}
+.debug-entry.state{border-left-color:var(--acc3)}
+.debug-time{color:var(--faint);margin-right:.5rem;font-size:.65rem}
+.debug-cat{color:var(--acc);font-weight:600;margin-right:.4rem;font-size:.65rem}
+.debug-msg{color:#d8d8e0}
+.debug-data{margin-top:.3rem;padding:.4rem .5rem;background:#0a0a12;border:1px solid var(--border);border-radius:2px;font-size:.68rem;color:#a8d8b0;max-height:160px;overflow:auto;white-space:pre-wrap;word-break:break-all;line-height:1.4}
+.hidden{display:none!important}
+
+.wake-status{font-size:.72rem;padding:.6rem .8rem;border-radius:var(--r);margin-top:.5rem;display:flex;justify-content:space-between;align-items:center;background:rgba(74,123,200,.08);color:#6a9be0;border:1px solid rgba(74,123,200,.3);flex-wrap:wrap;gap:.5rem}
+.wake-status.active{background:rgba(74,157,106,.08);color:var(--ok);border-color:rgba(74,157,106,.3)}
+.wake-status button{background:transparent;border:1px solid currentColor;color:inherit;padding:.3rem .7rem;border-radius:var(--r);font-size:.68rem;cursor:pointer;font-family:inherit}
+.stat-line{font-size:.72rem;color:var(--dim);margin-top:.6rem;padding:.5rem .7rem;background:var(--bg2);border-radius:var(--r);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.3rem;border:1px solid var(--border);font-family:var(--fm)}
+
+#noSleepCanvas{position:fixed;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1}
+#noSleepVideo{position:fixed;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1}
+
+@media(max-width:480px){
+h1{font-size:1.55rem}
+.style-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr))}
+.results-grid{grid-template-columns:1fr}
+body{padding-bottom:26rem}
+.debug-panel{height:200px}
+.status-bar{bottom:210px}
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Style Forge</h1>
+<p class="subtitle">1 photo · 30 styles artistiques · identité 100% préservée</p>
+</header>
+
+<div class="banner">
+<strong>Comment ça marche :</strong> tu charges <span class="hl">UNE photo</span>. L'IA l'analyse en profondeur (visage, pose, vêtements, composition, cadrage). Puis elle génère cette <strong>même photo</strong> dans <span class="hl2">30 styles artistiques différents</span> — en gardant <strong>l'identité exacte</strong> : même visage, même pose, même composition, mêmes vêtements. Seul le style visuel change.
+</div>
+
+<!-- ═══════════ API KEYS ═══════════ -->
+<div class="panel" id="api-panel">
+<label class="label">Clés API Agnes — une par ligne (chaque clé multiplie le débit)</label>
+<textarea id="api-keys-input" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-yyyyyyyyyyyyyyyyyyyyyyyy" rows="3" spellcheck="false" autocomplete="off"></textarea>
+<button type="button" class="btn" id="api-save-btn">Enregistrer les clés</button>
+<div class="status" id="api-status-line"><span class="dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
+<div class="keys-list" id="api-keys-status"></div>
+<div class="hint">Clés gratuites sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> → Settings → API Keys · N clés = N transformations en parallèle</div>
+<div class="stat-line"><span>📊 Vitesse vidéo : <span id="stat-speed">en attente</span></span><span id="stat-samples">0 génération</span></div>
+<div class="wake-status" id="wake-status"><span id="wake-status-text">💤 Veille automatique</span><button type="button" id="wake-toggle-btn">Garder l'écran allumé</button></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 1 — PHOTO ═══════════ -->
+<div class="section open" id="section-photo">
+<div class="section-header" data-toggle="section-photo">
+<span class="section-title">📸 Étape 1 — Votre photo <span class="badge">obligatoire</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+<div class="ref-drop" id="ref-drop">
+<input type="file" accept="image/*" id="ref-input">
+<div class="ref-icon">🖼️</div>
+<div class="ref-text"><strong>Cliquez pour choisir votre photo</strong><br>Portrait, paysage, objet, animal, groupe…</div>
+<div class="ref-hint">L'IA analysera sa composition, son sujet et sa lumière.</div>
+</div>
+<div class="analysis-panel" id="analysis-panel">
+<div class="ap-title">🔍 Analyse de l'IA</div>
+<div id="analysis-rows"></div>
+</div>
+</div></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 2 — STYLES ═══════════ -->
+<div class="section hidden open" id="section-styles">
+<div class="section-header" data-toggle="section-styles">
+<span class="section-title">🎨 Étape 2 — Styles à générer <span class="badge" id="styles-count-badge">0 sélectionné</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+<div class="style-categories" id="style-categories"></div>
+</div></div>
+</div>
+
+<!-- ═══════════ LANCEMENT ═══════════ -->
+<div class="section hidden" id="section-launch">
+<div class="section-body" style="max-height:none;overflow:visible"><div class="section-content" style="padding:1rem 1.2rem">
+<div class="toolbar">
+<button type="button" class="btn" id="btn-select-all">✓ Tout sélectionner</button>
+<button type="button" class="btn" id="btn-deselect-all">✕ Tout désélectionner</button>
+<button type="button" class="btn" id="btn-select-fav">★ Favoris</button>
+</div>
+<button type="button" class="btn btn-primary" id="generate-btn" disabled>🎨 Générer les styles</button>
+<button type="button" class="btn btn-stop" id="stop-btn">⏹ Arrêter</button>
+<div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+</div></div>
+</div>
+
+<!-- ═══════════ ÉTAPE 3 — RÉSULTATS ═══════════ -->
+<div class="section hidden" id="section-results">
+<div class="section-header" data-toggle="section-results">
+<span class="section-title">✨ Étape 3 — Résultats <span class="badge" id="results-badge">0 / 0</span></span>
+<span class="chevron">▼</span>
+</div>
+<div class="section-body"><div class="section-content">
+<div class="results-grid" id="results-grid"></div>
+</div></div>
+</div>
+
+<!-- ═══════════ STATUS / DEBUG ═══════════ -->
+<div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-text">Message</span></div>
+
+<div class="debug-panel" id="debug-panel">
+<div class="debug-header" id="debug-header">
+<div class="debug-title">🖥️ Console <span class="debug-badge" id="debug-count">0</span></div>
+<div class="debug-actions">
+<button type="button" id="debug-copy-btn">Copier</button>
+<button type="button" id="debug-clear-btn">Effacer</button>
+<button type="button" id="debug-collapse-btn">−</button>
+</div>
+</div>
+<div class="debug-body" id="debug-body"></div>
+</div>
+
+<canvas id="noSleepCanvas" width="2" height="2"></canvas>
+<video id="noSleepVideo" playsinline muted loop></video>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_TEXT = 'agnes-2.5-flash';
+const MODEL_IMAGE = 'agnes-image-2.1-flash';
+const MODEL_VIDEO = 'agnes-video-v2.0';
+const FRAME_RATE = 24;
+
+const IMAGE_PARALLEL_DEFAULT = 3;
+const IMAGE_INTERVAL_MS = 3400;
+const IMAGE_INTERVAL_MIN = 3200;
+const IMAGE_INTERVAL_MAX = 12000;
+
+const VIDEO_INTERVAL_MIN = 62000;
+const VIDEO_INTERVAL_MAX = 90000;
+const VIDEO_INTERVAL_SAFE = 75000;
+const VIDEO_FIRST_POLL_DELAY_SEC = 80;
+const VIDEO_POLL_INTERVALS = [8, 8, 12, 12, 20, 20, 25];
+const VIDEO_MAX_POLL_ATTEMPTS = 100;
+
+const API_KEYS_STORAGE = 'style_forge_api_keys_v1';
+const WAKE_LOCK_PREF = 'style_forge_wakelock';
+const TIMING_CACHE_KEY = 'style_forge_timing_v1';
+const DEBUG_MAX = 800;
+const REF_MAX_SIDE = 1280;
+
+// ══════════════════════════════════════════════════════════════════
+// CATALOGUE DES STYLES — 4 catégories · 30 styles
+// ══════════════════════════════════════════════════════════════════
+const STYLE_CATEGORIES = [
+{
+  id: 'animation',
+  name: '🎬 Animation & Dessin',
+  desc: 'Rendus cartoon, animés, BD, jeux vidéo',
+  styles: [
+    { id: 'ghibli',      emoji: '🌿', name: 'Studio Ghibli',      desc: 'Anime Miyazaki, aquarelle douce',      prompt: 'Studio Ghibli anime style, Hayao Miyazaki aesthetic, hand-painted watercolor backgrounds, warm nostalgic atmosphere, soft organic shapes' },
+    { id: 'pixar',       emoji: '✨', name: 'Pixar 3D',           desc: 'Animation 3D chaleureuse',             prompt: 'High-quality 3D computer animation, Pixar-style rendering, subsurface scattering, cinematic lighting, expressive characters' },
+    { id: 'disney',      emoji: '🏰', name: 'Disney Classique',   desc: 'Animation Disney dorée',               prompt: 'Classic Disney animated film style, hand-drawn, rich saturated colors, elegant motion, warm storytelling aesthetic' },
+    { id: 'simpson',     emoji: '🍩', name: 'Les Simpson',        desc: 'Cartoon jaune à contours noirs',       prompt: 'The Simpsons cartoon style, yellow-skinned characters, thick black outlines, flat saturated colors, Matt Groening' },
+    { id: 'south-park',  emoji: '🏔️', name: 'South Park',         desc: 'Géométrique et minimaliste',           prompt: 'South Park animation style, simple geometric character shapes, flat colors, thick outlines, cut-out aesthetic' },
+    { id: 'manga-nb',    emoji: '🖤', name: 'Manga N&B',          desc: 'Trait encré, trames',                  prompt: 'Black and white Japanese manga style, stark ink outlines, dramatic screentones, high contrast, shonen manga' },
+    { id: 'anime-color', emoji: '🌸', name: 'Anime Couleur',      desc: 'Anime moderne coloré',                 prompt: 'Modern Japanese anime style, cel-shaded, vibrant colors, expressive eyes, clean linework, seasonal anime aesthetic' },
+    { id: 'bd-fr',       emoji: '📘', name: 'BD Franco-Belge',    desc: 'Ligne claire à la Hergé',              prompt: 'Franco-Belgian bande dessinée style, ligne claire technique, uniform clean ink outlines, flat vivid colors, Tintin' },
+    { id: 'comics-us',   emoji: '💥', name: 'Comics US',          desc: 'Super-héros Marvel/DC',                prompt: 'American comic book style, bold ink outlines, halftone dots, dynamic shadows, saturated primary colors, Marvel/DC aesthetic' },
+    { id: 'claymation',  emoji: '🧱', name: 'Claymation',         desc: 'Pâte à modeler stop-motion',           prompt: 'Claymation stop-motion animation, plasticine texture, fingerprint details, Aardman Studios, tactile handmade' },
+    { id: 'pixel-art',   emoji: '👾', name: 'Pixel Art',          desc: '8-bit / 16-bit rétro',                 prompt: 'Pixel art style, 16-bit retro video game aesthetic, limited color palette, sharp pixel edges, SNES era' },
+    { id: 'low-poly',    emoji: '🔺', name: 'Low Poly 3D',        desc: 'Facettes géométriques',                prompt: 'Low poly 3D render, faceted geometric shapes, flat shading, minimalist polygons, indie game aesthetic' }
+  ]
+},
+{
+  id: 'painting',
+  name: '🖌️ Peinture & Illustration',
+  desc: 'Techniques picturales et dessins',
+  styles: [
+    { id: 'oil',         emoji: '🖼️', name: 'Peinture à l\'huile',desc: 'Coup de pinceau visible',             prompt: 'Classical oil painting style, visible impasto brushstrokes, rich textured paint, old master technique, chiaroscuro' },
+    { id: 'watercolor',  emoji: '🎨', name: 'Aquarelle',          desc: 'Bords fondus, papier texturé',         prompt: 'Dreamy watercolor painting aesthetic, soft bleeding edges, translucent washes, paper texture, wet-on-wet' },
+    { id: 'ink',         emoji: '🖋️', name: 'Encre de Chine',     desc: 'Noir et blanc, sumi-e',                prompt: 'Traditional Chinese ink wash painting, sumi-e style, black ink on rice paper, expressive brushstrokes, minimalist' },
+    { id: 'charcoal',    emoji: '✏️', name: 'Fusain',             desc: 'Dessin au charbon',                    prompt: 'Charcoal drawing, smudged dark tones, grainy paper texture, expressive hand-drawn strokes, monochrome' },
+    { id: 'pastel',      emoji: '🖍️', name: 'Pastel',             desc: 'Couleurs tendres, textures',           prompt: 'Soft pastel drawing, chalky texture, muted warm tones, Impressionist pastel style, blended colors' },
+    { id: 'renaissance', emoji: '👑', name: 'Renaissance',        desc: 'Portrait de maître ancien',            prompt: 'Italian Renaissance oil painting, Leonardo da Vinci and Raphael style, sfumato technique, chiaroscuro, classical proportions' },
+    { id: 'baroque',     emoji: '⚜️', name: 'Baroque',            desc: 'Drame, clair-obscur',                  prompt: 'Baroque painting, dramatic chiaroscuro lighting, deep shadows, Caravaggio influence, theatrical composition' },
+    { id: 'impressionism',emoji:'🌅', name: 'Impressionnisme',     desc: 'Monet, touches lumineuses',            prompt: 'Impressionist painting, Monet and Renoir style, visible broken brushstrokes, plein-air light, luminous colors' },
+    { id: 'ukiyo-e',     emoji: '🎋', name: 'Ukiyo-e',            desc: 'Estampe japonaise',                    prompt: 'Japanese ukiyo-e woodblock print style, Hokusai and Hiroshige aesthetic, flat colors, bold outlines, wave patterns' }
+  ]
+},
+{
+  id: 'photo',
+  name: '📷 Photo & Cinéma',
+  desc: 'Styles photographiques et cinématographiques',
+  styles: [
+    { id: 'wes-anderson',emoji: '🏨', name: 'Wes Anderson',       desc: 'Symétrie pastel, planimétrique',       prompt: 'Wes Anderson cinematography, perfect bilateral symmetry, centered frontal framing, pastel color palette, deadpan' },
+    { id: 'kubrick',     emoji: '🚀', name: 'Kubrick',            desc: 'Symétrie froide, 2001',                prompt: 'Stanley Kubrick cinematography, one-point perspective, cold symmetry, unsettling perfection, wide-angle' },
+    { id: 'noir',        emoji: '🕵️', name: 'Film Noir',          desc: 'N&B contrasté, ombres',                prompt: 'Classic film noir cinematography, high contrast black and white, dramatic chiaroscuro, deep shadows, 1940s Hollywood' },
+    { id: 'bw',          emoji: '⚫', name: 'Noir & Blanc',        desc: 'Monochrome élégant',                   prompt: 'Elegant black and white photography, high contrast monochrome, rich blacks and luminous whites, fine art' },
+    { id: 'sepia',       emoji: '🍂', name: 'Sépia Vintage',      desc: 'Vieux papier, chaleur',                prompt: 'Vintage sepia photograph, aged paper tone, warm brown color cast, antique feel, 1920s aesthetic' },
+    { id: 'cyberpunk',   emoji: '🌃', name: 'Cyberpunk',          desc: 'Néons rose et cyan',                   prompt: 'Cyberpunk aesthetic, neon pink and cyan lighting, holographic advertisements, Blade Runner atmosphere, rain-slick streets' },
+    { id: 'steampunk',   emoji: '⚙️', name: 'Steampunk',          desc: 'Cuivre, engrenages, vapeur',           prompt: 'Steampunk aesthetic, brass and copper machinery, steam and gears, Victorian industrial, sepia and gold tones' },
+    { id: 'vaporwave',   emoji: '🌴', name: 'Vaporwave',          desc: 'Nostalgie 90s pastel',                 prompt: 'Vaporwave aesthetic, nostalgic 90s imagery, pastel gradient, VHS quality, pink and cyan palette, roman busts' },
+    { id: 'neon-80s',    emoji: '📼', name: 'Néons 80s',          desc: 'VHS, synthwave',                       prompt: '1980s synthwave aesthetic, neon magenta and cyan, VHS scan lines, retro-futuristic, Miami Vice vibes' },
+    { id: 'super8',      emoji: '📽️', name: 'Super 8',            desc: 'Film 8mm rétro',                       prompt: 'Vintage Super 8 film aesthetic, grainy texture, subtle vignette, warm faded colors, soft focus edges, 1970s home movie' }
+  ]
+},
+{
+  id: 'graphic',
+  name: '🎭 Graphique & Artistique',
+  desc: 'Styles graphiques et mouvements artistiques',
+  styles: [
+    { id: 'pop-art',     emoji: '🎯', name: 'Pop Art',            desc: 'Warhol, couleurs vives',               prompt: 'Pop Art style, Andy Warhol aesthetic, bold saturated colors, flat areas, repetition, commercial art vibe' },
+    { id: 'minimal',     emoji: '⬜', name: 'Minimaliste',        desc: 'Épuré, essentiel',                     prompt: 'Minimalist art style, clean lines, negative space, limited color palette, essential forms, modern graphic design' },
+    { id: 'art-deco',    emoji: '💠', name: 'Art Déco',           desc: 'Géométrie dorée années 20',            prompt: 'Art Deco style, geometric patterns, gold and black, 1920s glamour, Gatsby aesthetic, elegant symmetry' },
+    { id: 'street-art',  emoji: '🎨', name: 'Street Art / Banksy',desc: 'Pochoir urbain',                       prompt: 'Street art style, Banksy stencil aesthetic, urban grunge, black and white with accent colors, political edge' },
+    { id: 'vitrail',     emoji: '⛪', name: 'Vitrail',            desc: 'Plomb et couleur, cathédrale',         prompt: 'Stained glass window style, lead lines, rich jewel tones, backlit translucent colors, cathedral aesthetic' },
+    { id: 'mosaique',    emoji: '🔷', name: 'Mosaïque',           desc: 'Tesselles byzantines',                 prompt: 'Byzantine mosaic style, individual colored tesserae, ancient Roman floor, gold leaf background, tessellated' },
+    { id: 'papercut',    emoji: '✂️', name: 'Papier Découpé',     desc: 'Collage, ombres portées',              prompt: 'Layered paper cut art, cut-paper collage, subtle drop shadows, tactile paper texture, depth by stacking' },
+    { id: 'diorama',     emoji: '🏞️', name: 'Diorama Miniature', desc: 'Scène en miniature',                   prompt: 'Miniature diorama style, tilt-shift photography, tiny scale, crafted model, tiny toy figures, macro lens' }
+  ]
+}
+];
+
+const FAVORITE_STYLES = ['ghibli', 'pixar', 'oil', 'watercolor', 'wes-anderson', 'cyberpunk', 'bw', 'pop-art'];
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+const state = {
+  keyPool: [],
+  referenceImage: null,
+  analysis: null,
+  selectedStyles: new Set(FAVORITE_STYLES),
+  results: [], // { styleId, status, imageUrl, videoUrl, videoPrompt, videoStatus, error }
+  isRunning: false,
+  stopRequested: false,
+  totalTransformed: 0,
+  isPlayingFilm: false,
+  playRAF: null
+};
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function nowTime(){return new Date().toLocaleTimeString('fr-FR',{hour12:false})}
+function formatEta(s){if(s<60)return Math.round(s)+'s';const m=Math.floor(s/60);const r=Math.round(s%60);return m+'m'+(r>0?' '+r+'s':'')}
+function setStatus(text){const b=document.getElementById('status-bar');const t=document.getElementById('status-text');if(!b||!t)return;if(text){b.classList.add('visible');t.textContent=text}else b.classList.remove('visible')}
+
+let toastTimeout=null;
+function showToast(message,type='success',duration=2500){
+  const t=document.getElementById('toast');const i=document.getElementById('toast-icon');const x=document.getElementById('toast-text');
+  if(!t||!i||!x)return;
+  t.classList.remove('visible','success','error','warn');void t.offsetWidth;
+  const icons={success:'✓',error:'✕',warn:'⚠'};i.textContent=icons[type]||'✓';x.textContent=message;
+  t.classList.add(type);requestAnimationFrame(()=>t.classList.add('visible'));
+  if(toastTimeout)clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>t.classList.remove('visible'),duration);
+}
+
+function sanitizeForApi(text){
+  if(text==null)return '';
+  return String(text)
+    .replace(/[\u2018\u2019\u201B\u2032\u02BC]/g, "'")
+    .replace(/[\u201C\u201D\u201F\u2033]/g, '"')
+    .replace(/\u2013/g, '-').replace(/\u2014/g, '--').replace(/\u2026/g, '...')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\u00A0/g, ' ').replace(/\u202F/g, ' ');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DEBUG
+// ══════════════════════════════════════════════════════════════════
+let debugCount=0,debugEntries=[],debugCollapsed=false;
+function debugLog(level,category,message,data){
+  const body=document.getElementById('debug-body');if(!body)return;
+  const time=nowTime();
+  const entry=document.createElement('div');entry.className='debug-entry '+level;
+  let html='<span class="debug-time">'+time+'</span><span class="debug-cat">['+esc(category)+']</span><span class="debug-msg">'+esc(message)+'</span>';
+  if(data!==undefined&&data!==null){
+    let ds;if(typeof data==='string')ds=data;else{try{ds=JSON.stringify(data,null,2)}catch(e){ds=String(data)}}
+    if(ds.length>3500)ds=ds.slice(0,3500)+'\n…[tronqué]';
+    html+='<pre class="debug-data">'+esc(ds)+'</pre>';
+  }
+  entry.innerHTML=html;body.appendChild(entry);
+  debugEntries.push({time,level,category,message});
+  if(debugEntries.length>DEBUG_MAX)debugEntries.shift();
+  while(body.children.length>DEBUG_MAX)body.removeChild(body.firstChild);
+  body.scrollTop=body.scrollHeight;
+  debugCount++;
+  const c=document.getElementById('debug-count');if(c)c.textContent=debugCount;
+}
+function clearDebug(){const b=document.getElementById('debug-body');if(b)b.innerHTML='';debugEntries=[];debugCount=0;const c=document.getElementById('debug-count');if(c)c.textContent='0'}
+function copyDebug(){const lines=debugEntries.map(e=>e.time+' ['+e.category+'] '+e.message).join('\n');const finish=(ok)=>showToast(ok?'Console copiée':'Copie impossible',ok?'success':'error');try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(lines).then(()=>finish(true)).catch(()=>legacyCopy(lines,finish));return}}catch(e){}legacyCopy(lines,finish)}
+function legacyCopy(text,cb){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(ta);cb(ok)}
+function toggleDebugCollapse(){const p=document.getElementById('debug-panel');const b=document.getElementById('debug-collapse-btn');if(!p||!b)return;debugCollapsed=!debugCollapsed;p.classList.toggle('collapsed',debugCollapsed);b.textContent=debugCollapsed?'+':'−'}
+
+// ══════════════════════════════════════════════════════════════════
+// TIMING CACHE
+// ══════════════════════════════════════════════════════════════════
+function loadTimingCache(){try{return JSON.parse(localStorage.getItem(TIMING_CACHE_KEY)||'{}')}catch(e){return{}}}
+function saveTimingCache(c){try{localStorage.setItem(TIMING_CACHE_KEY,JSON.stringify(c))}catch(e){}}
+function recordGenerationTime(key,ms){const c=loadTimingCache();if(!c[key])c[key]=[];c[key].push(ms);if(c[key].length>10)c[key]=c[key].slice(-10);saveTimingCache(c);updateTimingDisplay()}
+function estimateGenerationTime(key,fallbackMs){const c=loadTimingCache();const s=c[key];if(s&&s.length>0){const sorted=[...s].sort((a,b)=>a-b);const mid=Math.floor(sorted.length/2);return sorted.length%2===0?(sorted[mid-1]+sorted[mid])/2:sorted[mid]}return fallbackMs}
+function updateTimingDisplay(){const c=loadTimingCache();const v=c['video']||[];const s=document.getElementById('stat-speed');const t=document.getElementById('stat-samples');if(!s||!t)return;if(v.length===0){s.textContent='en attente';t.textContent='0 génération';return}const avg=v.reduce((a,b)=>a+b,0)/v.length;s.textContent=(avg/1000).toFixed(1)+' s en moyenne';t.textContent=v.length+' génération'+(v.length>1?'s':'')}
+
+// ══════════════════════════════════════════════════════════════════
+// WAKE LOCK
+// ══════════════════════════════════════════════════════════════════
+let wakeLockSentinel=null,wakeLockEnabled=false,canvasStream=null,canvasInterval=null;
+function isWakeLockSupported(){return 'wakeLock' in navigator&&typeof navigator.wakeLock.request==='function'}
+async function requestWakeLockAPI(){if(!isWakeLockSupported())return false;try{wakeLockSentinel=await navigator.wakeLock.request('screen');wakeLockSentinel.addEventListener('release',()=>{wakeLockSentinel=null;updateWakeStatus()});return true}catch(e){debugLog('warn','WAKELOCK','Refusé : '+e.message);return false}}
+async function releaseWakeLockAPI(){if(wakeLockSentinel){try{await wakeLockSentinel.release()}catch(e){}wakeLockSentinel=null}}
+function startCanvasStream(){if(canvasStream)return true;try{const canvas=document.getElementById('noSleepCanvas');const video=document.getElementById('noSleepVideo');if(!canvas||!video)return false;const ctx=canvas.getContext('2d');if(!ctx)return false;ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);if(typeof canvas.captureStream!=='function')return false;canvasStream=canvas.captureStream(1);let toggle=false;canvasInterval=setInterval(()=>{toggle=!toggle;ctx.fillStyle=toggle?'#000':'#010101';ctx.fillRect(0,0,canvas.width,canvas.height)},1000);video.srcObject=canvasStream;video.muted=true;video.playsInline=true;const p=video.play();if(p&&p.catch)p.catch(()=>{});return true}catch(e){return false}}
+function stopCanvasStream(){if(canvasInterval){clearInterval(canvasInterval);canvasInterval=null}const video=document.getElementById('noSleepVideo');if(video){try{video.pause();video.srcObject=null}catch(e){}}if(canvasStream){try{canvasStream.getTracks().forEach(t=>t.stop())}catch(e){}canvasStream=null}}
+async function activateWakeLock(){let s=false;if(isWakeLockSupported())s=await requestWakeLockAPI();if(!s)s=startCanvasStream();if(!s&&!canvasStream)s=startCanvasStream();return s}
+async function deactivateWakeLock(){await releaseWakeLockAPI();stopCanvasStream()}
+function updateWakeStatus(){const el=document.getElementById('wake-status');const txt=document.getElementById('wake-status-text');const btn=document.getElementById('wake-toggle-btn');if(!el||!txt||!btn)return;el.classList.remove('active');const canvas=document.getElementById('noSleepCanvas');const has=isWakeLockSupported()||(canvas&&canvas.captureStream);if(!has){txt.textContent='⚠️ Non supporté';btn.style.display='none';return}btn.style.display='inline-block';const isActive=wakeLockSentinel!==null||canvasStream!==null;if(wakeLockEnabled&&isActive){el.classList.add('active');txt.textContent='✅ Écran allumé';btn.textContent='Désactiver'}else{txt.textContent='💤 Veille automatique';btn.textContent='Garder l\'écran allumé'}}
+async function toggleWakeLock(){if(wakeLockEnabled){wakeLockEnabled=false;await deactivateWakeLock();try{localStorage.setItem(WAKE_LOCK_PREF,'0')}catch(e){}showToast('Veille automatique','warn')}else{wakeLockEnabled=true;const ok=await activateWakeLock();try{localStorage.setItem(WAKE_LOCK_PREF,'1')}catch(e){}showToast(ok?'Écran allumé':'Activez manuellement',ok?'success':'warn')}updateWakeStatus()}
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&wakeLockEnabled){await activateWakeLock();updateWakeStatus()}});
+
+// ══════════════════════════════════════════════════════════════════
+// MULTI-CLÉS API
+// ══════════════════════════════════════════════════════════════════
+function getStoredKeys(){try{const raw=localStorage.getItem(API_KEYS_STORAGE);if(!raw)return[];const arr=JSON.parse(raw);if(!Array.isArray(arr))return[];return arr.filter(k=>typeof k==='string'&&k.trim().length>0)}catch(e){return[]}}
+function setStoredKeys(keys){try{localStorage.setItem(API_KEYS_STORAGE,JSON.stringify(keys))}catch(e){}}
+function refreshKeyPool(){const stored=getStoredKeys();const old=state.keyPool||[];state.keyPool=stored.map(k=>{const existing=old.find(p=>p.key===k);return existing||{key:k,lastUsed:0,cooldownUntil:0,active:true,errorCount:0}})}
+function hasActiveKey(){return state.keyPool.some(k=>k.active)}
+function getReadyKey(){const now=Date.now();const active=state.keyPool.filter(k=>k.active);if(active.length===0)return{key:null,waitMs:0};const ready=active.filter(k=>!k.cooldownUntil||k.cooldownUntil<=now);if(ready.length===0){const soonest=active.reduce((a,b)=>(a.cooldownUntil||0)<(b.cooldownUntil||0)?a:b);return{key:null,waitMs:Math.max(1000,(soonest.cooldownUntil||0)-now)}}ready.sort((a,b)=>(a.lastUsed||0)-(b.lastUsed||0));return{key:ready[0],waitMs:0}}
+async function acquireKey(label){while(true){if(state.stopRequested)throw new Error('Arrêt demandé');const{key,waitMs}=getReadyKey();if(key){key.lastUsed=Date.now();return key}if(waitMs===0)throw new Error('Aucune clé API active');debugLog('warn',label,'Toutes les clés en cooldown — attente '+Math.round(waitMs/1000)+'s');await sleep(waitMs)}}
+function renderKeysStatus(){const el=document.getElementById('api-keys-status');if(!el)return;if(state.keyPool.length===0){el.innerHTML='';return}const now=Date.now();el.innerHTML=state.keyPool.map((k,i)=>{let stateHtml='<span class="key-state">Active</span>';if(!k.active)stateHtml='<span class="key-state dead">Inactive</span>';else if(k.cooldownUntil>now){const sec=Math.ceil((k.cooldownUntil-now)/1000);stateHtml='<span class="key-state cool">Cooldown '+sec+'s</span>'}return '<div class="key-row"><span class="key-id">#'+(i+1)+' · '+esc(k.key.slice(0,8))+'…'+esc(k.key.slice(-4))+'</span>'+stateHtml+'</div>'}).join('')}
+function saveKeysFromUI(){const input=document.getElementById('api-keys-input');if(!input)return;const raw=input.value||'';const keys=raw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);const valid=keys.filter(k=>k.startsWith('sk-'));const invalid=keys.filter(k=>!k.startsWith('sk-'));if(invalid.length>0){if(!confirm(invalid.length+' clé(s) ne commencent pas par "sk-". Les ignorer ?'))return}setStoredKeys(valid);refreshKeyPool();updateApiPanel();renderKeysStatus();showToast(valid.length+' clé(s) enregistrée(s) ✓','success');debugLog('success','CLÉS',valid.length+' clé(s) active(s)')}
+function updateApiPanel(){const panel=document.getElementById('api-panel');const input=document.getElementById('api-keys-input');const line=document.getElementById('api-status-line');const text=document.getElementById('api-status-text');if(!panel||!input||!line||!text)return;refreshKeyPool();const n=state.keyPool.length;if(n>0){panel.classList.add('ok');line.classList.add('ok');text.textContent=n+' clé(s) active(s) · parallélisme : '+n;input.value=state.keyPool.map(k=>k.key).join('\n');input.placeholder=''}else{panel.classList.remove('ok');line.classList.remove('ok');text.textContent='Aucune clé API enregistrée';input.value='';input.placeholder='Collez vos clés API Agnes ici — une par ligne (sk-...)'}renderKeysStatus();updateButtons()}
+
+// ══════════════════════════════════════════════════════════════════
+// API FETCH
+// ══════════════════════════════════════════════════════════════════
+async function apiFetch(url,options,label,maxAttempts){
+  options=options||{};label=label||'API';
+  maxAttempts=(typeof maxAttempts==='number'&&maxAttempts>0)?maxAttempts:6;
+  let lastErr=null;
+  for(let attempt=0;attempt<maxAttempts;attempt++){
+    if(state.stopRequested)throw new Error('Arrêt demandé');
+    let keyObj=null;
+    try{keyObj=await acquireKey(label)}catch(e){throw e}
+    const method=options.method||'GET';
+    let bodyPreview=null;
+    if(options.body){
+      try{
+        const p=JSON.parse(options.body);const c=JSON.parse(JSON.stringify(p));
+        const redact=(o)=>{if(Array.isArray(o)){o.forEach(redact);return}if(o&&typeof o==='object'){for(const k in o){if(typeof o[k]==='string'&&o[k].length>140)o[k]=o[k].slice(0,100)+'…[len '+o[k].length+']';else if(typeof o[k]==='object')redact(o[k])}}};
+        redact(c);bodyPreview=c;
+      }catch(e){bodyPreview=String(options.body).slice(0,400)}
+    }
+    debugLog('api','REQ '+label,method+' '+url+' · clé #'+(state.keyPool.indexOf(keyObj)+1)+' (essai '+(attempt+1)+'/'+maxAttempts+')',bodyPreview);
+    const headers=Object.assign({},options.headers||{},{'Authorization':'Bearer '+keyObj.key});
+    const finalOptions=Object.assign({},options,{headers});
+    try{
+      const t0=Date.now();
+      const res=await fetch(url,finalOptions);
+      const dt=Date.now()-t0;
+      let retryAfter=0;try{retryAfter=parseInt(res.headers.get('Retry-After')||'0',10)||0}catch(e){}
+      let errorText='';if(!res.ok){try{errorText=(await res.clone().text()).slice(0,1200)}catch(e){}}
+      debugLog('response','RÉP '+label,'HTTP '+res.status+' en '+dt+'ms · clé '+keyObj.key.slice(-4),errorText||undefined);
+      if(res.ok){keyObj.errorCount=0;return res}
+      if([400,401,403,404].includes(res.status)){
+        if(res.status===401||res.status===403){
+          keyObj.errorCount=(keyObj.errorCount||0)+1;
+          if(keyObj.errorCount>=3){keyObj.active=false;debugLog('error','CLÉ','Clé '+keyObj.key.slice(-4)+' désactivée après 3 erreurs auth');renderKeysStatus()}
+        }
+        const err=new Error('HTTP '+res.status+' — '+errorText.slice(0,400));err.status=res.status;err.body=errorText;throw err;
+      }
+      if(res.status===429){
+        const wait=retryAfter>0?retryAfter:Math.min(120,20+attempt*15);
+        keyObj.cooldownUntil=Date.now()+wait*1000;
+        debugLog('warn','RATELIMIT','Clé '+keyObj.key.slice(-4)+' → cooldown '+wait+'s');
+        renderKeysStatus();
+        const{key:next}=getReadyKey();
+        if(next&&next!==keyObj){debugLog('info','ROTATION','Nouvelle clé : '+next.key.slice(-4));continue}
+        setStatus('Limite API — nouvelle tentative dans '+wait+'s');
+        await sleep(Math.min(wait*1000,3000));continue;
+      }
+      if([500,502,503,504,520,522,524].includes(res.status)){
+        const wait=Math.min(60,8+attempt*6);
+        debugLog('warn','SERVICE','HTTP '+res.status+' — attente '+wait+'s');
+        setStatus('Service occupé — reprise dans '+wait+'s');
+        await sleep(wait*1000);continue;
+      }
+      const wait=Math.min(60,6+attempt*5);
+      debugLog('warn','HTTP','HTTP '+res.status+' — retry dans '+wait+'s');
+      await sleep(wait*1000);
+    }catch(e){
+      if(e.message==='Arrêt demandé')throw e;
+      if(e.status&&[400,401,403,404].includes(e.status))throw e;
+      lastErr=e;
+      const wait=Math.min(45,4+attempt*4);
+      debugLog('warn','NETWORK',e.message+' — retry dans '+wait+'s');
+      setStatus('Connexion instable — reprise dans '+wait+'s');
+      await sleep(wait*1000);
+    }
+  }
+  throw lastErr||new Error('Tentatives épuisées pour '+label);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// JSON PARSER — 5 stratégies
+// ══════════════════════════════════════════════════════════════════
+function balanceJson(text){let ob=0,ok=0,inString=false,escape=false;for(let i=0;i<text.length;i++){const ch=text[i];if(escape){escape=false;continue}if(ch==='\\'){escape=true;continue}if(ch==='"'){inString=!inString;continue}if(inString)continue;if(ch==='{')ob++;else if(ch==='}')ob--;else if(ch==='[')ok++;else if(ch===']')ok--;}let r=text;if(inString)r+='"';while(ok>0){r+=']';ok--}while(ob>0){r+='}';ob--}return r}
+function repairJson(text){
+  if(!text)return null;
+  let c=String(text).trim();
+  const fm=c.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if(fm)c=fm[1].trim();
+  const fb=c.indexOf('{');if(fb<0)return null;c=c.slice(fb);
+  const lb=c.lastIndexOf('}');if(lb>0)c=c.slice(0,lb+1);
+  let out='';let inString=false;let escape=false;
+  for(let i=0;i<c.length;i++){
+    const ch=c[i];
+    if(escape){out+=ch;escape=false;continue}
+    if(ch==='\\'){out+=ch;escape=true;continue}
+    if(ch==='"'){inString=!inString;out+=ch;continue}
+    if(inString){
+      if(ch==='\n'){out+='\\n';continue}
+      if(ch==='\r'){out+='\\r';continue}
+      if(ch==='\t'){out+='\\t';continue}
+      const code=ch.charCodeAt(0);if(code<32){out+='\\u'+code.toString(16).padStart(4,'0');continue}
+    }
+    out+=ch;
+  }
+  if(escape)out+='\\';if(inString)out+='"';
+  out=out.replace(/,\s*([}\]])/g,'$1');
+  return out;
+}
+function extractJson(text){
+  if(!text)return null;
+  const repaired=repairJson(text);
+  if(!repaired){debugLog('error','PARSE','Aucun { trouvé');return null}
+  try{return JSON.parse(repaired)}catch(e1){
+    debugLog('warn','PARSE','1er essai échoué : '+e1.message);
+    try{return JSON.parse(balanceJson(repaired))}catch(e2){
+      debugLog('error','PARSE','2e essai échoué : '+e2.message);
+      return null;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// FILE UTILS
+// ══════════════════════════════════════════════════════════════════
+function fileToDataUri(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=e=>resolve(e.target.result);r.onerror=()=>reject(new Error('Erreur lecture'));r.readAsDataURL(file)})}
+async function compressImage(dataUrl,maxSide){return new Promise((resolve)=>{const img=new Image();img.onload=()=>{let{width,height}=img;const scale=Math.min(1,maxSide/Math.max(width,height));width=Math.round(width*scale);height=Math.round(height*scale);const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;canvas.getContext('2d').drawImage(img,0,0,width,height);resolve(canvas.toDataURL('image/jpeg',0.9))};img.onerror=()=>resolve(dataUrl);img.src=dataUrl})}
+
+// ══════════════════════════════════════════════════════════════════
+// ANALYSE VISION DE LA PHOTO
+// ══════════════════════════════════════════════════════════════════
+async function analyzeReferenceImage(dataUrl){
+  const systemPrompt = `Tu es un analyste visuel expert. Tu examines UNE photo et tu extrais TOUT ce qui décrit son SUJET, pour qu'un modèle puisse reproduire cette MÊME photo en changeant uniquement le STYLE.
+
+Tu ne dois PAS nommer d'artistes, marques ou franchises.
+Tu dois décrire OBJECTIVEMENT et PRÉCISÉMENT :
+- Le(s) sujet(s) principal(aux) : type, âge apparent, genre, ethnie si visible, expression, pose
+- Les vêtements : couleurs, matières, styles
+- La composition : plan (portrait, buste, pied), angle, cadrage, position dans le cadre
+- L'éclairage : direction, qualité, ambiance colorimétrique
+- Le décor : environnement, éléments présents
+- Le nombre d'éléments et leurs positions
+
+Réponds UNIQUEMENT en JSON valide, sans markdown :
+{
+  "subject_type": "portrait / paysage / objet / animal / groupe / scène",
+  "subject_description": "description précise et détaillée du ou des sujets principaux",
+  "faces_description": "s'il y a un visage humain : âge apparent, genre, expression, coiffure — sinon vide",
+  "clothing_description": "description des vêtements et couleurs",
+  "pose_description": "description de la pose et des gestes",
+  "composition": "cadrage, angle, position dans le cadre, type de plan",
+  "lighting": "description de la lumière",
+  "environment": "description du décor et de l'arrière-plan",
+  "dominant_colors": "couleurs dominantes",
+  "identity_anchors": "élément(s) CRITIQUE(s) à préserver absolument : visage, identité, expression, pose"
+}
+
+Sois factuel, précis, exhaustif. Ne juge pas. Ne normalise pas.`;
+
+  const body = {
+    model: MODEL_TEXT,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: [
+        { type: 'text', text: 'Analyse cette photo. Extrais tout ce qui décrit son SUJET pour que le même contenu puisse être régénéré dans un style différent tout en gardant l\'identité exacte.' },
+        { type: 'image_url', image_url: { url: dataUrl } }
+      ]}
+    ],
+    temperature: 0.3,
+    max_tokens: 2000,
+    response_format: { type: 'json_object' }
+  };
+
+  debugLog('state','ANALYSE','Envoi de l\'image au modèle vision…');
+  const res = await apiFetch(API_BASE + '/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Analyse', 4);
+
+  const data = await res.json();
+  const content = data.choices?.[0]?.message?.content;
+  if(!content) throw new Error('Pas de contenu analyse');
+  const parsed = extractJson(content);
+  if(!parsed) throw new Error('Analyse invalide');
+  return parsed;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROMPT DE TRANSFORMATION STRICT
+// ══════════════════════════════════════════════════════════════════
+function buildStrictStylePrompt(style, analysis){
+  const identity = analysis ? [
+    'SOUJET À PRÉSERVER : ' + (analysis.subject_description || ''),
+    analysis.faces_description ? 'VISAGE : ' + analysis.faces_description : '',
+    analysis.clothing_description ? 'VÊTEMENTS : ' + analysis.clothing_description : '',
+    analysis.pose_description ? 'POSE : ' + analysis.pose_description : '',
+    analysis.composition ? 'COMPOSITION : ' + analysis.composition : '',
+    analysis.identity_anchors ? 'À PRÉSERVER ABSOLUMENT : ' + analysis.identity_anchors : ''
+  ].filter(Boolean).join('\n') : '';
+
+  return [
+    'You are given ONE single image. Restyle it while keeping EVERY ELEMENT of the original scene EXACTLY where it is.',
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ STYLE À APPLIQUER                                                ║',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    style.prompt,
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ CE QUI DOIT RESTER EXACTEMENT IDENTIQUE                          ║',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    identity,
+    '',
+    '► MÊME VISAGE : si un visage est présent, il doit rester RECONNAISSABLE — mêmes traits, même identité, même expression.',
+    '► MÊME POSE : le sujet est exactement dans la même position, mêmes gestes.',
+    '► MÊME COMPOSITION : même cadrage, même angle, même plan, même placement dans le cadre.',
+    '► MÊMES ÉLÉMENTS : aucun ajout, aucune suppression, même nombre d\'objets, mêmes positions.',
+    '► MÊMES VÊTEMENTS : mêmes couleurs de vêtements (réinterprétés dans le nouveau style mais reconnaissables).',
+    '',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ CE QUI CHANGE : uniquement l\'apparence visuelle                  ║',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    'Le médium, la technique de rendu, la palette de couleurs, la texture, la lumière artistique, le traitement stylistique.',
+    '',
+    'Output: same aspect ratio as input. High detail. No text, no watermark, no border added.',
+    'CRITICAL: This is a STYLE TRANSFER, not a re-imagination. The subject stays 100% identical, only the artistic rendering changes.'
+  ].filter(Boolean).join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GÉNÉRATION IMAGE — TRANSFORMATION STYLE
+// ══════════════════════════════════════════════════════════════════
+async function transformImageWithStyle(style, analysis, photoDataUri){
+  const prompt = buildStrictStylePrompt(style, analysis);
+  const body = {
+    model: MODEL_IMAGE,
+    prompt: sanitizeForApi(prompt),
+    n: 1,
+    size: '1K',
+    ratio: '9:16',
+    extra_body: {
+      image: [photoDataUri],
+      response_format: 'url'
+    }
+  };
+  debugLog('state','TRANSFORM','Style "'+style.name+'" — envoi…');
+  const res = await apiFetch(API_BASE + '/images/generations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Style '+style.id, 4);
+  const data = await res.json();
+  const item = data.data?.[0];
+  if(!item) throw new Error('Pas de donnée image');
+  return item.url || (item.b64_json ? 'data:image/png;base64,'+item.b64_json : null);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIDÉO
+// ══════════════════════════════════════════════════════════════════
+async function createVideoTask(imageUrl, userPrompt){
+  const basePrompt = [
+    'Animate this exact image as the starting frame.',
+    'The subject must remain IDENTICAL: same face, expression, clothing, pose, identity, composition.',
+    'This is a CONTINUATION of the source image, not a re-imagination.',
+    userPrompt ? 'Motion: ' + userPrompt : 'Subtle motion, breathing, light, atmosphere.',
+    'Portrait 9:16 vertical, 24fps, no text, no watermarks.',
+    'No music. Only natural ambient sounds.'
+  ].join('. ');
+  const body = {
+    model: MODEL_VIDEO,
+    prompt: sanitizeForApi(basePrompt),
+    image: imageUrl,
+    num_frames: 153,
+    frame_rate: FRAME_RATE
+  };
+  const res = await apiFetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 'Vidéo', 4);
+  const data = await res.json();
+  const id = data.video_id || data.id || data.task_id;
+  if(!id) throw new Error('Pas de video_id');
+  return id;
+}
+
+async function pollVideo(videoId, onProgress){
+  const estimatedMs = estimateGenerationTime('video', 30000 + 153*500);
+  const minWait = Math.min(VIDEO_FIRST_POLL_DELAY_SEC, Math.max(60, Math.floor(estimatedMs/1000*0.75)));
+  let remaining = minWait;
+  debugLog('info','POLLING','Attente initiale '+remaining+'s');
+  while(remaining>0){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+    onProgress('Préparation — '+remaining+'s');
+    await sleep(1000); remaining--;
+  }
+  for(let attempt=0;attempt<VIDEO_MAX_POLL_ATTEMPTS;attempt++){
+    if(state.stopRequested) throw new Error('Arrêt demandé');
+    if(attempt>0){
+      const idx=Math.min(attempt-1,VIDEO_POLL_INTERVALS.length-1);
+      let r=VIDEO_POLL_INTERVALS[idx];
+      while(r>0){ if(state.stopRequested) throw new Error('Arrêt demandé'); onProgress('Création — '+r+'s'); await sleep(1000); r--; }
+    }
+    const url = POLL_BASE+'?video_id='+encodeURIComponent(videoId)+'&model_name='+encodeURIComponent(MODEL_VIDEO);
+    const res = await apiFetch(url, { method:'GET' }, 'Polling', 3);
+    const d = await res.json();
+    const status = d.status || 'unknown';
+    const progress = d.progress || 0;
+    onProgress('Création — '+progress+'%');
+    if(status==='completed'||status==='succeeded'||status==='done'){
+      const videoUrl = (d.metadata && d.metadata.url) || d.url || (d.output && d.output.url);
+      if(!videoUrl) throw new Error('Terminé mais pas d\'URL');
+      return videoUrl;
+    }
+    if(status==='failed'||status==='error'||status==='cancelled') throw new Error('Échec ('+status+')');
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RATE LIMITER
+// ══════════════════════════════════════════════════════════════════
+function createRateLimitedQueue(maxConcurrent, minIntervalMs){
+  let running=0;let lastStart=0;const queue=[];let resolveIdle=null;
+  function tryNext(){
+    if(running>=maxConcurrent)return;
+    if(queue.length===0){if(running===0&&resolveIdle){resolveIdle();resolveIdle=null}return}
+    const now=Date.now();const wait=Math.max(0,lastStart+minIntervalMs-now);
+    if(wait>0){setTimeout(tryNext,wait);return}
+    const task=queue.shift();running++;lastStart=Date.now();
+    task().finally(()=>{running--;setTimeout(tryNext,0)});
+  }
+  return{
+    add(fn){return new Promise((resolve,reject)=>{queue.push(()=>fn().then(resolve,reject));setTimeout(tryNext,0)})},
+    idle(){return new Promise(r=>{if(running===0&&queue.length===0)return r();resolveIdle=r})}
+  };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI — STYLES
+// ══════════════════════════════════════════════════════════════════
+function renderStyleCategories(){
+  const container = document.getElementById('style-categories');
+  if(!container)return;
+  container.innerHTML = STYLE_CATEGORIES.map(cat=>{
+    const styles = cat.styles.map(s=>{
+      const selected = state.selectedStyles.has(s.id);
+      return '<div class="style-card'+(selected?' selected':'')+'" data-style="'+s.id+'">'+
+        '<div class="sc-check">'+(selected?'✓':'')+'</div>'+
+        '<div class="sc-emoji">'+s.emoji+'</div>'+
+        '<div class="sc-info"><div class="sc-name">'+esc(s.name)+'</div><div class="sc-desc">'+esc(s.desc)+'</div></div>'+
+      '</div>';
+    }).join('');
+    return '<div class="style-cat">'+
+      '<div class="style-cat-title"><span>'+esc(cat.name)+' · '+esc(cat.desc)+'</span>'+
+      '<div class="style-cat-actions">'+
+      '<button type="button" class="btn btn-mini" data-cat-all="'+cat.id+'">✓ Tous</button>'+
+      '<button type="button" class="btn btn-mini" data-cat-none="'+cat.id+'">✕ Aucun</button>'+
+      '</div></div>'+
+      '<div class="style-grid">'+styles+'</div>'+
+    '</div>';
+  }).join('');
+
+  container.querySelectorAll('[data-style]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const id = el.dataset.style;
+      if(state.selectedStyles.has(id)) state.selectedStyles.delete(id);
+      else state.selectedStyles.add(id);
+      renderStyleCategories();
+      updateStylesBadge();
+      updateButtons();
+    });
+  });
+  container.querySelectorAll('[data-cat-all]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const cat = STYLE_CATEGORIES.find(c=>c.id===btn.dataset.catAll);
+      if(cat) cat.styles.forEach(s=>state.selectedStyles.add(s.id));
+      renderStyleCategories();updateStylesBadge();updateButtons();
+    });
+  });
+  container.querySelectorAll('[data-cat-none]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const cat = STYLE_CATEGORIES.find(c=>c.id===btn.dataset.catNone);
+      if(cat) cat.styles.forEach(s=>state.selectedStyles.delete(s.id));
+      renderStyleCategories();updateStylesBadge();updateButtons();
+    });
+  });
+}
+function updateStylesBadge(){
+  const el = document.getElementById('styles-count-badge');
+  if(el) el.textContent = state.selectedStyles.size + ' sélectionné' + (state.selectedStyles.size>1?'s':'');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI — ANALYSE
+// ══════════════════════════════════════════════════════════════════
+function renderAnalysis(analysis){
+  const panel = document.getElementById('analysis-panel');
+  const rows = document.getElementById('analysis-rows');
+  if(!panel||!rows||!analysis)return;
+  panel.classList.add('visible');
+  const fields = [
+    ['Type', analysis.subject_type],
+    ['Sujet', analysis.subject_description],
+    ['Visage', analysis.faces_description],
+    ['Vêtements', analysis.clothing_description],
+    ['Pose', analysis.pose_description],
+    ['Composition', analysis.composition],
+    ['Lumière', analysis.lighting],
+    ['Décor', analysis.environment],
+    ['Couleurs', analysis.dominant_colors],
+    ['À préserver', analysis.identity_anchors]
+  ].filter(f=>f[1]);
+  rows.innerHTML = fields.map(f=>
+    '<div class="ap-row"><span class="ap-key">'+esc(f[0])+'</span><span class="ap-val">'+esc(f[1])+'</span></div>'
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI — RÉSULTATS
+// ══════════════════════════════════════════════════════════════════
+function renderResults(){
+  const grid = document.getElementById('results-grid');
+  if(!grid)return;
+  if(state.results.length===0){grid.innerHTML='';return}
+  grid.innerHTML = state.results.map((r,idx)=>{
+    const style = STYLE_CATEGORIES.flatMap(c=>c.styles).find(s=>s.id===r.styleId);
+    if(!style) return '';
+    const isDone = r.status==='done'&&r.imageUrl;
+    const isLoading = r.status==='loading';
+    const isError = r.status==='error';
+    const cardClass = 'result-card '+(isDone?'done':isLoading?'loading':isError?'error':'');
+    const header = '<div class="rc-header"><span class="rc-title">'+style.emoji+' '+esc(style.name)+'</span><span style="font-size:.65rem;color:'+(isDone?'var(--ok)':isError?'var(--err)':'var(--dim)')+';">'+(isDone?'✓ OK':isError?'✕ Échec':isLoading?'⏳':'⏸')+'</span></div>';
+
+    let body='';
+    if(isDone){
+      body = '<div class="rc-comparison">'+
+        '<div><img src="'+state.referenceImage+'" alt="Original"><div class="cmp-label">Avant</div></div>'+
+        '<div><img src="'+r.imageUrl+'" alt="Style"><div class="cmp-label">Après</div></div>'+
+      '</div>'+
+      '<a class="rc-download" href="'+r.imageUrl+'" target="_blank" rel="noopener" download="style-'+style.id+'.png">⬇ Télécharger</a>'+
+      '<div class="rc-video-area">'+
+        '<textarea id="vprompt-'+idx+'" placeholder="Mouvement pour la vidéo… (ex : vent léger qui bouge les cheveux)"'+(r.videoUrl?' disabled':'')+'>'+esc(r.videoPrompt||'')+'</textarea>'+
+        '<button type="button" class="btn-video" data-video-idx="'+idx+'"'+(r.videoUrl||r.videoStatus==='generating'?' disabled':'')+'>'+
+          (r.videoUrl?'✓ Vidéo générée':r.videoStatus==='generating'?'⏳ Génération…':r.videoStatus==='failed'?'↻ Réessayer':'🎬 Générer la vidéo')+
+        '</button>'+
+        (r.videoUrl?'<video src="'+r.videoUrl+'" controls playsinline preload="metadata"></video>':'')+
+        (r.videoStatus==='generating'?'<div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--warn);font-family:var(--fm);" id="vstatus-'+idx+'">'+esc(r.videoProgress||'Initialisation…')+'</div>':'')+
+        (r.videoStatus==='failed'?'<div style="text-align:center;padding:.5rem;font-size:.68rem;color:var(--err);font-family:var(--fm);">'+esc(r.videoError||'Erreur vidéo')+'</div>':'')+
+      '</div>';
+    } else if(isError){
+      body = '<div class="rc-placeholder" style="color:var(--err);">✕<br>'+esc(r.error||'Échec')+'</div>';
+    } else {
+      body = '<div class="rc-placeholder"><div class="spinner-mini"></div><span>Génération…</span></div>';
+    }
+
+    return '<div class="'+cardClass+'" id="result-'+idx+'">'+header+'<div class="rc-body">'+body+'</div></div>';
+  }).join('');
+
+  grid.querySelectorAll('.btn-video').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const idx = parseInt(btn.dataset.videoIdx,10);
+      const ta = document.getElementById('vprompt-'+idx);
+      launchVideoGeneration(idx, ta?ta.value.trim():'');
+    });
+  });
+  grid.querySelectorAll('textarea[id^="vprompt-"]').forEach(ta=>{
+    ta.addEventListener('input',()=>{
+      const idx = parseInt(ta.id.replace('vprompt-',''),10);
+      if(state.results[idx]) state.results[idx].videoPrompt = ta.value;
+    });
+  });
+
+  const badge = document.getElementById('results-badge');
+  if(badge){
+    const done = state.results.filter(r=>r.status==='done').length;
+    badge.textContent = done + ' / ' + state.results.length;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PHOTO DE RÉFÉRENCE
+// ══════════════════════════════════════════════════════════════════
+async function handleReferenceImage(file){
+  if(!file) return;
+  if(!file.type.startsWith('image/')){showToast('Fichier non-image','error');return}
+  if(!hasActiveKey()){showToast('Ajoutez d\'abord vos clés API','warn');return}
+  setStatus('Chargement de la photo…');
+  try{
+    const raw = await fileToDataUri(file);
+    const compressed = await compressImage(raw, REF_MAX_SIDE);
+    state.referenceImage = compressed;
+    state.analysis = null;
+    state.results = [];
+    renderRefPreview();
+    document.getElementById('analysis-panel').classList.remove('visible');
+    document.getElementById('section-results').classList.add('hidden');
+    document.getElementById('results-grid').innerHTML = '';
+    updateButtons();
+    debugLog('success','PHOTO','Photo chargée ('+Math.round(compressed.length/1024)+' Ko)');
+
+    setStatus('Analyse de la photo par l\'IA…');
+    const analysis = await analyzeReferenceImage(compressed);
+    state.analysis = analysis;
+    renderAnalysis(analysis);
+    document.getElementById('section-styles').classList.remove('hidden');
+    document.getElementById('section-launch').classList.remove('hidden');
+    setStatus(null);
+    showToast('Photo analysée ✓','success');
+    debugLog('success','ANALYSE','Sujet : '+(analysis.subject_type||'—'));
+    document.getElementById('section-styles').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    setStatus(null);
+    showToast('Erreur analyse : '+e.message.slice(0,60),'error');
+    debugLog('error','PHOTO',e.message);
+  }
+}
+
+function renderRefPreview(){
+  const drop = document.getElementById('ref-drop');
+  if(!drop) return;
+  if(state.referenceImage){
+    drop.classList.add('has-image');
+    drop.innerHTML = '<div class="ref-preview"><img src="'+state.referenceImage+'" alt="Référence"><div class="ref-label">📸 Photo source · identité préservée</div><button type="button" class="ref-remove" id="ref-remove-btn">✕</button></div>';
+    const btn = document.getElementById('ref-remove-btn');
+    if(btn) btn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      state.referenceImage = null;
+      state.analysis = null;
+      state.results = [];
+      document.getElementById('analysis-panel').classList.remove('visible');
+      document.getElementById('section-styles').classList.add('hidden');
+      document.getElementById('section-launch').classList.add('hidden');
+      document.getElementById('section-results').classList.add('hidden');
+      renderRefPreview();
+      updateButtons();
+      showToast('Photo retirée','warn');
+    });
+  } else {
+    drop.classList.remove('has-image');
+    drop.innerHTML = '<input type="file" accept="image/*" id="ref-input"><div class="ref-icon">🖼️</div><div class="ref-text"><strong>Cliquez pour choisir votre photo</strong><br>Portrait, paysage, objet, animal, groupe…</div><div class="ref-hint">L\'IA analysera sa composition, son sujet et sa lumière.</div>';
+    bindRefInput();
+  }
+}
+
+function bindRefInput(){
+  const input = document.getElementById('ref-input');
+  if(!input) return;
+  input.addEventListener('change',(e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(file) handleReferenceImage(file);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LANCEMENT DE LA GÉNÉRATION
+// ══════════════════════════════════════════════════════════════════
+async function startGeneration(){
+  if(state.isRunning) return;
+  if(!hasActiveKey()){showToast('Ajoutez vos clés API','error');return}
+  if(!state.referenceImage){showToast('Chargez une photo','error');return}
+  if(!state.analysis){showToast('Analyse de la photo manquante','error');return}
+  if(state.selectedStyles.size===0){showToast('Sélectionnez au moins un style','error');return}
+
+  state.isRunning = true;
+  state.stopRequested = false;
+  state.results = [];
+  document.getElementById('stop-btn').classList.add('visible');
+  document.getElementById('generate-btn').disabled = true;
+  document.getElementById('section-results').classList.remove('hidden');
+  document.getElementById('section-results').classList.add('open');
+
+  const styleIds = Array.from(state.selectedStyles);
+  const allStyles = STYLE_CATEGORIES.flatMap(c=>c.styles);
+  for(const id of styleIds){
+    state.results.push({ styleId: id, status: 'pending', imageUrl: null, videoUrl: null, videoPrompt: '', videoStatus: null, error: null });
+  }
+  renderResults();
+
+  await activateWakeLock();
+
+  const queue = createRateLimitedQueue(IMAGE_PARALLEL_DEFAULT, IMAGE_INTERVAL_MS);
+  const progressBar = document.getElementById('progress-bar');
+  const progressFill = document.getElementById('progress-fill');
+  progressBar.classList.add('visible');
+
+  let completed = 0;
+  const total = styleIds.length;
+  const startTime = Date.now();
+
+  debugLog('state','GÉNÉRATION','Démarrage de '+total+' styles · parallèle x'+IMAGE_PARALLEL_DEFAULT);
+  showToast('Génération de '+total+' styles…','success');
+
+  const tasks = [];
+  for(let i=0;i<state.results.length;i++){
+    const idx = i;
+    const r = state.results[idx];
+    const style = allStyles.find(s=>s.id===r.styleId);
+    if(!style) continue;
+
+    tasks.push(queue.add(async ()=>{
+      if(state.stopRequested) return;
+      state.results[idx].status = 'loading';
+      renderResults();
+      try{
+        debugLog('info','STYLE','Génération '+style.name+' ('+(idx+1)+'/'+total+')');
+        const url = await transformImageWithStyle(style, state.analysis, state.referenceImage);
+        state.results[idx].status = 'done';
+        state.results[idx].imageUrl = url;
+        completed++;
+        progressFill.style.width = Math.round((completed/total)*100)+'%';
+        setStatus('Style '+(idx+1)+' / '+total+' — '+style.name+' ✓');
+        renderResults();
+        debugLog('success','STYLE',style.name+' ✓ ('+completed+'/'+total+')');
+      }catch(e){
+        if(e.message==='Arrêt demandé') return;
+        state.results[idx].status = 'error';
+        state.results[idx].error = e.message.slice(0,120);
+        completed++;
+        progressFill.style.width = Math.round((completed/total)*100)+'%';
+        renderResults();
+        debugLog('error','STYLE',style.name+' : '+e.message);
+      }
+    }));
+  }
+
+  await Promise.allSettled(tasks);
+  await queue.idle();
+
+  const elapsed = (Date.now()-startTime)/1000;
+  const ok = state.results.filter(r=>r.status==='done').length;
+  progressFill.style.width = '100%';
+  setStatus('✦ '+ok+'/'+total+' styles générés en '+formatEta(elapsed)+' ✦');
+  await sleep(4000);
+  setStatus(null);
+
+  state.isRunning = false;
+  document.getElementById('stop-btn').classList.remove('visible');
+  updateButtons();
+  await deactivateWakeLock();
+
+  showToast(ok+' styles générés','success');
+  debugLog('success','FIN',ok+'/'+total+' styles en '+formatEta(elapsed));
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIDÉO PAR IMAGE TRANSFORMÉE
+// ══════════════════════════════════════════════════════════════════
+async function launchVideoGeneration(index, userPrompt){
+  const r = state.results[index];
+  if(!r || r.videoUrl || r.videoStatus==='generating') return;
+  r.videoStatus = 'generating';
+  r.videoProgress = 'Initialisation…';
+  r.videoError = null;
+  r.videoPrompt = userPrompt;
+  renderResults();
+  const startTime = Date.now();
+  try{
+    debugLog('info','VIDÉO','Lancement pour style '+r.styleId);
+    const videoId = await createVideoTask(r.imageUrl, userPrompt);
+    debugLog('success','VIDÉO','Tâche créée : '+videoId);
+    const videoUrl = await pollVideo(videoId, (prog)=>{
+      r.videoProgress = prog;
+      const el = document.getElementById('vstatus-'+index);
+      if(el) el.textContent = prog;
+    });
+    r.videoUrl = videoUrl;
+    r.videoStatus = 'done';
+    const elapsed = Date.now() - startTime;
+    recordGenerationTime('video', elapsed);
+    renderResults();
+    showToast('Vidéo prête ('+formatEta(elapsed/1000)+')','success');
+    debugLog('success','VIDÉO','Terminée en '+formatEta(elapsed/1000));
+  }catch(e){
+    r.videoStatus = 'failed';
+    r.videoError = e.message.slice(0,120);
+    renderResults();
+    showToast('Erreur vidéo : '+e.message.slice(0,50),'error');
+    debugLog('error','VIDÉO',e.message);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BOUTONS
+// ══════════════════════════════════════════════════════════════════
+function updateButtons(){
+  const genBtn = document.getElementById('generate-btn');
+  if(!genBtn) return;
+  const hasKey = hasActiveKey();
+  const hasPhoto = !!state.referenceImage;
+  const hasAnalysis = !!state.analysis;
+  const hasStyles = state.selectedStyles.size>0;
+  genBtn.disabled = !hasKey || !hasPhoto || !hasAnalysis || !hasStyles || state.isRunning;
+  if(state.isRunning) genBtn.textContent = '⏳ Génération en cours…';
+  else if(!hasKey) genBtn.textContent = '🔑 Ajoutez vos clés API';
+  else if(!hasPhoto) genBtn.textContent = '📸 Chargez une photo';
+  else if(!hasAnalysis) genBtn.textContent = '🔍 Analyse en cours…';
+  else if(!hasStyles) genBtn.textContent = '🎨 Choisissez au moins un style';
+  else genBtn.textContent = '🎨 Générer '+state.selectedStyles.size+' style'+(state.selectedStyles.size>1?'s':'');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function init(){
+  document.getElementById('api-save-btn').addEventListener('click',saveKeysFromUI);
+  document.getElementById('api-keys-input').addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();saveKeysFromUI()}
+  });
+
+  document.querySelectorAll('[data-toggle]').forEach(h=>{
+    h.addEventListener('click',()=>{
+      const el = document.getElementById(h.dataset.toggle);
+      if(el) el.classList.toggle('open');
+    });
+  });
+
+  bindRefInput();
+  renderStyleCategories();
+  updateStylesBadge();
+
+  document.getElementById('btn-select-all').addEventListener('click',()=>{
+    STYLE_CATEGORIES.forEach(c=>c.styles.forEach(s=>state.selectedStyles.add(s.id)));
+    renderStyleCategories();updateStylesBadge();updateButtons();
+  });
+  document.getElementById('btn-deselect-all').addEventListener('click',()=>{
+    state.selectedStyles.clear();
+    renderStyleCategories();updateStylesBadge();updateButtons();
+  });
+  document.getElementById('btn-select-fav').addEventListener('click',()=>{
+    FAVORITE_STYLES.forEach(id=>state.selectedStyles.add(id));
+    renderStyleCategories();updateStylesBadge();updateButtons();
+  });
+
+  document.getElementById('generate-btn').addEventListener('click',startGeneration);
+  document.getElementById('stop-btn').addEventListener('click',()=>{
+    state.stopRequested = true;
+    debugLog('warn','STOP','Arrêt demandé');
+    setStatus('Arrêt en cours…');
+  });
+
+  const wakeBtn = document.getElementById('wake-toggle-btn');
+  if(wakeBtn) wakeBtn.addEventListener('click',toggleWakeLock);
+  try{ wakeLockEnabled = localStorage.getItem(WAKE_LOCK_PREF)==='1'; }catch(e){}
+  if(wakeLockEnabled) activateWakeLock().then(()=>updateWakeStatus());
+
+  document.getElementById('debug-header').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')return;toggleDebugCollapse()});
+  document.getElementById('debug-collapse-btn').addEventListener('click',e=>{e.stopPropagation();toggleDebugCollapse()});
+  document.getElementById('debug-clear-btn').addEventListener('click',e=>{e.stopPropagation();clearDebug()});
+  document.getElementById('debug-copy-btn').addEventListener('click',e=>{e.stopPropagation();copyDebug()});
+
+  refreshKeyPool();
+  updateApiPanel();
+  updateButtons();
+  updateTimingDisplay();
+  updateWakeStatus();
+  renderResults();
+
+  const saved = getStoredKeys();
+  if(saved.length>0) document.getElementById('api-keys-input').value = saved.join('\n');
+
+  debugLog('success','INIT','Style Forge prêt');
+  debugLog('info','INIT','Modèles : '+MODEL_TEXT+' (analyse) · '+MODEL_IMAGE+' (transform) · '+MODEL_VIDEO+' (vidéo)');
+  debugLog('info','INIT',STYLE_CATEGORIES.length+' catégories · '+STYLE_CATEGORIES.reduce((a,c)=>a+c.styles.length,0)+' styles disponibles');
+  debugLog('info','INIT','Prompts STRICTS : la photo est envoyée SEULE + prompt de préservation d\'identité');
+})();
+</script>
+</body>
+</html>
