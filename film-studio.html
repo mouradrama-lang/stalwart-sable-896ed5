@@ -580,7 +580,7 @@ async function apiFetch(url, options, label, maxAttempts){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PARSER JSON — 5 STRATÉGIES (identique à Cinéma Studio v5)
+// PARSER JSON — 5+ STRATÉGIES
 // ══════════════════════════════════════════════════════════════════
 function balanceJson(text){
   let ob=0,ok=0,inString=false,escape=false;
@@ -731,7 +731,7 @@ async function compressImage(dataUrl,maxSide){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// PHOTOS — UPLOAD & ANALYSE VISION
+// PHOTOS — UPLOAD & ANALYSE
 // ══════════════════════════════════════════════════════════════════
 async function handleFiles(files){
   const list=Array.from(files).filter(f=>f.type.startsWith('image/'));
@@ -843,7 +843,7 @@ async function analyzePhotos(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// GÉNÉRATION D'IMAGE AVEC PRÉSERVATION D'IDENTITÉ
+// GÉNÉRATION D'IMAGE
 // ══════════════════════════════════════════════════════════════════
 async function generateImage(prompt, photos, ratio){
   const body={
@@ -1012,7 +1012,7 @@ async function pollVideo(videoIdObj, onProgress){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// APERÇUS DE STYLE — 6 propositions
+// APERÇUS DE STYLE
 // ══════════════════════════════════════════════════════════════════
 async function generatePreviews(){
   if(state.isGeneratingPreviews)return;
@@ -1036,7 +1036,6 @@ async function generatePreviews(){
   grid.innerHTML='';
   const photos=state.photos.map(p=>p.dataUri);
 
-  // Créer 6 cartes "loading"
   STYLES.forEach((style,i)=>{
     const card=document.createElement('div');
     card.className='preview-card loading';
@@ -1414,6 +1413,11 @@ async function generateVideos(){
 // ══════════════════════════════════════════════════════════════════
 async function launchFilm(){
   if(state.isLaunching)return;
+
+  // ⚡ Relire le thème depuis le textarea au cas où state.theme ne soit pas synchronisé
+  const themeInput=document.getElementById('theme-input');
+  if(themeInput)state.theme=themeInput.value;
+
   if(!state.selectedStyleId){showToast('Choisissez un style','error');return}
   if(!state.theme.trim()){showToast('Décrivez un sujet','error');return}
   if(!state.apiKey){showToast('Ajoutez votre clé API','error');return}
@@ -1645,12 +1649,13 @@ function stopFilmPlayback(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// BOUTONS / STATE
+// BOUTONS / STATE — ✅ CORRECTION APPLIQUÉE
 // ══════════════════════════════════════════════════════════════════
 function updateButtons(){
   const hasKey=!!state.apiKey;
   const hasPhotos=state.photos.length>0;
   const hasStyle=!!state.selectedStyleId;
+  const hasTheme=(state.theme||'').trim().length>=5;
   const genPrevBtn=document.getElementById('generate-previews-btn');
   const launchBtn=document.getElementById('launch-film-btn');
   const playBtn=document.getElementById('play-film-btn');
@@ -1662,12 +1667,16 @@ function updateButtons(){
     else if(!hasPhotos)genPrevBtn.innerHTML='📸 Ajoutez au moins 1 photo';
     else genPrevBtn.innerHTML='🎨 Voir 6 styles possibles<span style="display:block;font-size:.65rem;letter-spacing:.15em;color:var(--dim);margin-top:.4rem;font-weight:400;text-transform:none;">L\'IA génère 6 versions de votre personnage dans 6 styles différents — vous choisissez</span>';
   }
+
   if(launchBtn){
-    launchBtn.disabled=!hasKey||!hasPhotos||!hasStyle||!state.script||state.isLaunching||state.isGeneratingPreviews;
+    // ✅ Correction : plus de dépendance à state.script (généré pendant launchFilm)
+    launchBtn.disabled=!hasKey||!hasPhotos||!hasStyle||!hasTheme||state.isLaunching||state.isGeneratingPreviews;
     if(state.isLaunching)launchBtn.innerHTML='🎬 Génération du film en cours…';
     else if(!hasStyle)launchBtn.innerHTML='🎨 Choisissez d\'abord un style';
+    else if(!hasTheme)launchBtn.innerHTML='✍️ Décrivez le sujet du film';
     else launchBtn.innerHTML='🎬 Lancer la génération du film<span style="display:block;font-size:.65rem;letter-spacing:.15em;color:var(--dim);margin-top:.4rem;font-weight:400;text-transform:none;">Scénario → images → vidéos → player</span>';
   }
+
   if(playBtn)playBtn.disabled=state.isPlayingFilm||state.videos.filter(v=>v.status==='done').length===0;
 }
 
@@ -1675,13 +1684,11 @@ function updateButtons(){
 // INITIALISATION
 // ══════════════════════════════════════════════════════════════════
 (function init(){
-  // API key
   const saveBtn=document.getElementById('api-save-btn');
   if(saveBtn)saveBtn.addEventListener('click',saveApiKey);
   const apiInput=document.getElementById('api-key-input');
   if(apiInput)apiInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveApiKey()}});
 
-  // Sections repliables
   document.querySelectorAll('[data-toggle]').forEach(h=>{
     h.addEventListener('click',()=>{
       const el=document.getElementById(h.dataset.toggle);
@@ -1689,7 +1696,6 @@ function updateButtons(){
     });
   });
 
-  // Upload photos
   const uploadZone=document.getElementById('upload-zone');
   const fileInput=document.getElementById('file-input');
   if(uploadZone&&fileInput){
@@ -1697,7 +1703,7 @@ function updateButtons(){
     fileInput.addEventListener('change',e=>{handleFiles(e.target.files);fileInput.value=''});
   }
 
-  // Analyse
+  // Bouton Analyse (créé dynamiquement avant la status-line)
   const analysisBtn=document.createElement('button');
   analysisBtn.className='btn';
   analysisBtn.id='analyze-photos-btn';
@@ -1708,7 +1714,7 @@ function updateButtons(){
     analysisStatus.parentNode.insertBefore(analysisBtn,analysisStatus);
   }
 
-  // Style select
+  // Clic sur une carte de preview → sélection du style
   document.getElementById('previews-grid').addEventListener('click',e=>{
     const card=e.target.closest('.preview-card');
     if(!card||card.classList.contains('loading')||card.classList.contains('error'))return;
@@ -1717,15 +1723,12 @@ function updateButtons(){
     if(style)selectStyle(style.id);
   });
 
-  // Générer aperçus
   const genPrevBtn=document.getElementById('generate-previews-btn');
   if(genPrevBtn)genPrevBtn.addEventListener('click',generatePreviews);
 
-  // Lancer le film
   const launchBtn=document.getElementById('launch-film-btn');
   if(launchBtn)launchBtn.addEventListener('click',launchFilm);
 
-  // Stop
   document.getElementById('stop-btn').addEventListener('click',()=>{
     state.stopRequested=true;
     stopTTS();
@@ -1733,32 +1736,29 @@ function updateButtons(){
     debugLog('warn','STOP','Arrêt demandé');
   });
 
-  // Play film
   document.getElementById('play-film-btn').addEventListener('click',playFilm);
   document.getElementById('player-overlay').addEventListener('click',stopFilmPlayback);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.isPlayingFilm)stopFilmPlayback()});
 
-  // Theme input
+  // Theme input → toujours synchroniser avec state.theme
   const themeInput=document.getElementById('theme-input');
-  if(themeInput)themeInput.addEventListener('input',e=>{state.theme=e.target.value});
+  if(themeInput){
+    state.theme=themeInput.value;
+    themeInput.addEventListener('input',e=>{state.theme=e.target.value;updateButtons()});
+  }
 
-  // Selects
   document.getElementById('scene-count-select').addEventListener('change',e=>{state.sceneCount=parseInt(e.target.value,10)});
   document.getElementById('duration-select').addEventListener('change',e=>{state.durationFrames=parseInt(e.target.value,10)});
   document.getElementById('format-select').addEventListener('change',e=>{state.aspectRatio=e.target.value});
 
-  // Debug panel
   document.getElementById('debug-header').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')return;toggleDebugCollapse()});
   document.getElementById('debug-collapse-btn').addEventListener('click',e=>{e.stopPropagation();toggleDebugCollapse()});
   document.getElementById('debug-clear-btn').addEventListener('click',e=>{e.stopPropagation();clearDebug()});
   document.getElementById('debug-copy-btn').addEventListener('click',e=>{e.stopPropagation();copyDebug()});
 
-  // Restore API key
   const saved=getApiKey();
   if(saved)document.getElementById('api-key-input').value=saved;
 
-  // Init state
-  state.theme=themeInput?themeInput.value:'';
   updateApiPanel();
   updateButtons();
   initTTS();
