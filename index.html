@@ -1,446 +1,420 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MouraDrama - Studios de Création Numérique</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+:root {
+  --site-bg: #060b1a;
+  --site-bg-2: #0d1324;
+  --site-panel: rgba(15, 23, 42, 0.86);
+  --site-card: rgba(14, 20, 36, 0.94);
+  --site-border: rgba(148, 163, 184, 0.18);
+  --site-text: #e5eefb;
+  --site-muted: #a9b8cf;
+  --site-primary: #ff4d8d;
+  --site-secondary: #7c3aed;
+  --site-accent: #39d0ff;
+  --site-success: #3dd598;
+  --site-warning: #f5b942;
+  --site-shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
+}
 
-    :root {
-      --primary: #ff006e;
-      --secondary: #8338ec;
-      --accent: #3a86ff;
-      --dark: #1a1a2e;
-      --light: #f5f5f5;
-      --text: #2d2d2d;
-    }
+* { box-sizing: border-box; }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--text);
-      background: linear-gradient(135deg, var(--dark) 0%, #0f3460 100%);
-      overflow-x: hidden;
-      line-height: 1.6;
-    }
+html { scroll-behavior: smooth; }
 
-    /* Navigation */
-    nav {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      background: rgba(26, 26, 46, 0.95);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      padding: 1rem 2rem;
-      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-    }
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(124, 58, 237, 0.25), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(57, 208, 255, 0.18), transparent 30%),
+    linear-gradient(135deg, var(--site-bg) 0%, var(--site-bg-2) 100%);
+  color: var(--site-text);
+  line-height: 1.6;
+}
 
-    nav .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+a { color: inherit; text-decoration: none; }
 
-    nav .logo {
-      font-size: 1.8rem;
-      font-weight: bold;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+img { max-width: 100%; display: block; }
 
-    nav ul {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(6, 11, 26, 0.74);
+  border-bottom: 1px solid var(--site-border);
+  backdrop-filter: blur(12px);
+}
 
-    nav a {
-      color: var(--light);
-      text-decoration: none;
-      transition: color 0.3s ease;
-      font-size: 0.95rem;
-    }
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.9rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
 
-    nav a:hover {
-      color: var(--primary);
-    }
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #ff4d8d, #8b5cf6, #39d0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
-    /* Hero Section */
-    .hero {
-      margin-top: 70px;
-      padding: 100px 2rem;
-      text-align: center;
-      color: white;
-      position: relative;
-      overflow: hidden;
-    }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -10%;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(255, 0, 110, 0.15), transparent);
-      border-radius: 50%;
-      animation: float 6s ease-in-out infinite;
-    }
+.nav-links a {
+  color: var(--site-muted);
+  font-size: 0.92rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
 
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: -50%;
-      left: -10%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(51, 134, 252, 0.15), transparent);
-      border-radius: 50%;
-      animation: float 8s ease-in-out infinite reverse;
-    }
+.nav-links a:hover,
+.nav-links a.active {
+  color: white;
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+}
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(30px); }
-    }
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.72rem 1.1rem;
+  border-radius: 999px;
+  color: white;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--site-primary), var(--site-secondary));
+  box-shadow: 0 12px 30px rgba(255, 77, 141, 0.3);
+}
 
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 800px;
-      margin: 0 auto;
-    }
+.site-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.2rem 4rem;
+}
 
-    .hero h1 {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #ff006e, #3a86ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 900;
-      letter-spacing: -2px;
-    }
+.hero-panel {
+  display: grid;
+  grid-template-columns: 1.35fr 0.95fr;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-top: 1rem;
+}
 
-    .hero p {
-      font-size: 1.3rem;
-      margin-bottom: 2rem;
-      color: #d0d0d0;
-      font-weight: 300;
-    }
+.hero-copy,
+.hero-side,
+.section-shell,
+.feature-card,
+.tool-card,
+.footer-panel {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(10, 15, 27, 0.9));
+  border: 1px solid var(--site-border);
+  border-radius: 28px;
+  box-shadow: var(--site-shadow);
+}
 
-    .cta-button {
-      display: inline-block;
-      padding: 15px 40px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 600;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 10px 30px rgba(255, 0, 110, 0.3);
-      border: none;
-      cursor: pointer;
-    }
+.hero-copy {
+  padding: clamp(1.5rem, 2vw, 2.6rem);
+}
 
-    .cta-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(255, 0, 110, 0.5);
-    }
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(57, 208, 255, 0.1);
+  border: 1px solid rgba(57, 208, 255, 0.25);
+  color: #9adfff;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
 
-    /* Studios Grid */
-    .studios {
-      padding: 80px 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+.hero-copy h1 {
+  margin: 1.1rem 0 0.9rem;
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+}
 
-    .section-title {
-      text-align: center;
-      color: white;
-      font-size: 2.5rem;
-      margin-bottom: 3rem;
-      position: relative;
-      padding-bottom: 1.5rem;
-    }
+.hero-copy h1 .highlight {
+  background: linear-gradient(135deg, #ff4d8d, #8b5cf6, #39d0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
-    .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      border-radius: 2px;
-    }
+.hero-copy p {
+  font-size: 1.06rem;
+  color: var(--site-muted);
+  max-width: 620px;
+  margin: 0 0 1.4rem;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
 
-    .card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 15px;
-      padding: 2rem;
-      text-align: center;
-      color: white;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
+.primary-button,
+.secondary-button,
+.mini-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 0.5s ease;
-    }
+.primary-button {
+  color: #fff;
+  background: linear-gradient(135deg, var(--site-primary), var(--site-secondary));
+  box-shadow: 0 16px 35px rgba(255, 77, 141, 0.28);
+}
 
-    .card:hover::before {
-      left: 100%;
-    }
+.secondary-button,
+.mini-button {
+  color: var(--site-text);
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid var(--site-border);
+}
 
-    .card:hover {
-      transform: translateY(-10px);
-      border-color: rgba(255, 0, 110, 0.5);
-      box-shadow: 0 20px 40px rgba(255, 0, 110, 0.2);
-    }
+.primary-button:hover,
+.secondary-button:hover,
+.mini-button:hover,
+.nav-cta:hover {
+  transform: translateY(-1px);
+}
 
-    .card h3 {
-      font-size: 1.3rem;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-    }
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
 
-    .card p {
-      font-size: 0.95rem;
-      color: #b0b0b0;
-      margin-bottom: 1.5rem;
-    }
+.stat-block {
+  padding: 1rem 0.9rem;
+  border-radius: 20px;
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px solid var(--site-border);
+}
 
-    .card-link {
-      display: inline-block;
-      padding: 8px 20px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      text-decoration: none;
-      border-radius: 25px;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-    }
+.stat-block strong {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.2rem;
+}
 
-    .card-link:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(255, 0, 110, 0.4);
-    }
+.stat-block span {
+  color: var(--site-muted);
+  font-size: 0.8rem;
+}
 
-    /* Featured */
-    .featured {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
+.hero-side {
+  padding: 1.2rem;
+}
 
-    .featured-card {
-      background: linear-gradient(135deg, #8338ec, #3a86ff);
-      border-radius: 15px;
-      padding: 3rem 2rem;
-      color: white;
-      position: relative;
-      overflow: hidden;
-    }
+.side-stack {
+  display: grid;
+  gap: 0.9rem;
+  height: 100%;
+}
 
-    .featured-card::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
-      border-radius: 50%;
-    }
+.side-card {
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(148, 163, 184, 0.04);
+  border: 1px solid var(--site-border);
+}
 
-    .featured-card h3 {
-      position: relative;
-      z-index: 2;
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-    }
+.side-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.98rem;
+}
 
-    .featured-card p {
-      position: relative;
-      z-index: 2;
-      margin-bottom: 1.5rem;
-      font-size: 0.95rem;
-    }
+.side-card p {
+  margin: 0;
+  color: var(--site-muted);
+  font-size: 0.9rem;
+}
 
-    /* Footer */
-    footer {
-      background: rgba(26, 26, 46, 0.9);
-      color: #b0b0b0;
-      text-align: center;
-      padding: 3rem 2rem;
-      border-top: 1px solid rgba(255, 0, 110, 0.2);
-    }
+.section-shell {
+  margin-top: 1.5rem;
+  padding: 1.3rem;
+}
 
-    footer p {
-      margin-bottom: 0.5rem;
-    }
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      nav ul {
-        display: none;
-      }
+.section-heading h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+}
 
-      .hero h1 {
-        font-size: 2.5rem;
-      }
+.section-heading .hint {
+  color: var(--site-muted);
+  font-size: 0.9rem;
+}
 
-      .hero p {
-        font-size: 1.1rem;
-      }
+.catalog-grid,
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
 
-      .section-title {
-        font-size: 2rem;
-      }
+.tool-card,
+.feature-card {
+  padding: 1.1rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
 
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
+.tool-card:hover,
+.feature-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(57, 208, 255, 0.35);
+}
 
-    /* Scroll smooth */
-    html {
-      scroll-behavior: smooth;
-    }
-  </style>
-</head>
-<body>
-  <!-- Navigation -->
-  <nav>
-    <div class="container">
-      <div class="logo">🎬 MouraDrama</div>
-      <ul>
-        <li><a href="#studios">Studios</a></li>
-        <li><a href="#featured">À découvrir</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </div>
-  </nav>
+.tool-card .badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 77, 141, 0.1);
+  border: 1px solid rgba(255, 77, 141, 0.22);
+  color: #ff9ec0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Bienvenue dans MouraDrama</h1>
-      <p>Explorez nos studios créatifs de cinéma, animation et production numérique</p>
-      <button class="cta-button" onclick="document.getElementById('studios').scrollIntoView()">
-        Découvrir les studios
-      </button>
-    </div>
-  </section>
+.tool-card h3,
+.feature-card h3 {
+  margin: 0.85rem 0 0.45rem;
+  font-size: 1.25rem;
+}
 
-  <!-- Studios Section -->
-  <section class="studios" id="studios">
-    <h2 class="section-title">Nos Studios</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>🎬 Studio Cinématique</h3>
-        <p>Production vidéo professionnelle et cinéma numérique</p>
-        <a href="cinematic-studio.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>🎨 Studio Animation</h3>
-        <p>Création d'animations 2D et 3D innovantes</p>
-        <a href="anima.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>🤖 AI Studio</h3>
-        <p>Outils d'intelligence artificielle pour la création</p>
-        <a href="ai-studio.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>📺 Studio Vidéo</h3>
-        <p>Production vidéo et streaming live</p>
-        <a href="studio-video.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>👶 Kids Studio</h3>
-        <p>Contenu créatif pour enfants et jeunesse</p>
-        <a href="kids-studio.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>📰 News Studio</h3>
-        <p>Actualités et documentaires numériques</p>
-        <a href="news-studio.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>🎭 Dramaturgie</h3>
-        <p>Création théâtrale et dramatique</p>
-        <a href="studio-dramaturgie.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>📚 Documentaire</h3>
-        <p>Production documentaire et reportages</p>
-        <a href="ai-documentaire.html" class="card-link">Accéder</a>
-      </div>
-      <div class="card">
-        <h3>🎪 Atelier</h3>
-        <p>Ateliers de formation et tutoriels</p>
-        <a href="atelier.html" class="card-link">Accéder</a>
-      </div>
-    </div>
-  </section>
+.tool-card p,
+.feature-card p {
+  margin: 0 0 1rem;
+  color: var(--site-muted);
+  font-size: 0.94rem;
+}
 
-  <!-- Featured Section -->
-  <section class="studios" id="featured">
-    <h2 class="section-title">À Découvrir</h2>
-    <div class="featured">
-      <div class="featured-card">
-        <h3>🌟 Studio Principal</h3>
-        <p>Notre hub créatif central avec tous les outils et ressources pour vos projets audiovisuels.</p>
-        <a href="studio.html" class="card-link">Visiter</a>
-      </div>
-      <div class="featured-card" style="background: linear-gradient(135deg, #ff006e, #fb5607);">
-        <h3>🚀 CineForge</h3>
-        <p>Plateforme avancée de production vidéo avec effets numériques et post-production.</p>
-        <a href="cineforge.html" class="card-link">Explorer</a>
-      </div>
-      <div class="featured-card" style="background: linear-gradient(135deg, #06ffa5, #118ab2);">
-        <h3>💫 Story Creator</h3>
-        <p>Créez des histoires immersives avec nos outils de narration interactive.</p>
-        <a href="story.html" class="card-link">Commencer</a>
-      </div>
-    </div>
-  </section>
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: auto;
+}
 
-  <!-- Footer -->
-  <footer id="contact">
-    <p>&copy; 2024 MouraDrama - Tous droits réservés</p>
-    <p>Une plateforme créative pour l'audiovisuel et la production numérique</p>
-    <p>🚀 Construire, Créer, Partager</p>
-  </footer>
-</body>
-</html>
+.card-footer span {
+  color: #dfe8ff;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.mini-button {
+  padding: 0.7rem 0.9rem;
+  font-size: 0.82rem;
+}
+
+.feature-card {
+  min-height: 100%;
+}
+
+.feature-card ul {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  color: var(--site-muted);
+}
+
+.feature-card li::before {
+  content: "•";
+  color: var(--site-accent);
+  margin-right: 0.5rem;
+}
+
+.footer-panel {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  text-align: center;
+  color: var(--site-muted);
+}
+
+.footer-panel strong {
+  color: var(--site-text);
+}
+
+@media (max-width: 900px) {
+  .hero-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-inner {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-links {
+    justify-content: center;
+  }
+
+  .section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.app-nav {
+  position: sticky;
+  top: 0;
+}
+
+.app-nav .nav-inner {
+  max-width: 1200px;
+}
+
+.site-shell.compact {
+  max-width: 1024px;
+}
+
+.site-shell.compact .hero-copy,
+.site-shell.compact .hero-side {
+  border-radius: 22px;
+}
