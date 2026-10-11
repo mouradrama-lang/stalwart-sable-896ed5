@@ -1,907 +1,586 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Roman Studio — Romans illustrés par IA</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roman Studio V2 · Romans illustrés & BD animées</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
---bg:#0a0908;--bg2:#12100d;--bg3:#1a1714;
---panel:#16130f;--panel2:#1e1a15;--border:#2a2620;--border-soft:#221e18;
---ink:#e6dcc6;--dim:#9a9080;--faint:#5a5448;
---gold:#d4a94a;--gold-soft:#f0d78a;--gold-deep:#8a6f2e;
---crimson:#a83a3a;--crimson-soft:#d46a6a;
---sage:#7a9a6a;--sage-soft:#a8c898;
---blue:#5a7aa8;--blue-soft:#88a8d4;
---ok:#6a9a5a;--err:#b84a4a;--warn:#d4984a;
---r:4px;
---serif:Georgia,'Times New Roman','Cormorant Garamond',serif;
---sans:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
---mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --bg:#f4f7fb;--p:#fff;--ink:#0b1a2b;--dim:#6b7c93;--ln:#d5deea;
+  --a:#0a84ff;--b:#ff5a1f;--ok:#12b76a;--er:#e5383b;--gold:#c9a227;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:Rajdhani,system-ui,sans-serif;
+  --mono:'Share Tech Mono',ui-monospace,monospace;
+  --orb:'Orbitron',sans-serif;
 }
-html,body{background:var(--bg)}
-body{
-  font-family:var(--sans);background:var(--bg);color:var(--ink);
-  background-image:
-    radial-gradient(circle at 15% 0%, rgba(212,169,74,.05) 0%, transparent 45%),
-    radial-gradient(circle at 85% 100%, rgba(168,58,58,.04) 0%, transparent 45%);
-  background-attachment:fixed;
-  min-height:100vh;padding:1.5rem 1rem 24rem;font-size:15px;line-height:1.6;
-  max-width:1180px;margin:0 auto;letter-spacing:.01em;
-}
-header{margin-bottom:1.2rem;text-align:center;padding:1rem 0 1.4rem;position:relative}
-header::before{content:'❦';position:absolute;top:-.3rem;left:50%;transform:translateX(-50%);font-family:var(--serif);font-size:1.4rem;color:var(--gold);opacity:.4}
-header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
-h1{font-family:var(--serif);font-size:2.2rem;font-weight:300;letter-spacing:.02em;margin-bottom:.3rem;
-  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-soft) 50%,var(--crimson-soft) 100%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1}
-.subtitle{font-family:var(--serif);font-size:.92rem;color:var(--dim);font-style:italic;letter-spacing:.05em}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:16px/1.5 var(--sans);color:var(--ink);background:var(--bg);min-height:100vh;padding-bottom:70px}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(var(--ln) 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,var(--ln) 1px,transparent 1px) 0 0/40px 40px;opacity:.5}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--ink);padding:10px 18px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.logo{font:800 20px var(--orb);letter-spacing:.1em}
+.logo b{color:var(--a)}
+.logo i{display:block;font:10px var(--mono);letter-spacing:.3em;color:var(--dim);font-style:normal}
+.hb{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+main{max-width:1180px;margin:0 auto;padding:22px 16px}
 
-.toast{position:fixed;top:1.5rem;left:50%;transform:translateX(-50%) translateY(-120px);
-  background:var(--bg3);color:var(--ink);border:1px solid var(--border);border-left:3px solid var(--gold);
-  padding:.85rem 1.4rem;border-radius:var(--r);font-size:.85rem;font-weight:500;
-  box-shadow:0 8px 32px rgba(0,0,0,.7);z-index:1000;opacity:0;
-  transition:transform .35s cubic-bezier(.2,.9,.3,1.2),opacity .35s;
-  max-width:90vw;text-align:center;display:flex;align-items:center;gap:.6rem}
-.toast.visible{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{border-left-color:var(--ok)}
-.toast.error{border-left-color:var(--err)}
-.toast.warn{border-left-color:var(--warn)}
+.hero{background:var(--p);border:1px solid var(--ln);padding:22px;margin-bottom:16px;position:relative}
+.hero::before,.hero::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--a)}
+.hero::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.hero::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.lab{font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+h2{font:600 26px var(--orb);letter-spacing:.04em;margin:6px 0 8px}
+h2 b{color:var(--a)}
+h3{font:600 15px var(--orb);letter-spacing:.06em;margin:16px 0 4px}
+p.sub{color:var(--dim);margin-bottom:12px;max-width:780px}
 
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.3rem;margin-bottom:1rem}
-.panel.ok{box-shadow:inset 3px 0 0 var(--ok)}
-.panel-label{display:block;font-family:var(--mono);font-size:.66rem;color:var(--dim);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.16em;font-weight:600}
-.panel-label b{color:var(--gold);font-weight:700;margin-right:.4rem}
+.guide{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--a);background:#eef6ff;padding:12px 14px;margin:10px 0 16px;font-size:14px}
+.guide.go{border-color:var(--ok);background:#effaf4}
+.guide.er{border-color:var(--er);background:#fff1f1}
+.guide.wt{border-color:var(--b);background:#fff6f0}
+.guide b{color:var(--ink)}
 
-input[type=password],input[type=text],textarea{width:100%;padding:.85rem 1rem;border-radius:var(--r);
-  border:1px solid var(--border);background:var(--bg2);color:var(--ink);font-family:var(--mono);
-  font-size:.8rem;margin-bottom:.6rem}
-textarea{font-family:var(--serif);font-size:.95rem;line-height:1.6;resize:vertical;min-height:80px}
-input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+textarea,input[type=text],input[type=password],select{width:100%;font:13px var(--mono);padding:9px;border:1px solid var(--ln);background:#f9fbfd;color:var(--ink);outline:0}
+textarea:focus,input:focus,select:focus{border-color:var(--a);background:#fff}
+textarea{resize:vertical;min-height:70px;margin:4px 0;font-family:var(--serif);font-size:15px}
+label.f{display:block;margin:6px 0}
+label.f span{display:block}
+button,.btn{font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:9px 14px;border:1px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;display:inline-block;font-family:var(--mono)}
+button:hover:not(:disabled),.btn:hover{background:var(--ink);color:#fff}
+button:disabled{opacity:.35;cursor:not-allowed}
+.big{background:var(--a);border-color:var(--a);color:#fff;padding:14px 26px;font-size:14px;letter-spacing:.16em}
+.big:hover:not(:disabled){background:#0066cc;border-color:#0066cc}
+.sm{padding:5px 9px;font-size:10px}
+.ft{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap;align-items:center}
 
-.btn{width:100%;padding:.85rem 1.2rem;border-radius:var(--r);border:1px solid var(--border);
-  background:var(--bg2);color:var(--ink);font-size:.82rem;font-weight:600;
-  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;margin-bottom:.6rem;
-  transition:all .2s;font-family:inherit}
-.btn:hover:not(:disabled){background:var(--bg3);border-color:var(--gold)}
-.btn:disabled{opacity:.3;cursor:not-allowed}
-.btn-primary{border-color:var(--gold);background:linear-gradient(135deg,rgba(212,169,74,.18),rgba(212,169,74,.08));
-  color:var(--gold-soft);font-size:1rem;padding:1.2rem;letter-spacing:.2em;font-family:var(--serif)}
-.btn-primary:disabled{opacity:.4}
-.btn-stop{border-color:var(--err);color:var(--err);background:transparent;display:none}
-.btn-stop.visible{display:block}
-.btn-small{padding:.5rem .9rem;font-size:.7rem;width:auto;display:inline-block;margin-bottom:0}
+/* Tiroirs */
+.drawers{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:720px){.drawers{grid-template-columns:1fr}}
+.drawer-group{background:var(--p);border:1px solid var(--ln);padding:14px}
+.drawer-group h3{margin-top:0;color:var(--a);font-family:var(--orb)}
+.dg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px}
+.dg-item{padding:10px;border:1px solid var(--ln);background:#fbfdff;cursor:pointer;transition:.15s;position:relative}
+.dg-item:hover{border-color:var(--a);background:#eef6ff}
+.dg-item.active{border-color:var(--a);background:#eef6ff;box-shadow:inset 0 0 0 2px var(--a)}
+.dg-item .emoji{font-size:1.5rem;display:block;margin-bottom:4px}
+.dg-item .nm{font:600 13px var(--sans);color:var(--ink);line-height:1.2}
+.dg-item .stt{font:10px var(--mono);color:var(--dim);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
 
-.status-line{font-size:.75rem;padding:.6rem .9rem;border-radius:var(--r);margin-bottom:.5rem;
-  display:flex;align-items:center;gap:.6rem;background:var(--bg2);color:var(--dim);
-  border:1px solid var(--border-soft);font-family:var(--mono)}
-.status-line.ok{background:rgba(106,154,90,.08);color:var(--ok);border-color:rgba(106,154,90,.3)}
-.status-dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex-shrink:0}
-.status-line.ok .status-dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
-.hint{font-size:.72rem;color:var(--dim);margin-top:.5rem;line-height:1.5}
-.hint a{color:var(--gold);text-decoration:none;border-bottom:1px dotted var(--gold-deep)}
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.chip{font:11px var(--mono);padding:2px 8px;border:1px solid var(--ok);color:var(--ok)}
+.chip.off{border-color:var(--er);color:var(--er)}
+.chip.cd{border-color:var(--b);color:var(--b)}
 
-/* ═══ TIROIRS (drawers) ═══ */
-.drawers-bar{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;margin-bottom:1rem}
-.drawers-title{font-family:var(--serif);font-size:.95rem;color:var(--gold);margin-bottom:.6rem;letter-spacing:.1em;display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap}
-.drawers-title small{font-family:var(--mono);font-size:.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:.14em;font-weight:600}
-.drawers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.5rem}
-.drawer-card{padding:.75rem .85rem;background:var(--bg2);border:1px solid var(--border-soft);border-radius:var(--r);
-  cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
-.drawer-card:hover{border-color:var(--gold);background:var(--bg3)}
-.drawer-card.active{border-color:var(--gold);background:linear-gradient(135deg,rgba(212,169,74,.1),rgba(212,169,74,.03))}
-.drawer-card.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
-.drawer-card .dc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;gap:.4rem}
-.drawer-card .dc-emoji{font-size:1.4rem;line-height:1}
-.drawer-card .dc-count{font-family:var(--mono);font-size:.6rem;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;padding:.15rem .4rem;border:1px solid var(--border-soft);border-radius:2px}
-.drawer-card .dc-name{font-family:var(--serif);font-size:.86rem;color:var(--ink);font-weight:500;line-height:1.25;margin-bottom:.15rem}
-.drawer-card .dc-state{font-family:var(--mono);font-size:.62rem;color:var(--dim);letter-spacing:.04em}
-.drawer-card.full{border-color:rgba(212,169,74,.4)}
-.drawer-card.empty{opacity:.65}
-.drawer-card.empty .dc-state{font-style:italic}
+/* Cartes */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.cd{border:1px solid var(--ln);background:#fff;padding:10px;position:relative}
+.cd.pk{border-color:var(--a);box-shadow:0 0 0 1px var(--a)}
+.im{position:relative;background:#e8eef6;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:6px;font:11px var(--mono);color:var(--dim)}
+.im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sp{position:absolute;width:26px;height:26px;border:2px solid var(--a);border-top-color:transparent;border-radius:50%;animation:r 1s linear infinite;z-index:2}
+@keyframes r{to{transform:rotate(360deg)}}
+.ip{background:#f6f9fc;border:1px solid var(--ln);padding:8px;margin:6px 0}
+.rw{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;align-items:center}
+.up{border:1px solid var(--ink);cursor:pointer}
+.bar{height:6px;background:var(--ln);margin:12px 0}
+.bar i{display:block;height:100%;background:var(--a);width:0;transition:width .4s}
 
-/* ═══ PROTAGONISTES ═══ */
-.protagonists-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.7rem;margin-top:.5rem}
-.protagonist-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .3s}
-.protagonist-card.locked{border-color:var(--sage)}
-.protagonist-card.generating{border-color:var(--gold)}
-.protagonist-card.error{border-color:var(--err)}
-.pc-image{width:100%;aspect-ratio:3/4;background:#000;position:relative;overflow:hidden}
-.pc-image img{width:100%;height:100%;object-fit:cover;display:block}
-.pc-image .pc-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;color:var(--faint);font-family:var(--mono);font-size:.7rem;text-align:center;padding:.5rem}
-.pc-info{padding:.7rem .8rem;background:var(--panel)}
-.pc-name{font-family:var(--serif);font-size:.9rem;color:var(--gold-soft);font-weight:500;margin-bottom:.15rem}
-.pc-role{font-family:var(--mono);font-size:.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
-.pc-desc{font-family:var(--serif);font-size:.76rem;color:var(--ink);line-height:1.5;max-height:100px;overflow:hidden}
-.pc-badge{position:absolute;top:.5rem;left:.5rem;padding:.2rem .5rem;background:rgba(0,0,0,.7);border:1px solid var(--sage);color:var(--sage-soft);font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;border-radius:2px}
+/* Feed */
+.feed{margin:10px 0}
+.fi{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--ln);font-size:15px}
+.fi.ok{color:var(--ok)}
+.fi.er{color:var(--er)}
+.fi em{margin-left:auto;font:11px var(--mono);color:var(--dim);font-style:normal}
+.fi .ic{width:18px;text-align:center;flex:none}
+.sp2{display:inline-block;width:14px;height:14px;border:2px solid var(--a);border-top-color:transparent;border-radius:50%;animation:r 1s linear infinite;flex:none}
 
-/* ═══ CHAPITRES ═══ */
-.chapters-list{display:flex;flex-direction:column;gap:.9rem;margin-top:.5rem}
-.chapter-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .3s}
-.chapter-card.generating{border-color:var(--gold);box-shadow:0 0 20px rgba(212,169,74,.08)}
-.chapter-card.done{border-color:var(--sage)}
-.chapter-card.error{border-color:var(--err)}
-.chapter-header{padding:.8rem 1rem;background:linear-gradient(90deg,rgba(212,169,74,.06),transparent);
-  border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap}
-.chapter-num{font-family:var(--serif);font-size:.7rem;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;font-weight:600}
-.chapter-title{font-family:var(--serif);font-size:1.05rem;color:var(--ink);font-style:italic;flex:1;line-height:1.3}
-.chapter-status{font-family:var(--mono);font-size:.65rem;color:var(--dim);letter-spacing:.05em;flex-shrink:0}
-.chapter-body{padding:1rem 1.1rem}
-.chapter-narrative{font-family:var(--serif);font-size:.9rem;line-height:1.75;color:var(--ink);white-space:pre-wrap;margin-bottom:.8rem}
-.chapter-dialogue{margin:.6rem 0 .9rem;padding-left:.9rem;border-left:2px solid var(--crimson);font-family:var(--serif);font-size:.85rem;line-height:1.6;color:var(--crimson-soft)}
-.chapter-dialogue .speaker{font-family:var(--mono);font-size:.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-style:normal;margin-right:.3rem}
-.illustrations-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem;margin-top:.6rem}
-.illus-card{position:relative;background:#000;border:1px solid var(--border-soft);border-radius:var(--r);overflow:hidden;aspect-ratio:9/16;transition:border-color .3s}
-.illus-card img{width:100%;height:100%;object-fit:cover;display:block}
-.illus-card .ic-num{position:absolute;top:.35rem;left:.35rem;padding:.15rem .4rem;background:rgba(0,0,0,.75);color:var(--gold-soft);font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;border-radius:2px}
-.illus-card.loading{display:flex;align-items:center;justify-content:center}
-.illus-card.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(212,169,74,.1) 50%,transparent 70%);animation:shimmer 1.8s linear infinite}
-.illus-card.loading .spin-dot{width:20px;height:20px;border:2px solid rgba(212,169,74,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;z-index:2}
-.illus-card.error::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--err);font-size:1.5rem;background:rgba(0,0,0,.5)}
-@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* Log */
+#con{position:fixed;left:0;right:0;bottom:0;height:34vh;z-index:50;background:#0b1a2b;color:#bfe3ff;transform:translateY(100%);transition:transform .25s;display:flex;flex-direction:column}
+#con.on{transform:none}
+#lb{flex:1;overflow:auto;padding:8px 12px;font:12px/1.5 var(--mono)}
+.lg.er{color:#ff8a8a}
+.lg.wr{color:#ffc477}
+.lg.ok{color:#7dffb5}
 
-/* ═══ PLAYER ═══ */
-.player-overlay{position:fixed;inset:0;background:#000;z-index:2000;display:none;align-items:center;justify-content:center;cursor:pointer}
-.player-overlay.visible{display:flex}
-#player-canvas{display:block;max-width:100vw;max-height:100vh;background:#000}
-.player-hint{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);color:rgba(230,220,198,.6);
-  font-size:.75rem;font-family:var(--mono);letter-spacing:.15em;text-transform:uppercase;
-  pointer-events:none;opacity:1;transition:opacity .5s;background:rgba(0,0,0,.5);padding:.35rem .8rem;border-radius:3px}
-.player-hint.hidden{opacity:0}
-.player-controls{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.2rem;margin-top:.5rem}
-.player-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.5rem}
-.player-row .btn{margin-bottom:0;flex:1;min-width:140px}
-.voice-toggle{display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-size:.75rem;color:var(--dim);font-family:var(--mono);letter-spacing:.03em}
-.voice-toggle input{width:auto;margin:0;accent-color:var(--gold)}
+/* Modal */
+#md{position:fixed;inset:0;background:rgba(11,26,43,.55);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}
+#md.on{display:flex}
+#md>div{background:#fff;max-width:720px;width:100%;max-height:85vh;overflow:auto;padding:20px;border:1px solid var(--ink)}
 
-/* ═══ UI GÉNÉRALE ═══ */
-.section{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);margin-bottom:1rem;overflow:hidden}
-.section.hidden{display:none!important}
-.section-header{padding:.9rem 1.1rem;cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;transition:background .2s}
-.section-header:hover{background:var(--bg2)}
-.section-title{font-family:var(--serif);font-size:.9rem;text-transform:uppercase;letter-spacing:.18em;color:var(--ink);font-weight:500;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-.section-title .badge{display:inline-block;padding:.15rem .55rem;background:transparent;color:var(--gold);border:1px solid var(--gold-deep);border-radius:2px;font-size:.6rem;letter-spacing:.15em;font-family:var(--mono);font-weight:600}
-.chevron{font-size:.7rem;color:var(--faint);transition:transform .3s}
-.section.open .chevron{transform:rotate(180deg);color:var(--gold)}
-.section-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
-.section.open .section-body{max-height:20000px}
-.section-content{padding:0 1.1rem 1.1rem}
+/* Toast */
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;gap:6px;align-items:center}
+#toast div{background:var(--ink);color:#fff;font:12px var(--mono);padding:8px 14px}
 
-.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg3);border-top:1px solid var(--border);
-  color:var(--ink);padding:.85rem 1.1rem;font-size:.78rem;display:flex;align-items:center;gap:.7rem;
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:100;
-  font-family:var(--mono);box-shadow:0 -4px 20px rgba(0,0,0,.5)}
-.status-bar.visible{transform:translateY(0)}
-.spinner{width:12px;height:12px;border:2px solid rgba(212,169,74,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+/* Player */
+#pl{position:fixed;inset:0;background:#000;z-index:100;display:none;align-items:center;justify-content:center;flex-direction:column}
+#pl.on{display:flex}
+#pv{max-width:100vw;max-height:100vh;display:none}
+#pi{max-width:100vw;max-height:100vh;display:none}
+#sub{position:absolute;left:5%;right:5%;bottom:7%;text-align:center;color:#fff;font:600 22px/1.3 var(--sans);text-shadow:0 2px 8px #000}
+#pl button{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.9);color:#000}
 
-.debug-panel{position:fixed;bottom:0;left:0;right:0;height:220px;background:#05050a;border-top:2px solid var(--gold-deep);
-  z-index:200;display:flex;flex-direction:column;font-family:var(--mono);box-shadow:0 -8px 32px rgba(0,0,0,.7);transition:height .3s ease}
-.debug-panel.collapsed{height:36px}
-.debug-header{display:flex;justify-content:space-between;align-items:center;padding:.45rem .8rem;
-  background:linear-gradient(90deg,#0f0d0a,#1a1612);border-bottom:1px solid var(--border);flex-shrink:0;cursor:pointer;user-select:none}
-.debug-title{font-size:.68rem;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:.5rem}
-.debug-badge{font-size:.6rem;padding:.1rem .4rem;background:var(--gold);color:var(--bg);border-radius:2px;font-weight:700}
-.debug-actions{display:flex;gap:.3rem}
-.debug-actions button{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:.62rem;padding:.25rem .55rem;border-radius:2px;cursor:pointer;font-family:inherit}
-.debug-actions button:hover{color:var(--gold);border-color:var(--gold-deep)}
-.debug-body{flex:1;overflow-y:auto;padding:.5rem .7rem 1rem;font-size:.72rem;line-height:1.45;color:#c8c0b0}
-.debug-entry{margin-bottom:.25rem;padding:.2rem .4rem;border-left:2px solid transparent;word-break:break-word}
-.debug-entry.info{border-left-color:var(--faint)}
-.debug-entry.success{border-left-color:var(--ok);background:rgba(106,154,90,.04)}
-.debug-entry.warn{border-left-color:var(--warn);background:rgba(212,152,74,.04)}
-.debug-entry.error{border-left-color:var(--err);background:rgba(184,74,74,.06);color:#f0a0a0}
-.debug-entry.api{border-left-color:var(--blue)}
-.debug-entry.response{border-left-color:var(--crimson)}
-.debug-time{color:var(--faint);margin-right:.5rem;font-size:.62rem}
-.debug-cat{color:var(--gold-soft);font-weight:600;margin-right:.4rem;font-size:.62rem}
-.debug-msg{color:#d8d0c0}
-.debug-data{margin-top:.3rem;padding:.4rem .5rem;background:#0a0908;border:1px solid var(--border-soft);border-radius:2px;font-size:.66rem;color:#a8c898;max-height:160px;overflow:auto;white-space:pre-wrap;word-break:break-all;line-height:1.4}
+/* Case BD avec bulles superposées */
+.page{background:#fff;border:1px solid var(--ln);padding:16px;margin-bottom:18px}
+.case-wrap{position:relative;margin-bottom:10px;border:2px solid var(--ink);background:#000;overflow:hidden}
+.case-wrap img{display:block;width:100%;height:auto}
+.bubble{position:absolute;background:#fff;border:2px solid #000;padding:6px 10px;font:600 13px var(--sans);color:#000;max-width:45%;box-shadow:3px 3px 0 rgba(0,0,0,.85);z-index:3;line-height:1.25}
+.bubble .sp{position:static;display:block;width:auto;height:auto;border:none;animation:none;font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--a);margin-bottom:2px}
+.bubble::after{content:'';position:absolute;bottom:-9px;left:14px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:9px solid #000}
+.bubble.br::after{left:auto;right:14px}
+.case-meta{padding:6px 10px;background:#f6f9fc;border-top:1px solid var(--ln);font:11px var(--mono);color:var(--dim)}
+.case-meta b{color:var(--ink)}
 
-.hidden{display:none!important}
-::-webkit-scrollbar{width:8px;height:8px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+/* Lecteur BD */
+#pl .bd-frame{max-width:min(92vw,680px);max-height:88vh;position:relative;background:#000;border:3px solid #fff}
+#pl .bd-frame img{display:block;width:100%;height:auto}
 
-@media(max-width:480px){
-h1{font-size:1.7rem}
-.protagonists-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
-.illustrations-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
-body{padding-bottom:22rem}
-.debug-panel{height:180px}
-.drawers-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
-}
+/* Toggle Roman/BD */
+.mode-toggle{display:flex;gap:0;margin:10px 0;border:2px solid var(--ink);width:fit-content}
+.mode-toggle button{border:none;border-right:1px solid var(--ink);background:#fff;color:var(--ink);padding:10px 22px;font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.mode-toggle button:last-child{border-right:none}
+.mode-toggle button.on{background:var(--ink);color:#fff}
 </style>
 </head>
 <body>
 
 <header>
-<h1>Roman Studio</h1>
-<p class="subtitle">Un tiroir par genre — Personnages, chapitres, illustrations</p>
+  <div class="logo">ROMAN<b>·STUDIO</b><i>ROMANS ILLUSTRÉS · BD ANIMÉES</i></div>
+  <div class="hb">
+    <span class="chip" id="keychip" style="display:none"></span>
+    <button class="sm" data-a="sess">Mes projets</button>
+    <button class="sm" data-a="con">Journal</button>
+  </div>
 </header>
 
-<!-- ═══ API (clé unique) ═══ -->
-<div class="panel" id="api-panel">
-<label class="panel-label"><b>◆</b> Clé API Agnes — unique</label>
-<input type="password" id="api-key-input" placeholder="Collez votre clé API Agnes (sk-...)" autocomplete="off" spellcheck="false">
-<button type="button" class="btn" id="api-save-btn">Enregistrer la clé</button>
-<div class="status-line" id="api-status-line"><span class="status-dot"></span><span id="api-status-text">Aucune clé API enregistrée</span></div>
-<div class="hint">Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> → Settings → API Keys</div>
+<main id="main"></main>
+
+<div id="con">
+  <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #26405c;font:12px var(--mono)">
+    <span>JOURNAL TECHNIQUE</span>
+    <button class="sm" data-a="con" style="color:#bfe3ff;border-color:#4a6a8a">✕</button>
+  </div>
+  <div id="lb"></div>
 </div>
 
-<!-- ═══ TIROIRS PAR GENRE ═══ -->
-<div class="drawers-bar">
-<div class="drawers-title">
-<span>📚 Vos tiroirs littéraires</span>
-<small id="drawers-summary">—</small>
-</div>
-<div class="drawers-grid" id="drawers-grid"></div>
-</div>
+<div id="md"><div id="mdc"></div></div>
+<div id="toast"></div>
 
-<!-- ═══ GENRE ACTIF ═══ -->
-<div class="section open hidden" id="section-active">
-<div class="section-header" data-toggle="section-active">
-<span class="section-title" id="active-title">Genre actif</span>
-<span class="chevron">▼</span>
-</div>
-<div class="section-body"><div class="section-content">
-<label class="panel-label"><b>✎</b> Votre idée de roman</label>
-<textarea id="idea-input" placeholder="Ex : Un vieux libraire découvre que ses livres se souviennent de tous ceux qui les ont lus. Une nuit, l'un d'eux lui parle..."></textarea>
-<div id="idea-chips" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;margin-bottom:.8rem;"></div>
-<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
-<button type="button" class="btn btn-primary" id="generate-btn" disabled style="flex:2;min-width:200px;">✒️ Écrire le roman</button>
-<button type="button" class="btn btn-stop" id="stop-btn" style="flex:1;min-width:120px;">⏹ Arrêter</button>
-<button type="button" class="btn" id="new-drawer-btn" style="flex:1;min-width:120px;margin-bottom:0;">🗑️ Vider ce tiroir</button>
-</div>
-</div></div>
-</div>
-
-<!-- ═══ PROTAGONISTES ═══ -->
-<div class="section hidden" id="section-protagonists">
-<div class="section-header" data-toggle="section-protagonists">
-<span class="section-title">🎭 Protagonistes <span class="badge" id="protag-badge">0</span></span>
-<span class="chevron">▼</span>
-</div>
-<div class="section-body"><div class="section-content">
-<div class="hint" style="margin-bottom:.5rem;font-style:italic;">Les protagonistes gardent leur apparence entre tous les chapitres — c'est le principe du tiroir.</div>
-<div class="protagonists-grid" id="protagonists-grid"></div>
-</div></div>
-</div>
-
-<!-- ═══ CHAPITRES ═══ -->
-<div class="section hidden" id="section-chapters">
-<div class="section-header" data-toggle="section-chapters">
-<span class="section-title">📖 Chapitres & illustrations <span class="badge" id="chapters-badge">0</span></span>
-<span class="chevron">▼</span>
-</div>
-<div class="section-body"><div class="section-content">
-<div class="chapters-list" id="chapters-list"></div>
-</div></div>
-</div>
-
-<!-- ═══ PLAYER ═══ -->
-<div class="section hidden" id="section-player">
-<div class="section-header" data-toggle="section-player">
-<span class="section-title">▶ Lecture du roman</span>
-<span class="chevron">▼</span>
-</div>
-<div class="section-body"><div class="section-content">
-<div class="player-controls">
-<div class="player-row">
-<button type="button" class="btn" id="play-novel-btn" disabled>▶ Lire le roman</button>
-<button type="button" class="btn" id="stop-read-btn" disabled>⏹ Arrêter</button>
-</div>
-<div class="voice-toggle">
-<input type="checkbox" id="voice-toggle" checked>
-<label for="voice-toggle">Narration vocale française</label>
-</div>
-</div>
-<div class="hint">Lecture séquentielle : chapitres narrés + illustrations synchronisées.</div>
-</div></div>
-</div>
-
-<div class="status-bar" id="status-bar"><div class="spinner"></div><span id="status-text">Préparation…</span></div>
-<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-text">Message</span></div>
-
-<div class="debug-panel" id="debug-panel">
-<div class="debug-header" id="debug-header">
-<div class="debug-title">🖋️ Console <span class="debug-badge" id="debug-count">0</span></div>
-<div class="debug-actions">
-<button type="button" id="debug-copy-btn">Copier</button>
-<button type="button" id="debug-clear-btn">Effacer</button>
-<button type="button" id="debug-collapse-btn">−</button>
-</div>
-</div>
-<div class="debug-body" id="debug-body"></div>
-</div>
-
-<div class="player-overlay" id="player-overlay">
-<canvas id="player-canvas"></canvas>
-<div class="player-hint" id="player-hint-overlay">Échap ou clic pour quitter</div>
+<div id="pl">
+  <img id="pi" alt="">
+  <div id="sub"></div>
+  <button data-a="stopplay">✕ Quitter</button>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════
-// CONFIGURATION
-// ══════════════════════════════════════════════════════════════════
-const API_BASE = 'https://apihub.agnes-ai.com/v1';
-const MODEL_TEXT = 'agnes-2.5-flash';
-const MODEL_IMAGE = 'agnes-image-2.1-flash';
-const FRAME_RATE = 24;
-const API_KEY_STORAGE = 'roman_studio_api_key_v1';
-const DRAWER_PREFIX = 'roman_studio_drawer_';
-const DRAWER_VERSION = 1;
-const DEBUG_MAX = 600;
+/* ═════════════════════════════════════════════════════════════════════
+   CONFIG
+   ═════════════════════════════════════════════════════════════════════ */
+const API='https://apihub.agnes-ai.com/v1';
+const TXT=['agnes-3.0-flash','agnes-2.5-flash'];
+const IMG='agnes-image-2.5-flash';
+const RPM={img:10,txt:10};
+const API_KEY_STORAGE='romanstudio2_keys';
+const ROMAN_STORAGE='romanstudio2_roman_';
+const BD_STORAGE='romanstudio2_bd_';
 
-const IMAGE_PARALLEL = 2;         // 2 illustrations en parallèle
-const IMAGE_INTERVAL_MS = 3400;   // 3.4s entre créations
-const TEXT_TEMPERATURE = 0.85;
-const ILLUS_PER_CHAPTER = 3;      // 3 illustrations par chapitre
-const WORDS_PER_CHAPTER_TARGET = 220; // 200-250 mots par chapitre
-
-// ══════════════════════════════════════════════════════════════════
-// GENRES LITTÉRAIRES (les tiroirs)
-// ══════════════════════════════════════════════════════════════════
-const GENRES = [
-  { id:'fantasy',    emoji:'🐉', name:'Fantasy épique',       style:'high fantasy, medieval worlds, magic, epic scope, Tolkien-like grandeur',
-    palette:'deep emerald, gold, aged parchment, stormy sky' },
-  { id:'sf',         emoji:'🚀', name:'Science-Fiction',      style:'speculative science fiction, futuristic technology, cosmic scale, cyberpunk or space opera',
-    palette:'electric blue, chrome silver, neon cyan, deep space black' },
-  { id:'polar',      emoji:'🔍', name:'Polar / Thriller',     style:'noir crime fiction, tense atmosphere, morally grey characters, rain-soaked streets',
-    palette:'charcoal grey, blood red, sodium lamp amber, cold blue' },
-  { id:'romance',    emoji:'🌹', name:'Romance',              style:'emotional romance, intimate moments, tender glances, deeply human',
-    palette:'soft rose, warm cream, dusty lavender, golden hour' },
-  { id:'historique', emoji:'📜', name:'Roman historique',      style:'meticulously researched historical fiction, period detail, authentic atmosphere',
-    palette:'sepia brown, faded gold, oxblood leather, aged ivory' },
-  { id:'aventure',   emoji:'🗺️', name:'Aventure',              style:'pulp adventure, exotic locales, daring escapes, treasure and danger',
-    palette:'jungle green, saffron orange, sun-bleached bone, ocean turquoise' },
-  { id:'conte',      emoji:'✨', name:'Conte / Fable',         style:'literary fairy tale, timeless wisdom, symbolic imagery, gentle magic',
-    palette:'moonlight silver, deep indigo, forest green, candle gold' },
-  { id:'horreur',    emoji:'🕯️', name:'Horreur gothique',      style:'gothic horror, creeping dread, ancient curses, psychological terror',
-    palette:'pitch black, blood crimson, spectral white, fog grey' },
-  { id:'philo',      emoji:'🧭', name:'Philosophique',         style:'philosophical fiction, ideas as characters, existential questioning, cerebral',
-    palette:'monochrome cream, ink black, faded gold, glass blue' },
-  { id:'poetique',   emoji:'🌙', name:'Poétique',              style:'lyrical prose, sensory immersion, symbolic landscapes, meditative pace',
-    palette:'muted pastel, twilight pink, ocean mist, olive grove' },
-  { id:'bd',         emoji:'📔', name:'BD / Manga',            style:'comic book / manga aesthetic, dynamic framing, expressive characters, clear line',
-    palette:'bold flat colors, ink black outlines, vivid primaries' },
-  { id:'autobio',    emoji:'👤', name:'Autobiographie fictive',style:'intimate first-person memoir, sincere voice, formative memories, quiet revelation',
-    palette:'warm 1970s amber, polaroid white, faded denim, moss green' }
+/* ═════════════════════════════════════════════════════════════════════
+   GENRES — 6 romans + 6 BD
+   ═════════════════════════════════════════════════════════════════════ */
+const GENRES_ROMAN=[
+  {id:'roman-fantasy',emoji:'🐉',name:'Fantasy',style:'cinematic high fantasy, painterly oil-painting aesthetic, golden light, epic scale',palette:'deep emerald, gold, aged parchment, stormy sky'},
+  {id:'roman-sf',emoji:'🚀',name:'Science-Fiction',style:'cinematic sci-fi, photorealistic concept art, vast futuristic scale, cold clean light',palette:'electric blue, chrome silver, deep space black, cyan'},
+  {id:'roman-polar',emoji:'🔍',name:'Polar',style:'noir crime photography, dramatic chiaroscuro, rain-soaked streets, moody atmosphere',palette:'charcoal grey, blood red, sodium amber, cold blue'},
+  {id:'roman-romance',emoji:'🌹',name:'Romance',style:'soft cinematic photography, warm bokeh, golden hour light, tender tones',palette:'dusty rose, warm cream, lavender, pale gold'},
+  {id:'roman-historique',emoji:'📜',name:'Historique',style:'period drama cinematography, authentic costumes, candlelight, painterly realism',palette:'sepia, faded gold, oxblood leather, aged ivory'},
+  {id:'roman-aventure',emoji:'🗺️',name:'Aventure',style:'pulp adventure cinema, exotic locales, saturated colors, dramatic vistas',palette:'jungle green, saffron orange, sun-bleached bone, turquoise'}
 ];
 
-const IDEA_CHIPS = {
-  fantasy:    ['Un château dont les couloirs changent chaque nuit.','Un roi qui ne peut plus mentir depuis un sort mal lancé.','Deux enfants qui gardent la dernière forêt magique.'],
-  sf:         ['Une station spatiale où plus personne ne se souvient de la Terre.','Un androïde qui rêve.','Le dernier humain dans une bibliothèque orbitale.'],
-  polar:      ['Un flic qui ne dort plus à cause d\'une affaire non résolue.','Une lettre anonyme arrive 30 ans trop tard.','Une disparition dans un village qui n\'en a jamais parlé.'],
-  romance:    ['Deux inconnus se croisent au même banc chaque matin.','Elle écrit des lettres qu\'elle n\'envoie jamais.','Un amour qui reprend vingt ans après.'],
-  historique: ['Le carnet oublié d\'un soldat de 1916.','Une apothicaire au temps de la peste.','La dernière librairie juive de Varsovie.'],
-  aventure:   ['Une carte incomplète vers une cité perdue.','Trois explorateurs et un désert qui ne figure sur aucune carte.','Un équipage de pirates cherche une île qui se déplace.'],
-  conte:      ['Une petite fille qui parle aux arbres centenaires.','Un roi qui cherche la dernière graine.','La nuit où tous les lampions se sont éteints.'],
-  horreur:    ['Un phare dont le gardien entend des pas.','La maison qui se souvient de tous ses morts.','Un miroir qui reflète l\'envers du monde.'],
-  philo:      ['Un homme cherche à prouver qu\'il existe.','Deux amis passent une nuit à refaire le monde.','Un vieux philosophe et son dernier étudiant.'],
-  poetique:   ['Un pêcheur attend une barque qui ne viendra pas.','Le journal de bord d\'une femme qui compte les marées.','Un enfant poursuit une lumière dans un champ.'],
-  bd:         ['Un détective félin dans une ville de néons.','Une collégienne découvre qu\'elle peut parler aux esprits.','Un chef cuisinier dans une cité futuriste.'],
-  autobio:    ['Les étés chez ma grand-mère, un par un.','Mon premier amour, quand j\'avais quinze ans.','La lettre que je n\'ai jamais osé écrire à mon père.']
+const GENRES_BD=[
+  {id:'bd-shonen',emoji:'⚔️',name:'Shonen',style:'japanese shonen manga, dynamic lines, cel shading, ink outlines, energetic action poses',palette:'bright saturated colors, ink black outlines'},
+  {id:'bd-shojo',emoji:'🌸',name:'Shojo',style:'japanese shojo manga, delicate line art, soft watercolor washes, expressive large eyes, sparkling details',palette:'pastel pink, lavender, mint, cream'},
+  {id:'bd-seinen',emoji:'🗡️',name:'Seinen',style:'japanese seinen manga, realistic anatomies, detailed backgrounds, mature dark tone, precise ink work',palette:'muted earth tones, deep blacks, desaturated'},
+  {id:'bd-comics',emoji:'🦸',name:'Comics US',style:'american superhero comics, bold ink outlines, flat saturated colors, dynamic angles, halftone dots',palette:'primary red/blue/yellow, ink black'},
+  {id:'bd-francobelge',emoji:'📔',name:'Franco-belge',style:'franco-belgian bande dessinée, ligne claire, clean uniform lines, flat vivid colors',palette:'flat primaries, warm secondaries'},
+  {id:'bd-webtoon',emoji:'📱',name:'Webtoon / Manhwa',style:'korean webtoon / manhwa, clean digital line art, soft cel shading, vertical scrolling composition',palette:'pastel gradients, glossy highlights, muted jewel tones'}
+];
+
+/* ═════════════════════════════════════════════════════════════════════
+   UTILS
+   ═════════════════════════════════════════════════════════════════════ */
+const $=s=>document.querySelector(s);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const san=t=>String(t==null?'':t).replace(/[‘’]/g,"'").replace(/[“”«»]/g,'"').replace(/[–—]/g,'-').replace(/…/g,'...').replace(/[\u00a0\u202f]/g,' ');
+const escRe=s=>String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+
+/* ═════════════════════════════════════════════════════════════════════
+   STATE
+   ═════════════════════════════════════════════════════════════════════ */
+const state={
+  apiKeys:[],activeKey:0,
+  activeProject:null,   // {mode:'roman'|'bd', genreId, data:{...}}
+  isRunning:false,stopRequested:false,
+  isPlaying:false,
+  voiceEnabled:true
 };
 
-// ══════════════════════════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════════════════════════
-const state = {
-  apiKey: '',
-  activeGenre: null,
-  drawers: {},               // { genreId: { ...drawerState } }
-  isRunning: false,
-  stopRequested: false,
-  isPlaying: false,
-  playRAF: null,
-  voiceEnabled: true,
-  currentUtterance: null,
-  workingPollUrlBuilder: null
-};
-
-// ══════════════════════════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════════════════════════
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-function nowTime(){return new Date().toLocaleTimeString('fr-FR',{hour12:false})}
-function setStatus(text){const b=document.getElementById('status-bar');const t=document.getElementById('status-text');if(!b||!t)return;if(text){b.classList.add('visible');t.textContent=text}else b.classList.remove('visible')}
-
-let toastTimeout=null;
-function showToast(message,type='success',duration=2600){
-  const t=document.getElementById('toast');const i=document.getElementById('toast-icon');const x=document.getElementById('toast-text');
-  if(!t||!i||!x)return;
-  t.classList.remove('visible','success','error','warn');void t.offsetWidth;
-  const icons={success:'✓',error:'✕',warn:'⚠'};i.textContent=icons[type]||'✓';x.textContent=message;
-  t.classList.add(type);
-  requestAnimationFrame(()=>t.classList.add('visible'));
-  if(toastTimeout)clearTimeout(toastTimeout);
-  toastTimeout=setTimeout(()=>t.classList.remove('visible'),duration);
+/* ═════════════════════════════════════════════════════════════════════
+   LOG / TOAST
+   ═════════════════════════════════════════════════════════════════════ */
+function log(l,m){
+  const d=document.createElement('div');
+  d.className='lg '+l;
+  d.textContent=new Date().toLocaleTimeString('fr-FR')+'  '+m;
+  const b=$('#lb');
+  if(!b)return;
+  b.appendChild(d);
+  while(b.children.length>400)b.firstChild.remove();
+  b.scrollTop=b.scrollHeight;
+}
+function toast(m){
+  const d=document.createElement('div');
+  d.textContent=m;
+  $('#toast').appendChild(d);
+  setTimeout(()=>d.remove(),4200);
 }
 
-function sanitizeForApi(text){
-  if(text==null)return '';
-  return String(text)
-    .replace(/[\u2018\u2019\u201B\u2032\u02BC]/g, "'")
-    .replace(/[\u201C\u201D\u201F\u2033]/g, '"')
-    .replace(/\u2013/g, '-')
-    .replace(/\u2014/g, '--')
-    .replace(/\u2026/g, '...')
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\u202F/g, ' ');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// DEBUG
-// ══════════════════════════════════════════════════════════════════
-let debugCount=0,debugEntries=[],debugCollapsed=false;
-function debugLog(level,category,message,data){
-  const body=document.getElementById('debug-body');if(!body)return;
-  const time=nowTime();
-  const entry=document.createElement('div');entry.className='debug-entry '+level;
-  let html='<span class="debug-time">'+time+'</span><span class="debug-cat">['+esc(category)+']</span><span class="debug-msg">'+esc(message)+'</span>';
-  if(data!==undefined&&data!==null){
-    let ds;if(typeof data==='string')ds=data;else{try{ds=JSON.stringify(data,null,2)}catch(e){ds=String(data)}}
-    if(ds.length>3000)ds=ds.slice(0,3000)+'\n…[tronqué]';
-    html+='<pre class="debug-data">'+esc(ds)+'</pre>';
-  }
-  entry.innerHTML=html;body.appendChild(entry);
-  debugEntries.push({time,level,category,message});
-  if(debugEntries.length>DEBUG_MAX)debugEntries.shift();
-  while(body.children.length>DEBUG_MAX)body.removeChild(body.firstChild);
-  body.scrollTop=body.scrollHeight;
-  debugCount++;const c=document.getElementById('debug-count');if(c)c.textContent=debugCount;
-}
-function clearDebug(){const b=document.getElementById('debug-body');if(b)b.innerHTML='';debugEntries=[];debugCount=0;const c=document.getElementById('debug-count');if(c)c.textContent='0';debugLog('info','SYSTEM','Console effacée')}
-function copyDebug(){const lines=debugEntries.map(e=>e.time+' ['+e.category+'] '+e.message).join('\n');const finish=(ok)=>showToast(ok?'Console copiée':'Copie impossible',ok?'success':'error');try{if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(lines).then(()=>finish(true)).catch(()=>legacyCopy(lines,finish));return}}catch(e){}legacyCopy(lines,finish)}
-function legacyCopy(text,cb){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(ta);cb(ok)}
-function toggleDebugCollapse(){const p=document.getElementById('debug-panel');const b=document.getElementById('debug-collapse-btn');if(!p||!b)return;debugCollapsed=!debugCollapsed;p.classList.toggle('collapsed',debugCollapsed);b.textContent=debugCollapsed?'+':'−'}
-
-// ══════════════════════════════════════════════════════════════════
-// TIROIRS — auto-sauvegarde par genre
-// ══════════════════════════════════════════════════════════════════
-function drawerKey(genreId){return DRAWER_PREFIX+genreId+'_v'+DRAWER_VERSION}
-
-function loadAllDrawers(){
-  state.drawers={};
-  GENRES.forEach(g=>{
-    try{
-      const raw=localStorage.getItem(drawerKey(g.id));
-      if(raw){
-        const parsed=JSON.parse(raw);
-        if(parsed&&typeof parsed==='object')state.drawers[g.id]=parsed;
-      }
-    }catch(e){debugLog('warn','TIROIR','Lecture échouée pour '+g.id+' : '+e.message)}
-  });
-  debugLog('success','TIROIRS',Object.keys(state.drawers).length+' tiroir(s) chargé(s) sur '+GENRES.length);
-}
-
-function saveDrawer(genreId){
-  const drawer=state.drawers[genreId];
-  if(!drawer)return;
+/* ═════════════════════════════════════════════════════════════════════
+   MULTI-CLÉS API
+   ═════════════════════════════════════════════════════════════════════ */
+function loadKeys(){
   try{
-    drawer.updatedAt=Date.now();
-    localStorage.setItem(drawerKey(genreId),JSON.stringify(drawer));
-    debugLog('info','TIROIR','Sauvegardé : '+genreId+' ('+((drawer.chapters&&drawer.chapters.length)||0)+' ch.)');
-  }catch(e){debugLog('error','TIROIR','Sauvegarde échouée : '+e.message)}
-}
-
-function emptyDrawer(genreId){
-  return {
-    genre:genreId,
-    version:DRAWER_VERSION,
-    idea:'',
-    title:'',
-    logline:'',
-    universe:'',
-    protagonists:[],
-    chapters:[],
-    createdAt:Date.now(),
-    updatedAt:Date.now()
-  };
-}
-
-function getOrCreateDrawer(genreId){
-  if(!state.drawers[genreId])state.drawers[genreId]=emptyDrawer(genreId);
-  return state.drawers[genreId];
-}
-
-function deleteDrawer(genreId){
-  try{localStorage.removeItem(drawerKey(genreId))}catch(e){}
-  state.drawers[genreId]=emptyDrawer(genreId);
-  debugLog('warn','TIROIR','Tiroir vidé : '+genreId);
-}
-
-function drawerStats(drawer){
-  if(!drawer)return {chapters:0,illustrations:0,protagonists:0,state:'Vide'};
-  const chaps=(drawer.chapters||[]).length;
-  let illus=0;
-  (drawer.chapters||[]).forEach(c=>{illus+=(c.illustrations||[]).filter(i=>i.status==='done').length});
-  const protags=(drawer.protagonists||[]).length;
-  let s='Vide';
-  if(protags>0&&chaps===0)s=protags+' protag.';
-  else if(chaps>0){
-    const allDone=(drawer.chapters||[]).every(c=>c.status==='done');
-    s=chaps+' ch. · '+illus+' ill.'+(allDone?' ✓':'…');
-  }
-  return {chapters:chaps,illustrations:illus,protagonists:protags,state:s};
-}
-
-function renderDrawersGrid(){
-  const grid=document.getElementById('drawers-grid');
-  if(!grid)return;
-  let html='';
-  let activeCount=0,fullCount=0;
-  GENRES.forEach(g=>{
-    const drawer=state.drawers[g.id];
-    const stats=drawerStats(drawer);
-    const isActive=state.activeGenre===g.id;
-    let cls='drawer-card';
-    if(isActive)cls+=' active';
-    if(stats.chapters>0)activeCount++;
-    if(stats.chapters>0&&(drawer.chapters||[]).every(c=>c.status==='done'))fullCount++;
-    if(!drawer||(stats.chapters===0&&stats.protagonists===0))cls+=' empty';
-    else if((drawer.chapters||[]).every(c=>c.status==='done'))cls+=' full';
-    html+='<div class="'+cls+'" data-genre="'+g.id+'">';
-    html+='<div class="dc-head"><span class="dc-emoji">'+g.emoji+'</span>';
-    html+='<span class="dc-count">'+stats.state+'</span></div>';
-    html+='<div class="dc-name">'+esc(g.name)+'</div>';
-    html+='<div class="dc-state">'+esc(stats.state==='Vide'?'Aucun contenu':'Tiroir ouvert')+'</div>';
-    html+='</div>';
-  });
-  grid.innerHTML=html;
-  grid.querySelectorAll('[data-genre]').forEach(el=>{
-    el.addEventListener('click',()=>openDrawer(el.dataset.genre));
-  });
-  const sum=document.getElementById('drawers-summary');
-  if(sum)sum.textContent=activeCount+' actif'+(activeCount>1?'s':'')+' · '+fullCount+' complet'+(fullCount>1?'s':'');
-}
-
-function openDrawer(genreId){
-  const genre=GENRES.find(g=>g.id===genreId);
-  if(!genre)return;
-  state.activeGenre=genreId;
-  getOrCreateDrawer(genreId);
-  debugLog('state','TIROIR','Ouverture : '+genreId);
-  // Titre
-  const title=document.getElementById('active-title');
-  if(title)title.innerHTML=genre.emoji+' '+esc(genre.name)+' <span class="badge">'+esc(genre.palette)+'</span>';
-  // Section active
-  const sec=document.getElementById('section-active');
-  if(sec){sec.classList.remove('hidden');sec.classList.add('open');}
-  // Idée existante
-  const drawer=state.drawers[genreId];
-  const ideaInput=document.getElementById('idea-input');
-  if(ideaInput)ideaInput.value=drawer.idea||'';
-  // Chips
-  renderIdeaChips(genreId);
-  // Sections
-  renderProtagonists();
-  renderChapters();
-  renderDrawersGrid();
-  updateButtons();
-  // Auto-scroll
-  setTimeout(()=>{const el=document.getElementById('section-active');if(el)window.scrollTo({top:el.offsetTop-40,behavior:'smooth'})},200);
-}
-
-function renderIdeaChips(genreId){
-  const chips=document.getElementById('idea-chips');
-  if(!chips)return;
-  const ideas=IDEA_CHIPS[genreId]||[];
-  chips.innerHTML=ideas.map(i=>'<button type="button" class="btn btn-small" data-idea="'+esc(i)+'">'+esc(i.length>60?i.slice(0,58)+'…':i)+'</button>').join('');
-  chips.querySelectorAll('[data-idea]').forEach(b=>{
-    b.addEventListener('click',()=>{
-      const ta=document.getElementById('idea-input');
-      if(ta)ta.value=b.dataset.idea;
-      updateButtons();
-    });
-  });
-}
-
-// ══════════════════════════════════════════════════════════════════
-// API KEY
-// ══════════════════════════════════════════════════════════════════
-function getApiKey(){try{return(localStorage.getItem(API_KEY_STORAGE)||'').trim()}catch(e){return''}}
-function saveApiKey(){
-  const input=document.getElementById('api-key-input');if(!input)return;
-  const key=input.value.trim();
-  if(!key){try{localStorage.removeItem(API_KEY_STORAGE)}catch(e){}updateApiPanel();showToast('Clé supprimée','warn');return}
-  if(!key.startsWith('sk-')){if(!confirm('La clé ne commence pas par "sk-". Sauvegarder quand même ?'))return}
-  try{
-    localStorage.setItem(API_KEY_STORAGE,key);
-    state.apiKey=key;
-    updateApiPanel();showToast('Clé enregistrée ✓','success');
-    debugLog('success','API','Clé : '+key.slice(0,8)+'…'+key.slice(-4));
-    input.blur();
-  }catch(e){showToast('Erreur sauvegarde','error')}
-}
-function updateApiPanel(){
-  const panel=document.getElementById('api-panel');
-  const input=document.getElementById('api-key-input');
-  const line=document.getElementById('api-status-line');
-  const text=document.getElementById('api-status-text');
-  const key=getApiKey();state.apiKey=key;
-  if(!panel||!input||!line||!text)return;
-  if(key){
-    panel.classList.add('ok');line.classList.add('ok');
-    text.textContent='Clé active · '+key.slice(0,8)+'…'+key.slice(-4);
-    input.value=key;input.placeholder='';
-  }else{
-    panel.classList.remove('ok');line.classList.remove('ok');
-    text.textContent='Aucune clé API enregistrée';
-    input.value='';input.placeholder='Collez votre clé API Agnes (sk-...)';
-  }
-  updateButtons();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// BOUTONS
-// ══════════════════════════════════════════════════════════════════
-function updateButtons(){
-  const genBtn=document.getElementById('generate-btn');
-  const stopBtn=document.getElementById('stop-btn');
-  const playBtn=document.getElementById('play-novel-btn');
-  const stopReadBtn=document.getElementById('stop-read-btn');
-  const hasKey=!!state.apiKey;
-  const drawer=state.activeGenre?state.drawers[state.activeGenre]:null;
-  const hasIdea=document.getElementById('idea-input')?document.getElementById('idea-input').value.trim().length>=10:false;
-  const hasChapters=drawer&&drawer.chapters&&drawer.chapters.some(c=>c.status==='done');
-  if(genBtn){
-    genBtn.disabled=!hasKey||!hasIdea||state.isRunning||!state.activeGenre;
-    if(state.isRunning)genBtn.innerHTML='✒️ Écriture en cours…';
-    else if(!state.activeGenre)genBtn.innerHTML='📚 Ouvrez un tiroir';
-    else if(!hasKey)genBtn.innerHTML='🔑 Ajoutez votre clé API';
-    else if(!hasIdea)genBtn.innerHTML='✎ Décrivez votre idée (10 caractères min)';
-    else genBtn.innerHTML='✒️ Écrire le roman';
-  }
-  if(stopBtn)stopBtn.classList.toggle('visible',state.isRunning);
-  if(playBtn)playBtn.disabled=!hasChapters||state.isRunning||state.isPlaying;
-  if(stopReadBtn)stopReadBtn.disabled=!state.isPlaying;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// API FETCH AVEC RETRY
-// ══════════════════════════════════════════════════════════════════
-async function apiFetch(url,options,label,maxAttempts){
-  options=options||{};label=label||'API';
-  maxAttempts=(typeof maxAttempts==='number'&&maxAttempts>0)?maxAttempts:6;
-  let lastErr=null;
-  for(let attempt=0;attempt<maxAttempts;attempt++){
-    if(state.stopRequested)throw new Error('Arrêt demandé');
-    const method=options.method||'GET';
-    let bodyPreview=null;
-    if(options.body){
-      try{
-        const p=JSON.parse(options.body);
-        const c=JSON.parse(JSON.stringify(p));
-        const redact=(o)=>{if(Array.isArray(o)){o.forEach(redact);return}if(o&&typeof o==='object'){for(const k in o){if(typeof o[k]==='string'&&o[k].length>140)o[k]=o[k].slice(0,100)+'…[len '+o[k].length+']';else if(typeof o[k]==='object')redact(o[k])}}};
-        redact(c);bodyPreview=c;
-      }catch(e){bodyPreview=String(options.body).slice(0,400)}
+    const raw=localStorage.getItem(API_KEY_STORAGE);
+    if(raw){
+      const arr=JSON.parse(raw);
+      if(Array.isArray(arr))state.apiKeys=arr;
     }
-    debugLog('api','REQ '+label,method+' '+url+' (essai '+(attempt+1)+'/'+maxAttempts+')',bodyPreview);
-    const headers=Object.assign({},options.headers||{},{'Authorization':'Bearer '+state.apiKey});
-    const finalOptions=Object.assign({},options,{headers});
+  }catch(e){}
+  if(!state.apiKeys.length)state.apiKeys=[];
+  state.apiKeys=state.apiKeys.map(k=>typeof k==='string'?{k:k,img:0,txt:0,cool:0,off:false}:k);
+}
+function saveKeys(){
+  try{localStorage.setItem(API_KEY_STORAGE,JSON.stringify(state.apiKeys))}catch(e){}
+}
+function liveKeys(){return state.apiKeys.filter(k=>!k.off)}
+function hasKey(){return liveKeys().length>0}
+
+async function slot(kind){
+  for(;;){
+    if(state.stopRequested)throw new Error('stop');
+    const live=liveKeys();
+    if(!live.length)throw new Error('Aucune clé API active');
+    const iv=60000/RPM[kind]*1.15, now=Date.now();
+    let best=null,bt=1e18;
+    for(const o of live){
+      const t=Math.max(o[kind]||0,o.cool||0,now);
+      if(t<bt){bt=t;best=o}
+    }
+    if(bt>now){await sleep(Math.min(bt-now,400));continue}
+    if(best.cool>Date.now())continue;
+    best[kind]=now+iv;
+    return best;
+  }
+}
+
+async function call(kind,url,body,tries){
+  let err;
+  for(let a=0;a<tries;a++){
+    if(state.stopRequested)throw new Error('stop');
+    const o=await slot(kind);
     try{
-      const t0=Date.now();
-      const res=await fetch(url,finalOptions);
-      const dt=Date.now()-t0;
-      let retryAfter=0;try{retryAfter=parseInt(res.headers.get('Retry-After')||'0',10)||0}catch(e){}
-      let errorText='';
-      if(!res.ok){try{errorText=(await res.clone().text()).slice(0,1200)}catch(e){}}
-      debugLog('response','RÉP '+label,'HTTP '+res.status+' en '+dt+'ms',errorText||undefined);
-      if(res.ok)return res;
-      if([400,401,403,404].includes(res.status)){
-        const err=new Error('HTTP '+res.status+' — '+errorText.slice(0,400));
-        err.status=res.status;err.body=errorText;throw err;
+      const r=await fetch(url,{
+        method:'POST',
+        headers:{'Content-Type':'application/json',Authorization:'Bearer '+o.k},
+        body:JSON.stringify(body)
+      });
+      if(r.ok){o.off=o.off;return r}
+      const t=(await r.text()).slice(0,200);
+      log('er',kind+' HTTP '+r.status+' '+t.slice(0,80));
+      if(r.status===429){
+        o.cool=Date.now()+(parseInt(r.headers.get('Retry-After'))||25)*1000;
+        err=new Error('429');
+        continue;
       }
-      if(res.status===429){
-        const wait=retryAfter>0?retryAfter:Math.min(120,20+attempt*15);
-        debugLog('warn','RATELIMIT','429 — attente '+wait+'s');
-        setStatus('Limite API — nouvelle tentative dans '+wait+'s');
-        await sleep(wait*1000);continue;
+      if([401,402,403].includes(r.status)){
+        o.off=true;
+        log('wr','clé …'+o.k.slice(-4)+' désactivée');
+        err=new Error('HTTP '+r.status);
+        continue;
       }
-      if([500,502,503,504,520,522,524].includes(res.status)){
-        const wait=Math.min(60,8+attempt*6);
-        debugLog('warn','SERVICE','HTTP '+res.status+' — attente '+wait+'s');
-        setStatus('Service occupé — reprise dans '+wait+'s');
-        await sleep(wait*1000);continue;
+      if(r.status>=500||r.status===408){
+        err=new Error('HTTP '+r.status);
+        await sleep(2000*(a+1));
+        continue;
       }
-      const wait=Math.min(60,6+attempt*5);
-      debugLog('warn','HTTP','HTTP '+res.status+' — retry dans '+wait+'s');
-      await sleep(wait*1000);
+      throw Object.assign(new Error('HTTP '+r.status+' '+t),{fatal:true});
     }catch(e){
-      if(e.message==='Arrêt demandé')throw e;
-      if(e.status&&[400,401,403,404].includes(e.status))throw e;
-      lastErr=e;
-      const wait=Math.min(45,4+attempt*4);
-      debugLog('warn','NETWORK',e.message+' — retry dans '+wait+'s');
-      setStatus('Connexion instable — reprise dans '+wait+'s');
-      await sleep(wait*1000);
+      if(e.fatal||e.message==='stop')throw e;
+      err=e;
+      await sleep(1500*(a+1));
     }
   }
-  throw lastErr||new Error('Tentatives épuisées pour '+label);
+  throw err||new Error('échec');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// JSON REPAIR (stratégies héritées)
-// ══════════════════════════════════════════════════════════════════
-function balanceJson(text){
-  let ob=0,ok=0,inString=false,escape=false;
-  for(let i=0;i<text.length;i++){
-    const ch=text[i];
-    if(escape){escape=false;continue}
-    if(ch==='\\'){escape=true;continue}
-    if(ch==='"'){inString=!inString;continue}
-    if(inString)continue;
-    if(ch==='{')ob++;else if(ch==='}')ob--;
-    else if(ch==='[')ok++;else if(ch===']')ok--;
-  }
-  let r=text;if(inString)r+='"';
-  while(ok>0){r+=']';ok--}while(ob>0){r+='}';ob--}
-  return r;
-}
-function fixUnquotedKeys(text){
-  let out='';let i=0;const n=text.length;let inString=false;let escape=false;const stack=[];let lastStructural='{';
-  while(i<n){
-    const ch=text[i];
-    if(escape){out+=ch;escape=false;i++;continue}
-    if(ch==='\\'){out+=ch;escape=true;i++;continue}
-    if(inString){out+=ch;if(ch==='"')inString=false;i++;continue}
-    if(ch==='"'){inString=true;out+=ch;i++;continue}
-    if(ch==='{'){stack.push('{');lastStructural='{';out+=ch;i++;continue}
-    if(ch==='['){stack.push('[');lastStructural='[';out+=ch;i++;continue}
-    if(ch==='}'){if(stack.length)stack.pop();lastStructural='}';out+=ch;i++;continue}
-    if(ch===']'){if(stack.length)stack.pop();lastStructural=']';out+=ch;i++;continue}
-    if(ch===','){lastStructural=',';out+=ch;i++;continue}
-    if(ch===':'){lastStructural=':';out+=ch;i++;continue}
-    if(/\s/.test(ch)){out+=ch;i++;continue}
-    const top=stack[stack.length-1];
-    if((lastStructural==='{'||lastStructural===',')&&top==='{'&&/[A-Za-z_$]/.test(ch)){
-      let j=i;while(j<n&&/[A-Za-z0-9_$]/.test(text[j]))j++;
-      let k=j;while(k<n&&/\s/.test(text[k]))k++;
-      if(text[k]===':'){out+='"'+text.slice(i,j)+'"';i=j;continue}
-    }
-    out+=ch;i++;
-  }
-  return out;
-}
-function fixMissingCommas(text){
-  let out='';let i=0;const n=text.length;let inString=false;let escape=false;let justClosedValue=false;
-  while(i<n){
-    const ch=text[i];
-    if(escape){out+=ch;escape=false;i++;continue}
-    if(ch==='\\'){out+=ch;escape=true;i++;continue}
-    if(inString){
-      out+=ch;
-      if(ch==='"'){inString=false;let j=i+1;while(j<n&&/\s/.test(text[j]))j++;justClosedValue=(text[j]!==':');}
-      i++;continue;
-    }
-    if(/\s/.test(ch)){out+=ch;i++;continue}
-    if(justClosedValue&&ch!==','&&ch!=='}'&&ch!==']'&&ch!==':'){out+=',';justClosedValue=false}
-    if(ch==='"'){inString=true;justClosedValue=false;out+=ch;i++;continue}
-    if(ch==='{'||ch==='['){justClosedValue=false;out+=ch;i++;continue}
-    if(ch==='}'||ch===']'){justClosedValue=true;out+=ch;i++;continue}
-    if(ch===','){justClosedValue=false;out+=ch;i++;continue}
-    if(ch===':'){justClosedValue=false;out+=ch;i++;continue}
-    justClosedValue=false;out+=ch;i++;
-  }
-  return out;
-}
-function repairJson(text){
-  if(!text)return null;
-  let c=String(text).trim();
-  const fm=c.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if(fm)c=fm[1].trim();
-  const fb=c.indexOf('{');if(fb<0)return null;
-  c=c.slice(fb);
-  const lb=c.lastIndexOf('}');if(lb>0)c=c.slice(0,lb+1);
-  let out='';let inString=false;let strDelim='"';let escape=false;
+/* ═════════════════════════════════════════════════════════════════════
+   JSON PARSER ROBUSTE
+   ═════════════════════════════════════════════════════════════════════ */
+function J(t){
+  if(!t)return null;
+  let c=String(t).replace(/```json|```/g,'');
+  const a=c.indexOf('{'),b=c.lastIndexOf('}');
+  if(a<0||b<0)return null;
+  c=c.slice(a,b+1);
+  try{return JSON.parse(c)}catch(e){}
+  // Fix quotes + newlines
+  let o='',s=false,x=false;
   for(let i=0;i<c.length;i++){
     const ch=c[i];
-    if(escape){if('"\\/bfnrtu'.includes(ch))out+='\\'+ch;else out+=ch;escape=false;continue}
-    if(ch==='\\'){escape=true;continue}
-    if(ch==='"'||ch==="'"){
-      if(!inString){inString=true;strDelim=ch;out+='"';continue}
-      if(ch===strDelim){inString=false;out+='"';continue}
-      if(ch==='"'){out+='\\"';continue}
-      out+="'";continue;
-    }
-    if(inString){
-      if(ch==='\n'){out+='\\n';continue}
-      if(ch==='\r'){out+='\\r';continue}
-      if(ch==='\t'){out+='\\t';continue}
-      const code=ch.charCodeAt(0);if(code<32){out+='\\u'+code.toString(16).padStart(4,'0');continue}
-    }
-    out+=ch;
+    if(x){o+=ch;x=false;continue}
+    if(ch==='\\'){o+=ch;x=true;continue}
+    if(ch==='"'){s=!s;o+=ch;continue}
+    if(s&&ch==='\n'){o+='\\n';continue}
+    if(s&&ch==='\r'){continue}
+    if(s&&ch.charCodeAt(0)<32){o+=' ';continue}
+    o+=ch;
   }
-  if(escape)out+='\\';if(inString)out+='"';
-  try{out=fixUnquotedKeys(out)}catch(e){}
-  try{out=fixMissingCommas(out)}catch(e){}
-  out=out.replace(/,\s*([}\]])/g,'$1');
-  return out;
-}
-function extractJson(text){
-  if(!text)return null;
-  const repaired=repairJson(text);
-  if(!repaired){debugLog('error','PARSE','Aucun { trouvé');return null}
-  try{return JSON.parse(repaired)}
-  catch(e1){
-    debugLog('warn','PARSE','Stratégie 1 échouée : '+e1.message);
-    try{return JSON.parse(balanceJson(repaired))}
-    catch(e2){debugLog('error','PARSE','Stratégie 2 échouée : '+e2.message);return null}
-  }
+  try{return JSON.parse(o.replace(/,\s*([}\]])/g,'$1'))}catch(e){return null}
 }
 
-// ══════════════════════════════════════════════════════════════════
-// APPELS API
-// ══════════════════════════════════════════════════════════════════
-async function callChatCompletion(systemPrompt,userPrompt,label,maxTokens,temperature){
-  const sysMsg=sanitizeForApi(systemPrompt)||'Tu es un assistant utile.';
-  const usrMsg=sanitizeForApi(userPrompt);
-  if(!usrMsg)throw new Error('callChatCompletion : userPrompt vide');
-  const body={
-    model:MODEL_TEXT,
-    messages:[{role:'system',content:sysMsg},{role:'user',content:usrMsg}],
-    temperature:typeof temperature==='number'?temperature:TEXT_TEMPERATURE,
-    max_tokens:maxTokens||8000,
-    reasoning_effort:'none',
-    chat_template_kwargs:{enable_thinking:false}
-  };
-  const res=await apiFetch(API_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},label,4);
-  const data=await res.json();
-  const choice=data.choices&&data.choices[0];
-  const msg=choice&&choice.message;
-  let content=msg&&msg.content;
-  if(!content&&msg&&msg.reasoning_content){debugLog('warn',label,'content vide → fallback reasoning_content');content=msg.reasoning_content}
-  debugLog('response',label,'finish_reason='+(choice&&choice.finish_reason)+' · len='+((content&&content.length)||0));
-  return content;
+/* ═════════════════════════════════════════════════════════════════════
+   IA — TEXTE
+   ═════════════════════════════════════════════════════════════════════ */
+async function chat(sys,user,max,temp){
+  for(let i=0;i<TXT.length;i++){
+    try{
+      const r=await call('txt',API+'/chat/completions',{
+        model:TXT[i],
+        messages:[{role:'system',content:san(sys)},{role:'user',content:san(user)}],
+        temperature:temp||0.8,
+        max_tokens:max||6000,
+        chat_template_kwargs:{enable_thinking:false}
+      },3);
+      const d=await r.json();
+      const t=d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content;
+      if(t)return t;
+    }catch(e){
+      if(e.message==='stop'||e.fatal)throw e;
+      log('wr','texte '+TXT[i]+' : '+e.message);
+    }
+  }
+  throw new Error('IA texte indisponible');
+}
+async function llmJSON(sys,user,max,temp){
+  for(let a=0;a<2;a++){
+    const j=J(await chat(sys+' Réponds UNIQUEMENT par un objet JSON valide, sans texte autour.',user,max,temp));
+    if(j)return j;
+  }
+  throw new Error('Réponse IA illisible');
 }
 
-async function generateImage(prompt,referenceImageUrl){
+/* ═════════════════════════════════════════════════════════════════════
+   IMAGES — DATA URI NON-BLOQUANT
+   ═════════════════════════════════════════════════════════════════════ */
+function toData(u){
+  return new Promise(resolve=>{
+    if(!u)return resolve(null);
+    if(u.indexOf('data:')===0)return resolve(u);
+    fetch(u).then(r=>r.blob()).then(b=>{
+      const o=URL.createObjectURL(b),im=new Image();
+      im.onload=()=>{
+        try{
+          const s=Math.min(1,1024/Math.max(im.width,im.height));
+          const c=document.createElement('canvas');
+          c.width=Math.round(im.width*s);
+          c.height=Math.round(im.height*s);
+          c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+          URL.revokeObjectURL(o);
+          resolve(c.toDataURL('image/jpeg',0.86));
+        }catch(e){URL.revokeObjectURL(o);resolve(null)}
+      };
+      im.onerror=()=>{URL.revokeObjectURL(o);resolve(null)};
+      im.src=o;
+    }).catch(()=>resolve(null));
+  });
+}
+
+function mkImg(prompt,refUris,ratio){
   const body={
-    model:MODEL_IMAGE,
-    prompt:sanitizeForApi(prompt),
+    model:IMG,
+    prompt:san(prompt),
     n:1,
     size:'1K',
-    ratio:'9:16'
+    ratio:ratio||'3:4',
+    extra_body:{response_format:'url'}
   };
-  if(referenceImageUrl){
-    body.extra_body={image:[referenceImageUrl],response_format:'url'};
-  } else {
-    body.extra_body={response_format:'url'};
-  }
-  const res=await apiFetch(API_BASE+'/images/generations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)},'Image',4);
-  const data=await res.json();
-  const item=data.data&&data.data[0];
-  if(!item)throw new Error('Pas d\'image');
-  if(item.url)return item.url;
-  if(item.b64_json)return 'data:image/png;base64,'+item.b64_json;
-  throw new Error('Format inconnu');
+  if(refUris&&refUris.length)body.extra_body.image=refUris.filter(Boolean).slice(0,4);
+  return call('img',API+'/images/generations',body,3).then(r=>r.json()).then(d=>{
+    const it=d.data&&d.data[0];
+    const u=it&&(it.url||(it.b64_json&&'data:image/png;base64,'+it.b64_json));
+    if(!u)throw new Error('pas d\'image reçue');
+    const img={u:u,d:u.indexOf('data:')===0?u:null};
+    if(!img.d){
+      img._conv=toData(u).then(dd=>{img.d=dd||u;return img.d}).catch(()=>{img.d=img.u;return img.d});
+    }
+    return img;
+  });
+}
+function ensureRef(img){
+  if(!img)return Promise.resolve(null);
+  if(img.d)return Promise.resolve(img.d);
+  if(img._conv)return img._conv;
+  img._conv=toData(img.u).then(dd=>{img.d=dd||img.u;return img.d}).catch(()=>{img.d=img.u;return img.d});
+  return img._conv;
+}
+function readFile(f,maxSide){
+  return new Promise(res=>{
+    const fr=new FileReader();
+    fr.onload=()=>{
+      const im=new Image();
+      im.onload=()=>{
+        const s=Math.min(1,maxSide/Math.max(im.width,im.height));
+        const c=document.createElement('canvas');
+        c.width=Math.round(im.width*s);
+        c.height=Math.round(im.height*s);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        const d=c.toDataURL('image/jpeg',0.88);
+        res({u:d,d:d});
+      };
+      im.onerror=()=>res(null);
+      im.src=fr.result;
+    };
+    fr.readAsDataURL(f);
+  });
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PROMPTS — ÉTAPE 1 : PLAN DU ROMAN
-// ══════════════════════════════════════════════════════════════════
-function buildNovelPlanPrompt(idea,genre){
+/* ═════════════════════════════════════════════════════════════════════
+   PROJET MODEL
+   ═════════════════════════════════════════════════════════════════════ */
+function newRoman(){
+  return {
+    id:uid()+uid(),
+    mode:'roman',
+    genreId:null,
+    title:'',logline:'',universe:'',idea:'',
+    protagonists:[],chapters:[],
+    created:Date.now(),updated:Date.now(),
+    step:1
+  };
+}
+function newBD(){
+  return {
+    id:uid()+uid(),
+    mode:'bd',
+    genreId:null,
+    title:'',logline:'',universe:'',idea:'',
+    protagonists:[],pages:[],
+    created:Date.now(),updated:Date.now(),
+    step:1
+  };
+}
+
+function getStorageKey(project){
+  return (project.mode==='bd'?BD_STORAGE:ROMAN_STORAGE)+project.genreId;
+}
+function saveProject(){
+  const p=state.activeProject;
+  if(!p||!p.genreId)return;
+  p.updated=Date.now();
+  try{
+    localStorage.setItem(getStorageKey(p),JSON.stringify(p));
+    log('in','sauvegardé ('+p.mode+' '+p.genreId+')');
+  }catch(e){log('er','sauvegarde : '+e.message)}
+}
+function loadProject(mode,genreId){
+  try{
+    const raw=localStorage.getItem((mode==='bd'?BD_STORAGE:ROMAN_STORAGE)+genreId);
+    if(!raw)return null;
+    const parsed=JSON.parse(raw);
+    return parsed;
+  }catch(e){return null}
+}
+function listProjects(){
+  const out=[];
+  const all=[['roman',GENRES_ROMAN,ROMAN_STORAGE],['bd',GENRES_BD,BD_STORAGE]];
+  all.forEach(([mode,genres,prefix])=>{
+    genres.forEach(g=>{
+      try{
+        const raw=localStorage.getItem(prefix+g.id);
+        if(raw){
+          const p=JSON.parse(raw);
+          out.push(p);
+        }
+      }catch(e){}
+    });
+  });
+  return out.sort((a,b)=>b.updated-a.updated);
+}
+function deleteProject(mode,genreId){
+  try{localStorage.removeItem((mode==='bd'?BD_STORAGE:ROMAN_STORAGE)+genreId)}catch(e){}
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   FIND / HELPERS
+   ═════════════════════════════════════════════════════════════════════ */
+function findProtagonist(id){
+  return state.activeProject.protagonists.find(p=>p.id===id);
+}
+function findChapter(id){
+  const key=state.activeProject.mode==='bd'?'pages':'chapters';
+  return state.activeProject[key].find(c=>c.id===id);
+}
+function findCase(caseId){
+  const chapters=state.activeProject.mode==='bd'?state.activeProject.pages:state.activeProject.chapters;
+  for(const ch of chapters){
+    const arr=state.activeProject.mode==='bd'?ch.cases:ch.illustrations;
+    const found=arr.find(c=>c.id===caseId);
+    if(found)return {case:found,chapter:ch};
+  }
+  return null;
+}
+function genreOf(project){
+  const list=project.mode==='bd'?GENRES_BD:GENRES_ROMAN;
+  return list.find(g=>g.id===project.genreId)||list[0];
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   PROMPTS — PLAN (Roman vs BD)
+   ═════════════════════════════════════════════════════════════════════ */
+function buildPlanPrompt(idea,genre,mode){
+  const isBD=mode==='bd';
   return [
-    'Tu es un romancier et directeur littéraire. Tu conçois la structure complète d\'un roman illustré.',
+    isBD
+      ? 'Tu es scénariste de bande dessinée et directeur artistique. Tu conçois la structure d\'une BD complète.'
+      : 'Tu es romancier et directeur littéraire. Tu conçois la structure d\'un roman illustré.',
     '',
-    'GENRE : '+genre.name+' ('+genre.style+')',
-    'PALETTE LITTÉRAIRE : '+genre.palette,
+    'GENRE : '+genre.name,
+    'STYLE VISUEL : '+genre.style,
+    'PALETTE : '+genre.palette,
     '',
-    'IDÉE DE L\'AUTEUR :',
+    isBD?'IDÉE DE LA BD :':'IDÉE DU ROMAN :',
     '"'+idea+'"',
     '',
-    'Tu dois produire la STRUCTURE complète du roman. Sois généreux et précis.',
+    'STRUCTURE :',
+    isBD
+      ? '- 3 PLANCHES (chapitres visuels). Chaque planche aura exactement 4 CASES.'
+      : '- 4 CHAPITRES. Chaque chapitre aura 200-250 mots + 3 ILLUSTRATIONS.',
+    '- 2 à 4 PROTAGONISTES principaux.',
     '',
-    'RÈGLES :',
-    '- Le roman comporte exactement 4 CHAPITRES (courts, 200-250 mots chacun).',
-    '- Chaque chapitre aura 3 ILLUSTRATIONS (plans visuels) — nous les génèrerons plus tard.',
-    '- Les protagonistes sont les PERSONNAGES PRINCIPAUX — 2 à 4 maximum.',
-    '- Chaque protagoniste a une APPARENCE PHYSIQUE TRÈS PRÉCISE et UNIQUE qui restera IDENTIQUE dans toutes les illustrations du roman. C\'est crucial pour la cohérence visuelle.',
+    '╔══════════════════════════════════════════════════════════════════╗',
+    '║ APPEARANCE STRUCTURÉE — CRITIQUE POUR LA COHÉRENCE                ║',
+    '╚══════════════════════════════════════════════════════════════════╝',
+    'Pour CHAQUE protagoniste, produis un objet "appearance" avec 7 champs SÉPARÉS :',
+    '  - face : forme du visage, pommettes, nez, bouche, menton (1 phrase précise)',
+    '  - hair : couleur PRÉCISE (avec code hex ou nom exact), longueur, coiffure, texture',
+    '  - eyes : couleur PRÉCISE, forme, expression habituelle',
+    '  - build : taille, corpulence, posture, âge apparent',
+    '  - outfit : vêtements signature avec COULEURS EXACTES et matières',
+    '  - accessories : lunettes, bijoux, armes, cicatrices, tatouages, détails distinctifs',
+    '  - signature_colors : tableau de 3 à 5 couleurs dominantes au format "#hex"',
+    '',
+    'Ces 7 champs seront COPIÉS dans CHAQUE prompt d\'illustration. Sois ultra-précis.',
     '',
     'RÈGLES JSON :',
     '- Toutes les chaînes sur UNE SEULE LIGNE.',
@@ -911,749 +590,872 @@ function buildNovelPlanPrompt(idea,genre){
     '',
     'FORMAT DE SORTIE (JSON strict) :',
     '{',
-    '  "title": "titre du roman",',
-    '  "logline": "résumé du roman en une phrase",',
-    '  "universe": "description du monde / du cadre en 2-3 phrases",',
+    '  "title": "'+(isBD?'titre de la BD':'titre du roman')+'",',
+    '  "logline": "résumé en une phrase",',
+    '  "universe": "description du monde en 2-3 phrases",',
     '  "protagonists": [',
     '    {',
-    '      "id": "identifiant_court_sans_espaces",',
+    '      "id": "identifiant_court",',
     '      "name": "Nom",',
-    '      "role": "protagoniste principal | ami | antagoniste | confident",',
-    '      "personality": "traits de personnalité en 1 phrase",',
-    '      "backstory": "passé du personnage en 1-2 phrases",',
-    '      "physical_description": "description physique TRÈS PRÉCISE (visage, cheveux, corpulence, vêtements signature, âge apparent, couleurs précises). Cette description servira à chaque illustration pour garder le personnage IDENTIQUE.",',
-    '      "reference_prompt": "prompt en anglais, 40-60 mots, pour générer un portrait de référence — buste, expression calme, fond neutre, éclairage doux, style cinématographique 35mm"',
+    '      "role": "protagoniste | ami | antagoniste | confident",',
+    '      "personality": "traits en 1 phrase",',
+    '      "appearance": {',
+    '        "face": "…","hair": "…","eyes": "…","build": "…",',
+    '        "outfit": "…","accessories": "…",',
+    '        "signature_colors": ["#hex1","#hex2","#hex3"]',
+    '      }',
     '    }',
     '  ],',
-    '  "chapters": [',
-    '    {',
-    '      "number": 1,',
-    '      "title": "titre du chapitre",',
-    '      "summary": "résumé du chapitre en 2-3 phrases",',
-    '      "key_emotional_beat": "l\'émotion dominante du chapitre en un mot"',
-    '    }',
-    '  ],',
-    '  "final_scene": "description de la scène finale du roman en 2 phrases"',
-    '}',
-    '',
-    'IMPORTANT : chaque description physique doit être assez précise pour qu\'une IA dessine TOUJOURS le même personnage. Inclus vêtements signature, couleurs précises, détails distinctifs (cicatrice, lunettes, tatouage, coiffure).'
+    isBD
+      ? '  "pages": [{ "number": 1, "title": "titre de la planche", "summary": "résumé en 2-3 phrases" }]'
+      : '  "chapters": [{ "number": 1, "title": "titre du chapitre", "summary": "résumé en 2-3 phrases", "key_emotional_beat": "émotion" }]',
+    '}'
   ].join('\n');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PROMPTS — ÉTAPE 2 : TEXTE DU CHAPITRE
-// ══════════════════════════════════════════════════════════════════
-function buildChapterTextPrompt(novelPlan,chapterOutline,chapterNumber,previousChapters,genre){
-  const protagsDesc=novelPlan.protagonists.map(p=>'- '+p.name+' ('+p.role+') : '+p.personality+'. '+p.physical_description).join('\n');
-  const prevSummary=(previousChapters||[]).map(c=>'Chapitre '+c.number+' — '+c.title+' : '+c.narrative.slice(0,180)+'…').join('\n\n');
+/* ═════════════════════════════════════════════════════════════════════
+   PROMPTS — CHARACTER SHEET (4 vues)
+   ═════════════════════════════════════════════════════════════════════ */
+function buildCharacterSheetPrompt(protag,genre,mode){
+  const isBD=mode==='bd';
+  const a=protag.appearance||{};
+  return [
+    isBD
+      ? 'CHARACTER REFERENCE SHEET — MANGA STYLE, MULTIPLE VIEWS on a single image.'
+      : 'CHARACTER REFERENCE SHEET — PHOTOGRAPHIC, MULTIPLE VIEWS on a single image.',
+    '',
+    'CHARACTER: '+protag.name+' ('+protag.role+').',
+    'FACE: '+(a.face||''),
+    'HAIR: '+(a.hair||''),
+    'EYES: '+(a.eyes||''),
+    'BUILD: '+(a.build||''),
+    'OUTFIT: '+(a.outfit||''),
+    'ACCESSORIES: '+(a.accessories||''),
+    'SIGNATURE COLORS: '+((a.signature_colors||[]).join(', ')),
+    '',
+    'LAYOUT — FOUR VIEWS IN A HORIZONTAL ROW, same character in each:',
+    '  1. FRONT view — facing camera directly, neutral expression',
+    '  2. THREE-QUARTER view — 45° angle, neutral expression',
+    '  3. PROFILE view — full side profile, neutral expression',
+    '  4. FULL BODY view — standing straight, arms relaxed at sides',
+    '',
+    'BACKGROUND: plain neutral light grey studio background, no other elements.',
+    'LIGHTING: even, soft, professional studio lighting, no dramatic shadows.',
+    'STYLE: '+genre.style,
+    isBD
+      ? 'Clean digital line art, cel shading, expressive manga/anime aesthetic, sharp ink outlines.'
+      : 'Shot on 35mm film, visible film grain, sharp focus, high detail.',
+    '',
+    'The SAME character must appear identically in all four views: same face, same hair, same outfit, same colors, same accessories.',
+    'No text, no watermark, no logo, no labels, no multiple characters.'
+  ].join('\n');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   PROMPTS — CHAPITRE ROMAN
+   ═════════════════════════════════════════════════════════════════════ */
+function buildRomanChapterPrompt(plan,outline,chapterNumber,previousChapters,genre){
+  const protagsDesc=plan.protagonists.map(p=>'- '+p.name+' ('+p.role+') : '+p.personality+'. '+(p.appearance?a.appearance:'').toString()).join('\n');
+  const prevSummary=(previousChapters||[]).map(c=>'Chapitre '+c.number+' — '+c.title+' : '+(c.narrative||'').slice(0,180)).join('\n\n');
   return [
     'Tu es romancier. Tu écris le CHAPITRE '+chapterNumber+' d\'un roman illustré en français.',
     '',
     'GENRE : '+genre.name+' ('+genre.style+')',
-    'TITRE DU ROMAN : '+novelPlan.title,
-    'UNIVERS : '+novelPlan.universe,
+    'TITRE DU ROMAN : '+plan.title,
+    'UNIVERS : '+plan.universe,
     '',
-    'PROTAGONISTES (tu dois les respecter à la lettre) :',
-    protagsDesc,
+    'PROTAGONISTES :',
+    plan.protagonists.map(p=>'- '+p.name+' ('+p.role+') : '+p.personality).join('\n'),
     '',
-    prevSummary?'CHAPITRES PRÉCÉDENTS (résumés) :\n'+prevSummary+'\n':'',
-    'CHAPITRE '+chapterNumber+' À ÉCRIRE :',
-    'Titre imposé : '+chapterOutline.title,
-    'Résumé imposé : '+chapterOutline.summary,
-    'Émotion dominante : '+chapterOutline.key_emotional_beat,
+    prevSummary?'CHAPITRES PRÉCÉDENTS :\n'+prevSummary+'\n':'',
+    'CHAPITRE À ÉCRIRE :',
+    'Titre : '+outline.title,
+    'Résumé : '+outline.summary,
+    'Émotion : '+outline.key_emotional_beat,
     '',
     'CONSIGNES :',
-    '- Écris 200 à 250 mots de récit narratif à la 3e personne.',
+    '- 200 à 250 mots de récit à la 3e personne.',
     '- Prose littéraire, sensorielle, avec un vrai rythme.',
-    '- Termine par une phrase qui donne envie de lire la suite.',
-    '- Ajoute 1 à 3 répliques de dialogue courtes (max 15 mots chacune) attribuées aux protagonistes.',
-    '- Ensuite tu concevras 3 PROMPTS D\'ILLUSTRATION (voir format ci-dessous).',
+    '- 1 à 3 répliques de dialogue courtes attribuées aux protagonistes.',
+    '- 3 PROMPTS D\'ILLUSTRATION en anglais (scènes clés du chapitre).',
     '',
-    'PROMPTS D\'ILLUSTRATION :',
-    '- 3 prompts en anglais, chacun décrivant une scène clé du chapitre.',
-    '- Chaque prompt doit décrire : le lieu, l\'éclairage, le cadrage (wide/medium/close-up), les protagonistes présents avec leurs traits physiques RAPPELÉS.',
-    '- Le style visuel doit être cinématographique, cohérent avec le genre.',
+    'RÈGLES JSON : chaînes sur une ligne, pas d\'apostrophes échappées, pas de virgule finale.',
     '',
-    'RÈGLES JSON :',
-    '- Toutes les chaînes sur UNE SEULE LIGNE.',
-    '- N\'échappe jamais les apostrophes françaises.',
-    '- Échappe uniquement les guillemets doubles internes en \\".',
-    '- Pas de virgule finale. Pas de markdown.',
-    '',
-    'FORMAT DE SORTIE (JSON strict) :',
+    'FORMAT :',
     '{',
-    '  "number": '+chapterNumber+',',
-    '  "title": "titre du chapitre",',
-    '  "narrative": "texte narratif de 200-250 mots sur UNE SEULE LIGNE",',
-    '  "dialogue": [',
-    '    { "speaker": "Nom du personnage", "line": "réplique courte en français" }',
-    '  ],',
+    '  "narrative": "texte de 200-250 mots",',
+    '  "dialogue": [{"speaker":"Nom","line":"réplique courte"}],',
     '  "illustrations": [',
+    '    {"prompt":"English prompt 50-80 words describing scene, characters and composition","characters_present":["id_protag"]}',
+    '  ]',
+    '}'
+  ].join('\n');
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   PROMPTS — PLANCHE BD
+   ═════════════════════════════════════════════════════════════════════ */
+function buildBDPagePrompt(plan,outline,pageNumber,previousPages,genre){
+  const prevSummary=(previousPages||[]).map(p=>'Planche '+p.number+' — '+p.title+' : '+(p.summary||'')).join('\n');
+  return [
+    'Tu es scénariste BD. Tu écris la PLANCHE '+pageNumber+' d\'une bande dessinée '+genre.name+' en français.',
+    '',
+    'GENRE BD : '+genre.name,
+    'STYLE VISUEL : '+genre.style,
+    'TITRE DE LA BD : '+plan.title,
+    'UNIVERS : '+plan.universe,
+    '',
+    'PROTAGONISTES :',
+    plan.protagonists.map(p=>'- '+p.name+' ('+p.role+') : '+p.personality).join('\n'),
+    '',
+    prevSummary?'PLANCHES PRÉCÉDENTES :\n'+prevSummary+'\n':'',
+    'PLANCHE À ÉCRIRE :',
+    'Titre : '+outline.title,
+    'Résumé : '+outline.summary,
+    '',
+    'CONSIGNES :',
+    '- Découpe cette planche en EXACTEMENT 4 CASES.',
+    '- Chaque case = un moment visuel clé avec cadrage précis.',
+    '- Chaque case peut contenir 0 à 2 bulles de dialogue.',
+    '- Les dialogues sont des phrases courtes, vivantes, adaptées à la BD.',
+    '',
+    'CADRAGES POSSIBLES : wide (plan large), medium (plan moyen), close-up (gros plan), dramatic (cadrage dynamique), over-the-shoulder (par-dessus l\'épaule).',
+    '',
+    'RÈGLES JSON : chaînes sur une ligne, pas d\'apostrophes échappées, pas de virgule finale.',
+    '',
+    'FORMAT :',
+    '{',
+    '  "cases": [',
     '    {',
-    '      "prompt": "prompt complet en anglais, 50-80 mots, incluant le rappel physique des personnages présents",',
-    '      "characters_present": ["id_du_protagoniste_1"]',
+    '      "index": 1,',
+    '      "framing": "wide|medium|close-up|dramatic|over-the-shoulder",',
+    '      "action": "English description of the visual action, 1-2 sentences",',
+    '      "characters_present": ["id_protag1","id_protag2"],',
+    '      "dialogue": [{"speaker":"Nom","line":"réplique courte en français"}],',
+    '      "prompt": "English prompt 50-80 words describing the case: scene, characters, composition, mood, dynamic framing"',
     '    }',
     '  ]',
-    '}',
-    '',
-    'EXACTEMENT 3 illustrations avec chacune au moins 1 personnage présent.'
+    '}'
   ].join('\n');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PIPELINE PRINCIPAL
-// ══════════════════════════════════════════════════════════════════
-async function startNovelGeneration(){
-  if(state.isRunning)return;
-  if(!state.apiKey){showToast('Ajoutez votre clé API','error');return}
-  if(!state.activeGenre){showToast('Ouvrez un tiroir','error');return}
-  const ideaInput=document.getElementById('idea-input');
-  const idea=ideaInput?ideaInput.value.trim():'';
-  if(idea.length<10){showToast('Décrivez votre idée (10 caractères min)','error');return}
+/* ═════════════════════════════════════════════════════════════════════
+   PROMPTS — ILLUSTRATION ROMAN (avec signature features + règle stricte)
+   ═════════════════════════════════════════════════════════════════════ */
+function buildIllustrationPrompt(illustration,chapter,plan,genre){
+  const presentIds=illustration.characters_present||[];
+  const presentChars=presentIds.map(id=>plan.protagonists.find(p=>p.id===id)).filter(Boolean);
 
-  state.isRunning=true;
-  state.stopRequested=false;
-  const genreId=state.activeGenre;
-  const genre=GENRES.find(g=>g.id===genreId);
-  const drawer=getOrCreateDrawer(genreId);
-  drawer.idea=idea;
-  drawer.chapters=[];
-  drawer.protagonists=[];
-  saveDrawer(genreId);
+  const sigBlocks=presentChars.map(p=>{
+    const a=p.appearance||{};
+    return [
+      '─── '+p.name.toUpperCase()+' — SIGNATURE FEATURES (MUST MATCH REFERENCE) ───',
+      '  Face: '+(a.face||''),
+      '  Hair: '+(a.hair||''),
+      '  Eyes: '+(a.eyes||''),
+      '  Build: '+(a.build||''),
+      '  Outfit: '+(a.outfit||''),
+      '  Accessories: '+(a.accessories||''),
+      '  Signature colors: '+((a.signature_colors||[]).join(', '))
+    ].join('\n');
+  }).join('\n\n');
 
-  updateButtons();
-  renderProtagonists();
-  renderChapters();
+  const refCount=presentChars.length;
+  const refRule=refCount>0
+    ? refCount+' character reference sheet(s) are attached. These are the AUTHORITATIVE appearance. The characters MUST look exactly like the references.'
+    : 'No character reference attached.';
 
-  const t0=Date.now();
-  debugLog('state','ROMAN','═══════════════════════════════');
-  debugLog('state','ROMAN','Démarrage — '+genre.name+' — « '+idea.slice(0,60)+'… »');
-
-  try{
-    // ═══ ÉTAPE 1 : PLAN DU ROMAN ═══
-    setStatus('Étape 1/3 — Conception du roman…');
-    debugLog('ai','PLAN','Conception de la structure…');
-    const planPrompt=buildNovelPlanPrompt(idea,genre);
-    const planRaw=await callChatCompletion(
-      'Tu es romancier. Tu réponds UNIQUEMENT en JSON valide strict. Chaque chaîne sur une seule ligne. Jamais d\'apostrophes échappées. Pas de markdown. Pas de commentaire.',
-      planPrompt,'Plan du roman',4000
-    );
-    if(!planRaw)throw new Error('Pas de contenu plan');
-    const plan=extractJson(planRaw);
-    if(!plan||!plan.protagonists||!Array.isArray(plan.protagonists)||!plan.chapters||!Array.isArray(plan.chapters)){
-      debugLog('error','PLAN','Structure invalide',planRaw.slice(0,1500));
-      throw new Error('Plan du roman invalide');
-    }
-    // Normalise
-    plan.title=plan.title||'Sans titre';
-    plan.logline=plan.logline||'';
-    plan.universe=plan.universe||'';
-    plan.protagonists=plan.protagonists.slice(0,4);
-    plan.chapters=plan.chapters.slice(0,4);
-    drawer.title=plan.title;
-    drawer.logline=plan.logline;
-    drawer.universe=plan.universe;
-    saveDrawer(genreId);
-    debugLog('success','PLAN','Roman : « '+plan.title+' » · '+plan.protagonists.length+' protag. · '+plan.chapters.length+' chapitres');
-
-    // Initialise protagonistes et chapitres dans le tiroir
-    drawer.protagonists=plan.protagonists.map(p=>({
-      id:p.id||('p'+Math.random().toString(36).slice(2,7)),
-      name:p.name||'?',
-      role:p.role||'protagoniste',
-      personality:p.personality||'',
-      backstory:p.backstory||'',
-      physical_description:p.physical_description||'',
-      reference_prompt:p.reference_prompt||'',
-      referenceImage:null,
-      imageStatus:'pending'
-    }));
-    drawer.chapters=plan.chapters.map(c=>({
-      number:c.number||1,
-      title:c.title||'Chapitre',
-      summary:c.summary||'',
-      key_emotional_beat:c.key_emotional_beat||'',
-      narrative:'',
-      dialogue:[],
-      illustrations:[],
-      status:'pending'
-    }));
-    saveDrawer(genreId);
-    renderProtagonists();
-    document.getElementById('section-protagonists').classList.remove('hidden');
-    document.getElementById('section-protagonists').classList.add('open');
-    document.getElementById('protag-badge').textContent=drawer.protagonists.length;
-    await sleep(500);
-    if(state.stopRequested)throw new Error('Arrêt demandé');
-
-    // ═══ ÉTAPE 2 : IMAGES DE RÉFÉRENCE DES PROTAGONISTES ═══
-    setStatus('Étape 2/3 — Portraits des protagonistes…');
-    debugLog('state','PROTAG','Génération de '+drawer.protagonists.length+' portraits de référence…');
-    for(let i=0;i<drawer.protagonists.length;i++){
-      if(state.stopRequested)break;
-      const p=drawer.protagonists[i];
-      p.imageStatus='generating';
-      renderProtagonists();
-      try{
-        const refPrompt=buildProtagonistReferencePrompt(p,genre);
-        const url=await generateImage(refPrompt,null);
-        p.referenceImage=url;
-        p.imageStatus='done';
-        debugLog('success','PROTAG','Portrait '+(i+1)+' : '+p.name);
-      }catch(e){
-        p.imageStatus='error';
-        p.referenceError=e.message;
-        debugLog('error','PROTAG','Échec '+p.name+' : '+e.message);
-      }
-      renderProtagonists();
-      saveDrawer(genreId);
-      // Pause entre portraits
-      if(i<drawer.protagonists.length-1){
-        for(let r=3;r>0;r--){
-          if(state.stopRequested)break;
-          setStatus('Portrait suivant dans '+r+'s…');
-          await sleep(1000);
-        }
-      }
-    }
-    debugLog('success','PROTAG','Portraits terminés');
-    if(state.stopRequested)throw new Error('Arrêt demandé');
-
-    // ═══ ÉTAPE 3 : CHAPITRES (TEXTE + ILLUSTRATIONS) ═══
-    setStatus('Étape 3/3 — Écriture des chapitres…');
-    document.getElementById('section-chapters').classList.remove('hidden');
-    document.getElementById('section-chapters').classList.add('open');
-    document.getElementById('chapters-badge').textContent=drawer.chapters.length;
-
-    for(let ci=0;ci<drawer.chapters.length;ci++){
-      if(state.stopRequested)break;
-      const chapterOutline=plan.chapters[ci];
-      const chapter=drawer.chapters[ci];
-      chapter.status='writing';
-      renderChapters();
-
-      debugLog('state','CHAPITRE',(ci+1)+'/'+drawer.chapters.length+' — Écriture…');
-      try{
-        const chapPrompt=buildChapterTextPrompt(plan,chapterOutline,ci+1,drawer.chapters.slice(0,ci),genre);
-        const chapRaw=await callChatCompletion(
-          'Tu es romancier. Tu réponds UNIQUEMENT en JSON valide strict. Chaque chaîne sur une seule ligne. Jamais d\'apostrophes échappées. Pas de markdown.',
-          chapPrompt,'Chapitre '+(ci+1),3500
-        );
-        const chapData=extractJson(chapRaw);
-        if(!chapData||!chapData.narrative){
-          debugLog('error','CHAPITRE','Chapitre '+(ci+1)+' : JSON invalide',chapRaw?chapRaw.slice(0,1200):'');
-          chapter.status='error';
-          chapter.error='JSON invalide';
-          renderChapters();
-          saveDrawer(genreId);
-          continue;
-        }
-        chapter.narrative=chapData.narrative;
-        chapter.dialogue=Array.isArray(chapData.dialogue)?chapData.dialogue:[];
-        chapter.illustrations=(chapData.illustrations||[]).slice(0,ILLUS_PER_CHAPTER).map((ill,ii)=>({
-          index:ii,
-          prompt:ill.prompt||'',
-          characters_present:Array.isArray(ill.characters_present)?ill.characters_present:[],
-          image:null,
-          status:'pending'
-        }));
-        chapter.status='illustrating';
-        renderChapters();
-        saveDrawer(genreId);
-        debugLog('success','CHAPITRE','Chapitre '+(ci+1)+' : texte prêt ('+chapter.narrative.length+' chars) · '+chapter.illustrations.length+' illustrations à venir');
-
-        // Génère les illustrations du chapitre
-        for(let ii=0;ii<chapter.illustrations.length;ii++){
-          if(state.stopRequested)break;
-          const ill=chapter.illustrations[ii];
-          ill.status='loading';
-          renderChapters();
-          try{
-            const fullPrompt=buildIllustrationPrompt(ill,plan,chapter,genre,ii+1);
-            // Cherche l'image de référence du premier protagoniste présent
-            const mainCharId=(ill.characters_present&&ill.characters_present[0])||null;
-            const mainChar=mainCharId?drawer.protagonists.find(p=>p.id===mainCharId):null;
-            const refImage=mainChar&&mainChar.referenceImage?mainChar.referenceImage:null;
-            const url=await generateImage(fullPrompt,refImage);
-            ill.image=url;
-            ill.status='done';
-            debugLog('success','ILLUS','Chap. '+(ci+1)+' / ill. '+(ii+1)+' ✓');
-          }catch(e){
-            ill.status='error';
-            ill.error=e.message;
-            debugLog('error','ILLUS','Chap. '+(ci+1)+' / ill. '+(ii+1)+' : '+e.message);
-          }
-          renderChapters();
-          saveDrawer(genreId);
-          // Throttle
-          if(ii<chapter.illustrations.length-1){
-            for(let r=3;r>0;r--){
-              if(state.stopRequested)break;
-              setStatus('Chap. '+(ci+1)+' — illustration suivante dans '+r+'s…');
-              await sleep(1000);
-            }
-          }
-        }
-        chapter.status='done';
-        renderChapters();
-        saveDrawer(genreId);
-        debugLog('success','CHAPITRE','Chapitre '+(ci+1)+' terminé');
-      }catch(e){
-        if(e.message==='Arrêt demandé')break;
-        chapter.status='error';
-        chapter.error=e.message;
-        renderChapters();
-        saveDrawer(genreId);
-        debugLog('error','CHAPITRE','Chapitre '+(ci+1)+' : '+e.message);
-      }
-    }
-
-    // Fin
-    const t1=Date.now();
-    const total=((t1-t0)/1000).toFixed(1);
-    setStatus('✦ Roman terminé en '+total+'s ✦');
-    debugLog('state','ROMAN','Terminé en '+total+'s');
-    document.getElementById('section-player').classList.remove('hidden');
-    await sleep(3000);
-    setStatus(null);
-    showToast('Roman prêt','success');
-  }catch(e){
-    if(e.message==='Arrêt demandé'){
-      debugLog('warn','ROMAN','Arrêt demandé');
-      setStatus('Arrêté.');
-      await sleep(1200);
-      setStatus(null);
-    }else{
-      debugLog('error','ROMAN',e.message);
-      setStatus('Erreur : '+e.message.slice(0,80));
-      showToast('Erreur : '+e.message.slice(0,60),'error',4500);
-      await sleep(2400);
-      setStatus(null);
-    }
-  }
-
-  state.isRunning=false;
-  state.stopRequested=false;
-  updateButtons();
-  renderDrawersGrid();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// BUILDERS DE PROMPTS D'IMAGES
-// ══════════════════════════════════════════════════════════════════
-function buildProtagonistReferencePrompt(p,genre){
-  const base=(p.reference_prompt||'').trim();
-  const physical=(p.physical_description||'').trim();
   return [
-    base||('Cinematic character portrait bust, calm neutral expression, soft studio lighting, plain neutral background, shot on 35mm film'),
+    'ILLUSTRATION FOR CHAPTER '+chapter.number+' OF THE NOVEL «'+plan.title+'».',
     '',
-    'CHARACTER: '+p.name+' ('+p.role+'). '+physical,
+    'SCENE: '+illustration.prompt,
+    '',
+    sigBlocks,
+    '',
+    '╔══════════════════════════════════════════════════════════════╗',
+    '║ ABSOLUTE FIDELITY RULE — DO NOT MODIFY THE CHARACTERS        ║',
+    '╚══════════════════════════════════════════════════════════════╝',
+    refRule,
+    '► DO NOT change hair color, hair length, hairstyle, eye color, face shape, skin tone, build, outfit, colors, or accessories.',
+    '► DO NOT invent new clothing, new haircuts, new facial features or new colors.',
+    '► DO NOT beautify, stylize, age, or rejuvenate the characters.',
     '',
     'STYLE: '+genre.style,
-    'PALETTE: '+genre.palette,
-    'Shot on 35mm film, visible film grain, cinematic photography, shallow depth of field, professional color grading.',
-    'Portrait 9:16, bust framing, eyes looking at camera, neutral background.',
-    'No text, no watermark, no logo, no multiple characters.'
-  ].join('\n');
-}
-
-function buildIllustrationPrompt(ill,plan,chapter,genre,index){
-  const protags=plan.protagonists||[];
-  const present=ill.characters_present||[];
-  const charBlock=present.map(id=>{
-    const p=protags.find(x=>x.id===id);
-    if(!p)return '';
-    return 'CHARACTER PRESENT — '+p.name+' ('+p.role+'): '+p.physical_description;
-  }).filter(Boolean).join('\n');
-  return [
-    'ILLUSTRATION '+(index)+' FOR CHAPTER '+chapter.number+' OF THE NOVEL «'+plan.title+'».',
-    '',
-    'SCENE DESCRIPTION: '+ill.prompt,
-    '',
-    charBlock,
-    '',
-    'CONSISTENCY RULE: The characters described above MUST look exactly like in the reference image — same face, same hair, same outfit, same colors. The reference image is provided. Follow it strictly.',
-    '',
-    'STYLE: '+genre.style,
-    'PALETTE: '+genre.palette,
-    'Shot on 35mm film, visible film grain, cinematic photography, painterly depth, professional color grading.',
+    'PALETTE (ambiance générale): '+genre.palette,
+    'Shot on 35mm film, visible film grain, painterly depth, professional color grading.',
     'Vertical portrait 9:16 composition, cinematic framing.',
     'No text, no watermark, no logo, no borders, no panel separators.'
   ].filter(Boolean).join('\n');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// RENDU PROTAGONISTES
-// ══════════════════════════════════════════════════════════════════
-function renderProtagonists(){
-  const grid=document.getElementById('protagonists-grid');
-  if(!grid)return;
-  if(!state.activeGenre){grid.innerHTML='';return}
-  const drawer=state.drawers[state.activeGenre];
-  if(!drawer||!drawer.protagonists||drawer.protagonists.length===0){grid.innerHTML='';return}
-  grid.innerHTML=drawer.protagonists.map(p=>{
-    let cls='protagonist-card';
-    if(p.imageStatus==='generating')cls+=' generating';
-    else if(p.imageStatus==='done')cls+=' locked';
-    else if(p.imageStatus==='error')cls+=' error';
-    let imgBlock='';
-    if(p.imageStatus==='done'&&p.referenceImage){
-      imgBlock='<img src="'+p.referenceImage+'" alt="'+esc(p.name)+'"><span class="pc-badge">✓ Référence</span>';
-    } else if(p.imageStatus==='generating'){
-      imgBlock='<div class="pc-placeholder"><div class="spin-dot" style="width:24px;height:24px;border:2px solid rgba(212,169,74,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite"></div><span>Génération du portrait…</span></div>';
-    } else if(p.imageStatus==='error'){
-      imgBlock='<div class="pc-placeholder" style="color:var(--err)">✕ '+esc((p.referenceError||'Erreur').slice(0,60))+'</div>';
-    } else {
-      imgBlock='<div class="pc-placeholder">En attente…</div>';
-    }
-    return '<div class="'+cls+'">'+
-      '<div class="pc-image">'+imgBlock+'</div>'+
-      '<div class="pc-info">'+
-        '<div class="pc-name">'+esc(p.name)+'</div>'+
-        '<div class="pc-role">'+esc(p.role)+'</div>'+
-        '<div class="pc-desc">'+esc(p.physical_description||'')+'</div>'+
-      '</div>'+
-    '</div>';
-  }).join('');
+/* ═════════════════════════════════════════════════════════════════════
+   PROMPTS — CASE BD (avec signature features + règle stricte)
+   ═════════════════════════════════════════════════════════════════════ */
+function buildBDPanelPrompt(caseItem,page,plan,genre){
+  const presentIds=caseItem.characters_present||[];
+  const presentChars=presentIds.map(id=>plan.protagonists.find(p=>p.id===id)).filter(Boolean);
+
+  const sigBlocks=presentChars.map(p=>{
+    const a=p.appearance||{};
+    return [
+      '─── '+p.name.toUpperCase()+' — SIGNATURE FEATURES (MUST MATCH REFERENCE) ───',
+      '  Face: '+(a.face||''),
+      '  Hair: '+(a.hair||''),
+      '  Eyes: '+(a.eyes||''),
+      '  Build: '+(a.build||''),
+      '  Outfit: '+(a.outfit||''),
+      '  Accessories: '+(a.accessories||''),
+      '  Signature colors: '+((a.signature_colors||[]).join(', '))
+    ].join('\n');
+  }).join('\n\n');
+
+  const refCount=presentChars.length;
+  const refRule=refCount>0
+    ? refCount+' character reference sheet(s) are attached. These are AUTHORITATIVE. The characters MUST look exactly like the references.'
+    : 'No character reference attached.';
+
+  const framingMap={
+    'wide':'wide establishing shot, full environment visible',
+    'medium':'medium shot, character from waist up',
+    'close-up':'close-up, character face dominant',
+    'dramatic':'dramatic dynamic angle, tilted composition',
+    'over-the-shoulder':'over-the-shoulder shot'
+  };
+
+  return [
+    'BD PANEL — PAGE '+page.number+' — CASE '+caseItem.index,
+    'Comic / manga panel illustration, style '+genre.name+'.',
+    '',
+    'FRAMING: '+(framingMap[caseItem.framing]||'medium shot'),
+    'SCENE: '+caseItem.action,
+    '',
+    sigBlocks,
+    '',
+    '╔══════════════════════════════════════════════════════════════╗',
+    '║ ABSOLUTE FIDELITY RULE — DO NOT MODIFY THE CHARACTERS        ║',
+    '╚══════════════════════════════════════════════════════════════╝',
+    refRule,
+    '► DO NOT change hair color, hair length, eye color, face shape, outfit or accessories.',
+    '► DO NOT invent new clothing or new facial features.',
+    '► DO NOT mix up characters between themselves.',
+    '',
+    'STYLE: '+genre.style,
+    'PALETTE: '+genre.palette,
+    'Single panel composition, no surrounding frame, no captions inside the image.',
+    'No text, no letters, no speech bubbles, no watermark (dialogue will be added separately).',
+    'Panel aspect ratio 4:3, ink outlines, clean digital rendering.'
+  ].filter(Boolean).join('\n');
 }
 
-// ══════════════════════════════════════════════════════════════════
-// RENDU CHAPITRES
-// ══════════════════════════════════════════════════════════════════
-function renderChapters(){
-  const list=document.getElementById('chapters-list');
-  if(!list)return;
-  if(!state.activeGenre){list.innerHTML='';return}
-  const drawer=state.drawers[state.activeGenre];
-  if(!drawer||!drawer.chapters||drawer.chapters.length===0){list.innerHTML='';return}
-  list.innerHTML=drawer.chapters.map((c,ci)=>{
-    let cls='chapter-card';
-    if(c.status==='writing'||c.status==='illustrating')cls+=' generating';
-    else if(c.status==='done')cls+=' done';
-    else if(c.status==='error')cls+=' error';
-    let statusText='En attente';
-    if(c.status==='writing')statusText='Écriture…';
-    else if(c.status==='illustrating')statusText='Illustrations…';
-    else if(c.status==='done')statusText='Terminé ✓';
-    else if(c.status==='error')statusText='Échec';
-    let dialogueHtml='';
-    if(c.dialogue&&c.dialogue.length){
-      dialogueHtml='<div class="chapter-dialogue">'+c.dialogue.map(d=>'<div><span class="speaker">'+esc(d.speaker||'')+'</span>« '+esc(d.line||'')+' »</div>').join('')+'</div>';
+/* ═════════════════════════════════════════════════════════════════════
+   PIPELINE — PLAN
+   ═════════════════════════════════════════════════════════════════════ */
+async function generatePlan(){
+  const p=state.activeProject;
+  if(!p.idea||p.idea.trim().length<10)throw new Error('Idée trop courte (10 caractères min)');
+  const genre=genreOf(p);
+  const prompt=buildPlanPrompt(p.idea,genre,p.mode);
+  const raw=await chat(
+    'Tu es scénariste. Tu réponds UNIQUEMENT en JSON valide strict.',
+    prompt,6000,0.8
+  );
+  const plan=J(raw);
+  if(!plan||!plan.protagonists||!Array.isArray(plan.protagonists))throw new Error('Plan invalide');
+  // Normalise
+  p.title=plan.title||'Sans titre';
+  p.logline=plan.logline||'';
+  p.universe=plan.universe||'';
+  p.protagonists=plan.protagonists.slice(0,4).map(pt=>({
+    id:pt.id||uid(),
+    name:pt.name||'?',
+    role:pt.role||'protagoniste',
+    personality:pt.personality||'',
+    appearance:pt.appearance||{
+      face:'',hair:'',eyes:'',build:'',outfit:'',accessories:'',
+      signature_colors:[]
+    },
+    sheet:null,sheetStatus:'pending'
+  }));
+  const chapterKey=p.mode==='bd'?'pages':'chapters';
+  const rawList=p.mode==='bd'?plan.pages:plan.chapters;
+  if(!rawList||!rawList.length)throw new Error('Structure de chapitres/planches manquante');
+  p[chapterKey]=rawList.slice(0,4).map(c=>({
+    id:uid(),
+    number:c.number||1,
+    title:c.title||'',
+    summary:c.summary||'',
+    key_emotional_beat:c.key_emotional_beat||'',
+    narrative:p.mode==='bd'?'':(c.narrative||''),
+    dialogue:[],
+    [p.mode==='bd'?'cases':'illustrations']:[],
+    status:'pending'
+  }));
+  saveProject();
+  log('ok','Plan généré : « '+p.title+' » · '+p.protagonists.length+' protag. · '+p[chapterKey].length+(p.mode==='bd'?' planches':' chapitres'));
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   PIPELINE — CHARACTER SHEETS
+   ═════════════════════════════════════════════════════════════════════ */
+async function generateCharacterSheets(){
+  const p=state.activeProject;
+  const genre=genreOf(p);
+  for(let i=0;i<p.protagonists.length;i++){
+    if(state.stopRequested)break;
+    const pr=p.protagonists[i];
+    if(pr.sheet&&pr.sheet.u)continue;
+    pr.sheetStatus='generating';
+    renderAll();
+    try{
+      const prompt=buildCharacterSheetPrompt(pr,genre,p.mode);
+      const img=await mkImg(prompt,[],p.mode==='bd'?'4:3':'3:4');
+      pr.sheet=img;
+      pr.sheetStatus='done';
+      log('ok','Character sheet '+pr.name+' prêt');
+    }catch(e){
+      if(e.message==='stop')break;
+      pr.sheetStatus='error';
+      log('er','Character sheet '+pr.name+' : '+e.message);
     }
-    let illusHtml='';
-    if(c.illustrations&&c.illustrations.length){
-      illusHtml='<div class="illustrations-grid">'+c.illustrations.map((ill,ii)=>{
-        let icls='illus-card';
-        let inner='';
-        if(ill.status==='done'&&ill.image){
-          inner='<img src="'+ill.image+'" alt=""><span class="ic-num">Plan '+(ii+1)+'</span>';
-        } else if(ill.status==='loading'){
-          icls+=' loading';
-          inner='<div class="spin-dot"></div><span class="ic-num">Plan '+(ii+1)+'</span>';
-        } else if(ill.status==='error'){
-          icls+=' error';
-          inner='<span class="ic-num">Plan '+(ii+1)+'</span>';
+    saveProject();
+    renderAll();
+    if(i<p.protagonists.length-1)await sleep(1500);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   PIPELINE — CHAPITRES / PLANCHES
+   ═════════════════════════════════════════════════════════════════════ */
+async function generateChapters(){
+  const p=state.activeProject;
+  const genre=genreOf(p);
+  const key=p.mode==='bd'?'pages':'chapters';
+  const chapters=p[key];
+  const planSnapshot={
+    title:p.title,
+    universe:p.universe,
+    protagonists:p.protagonists.map(pr=>({
+      id:pr.id,name:pr.name,role:pr.role,personality:pr.personality,appearance:pr.appearance
+    }))
+  };
+  for(let ci=0;ci<chapters.length;ci++){
+    if(state.stopRequested)break;
+    const ch=chapters[ci];
+    if(ch.status==='done')continue;
+    ch.status='writing';
+    renderAll();
+    try{
+      if(p.mode==='roman'){
+        const prev=chapters.slice(0,ci);
+        const prompt=buildRomanChapterPrompt(planSnapshot,ch,ci+1,prev,genre);
+        const raw=await chat('Tu es romancier. Tu réponds UNIQUEMENT en JSON valide strict.',prompt,3500,0.8);
+        const data=J(raw);
+        if(!data||!data.narrative)throw new Error('JSON chapitre invalide');
+        ch.narrative=data.narrative;
+        ch.dialogue=Array.isArray(data.dialogue)?data.dialogue:[];
+        ch.illustrations=(data.illustrations||[]).slice(0,3).map((ill,ii)=>({
+          id:uid(),
+          index:ii,
+          prompt:ill.prompt||'',
+          characters_present:Array.isArray(ill.characters_present)?ill.characters_present:[],
+          image:null,status:'pending'
+        }));
+      } else {
+        const prev=chapters.slice(0,ci);
+        const prompt=buildBDPagePrompt(planSnapshot,ch,ci+1,prev,genre);
+        const raw=await chat('Tu es scénariste BD. Tu réponds UNIQUEMENT en JSON valide strict.',prompt,3500,0.8);
+        const data=J(raw);
+        if(!data||!Array.isArray(data.cases))throw new Error('JSON planche invalide');
+        ch.cases=data.cases.slice(0,4).map((c,ci2)=>({
+          id:uid(),
+          index:c.index||(ci2+1),
+          framing:c.framing||'medium',
+          action:c.action||'',
+          characters_present:Array.isArray(c.characters_present)?c.characters_present:[],
+          dialogue:Array.isArray(c.dialogue)?c.dialogue:[],
+          prompt:c.prompt||'',
+          image:null,status:'pending'
+        }));
+      }
+      ch.status='done';
+      saveProject();
+      log('ok',(p.mode==='bd'?'Planche ':'Chapitre ')+(ci+1)+' prêt(e)');
+    }catch(e){
+      if(e.message==='stop')break;
+      ch.status='error';
+      log('er','Chapitre '+(ci+1)+' : '+e.message);
+    }
+    renderAll();
+    if(ci<chapters.length-1)await sleep(1500);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   PIPELINE — ILLUSTRATIONS / CASES
+   ═════════════════════════════════════════════════════════════════════ */
+async function generateIllustrations(){
+  const p=state.activeProject;
+  const genre=genreOf(p);
+  const key=p.mode==='bd'?'pages':'chapters';
+  const listKey=p.mode==='bd'?'cases':'illustrations';
+  const planSnapshot={
+    title:p.title,universe:p.universe,
+    protagonists:p.protagonists.map(pr=>({id:pr.id,name:pr.name,appearance:pr.appearance}))
+  };
+  // Étape 1 : récupérer les refs des persos (data URI)
+  const protagRefs={};
+  for(const pr of p.protagonists){
+    if(pr.sheet){
+      protagRefs[pr.id]=await ensureRef(pr.sheet);
+    }
+  }
+  // Étape 2 : générer chaque item
+  for(let ci=0;ci<p[key].length;ci++){
+    const ch=p[key][ci];
+    const items=ch[listKey]||[];
+    for(let ii=0;ii<items.length;ii++){
+      if(state.stopRequested)break;
+      const it=items[ii];
+      if(it.image&&it.image.u)continue;
+      it.status='loading';
+      renderAll();
+      try{
+        let prompt;
+        let ratio;
+        if(p.mode==='roman'){
+          prompt=buildIllustrationPrompt(it,ch,planSnapshot,genre);
+          ratio='9:16';
         } else {
-          icls+=' loading';
-          inner='<span class="ic-num">Plan '+(ii+1)+'</span>';
+          prompt=buildBDPanelPrompt(it,ch,planSnapshot,genre);
+          ratio='4:3';
         }
-        return '<div class="'+icls+'">'+inner+'</div>';
-      }).join('')+'</div>';
+        // Refs : personnages présents (dans l'ordre), scène en dernier
+        const refUris=[];
+        (it.characters_present||[]).forEach(id=>{
+          if(protagRefs[id])refUris.push(protagRefs[id]);
+        });
+        const img=await mkImg(prompt,refUris,ratio);
+        it.image=img;
+        it.status='done';
+        log('ok',(p.mode==='bd'?'Case':'Illustration')+' '+ch.number+'.'+it.index+' ✓ ('+refUris.length+' refs)');
+      }catch(e){
+        if(e.message==='stop')break;
+        it.status='error';
+        log('er','Image '+ch.number+'.'+it.index+' : '+e.message);
+      }
+      saveProject();
+      renderAll();
+      if(ii<items.length-1)await sleep(1500);
     }
-    return '<div class="'+cls+'">'+
-      '<div class="chapter-header">'+
-        '<div class="chapter-num">Chapitre '+c.number+'</div>'+
-        '<div class="chapter-title">'+esc(c.title||'')+'</div>'+
-        '<div class="chapter-status">'+esc(statusText)+'</div>'+
-      '</div>'+
-      '<div class="chapter-body">'+
-        (c.narrative?'<div class="chapter-narrative">'+esc(c.narrative)+'</div>':'<div class="hint" style="font-style:italic">'+esc(c.summary||'')+'</div>')+
-        dialogueHtml+
-        illusHtml+
-      '</div>'+
-    '</div>';
-  }).join('');
-  document.getElementById('chapters-badge').textContent=drawer.chapters.length;
+  }
 }
 
-// ══════════════════════════════════════════════════════════════════
-// PLAYER + TTS
-// ══════════════════════════════════════════════════════════════════
-let ttsVoice=null;
-function pickFrenchVoice(){
-  if(!('speechSynthesis' in window))return null;
-  const voices=window.speechSynthesis.getVoices();
-  if(!voices||voices.length===0)return null;
-  const fr=voices.filter(v=>v.lang&&v.lang.toLowerCase().startsWith('fr'));
-  if(fr.length===0)return null;
-  const preferred=fr.find(v=>/premium|enhanced|amelie|thomas|audrey|marie|google français/i.test(v.name));
-  return preferred||fr[0];
+/* ═════════════════════════════════════════════════════════════════════
+   LANCER LE PIPELINE COMPLET
+   ═════════════════════════════════════════════════════════════════════ */
+async function runFullPipeline(){
+  if(state.isRunning)return;
+  if(!hasKey()){toast('Ajoutez au moins une clé API');return}
+  const p=state.activeProject;
+  if(!p||!p.genreId){toast('Choisissez un tiroir');return}
+  state.isRunning=true;
+  state.stopRequested=false;
+  updateButtons();
+  try{
+    log('in','────── Génération '+(p.mode==='bd'?'BD':'roman')+' ──────');
+    toast('Plan…');
+    await generatePlan();
+    toast('Character sheets…');
+    await generateCharacterSheets();
+    toast(p.mode==='bd'?'Planches…':'Chapitres…');
+    await generateChapters();
+    toast('Illustrations…');
+    await generateIllustrations();
+    toast('✦ Terminé ✦');
+    log('ok','Génération complète terminée');
+  }catch(e){
+    if(e.message==='stop'){log('wr','Arrêt demandé');toast('Arrêté')}
+    else{log('er',e.message);toast('Erreur : '+e.message.slice(0,60))}
+  }
+  state.isRunning=false;
+  state.stopRequested=false;
+  saveProject();
+  renderAll();
+  updateButtons();
 }
-function initTTS(){
-  if(!('speechSynthesis' in window))return;
-  const update=()=>{ttsVoice=pickFrenchVoice();if(ttsVoice)debugLog('success','TTS','Voix : '+ttsVoice.name)};
-  update();
-  window.speechSynthesis.onvoiceschanged=update;
-}
-function speakFR(text){
+
+/* ═════════════════════════════════════════════════════════════════════
+   PLAYER
+   ═════════════════════════════════════════════════════════════════════ */
+function speak(text){
   if(!state.voiceEnabled)return;
   if(!('speechSynthesis' in window))return;
   if(!text)return;
   try{
-    window.speechSynthesis.cancel();
+    speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(text);
-    u.lang='fr-FR';u.rate=.95;u.pitch=1.0;u.volume=1.0;
-    if(ttsVoice)u.voice=ttsVoice;
-    window.speechSynthesis.speak(u);
-    state.currentUtterance=u;
+    u.lang='fr-FR';
+    u.rate=0.97;
+    speechSynthesis.speak(u);
   }catch(e){}
 }
-function stopTTS(){try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}state.currentUtterance=null}
+function stopSpeech(){try{if('speechSynthesis' in window)speechSynthesis.cancel()}catch(e){}}
 
 async function playNovel(){
-  if(state.isPlaying)return;
-  if(!state.activeGenre)return;
-  const drawer=state.drawers[state.activeGenre];
-  if(!drawer||!drawer.chapters||drawer.chapters.length===0)return;
+  const p=state.activeProject;
+  if(p.mode!=='roman')return;
+  const chapters=p.chapters.filter(c=>c.status==='done');
+  if(!chapters.length){toast('Aucun chapitre prêt');return}
   state.isPlaying=true;
-  updateButtons();
-  const overlay=document.getElementById('player-overlay');
-  const canvas=document.getElementById('player-canvas');
-  const hint=document.getElementById('player-hint-overlay');
-  if(!overlay||!canvas)return;
-  const dpr=Math.min(window.devicePixelRatio||1,2);
-  const cssW=window.innerWidth;
-  const cssH=window.innerHeight;
-  canvas.width=Math.round(cssW*dpr);
-  canvas.height=Math.round(cssH*dpr);
-  canvas.style.width=cssW+'px';
-  canvas.style.height=cssH+'px';
-  const ctx=canvas.getContext('2d');
-  overlay.classList.add('visible');
-  hint.classList.remove('hidden');
-  setTimeout(()=>hint.classList.add('hidden'),3500);
-  // déblocage Safari
-  try{if('speechSynthesis' in window){const u0=new SpeechSynthesisUtterance(' ');u0.volume=0;window.speechSynthesis.speak(u0)}}catch(e){}
-
-  debugLog('state','PLAYER','Lecture du roman : '+drawer.chapters.length+' chapitres');
-
-  for(let ci=0;ci<drawer.chapters.length;ci++){
+  $('#pl').classList.add('on');
+  const img=$('#pi');
+  const sub=$('#sub');
+  img.style.display='block';
+  for(let ci=0;ci<chapters.length;ci++){
     if(!state.isPlaying)break;
-    const chapter=drawer.chapters[ci];
-    if(chapter.status!=='done'&&chapter.status!=='illustrating')continue;
-    await playChapter(chapter,ci,drawer,ctx,canvas,dpr);
+    const ch=chapters[ci];
+    const illList=(ch.illustrations||[]).filter(i=>i.status==='done');
+    const fullText=(ch.narrative||'')+' '+((ch.dialogue||[]).map(d=>d.line).join('. '));
+    speak(fullText);
+    for(let ii=0;ii<illList.length;ii++){
+      if(!state.isPlaying)break;
+      const ill=illList[ii];
+      img.src=ill.image.u;
+      sub.innerHTML='<b>Chapitre '+ch.number+'</b> — '+esc(ch.title)+'<br><small>'+esc(ch.narrative.slice(0,120))+'…</small>';
+      const w=(ch.narrative||'').split(/\s+/).length;
+      const dur=Math.max(3000,Math.min(8000,(w*80)/Math.max(1,illList.length)));
+      await sleep(dur);
+    }
+  }
+  stopPlay();
+}
+async function playBD(){
+  const p=state.activeProject;
+  if(p.mode!=='bd')return;
+  const pages=p.pages.filter(pg=>pg.status==='done');
+  if(!pages.length){toast('Aucune planche prête');return}
+  state.isPlaying=true;
+  $('#pl').classList.add('on');
+  const img=$('#pi');
+  const sub=$('#sub');
+  img.style.display='block';
+  for(let pi=0;pi<pages.length;pi++){
+    if(!state.isPlaying)break;
+    const pg=pages[pi];
+    const cases=(pg.cases||[]).filter(c=>c.status==='done');
+    for(let ci=0;ci<cases.length;ci++){
+      if(!state.isPlaying)break;
+      const c=cases[ci];
+      img.src=c.image.u;
+      const dialogueText=(c.dialogue||[]).map(d=>d.speaker+' dit : '+d.line).join('. ');
+      if(dialogueText)speak(dialogueText);
+      sub.innerHTML='<b>Planche '+pg.number+'</b> — Case '+(ci+1)+'/'+cases.length
+        +(dialogueText?'<br><small>'+esc(dialogueText)+'</small>':'');
+      await sleep(Math.max(3500,Math.min(7000,(c.dialogue||[]).reduce((a,d)=>a+d.line.length,0)*60+2000)));
+    }
+  }
+  stopPlay();
+}
+function stopPlay(){
+  state.isPlaying=false;
+  stopSpeech();
+  $('#pl').classList.remove('on');
+  if(state.activeProject)renderAll();
+}
+
+/* ═════════════════════════════════════════════════════════════════════
+   UI — RENDER
+   ═════════════════════════════════════════════════════════════════════ */
+function renderAll(){renderApp()}
+
+function renderApp(){
+  const main=$('#main');
+  if(!main)return;
+  // Chip clés
+  const chip=$('#keychip');
+  if(chip){
+    const live=liveKeys().length,tot=state.apiKeys.length;
+    chip.style.display=tot?'':'none';
+    chip.textContent=live+'/'+tot+' clé(s)';
+    chip.className='chip '+(live?'':'off');
   }
 
-  stopNovelPlayback();
-}
+  const p=state.activeProject;
+  let html='';
 
-async function playChapter(chapter,chapterIndex,drawer,ctx,canvas,dpr){
-  return new Promise(resolve=>{
-    const illustrationCount=(chapter.illustrations||[]).filter(i=>i.status==='done').length;
-    const totalIllustrations=Math.max(1,illustrationCount);
-    const narrative=(chapter.narrative||'').trim();
-    const dialogueLines=(chapter.dialogue||[]).map(d=>d.line).join('. ');
-    const fullText=narrative+(dialogueLines?(' '+dialogueLines):'');
-    const durationPerIllus=Math.max(3,Math.min(8,Math.ceil(fullText.split(/\s+/).length*0.3/totalIllustrations)));
+  // Header clés API
+  html+='<div class="hero">';
+  html+='<div class="lab">◆ CONFIGURATION</div>';
+  html+='<h2>Clés API <b>Agnès</b></h2>';
+  html+='<p class="sub">Une ou plusieurs clés, une par ligne. Plus il y a de clés, plus vite le studio travaille.</p>';
+  html+='<textarea id="keys" rows="4" spellcheck="false" placeholder="sk-…&#10;sk-…">'+esc(state.apiKeys.map(k=>k.k).join('\n'))+'</textarea>';
+  html+='<div class="chips">'+state.apiKeys.map((k,i)=>'<span class="chip '+(k.off?'off':'')+'">#'+(i+1)+' …'+esc(k.k.slice(-4))+'</span>').join('')+'</div>';
+  html+='<button data-a="savekeys">Enregistrer les clés</button>';
+  html+='</div>';
 
-    // TTS narration
-    if(fullText)speakFR(fullText);
-
-    // Timeline des illustrations
-    let currentIllusIndex=0;
-    let finished=false;
-    const finish=()=>{if(finished)return;finished=true;stopTTS();resolve()};
-
-    const renderFrame=(illusIdx)=>{
-      ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);
-      // Image
-      const illus=(chapter.illustrations||[]).filter(i=>i.status==='done')[illusIdx];
-      if(illus&&illus.image){
-        const img=new Image();
-        img.crossOrigin='anonymous';
-        img.onload=()=>{
-          const ar=img.width/img.height;
-          const car=canvas.width/canvas.height;
-          let dw,dh,dx,dy;
-          if(ar>car){dw=canvas.width;dh=canvas.width/ar;dx=0;dy=(canvas.height-dh)/2}
-          else{dh=canvas.height;dw=canvas.height*ar;dx=(canvas.width-dw)/2;dy=0}
-          try{ctx.drawImage(img,dx,dy,dw,dh)}catch(e){}
-        };
-        img.src=illus.image;
+  // Tiroirs
+  html+='<div class="drawers">';
+  ['roman','bd'].forEach(mode=>{
+    const isRoman=mode==='roman';
+    const genres=isRoman?GENRES_ROMAN:GENRES_BD;
+    html+='<div class="drawer-group"><h3>'+(isRoman?'📖 ROMANS ILLUSTRÉS':'💬 BANDES DESSINÉES')+'</h3><div class="dg-grid">';
+    genres.forEach(g=>{
+      const saved=loadProject(mode,g.id);
+      const active=p&&p.mode===mode&&p.genreId===g.id;
+      let stt='Vide';
+      if(saved){
+        const key=mode==='bd'?'pages':'chapters';
+        const listKey=mode==='bd'?'cases':'illustrations';
+        const ch=saved[key]||[];
+        const totalIll=ch.reduce((a,c)=>a+((c[listKey]||[]).filter(x=>x.status==='done').length),0);
+        const done=ch.filter(c=>c.status==='done').length;
+        stt=ch.length?(done+'/'+ch.length+' · '+totalIll+' img'):(saved.protagonists&&saved.protagonists.length?saved.protagonists.length+' protag.':'');
       }
-      // Overlay narratif
-      const t=Date.now();
-      const pad=Math.round(Math.min(40*dpr,canvas.width*0.04));
-      const bandH=Math.round(Math.min(200*dpr,canvas.height*0.28));
-      const bandY=canvas.height-bandH-pad;
-      const bandW=canvas.width-pad*2;
-      ctx.save();
-      const grad=ctx.createLinearGradient(0,bandY,0,bandY+bandH);
-      grad.addColorStop(0,'rgba(10,9,8,0.0)');
-      grad.addColorStop(0.3,'rgba(10,9,8,0.85)');
-      grad.addColorStop(1,'rgba(10,9,8,0.95)');
-      ctx.fillStyle=grad;
-      ctx.fillRect(pad,bandY,bandW,bandH);
-      // Filet doré
-      ctx.fillStyle='#d4a94a';
-      ctx.fillRect(pad,bandY+Math.round(bandH*0.1),Math.round(4*dpr),bandH-Math.round(bandH*0.2));
-      // Titre chapitre
-      const chTitleSize=Math.round(Math.min(20*dpr,canvas.height*0.024));
-      ctx.fillStyle='#d4a94a';
-      ctx.font='600 '+chTitleSize+'px Georgia, serif';
-      ctx.textBaseline='top';
-      ctx.fillText('CHAPITRE '+chapter.number+' — '+(chapter.title||'').toUpperCase(),pad+Math.round(bandH*0.12),bandY+Math.round(bandH*0.12));
-      // Texte narratif (tronqué)
-      const textSize=Math.round(Math.min(24*dpr,canvas.height*0.028));
-      ctx.fillStyle='#e6dcc6';
-      ctx.font='400 '+textSize+'px Georgia, serif';
-      let txt=narrative;
-      const maxW=bandW-Math.round(bandH*0.25);
-      // Wrap simple sur 3 lignes
-      const words=txt.split(/\s+/);
-      let lines=[];let cur='';
-      for(const w of words){
-        const test=cur?cur+' '+w:w;
-        if(ctx.measureText(test).width>maxW){lines.push(cur);cur=w;if(lines.length>=3)break}
-        else cur=test;
-      }
-      if(lines.length<3&&cur)lines.push(cur);
-      const lineHeight=textSize*1.35;
-      const textStartY=bandY+Math.round(bandH*0.44);
-      lines.forEach((ln,li)=>{
-        ctx.fillText(ln,pad+Math.round(bandH*0.12),textStartY+li*lineHeight);
+      html+='<div class="dg-item '+(active?'active':'')+'" data-a="open-drawer" data-mode="'+mode+'" data-genre="'+g.id+'">';
+      html+='<span class="emoji">'+g.emoji+'</span>';
+      html+='<div class="nm">'+esc(g.name)+'</div>';
+      html+='<div class="stt">'+esc(stt||'Vide')+'</div>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  });
+  html+='</div>';
+
+  // Si un projet est actif, afficher son contenu
+  if(p){
+    const genre=genreOf(p);
+    html+='<div class="hero">';
+    html+='<div class="lab">TIROIR ACTIF · '+(p.mode==='bd'?'BANDE DESSINÉE':'ROMAN')+'</div>';
+    html+='<h2>'+genre.emoji+' '+esc(genre.name)+' <b>'+(p.title?('— '+esc(p.title)):'')+'</b></h2>';
+    if(p.logline)html+='<p class="sub"><em>'+esc(p.logline)+'</em></p>';
+    html+='<label class="f"><span class="lab">Votre idée</span><textarea id="idea" rows="4" placeholder="Décrivez votre idée en quelques phrases…">'+esc(p.idea||'')+'</textarea></label>';
+    html+='<div class="rw" style="margin-top:10px">';
+    html+='<button data-a="run" '+(state.isRunning?'disabled':'')+'>'+(state.isRunning?'⏳ Génération…':'✦ Générer '+((p.mode==='bd')?'la BD':'le roman'))+'</button>';
+    if(state.isRunning)html+='<button data-a="stop">■ Arrêter</button>';
+    html+='<button data-a="delete-drawer" data-mode="'+p.mode+'" data-genre="'+p.genreId+'">🗑 Vider ce tiroir</button>';
+    html+='</div>';
+    html+='</div>';
+
+    // Protagonistes
+    if(p.protagonists&&p.protagonists.length){
+      html+='<div class="hero">';
+      html+='<div class="lab">PROTAGONISTES · '+p.protagonists.length+'</div>';
+      html+='<h2>🎭 Character sheets</h2>';
+      html+='<p class="sub">Ces planches 4 vues garantissent que les personnages gardent leur apparence à travers chapitres et planches.</p>';
+      html+='<div class="grid">';
+      p.protagonists.forEach(pr=>{
+        const s=pr.sheet;
+        const cls='cd'+(pr.sheetStatus==='done'?' pk':'');
+        html+='<div class="'+cls+'">';
+        html+='<div class="im" style="aspect-ratio:'+(p.mode==='bd'?'4/3':'3/4')+'">';
+        if(s&&s.u)html+='<img src="'+esc(s.u)+'" alt="">';
+        else html+='<span>'+(pr.sheetStatus==='generating'?'Génération…':pr.sheetStatus==='error'?'✕ Échec':'En attente…')+'</span>';
+        if(pr.sheetStatus==='generating')html+='<i class="sp"></i>';
+        html+='</div>';
+        html+='<div class="lab" style="color:var(--a)">'+esc(pr.name)+' · '+esc(pr.role)+'</div>';
+        html+='<div style="font-size:13px;margin-top:4px">'+esc(pr.personality||'')+'</div>';
+        if(pr.appearance){
+          const a=pr.appearance;
+          html+='<details style="margin-top:6px;font-size:12px"><summary class="lab">Signature features</summary>';
+          html+='<div style="margin-top:4px">Face: '+esc(a.face||'')+'<br>Hair: '+esc(a.hair||'')+'<br>Eyes: '+esc(a.eyes||'')+'<br>Outfit: '+esc(a.outfit||'')+'<br>Acc: '+esc(a.accessories||'')+'<br>Colors: '+esc((a.signature_colors||[]).join(', '))+'</div></details>';
+        }
+        html+='<div class="rw"><button class="sm" data-a="regen-sheet" data-id="'+pr.id+'">↻ Regénérer</button></div>';
+        html+='</div>';
       });
-      // Indicateur illustration
-      const indSize=Math.round(Math.min(14*dpr,canvas.height*0.018));
-      ctx.fillStyle='#9a9080';
-      ctx.font='500 '+indSize+'px ui-monospace, monospace';
-      ctx.textAlign='right';
-      ctx.fillText('Plan '+(illusIdx+1)+'/'+totalIllustrations,pad+bandW-Math.round(bandH*0.12),bandY+Math.round(bandH*0.12));
-      ctx.textAlign='left';
-      ctx.restore();
-    };
-
-    let illustTimer=null;
-    let chaptersTimer=null;
-
-    const advanceIllustration=()=>{
-      if(finished)return;
-      if(currentIllusIndex<totalIllustrations-1){
-        currentIllusIndex++;
-        renderFrame(currentIllusIndex);
-      }
-    };
-
-    // Cycle d'illustrations
-    renderFrame(0);
-    if(totalIllustrations>1){
-      illustTimer=setInterval(advanceIllustration,durationPerIllus*1000);
+      html+='</div></div>';
     }
 
-    // Fin du chapitre après la durée estimée
-    const totalDuration=durationPerIllus*totalIllustrations*1000+1500;
-    chaptersTimer=setTimeout(()=>{
-      if(illustTimer)clearInterval(illustTimer);
-      finish();
-    },totalDuration);
+    // Chapitres / Planches
+    const key=p.mode==='bd'?'pages':'chapters';
+    const listKey=p.mode==='bd'?'cases':'illustrations';
+    const list=p[key]||[];
+    if(list.length){
+      html+='<div class="hero">';
+      html+='<div class="lab">'+(p.mode==='bd'?'PLANCHES':'CHAPITRES')+' · '+list.length+'</div>';
+      html+='<h2>'+(p.mode==='bd'?'💬 Planches & cases':'📖 Chapitres & illustrations')+'</h2>';
+      list.forEach((ch,ci)=>{
+        html+='<div class="page">';
+        html+='<div class="lab">'+((p.mode==='bd')?'Planche':'Chapitre')+' '+(ci+1)+' · '+esc(ch.status)+'</div>';
+        html+='<h3 style="margin-top:0">'+esc(ch.title||'')+'</h3>';
+        if(ch.summary)html+='<p style="color:var(--dim);font-size:14px;margin-bottom:8px"><em>'+esc(ch.summary)+'</em></p>';
+        // Texte narratif (roman uniquement)
+        if(p.mode==='roman'&&ch.narrative){
+          html+='<div style="font-family:var(--serif);font-size:15px;line-height:1.7;background:#f9fbfd;padding:12px;border-left:3px solid var(--a);margin-bottom:10px">'+esc(ch.narrative)+'</div>';
+          if(ch.dialogue&&ch.dialogue.length){
+            html+='<div style="margin-bottom:10px">';
+            ch.dialogue.forEach(d=>{
+              html+='<div style="font-family:var(--serif);font-style:italic;color:var(--dim)"><b>'+esc(d.speaker)+'</b> : « '+esc(d.line)+' »</div>';
+            });
+            html+='</div>';
+          }
+        }
+        // Illustrations / cases
+        const items=ch[listKey]||[];
+        if(items.length){
+          html+='<div class="grid">';
+          items.forEach(it=>{
+            html+='<div class="cd">';
+            const aspect=p.mode==='bd'?'4/3':'9/16';
+            html+='<div class="im" style="aspect-ratio:'+aspect+'">';
+            if(it.image&&it.image.u)html+='<img src="'+esc(it.image.u)+'" alt="">';
+            else html+='<span>'+(it.status==='loading'?'Création…':it.status==='error'?'✕ Erreur':'En attente')+'</span>';
+            if(it.status==='loading')html+='<i class="sp"></i>';
+            html+='</div>';
+            if(p.mode==='bd'){
+              html+='<div class="lab">Case '+it.index+' · '+esc(it.framing||'')+'</div>';
+              if(it.dialogue&&it.dialogue.length){
+                it.dialogue.forEach(d=>{
+                  html+='<div style="font-size:12px;margin-top:4px;color:var(--dim)"><b>'+esc(d.speaker)+'</b> : '+esc(d.line)+'</div>';
+                });
+              }
+            } else {
+              html+='<div class="lab">Illustration '+(it.index+1)+'</div>';
+            }
+            html+='<div class="rw"><button class="sm" data-a="regen-item" data-id="'+it.id+'">↻ Nouvelle image</button></div>';
+            html+='</div>';
+          });
+          html+='</div>';
+        }
+        html+='</div>';
+      });
+      // Bouton lecture
+      const hasContent=p.mode==='bd'
+        ? list.some(pg=>(pg.cases||[]).some(c=>c.image&&c.image.u))
+        : list.some(c=>(c.illustrations||[]).some(i=>i.image&&i.image.u));
+      html+='<div class="rw">'+(hasContent?'<button data-a="play" class="big">▶ Lire '+(p.mode==='bd'?'la BD':'le roman')+'</button>':'')+'</div>';
+      html+='</div>';
+    }
+  }
 
-    // Sauvegarde pour pouvoir stopper
-    state.playRAF={clear:()=>{if(illustTimer)clearInterval(illustTimer);if(chaptersTimer)clearTimeout(chaptersTimer);finish()}};
-  });
+  main.innerHTML=html;
+
+  // Attache listeners
+  const ideaEl=$('#idea');
+  if(ideaEl){
+    ideaEl.addEventListener('input',e=>{
+      if(state.activeProject){state.activeProject.idea=e.target.value;saveProject()}
+    });
+  }
 }
 
-function stopNovelPlayback(){
-  state.isPlaying=false;
-  if(state.playRAF&&state.playRAF.clear){state.playRAF.clear();state.playRAF=null}
-  stopTTS();
-  const overlay=document.getElementById('player-overlay');
-  if(overlay)overlay.classList.remove('visible');
-  updateButtons();
-}
+/* ═════════════════════════════════════════════════════════════════════
+   ACTIONS
+   ═════════════════════════════════════════════════════════════════════ */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');
+  if(!b||b.disabled)return;
+  const a=b.dataset.a;
+  if(a==='con'){$('#con').classList.toggle('on');return}
+  if(a==='sess'){showSessions();return}
+  if(a==='savekeys'){
+    const raw=$('#keys').value||'';
+    const keys=raw.split(/\r?\n/).map(s=>s.trim()).filter(s=>s.length>=8);
+    state.apiKeys=keys.map(k=>({k:k,img:0,txt:0,cool:0,off:false}));
+    saveKeys();
+    toast(keys.length+' clé(s) enregistrée(s)');
+    log('ok',keys.length+' clé(s) chargée(s)');
+    renderApp();
+    return;
+  }
+  if(a==='open-drawer'){
+    const mode=b.dataset.mode;
+    const genreId=b.dataset.genre;
+    let project=loadProject(mode,genreId);
+    if(!project){
+      project=mode==='bd'?newBD():newRoman();
+      project.genreId=genreId;
+    }
+    state.activeProject=project;
+    renderApp();
+    return;
+  }
+  if(a==='delete-drawer'){
+    if(!confirm('Vider complètement ce tiroir ?'))return;
+    deleteProject(b.dataset.mode,b.dataset.genre);
+    if(state.activeProject&&state.activeProject.genreId===b.dataset.genre){
+      state.activeProject=null;
+    }
+    renderApp();
+    return;
+  }
+  if(a==='run'){runFullPipeline();return}
+  if(a==='stop'){state.stopRequested=true;toast('Arrêt en cours…');return}
+  if(a==='play'){
+    if(state.activeProject.mode==='bd')playBD();
+    else playNovel();
+    return;
+  }
+  if(a==='stopplay'){stopPlay();return}
+  if(a==='regen-sheet'){
+    const id=b.dataset.id;
+    const pr=findProtagonist(id);
+    if(pr){pr.sheet=null;pr.sheetStatus='pending';renderApp();toast('Sheet réinitialisé — relancez la génération')}
+    return;
+  }
+  if(a==='regen-item'){
+    const id=b.dataset.id;
+    const found=findCase(id);
+    if(found){found.case.image=null;found.case.status='pending';renderApp();toast('Image réinitialisée — relancez la génération')}
+    return;
+  }
+});
 
-// ══════════════════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════════════════
-(function init(){
-  // API
-  const saveBtn=document.getElementById('api-save-btn');
-  if(saveBtn)saveBtn.addEventListener('click',saveApiKey);
-  const apiInput=document.getElementById('api-key-input');
-  if(apiInput)apiInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveApiKey()}});
-
-  // Sections collapsibles
-  document.querySelectorAll('[data-toggle]').forEach(h=>{
-    h.addEventListener('click',()=>{
-      const el=document.getElementById(h.dataset.toggle);
-      if(el)el.classList.toggle('open');
+/* ═════════════════════════════════════════════════════════════════════
+   SESSIONS MODAL
+   ═════════════════════════════════════════════════════════════════════ */
+function showSessions(){
+  const list=listProjects();
+  let html='<h3>Mes projets</h3><p class="sub">Tous vos tiroirs sont sauvegardés automatiquement dans ce navigateur.</p>';
+  if(!list.length){
+    html+='<p class="lab">Aucun projet pour l\'instant.</p>';
+  } else {
+    list.forEach(p=>{
+      const genre=p.mode==='bd'?GENRES_BD.find(g=>g.id===p.genreId):GENRES_ROMAN.find(g=>g.id===p.genreId);
+      const key=p.mode==='bd'?'pages':'chapters';
+      const listKey=p.mode==='bd'?'cases':'illustrations';
+      const ch=p[key]||[];
+      const imgs=ch.reduce((a,c)=>a+((c[listKey]||[]).filter(i=>i.image&&i.image.u).length),0);
+      html+='<div class="cd" style="margin-top:8px">';
+      html+='<b>'+(genre?genre.emoji+' '+esc(genre.name):'—')+'</b> · '+esc(p.mode==='bd'?'BD':'Roman')+' · '+esc(p.title||'Sans titre');
+      html+='<div class="lab" style="margin-top:4px">'+new Date(p.updated).toLocaleString('fr-FR')+' · '+(p.protagonists||[]).length+' perso · '+ch.length+(p.mode==='bd'?' planches':' chap')+' · '+imgs+' images</div>';
+      html+='<div class="rw">';
+      html+='<button class="sm" data-a="open-from-modal" data-mode="'+p.mode+'" data-genre="'+p.genreId+'">Ouvrir</button>';
+      html+='<button class="sm" data-a="delete-drawer" data-mode="'+p.mode+'" data-genre="'+p.genreId+'">Supprimer</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<div style="margin-top:14px"><button data-a="closemd">Fermer</button></div>';
+  $('#mdc').innerHTML=html;
+  $('#md').classList.add('on');
+  // Petit hack pour gérer open-from-modal
+  $('#mdc').querySelectorAll('[data-a="open-from-modal"]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const mode=btn.dataset.mode;
+      const genreId=btn.dataset.genre;
+      let project=loadProject(mode,genreId);
+      if(project){
+        state.activeProject=project;
+        $('#md').classList.remove('on');
+        renderApp();
+      }
     });
   });
+}
+document.addEventListener('click',e=>{
+  if(e.target.id==='md')e.target.classList.remove('on');
+  if(e.target.dataset&&e.target.dataset.a==='closemd'){$('#md').classList.remove('on')}
+});
 
-  // Bouton génération
-  const genBtn=document.getElementById('generate-btn');
-  if(genBtn)genBtn.addEventListener('click',startNovelGeneration);
-  const stopBtn=document.getElementById('stop-btn');
-  if(stopBtn)stopBtn.addEventListener('click',()=>{
-    state.stopRequested=true;
-    debugLog('warn','STOP','Arrêt demandé');
-    setStatus('Arrêt en cours…');
-  });
-
-  // Bouton vider tiroir
-  const newBtn=document.getElementById('new-drawer-btn');
-  if(newBtn)newBtn.addEventListener('click',()=>{
-    if(!state.activeGenre)return;
-    if(!confirm('Vider complètement ce tiroir ? Toutes les données seront perdues.'))return;
-    deleteDrawer(state.activeGenre);
-    const ideaInput=document.getElementById('idea-input');
-    if(ideaInput)ideaInput.value='';
-    renderProtagonists();
-    renderChapters();
-    renderDrawersGrid();
-    updateButtons();
-    showToast('Tiroir vidé','warn');
-  });
-
-  // Idée
-  const ideaInput=document.getElementById('idea-input');
-  if(ideaInput)ideaInput.addEventListener('input',updateButtons);
-
-  // Player
-  const playBtn=document.getElementById('play-novel-btn');
-  if(playBtn)playBtn.addEventListener('click',playNovel);
-  const stopReadBtn=document.getElementById('stop-read-btn');
-  if(stopReadBtn)stopReadBtn.addEventListener('click',stopNovelPlayback);
-  const voiceToggle=document.getElementById('voice-toggle');
-  if(voiceToggle)voiceToggle.addEventListener('change',e=>{
-    state.voiceEnabled=e.target.checked;
-    if(!state.voiceEnabled)stopTTS();
-  });
-  const overlay=document.getElementById('player-overlay');
-  if(overlay)overlay.addEventListener('click',stopNovelPlayback);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.isPlaying)stopNovelPlayback()});
-
-  // Debug
-  const dh=document.getElementById('debug-header');
-  if(dh)dh.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')return;toggleDebugCollapse()});
-  const dc=document.getElementById('debug-collapse-btn');
-  if(dc)dc.addEventListener('click',e=>{e.stopPropagation();toggleDebugCollapse()});
-  const dclr=document.getElementById('debug-clear-btn');
-  if(dclr)dclr.addEventListener('click',e=>{e.stopPropagation();clearDebug()});
-  const dcp=document.getElementById('debug-copy-btn');
-  if(dcp)dcp.addEventListener('click',e=>{e.stopPropagation();copyDebug()});
-
-  // Init
-  initTTS();
-  loadAllDrawers();
-  updateApiPanel();
-  renderDrawersGrid();
-  updateButtons();
-
-  debugLog('success','INIT','Roman Studio prêt');
-  debugLog('info','INIT','Un tiroir par genre · sauvegarde automatique localStorage');
-  debugLog('info','INIT','Personnage = protagoniste · Chapitre = scène · Plan = illustration');
-  debugLog('info','INIT','Cohérence via image de référence envoyée à chaque illustration');
-  debugLog('info','INIT','Pipeline : Idée → Plan → Portraits → Chapitres + Illustrations → Lecture');
+/* ═════════════════════════════════════════════════════════════════════
+   INIT
+   ═════════════════════════════════════════════════════════════════════ */
+(function init(){
+  loadKeys();
+  renderApp();
+  log('ok','Roman Studio V2 prêt');
+  log('in',state.apiKeys.length+' clé(s) API chargée(s)');
+  log('in','6 genres Roman + 6 genres BD disponibles');
+  log('in','Character sheets 4 vues · Signature features · Règle de fidélité absolue');
 })();
 </script>
 </body>
