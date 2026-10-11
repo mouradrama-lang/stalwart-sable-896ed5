@@ -1,1 +1,549 @@
-<html><body><p>placeholder</p></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MouraDrama Studio</title>
+    <style>
+      :root {
+        --bg: #07111f;
+        --bg-2: #0d1c2d;
+        --panel: rgba(15, 23, 42, 0.88);
+        --panel-strong: rgba(18, 27, 42, 0.96);
+        --border: rgba(148, 163, 184, 0.18);
+        --text: #edf4ff;
+        --muted: #a8bed8;
+        --pink: #ff4d8d;
+        --purple: #7c3aed;
+        --cyan: #39d0ff;
+        --success: #3dd598;
+        --shadow: 0 20px 40px rgba(2, 6, 23, 0.35);
+      }
+
+      * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at top left, rgba(124, 58, 237, 0.24), transparent 35%),
+                    radial-gradient(circle at bottom right, rgba(57, 208, 255, 0.18), transparent 30%),
+                    linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      a { color: inherit; text-decoration: none; }
+
+      .shell {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1.2rem 4rem;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(12px);
+        background: rgba(6, 11, 26, 0.75);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .topbar-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0.9rem 1.2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .brand {
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        background: linear-gradient(135deg, var(--pink), var(--purple), var(--cyan));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .nav {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .nav a {
+        color: var(--muted);
+        padding: 0.55rem 0.8rem;
+        border-radius: 999px;
+        transition: 0.2s ease;
+      }
+
+      .nav a:hover,
+      .nav a.active {
+        background: rgba(124, 58, 237, 0.18);
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        color: #fff;
+      }
+
+      .cta {
+        padding: 0.75rem 1.1rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--pink), var(--purple));
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 12px 26px rgba(255, 77, 141, 0.2);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero-copy {
+        padding: clamp(1.5rem, 3vw, 2.6rem);
+      }
+
+      .eyebrow {
+        display: inline-block;
+        background: rgba(57, 208, 255, 0.1);
+        color: #9adfff;
+        border: 1px solid rgba(57, 208, 255, 0.24);
+        border-radius: 999px;
+        padding: 0.42rem 0.75rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      h1 {
+        font-size: clamp(2.5rem, 6vw, 4.2rem);
+        line-height: 1.05;
+        letter-spacing: -0.06em;
+        margin: 1rem 0 0.9rem;
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, var(--pink), var(--purple), var(--cyan));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero-copy p {
+        margin: 0 0 1.5rem;
+        color: var(--muted);
+        font-size: 1.08rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.2rem;
+      }
+
+      .button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.9rem 1.2rem;
+        border-radius: 999px;
+        font-weight: 700;
+      }
+
+      .button.primary {
+        background: linear-gradient(135deg, var(--pink), var(--purple));
+        color: white;
+        box-shadow: 0 15px 30px rgba(255, 77, 141, 0.25);
+      }
+
+      .button.secondary {
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.8rem;
+      }
+
+      .stat {
+        background: rgba(148, 163, 184, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 0.9rem 0.8rem;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.5rem;
+        margin-bottom: 0.2rem;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .hero-side {
+        padding: 1.2rem;
+      }
+
+      .side-stack {
+        display: grid;
+        gap: 0.9rem;
+      }
+
+      .mini-card {
+        padding: 1rem 1.1rem;
+        background: rgba(148, 163, 184, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+      }
+
+      .mini-card h3 {
+        margin: 0 0 0.4rem;
+        font-size: 1rem;
+      }
+
+      .mini-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .tool-card,
+      .feature-card,
+      .footer-panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .tool-card,
+      .feature-card {
+        padding: 1.1rem;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.65rem;
+        border-radius: 999px;
+        background: rgba(255, 77, 141, 0.1);
+        border: 1px solid rgba(255, 77, 141, 0.26);
+        color: #ff9fbe;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .tool-card h3, .feature-card h3 {
+        margin: 0.85rem 0 0.5rem;
+        font-size: 1.3rem;
+      }
+
+      .tool-card p, .feature-card p {
+        margin: 0 0 1rem;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.8rem;
+      }
+
+      .card-footer span {
+        color: #dfe8ff;
+        font-size: 0.75rem;
+        opacity: 0.82;
+      }
+
+      .small-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.7rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid var(--border);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .feature-card ul {
+        list-style: none;
+        margin: 0.9rem 0 0;
+        padding: 0;
+        display: grid;
+        gap: 0.5rem;
+        color: var(--muted);
+      }
+
+      .feature-card li::before {
+        content: "•";
+        color: var(--cyan);
+        margin-right: 0.5rem;
+      }
+
+      .footer-panel {
+        margin-top: 1.5rem;
+        padding: 1.2rem;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .footer-panel strong {
+        color: var(--text);
+      }
+
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .topbar-inner {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .nav {
+          justify-content: center;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a href="index.html" class="brand">🎬 MouraDrama</a>
+        <nav class="nav">
+          <a href="#catalogue" class="active">Catalogue</a>
+          <a href="#features">Fonctionnalités</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <a href="studio.html" class="cta">Ouvrir le studio</a>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="hero">
+        <div class="panel hero-copy">
+          <span class="eyebrow">AI vidéo • création numérique</span>
+          <h1>Créez des <span class="gradient-text">vidéos immersives</span> sans friction.</h1>
+          <p>
+            MouraDrama centralise des outils de génération vidéo, d’animation, de narration,
+            de documentaire et de storytelling pour transformer une idée en production visuelle.
+          </p>
+
+          <div class="actions">
+            <a href="studio.html" class="button primary">Accéder au studio</a>
+            <a href="#catalogue" class="button secondary">Explorer les outils</a>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <strong>40+</strong>
+              <span>outils créatifs</span>
+            </div>
+            <div class="stat">
+              <strong>9:16</strong>
+              <span>formats sociaux</span>
+            </div>
+            <div class="stat">
+              <strong>IA</strong>
+              <span>génération assistée</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <div class="side-stack">
+            <div class="mini-card">
+              <h3>🎬 Studio complet</h3>
+              <p>Effets, prompts, styles et générateur vidéo orienté portrait.</p>
+            </div>
+            <div class="mini-card">
+              <h3>🧠 Short Drama</h3>
+              <p>Une idée devient scénario, personnages, images clés et voix.</p>
+            </div>
+            <div class="mini-card">
+              <h3>🚀 Publicité & documentaire</h3>
+              <p>Des workflows prêts pour la communication, le média et le storytelling.</p>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel" id="catalogue" style="margin-top:1.5rem; padding:1.3rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <h2 style="margin:0; font-size: clamp(1.6rem, 3vw, 2.1rem);">Catalogue des studios</h2>
+          <span style="color: var(--muted); font-size:0.9rem;">Tous les outils créatifs de MouraDrama</span>
+        </div>
+
+        <div class="cards">
+          <article class="tool-card">
+            <span class="badge">Studio</span>
+            <h3>Studio complet</h3>
+            <p>Génération avancée avec effets, styles et rendu vidéo 9:16.</p>
+            <div class="card-footer">
+              <span>Vidéo / IA</span>
+              <a href="studio.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <span class="badge">Narration</span>
+            <h3>Short Drama</h3>
+            <p>Transforme une idée simple en mini-film structuré.</p>
+            <div class="card-footer">
+              <span>Scénario / voix</span>
+              <a href="ai-studio.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <span class="badge">Documentaire</span>
+            <h3>AI Documentaire</h3>
+            <p>Créez des récits documentaires et des séquences de reportage.</p>
+            <div class="card-footer">
+              <span>Storytelling</span>
+              <a href="ai-documentaire.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <span class="badge">Publicité</span>
+            <h3>AI Pub</h3>
+            <p>Des messages marketing et visuels pour des formats courts.</p>
+            <div class="card-footer">
+              <span>Marque / promo</span>
+              <a href="ai-pub.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <span class="badge">Atelier</span>
+            <h3>Atelier créatif</h3>
+            <p>Expérimentations visuelles, prompts et mises en scène créatives.</p>
+            <div class="card-footer">
+              <span>Expérimentation</span>
+              <a href="atelier.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <span class="badge">Contenu</span>
+            <h3>Story / Histoire</h3>
+            <p>Conception de récits, personnages, arcs narratifs et univers visuels.</p>
+            <div class="card-footer">
+              <span>Narratif</span>
+              <a href="story.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <span class="badge">Kids</span>
+            <h3>Kids Studio</h3>
+            <p>Production plus douce, colorée et ludique pour les contenus jeunesse.</p>
+            <div class="card-footer">
+              <span>Jeunesse</span>
+              <a href="kids-studio.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+
+          <article class="tool-card">
+            <span class="badge">News</span>
+            <h3>News Studio</h3>
+            <p>Formats d’actualité, média et contenus visuels récurrents.</p>
+            <div class="card-footer">
+              <span>Actualité</span>
+              <a href="news-studio.html" class="small-button">Ouvrir</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="features" style="margin-top:1.5rem; padding:1.3rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+          <h2 style="margin:0; font-size: clamp(1.6rem, 3vw, 2.1rem);">Pourquoi ce site fonctionne</h2>
+          <span style="color: var(--muted); font-size:0.9rem;">Une plateforme plus claire et plus rapide à utiliser</span>
+        </div>
+
+        <div class="cards">
+          <article class="feature-card">
+            <h3>🎯 Navigation simplifiée</h3>
+            <p>Un accès centralisé à chaque studio avec des raccourcis clairs et rapides.</p>
+            <ul>
+              <li>Accueil lisible</li>
+              <li>Accès direct aux outils</li>
+              <li>Parcours orienté produit</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <h3>🎨 Design cohérent</h3>
+            <p>Palette moderne, contrastes soignés et cartes pensées pour le web.</p>
+            <ul>
+              <li>UI plus premium</li>
+              <li>Hiérarchie claire</li>
+              <li>Compatible mobile</li>
+            </ul>
+          </article>
+
+          <article class="feature-card">
+            <h3>⚙️ Flexibilité de production</h3>
+            <p>Chaque outil garde son identité, tout en partageant une logique de navigation.</p>
+            <ul>
+              <li>Plusieurs formats</li>
+              <li>Plusieurs usages</li>
+              <li>Évolutivité simple</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer-panel" id="contact">
+        <p><strong>MouraDrama</strong> — studio de création vidéo et génération IA.</p>
+        <p>Produits visuels, storytelling, publicité et outils de création numérique.</p>
+      </footer>
+    </main>
+  </body>
+</html>
