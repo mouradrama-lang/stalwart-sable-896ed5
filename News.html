@@ -61,7 +61,6 @@ textarea{font-size:13px;min-height:64px;resize:vertical;line-height:1.55}
 .search-bar{display:flex;gap:8px;flex-wrap:wrap}
 .search-bar input{flex:1;min-width:180px}
 
-/* Political vision */
 .pv-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .pv-presets button{padding:7px 12px;border-radius:100px;border:1px solid var(--line2);background:var(--bg3);color:var(--fg2);font-size:12px;font-weight:600;transition:.15s}
 .pv-presets button:hover{border-color:var(--gold);color:var(--gold2)}
@@ -69,7 +68,6 @@ textarea{font-size:13px;min-height:64px;resize:vertical;line-height:1.55}
 .pv-color-bar{display:flex;height:4px;border-radius:2px;overflow:hidden;margin-top:8px}
 .pv-color-bar span{flex:1}
 
-/* Styles cards */
 .styles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
 .style-card{background:var(--bg3);border:1px solid var(--line2);border-radius:var(--rs);padding:12px 14px;cursor:pointer;transition:.15s}
 .style-card:hover{border-color:var(--gold);background:rgba(230,180,90,.04)}
@@ -89,7 +87,7 @@ textarea{font-size:13px;min-height:64px;resize:vertical;line-height:1.55}
 .news-item.selected .check{background:var(--gold);border-color:var(--gold);color:#1a1408}
 .news-item .body{flex:1;min-width:0}
 .news-item .title{font-size:13.5px;font-weight:600;line-height:1.4;color:var(--fg)}
-.news-item .meta{font-size:11px;color:var(--mut);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
+.news-item .meta{font-size:11px;color:var(--mut);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .news-empty{padding:32px 20px;text-align:center;color:var(--mut);font-size:13px;line-height:1.6}
 .news-empty .ic{font-size:34px;display:block;margin-bottom:10px;opacity:.6}
 
@@ -145,7 +143,6 @@ textarea{font-size:13px;min-height:64px;resize:vertical;line-height:1.55}
 .icard .imgwrap .badge{position:absolute;top:10px;left:10px;padding:3px 9px;border-radius:100px;background:rgba(0,0,0,.72);color:var(--gold2);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;backdrop-filter:blur(6px);z-index:3}
 .icard .imgwrap .badge.style{left:auto;right:10px;color:#fff;background:rgba(0,0,0,.72)}
 
-/* Carte narrative sous l'image */
 .icard .narrative{padding:12px 14px 4px;border-top:1px solid var(--line)}
 .icard .narrative .n-label{font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:flex;align-items:center;gap:6px}
 .icard .narrative .n-label .n-dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
@@ -291,6 +288,30 @@ textarea{font-size:13px;min-height:64px;resize:vertical;line-height:1.55}
 </div>
 </details>
 
+<details class="card" id="cPaste">
+<summary><span>📋</span> Coller un article directement <span class="cnt" id="pasteCnt">0</span><span class="arr">▾</span></summary>
+<div class="content">
+<div class="hint" style="margin-bottom:12px">Pour les sources non indexées (presse locale algérienne, articles en arabe, exclusivités, paywalls) : collez le titre et le contenu brut. L'IA les analysera comme les articles API.</div>
+<div class="f">
+<label>Titre de l'article</label>
+<input type="text" id="pasteTitle" placeholder="Ex: Mer Noire — frappes de drones sur navires marchands">
+</div>
+<div class="f">
+<label>Source (optionnel)</label>
+<input type="text" id="pasteSource" placeholder="Ex: El Watan, AFP, Le Monde, Echorouk…">
+</div>
+<div class="f">
+<label>Contenu de l'article</label>
+<textarea id="pasteBody" rows="8" placeholder="Collez ici le texte complet. L'IA en tirera une analyse éditoriale et 8 scènes illustrées."></textarea>
+<div class="hint">300 à 500 mots suffisent. Plus le contenu est riche, plus l'analyse et la narration seront fines.</div>
+</div>
+<div class="brow">
+<button class="btn" id="pasteClear">Effacer</button>
+<button class="btn gold" id="pasteAdd">➕ Ajouter à la liste</button>
+</div>
+</div>
+</details>
+
 <details class="card" open id="cPolitics">
 <summary><span>🏛️</span> 2. Votre vision politique <span class="cnt" id="pvBadge">—</span><span class="arr">▾</span></summary>
 <div class="content">
@@ -369,7 +390,7 @@ textarea{font-size:13px;min-height:64px;resize:vertical;line-height:1.55}
 <span class="ic">🎬</span>
 <div class="t">Prêt à créer</div>
 <div class="s">
-<b>1.</b> Colle tes clés Agnes · <b>2.</b> Cherche un sujet · <b>3.</b> Définis ta vision politique · <b>4.</b> Choisis un style visuel · <b>5.</b> Coche les actualités · <b>6.</b> Lance la génération.<br><br>
+<b>1.</b> Colle tes clés Agnes · <b>2.</b> Cherche un sujet (ou colle un article) · <b>3.</b> Définis ta vision politique · <b>4.</b> Choisis un style visuel · <b>5.</b> Coche les actualités · <b>6.</b> Lance la génération.<br><br>
 L'IA analyse chaque actualité, la découpe en 8 scènes, et rédige une narration politique progressive qui accompagne chaque image.
 </div>
 </div>
@@ -928,10 +949,11 @@ async function callText(messages,maxTok){
 async function analyzeNews(news,style,politicalVision){
   var pv=politicalVision&&politicalVision.trim()?politicalVision.trim():'';
   var sys='Tu es un éditorialiste politique et directeur artistique satirique. Tu conçois des illustrations qui racontent une actualité de manière drôle, pertinente et politiquement engagée. Tu retournes UNIQUEMENT du JSON valide, sans markdown, sans commentaire.';
+  var content=(news.body&&news.body.length>200)?news.body.slice(0,5000):(news.description||'');
   var usr=
 'ACTUALITÉ À ILLUSTRER :\n'+
 'Titre : "'+news.title+'"\n'+
-(news.description?'Contexte : '+news.description+'\n':'')+
+(content?'Contenu complet :\n'+content+'\n':'')+
 (news.source?'Source : '+news.source+'\n':'')+
 '\n'+
 'STYLE VISUEL IMPOSÉ : "'+style.name+'"\n'+
@@ -1162,18 +1184,22 @@ function updatePoliticsBadge(){
 
 function renderNews(){
   var list=$('newsList');if(!list)return;
-  $('newsCnt').textContent=st.news.length;
+  var apiCount=st.news.filter(function(x){return !x.pasted}).length;
+  var pastedCount=st.news.filter(function(x){return x.pasted}).length;
+  $('newsCnt').textContent=apiCount;
+  var pc=$('pasteCnt');if(pc)pc.textContent=pastedCount;
   if(!st.news.length){
-    list.innerHTML='<div class="news-empty"><span class="ic">📭</span>Aucune actualité.</div>';return;
+    list.innerHTML='<div class="news-empty"><span class="ic">📭</span>Aucune actualité. Cherche un sujet, ou colle un article ci-dessus.</div>';return;
   }
   list.innerHTML=st.news.map(function(it,i){
     var sel=st.selected.has(i)?' selected':'';
     var date=it.publishedAt?new Date(it.publishedAt).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    var pastedBadge=it.pasted?'<span style="background:var(--gold);color:#1a1408;padding:1px 7px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.04em">📋 COLLÉ</span>':'';
     return '<div class="news-item'+sel+'" data-i="'+i+'">'+
       '<div class="check">'+(sel?'✓':'')+'</div>'+
       '<div class="body">'+
         '<div class="title">'+esc(it.title)+'</div>'+
-        '<div class="meta"><span>#'+(i+1)+'</span>'+(it.source?'<span>'+esc(it.source)+'</span>':'')+(date?'<span>'+esc(date)+'</span>':'')+'</div>'+
+        '<div class="meta">'+pastedBadge+'<span>#'+(i+1)+'</span>'+(it.source?'<span>'+esc(it.source)+'</span>':'')+(date?'<span>'+esc(date)+'</span>':'')+'</div>'+
       '</div></div>';
   }).join('');
   list.querySelectorAll('.news-item').forEach(function(el){
@@ -1403,7 +1429,7 @@ async function launchGeneration(){
     var pctAnalyse=10+Math.round(30*(i/total));
     updateOverlay('Analyse '+(i+1)+'/'+total+' : '+news.title.slice(0,55)+'…',pctAnalyse);
     setStage('🧠 Analyse éditoriale '+ (i+1) +'/'+total+'…');
-    log('Analyse IA news#'+(newsIdx+1),'w');
+    log('Analyse IA news#'+(newsIdx+1)+(news.pasted?' (article collé)':''),'w');
     try{
       var ana=await analyzeNews(news,style,st.politicalVision);
       analyses[newsIdx]=ana;
@@ -1869,8 +1895,9 @@ function showInlineConfirm(){
   var n=sel.length;
   var total=n*st.imgPerNews;
   var estMin=Math.max(1,Math.round(total/(Math.max(2,st.keysAgnes.filter(function(k){return k.active}).length*2)*0.6)));
+  var pastedCount=sel.filter(function(i){return st.news[i]&&st.news[i].pasted}).length;
   var pvInfo=st.politicalVision?('<br><br>🏛️ <b>Vision politique</b> : '+esc(st.politicalVision.slice(0,120))+(st.politicalVision.length>120?'…':'')):'';
-  $('icSummary').innerHTML='Vous allez analyser <b>'+n+' actualité(s)</b> avec l\'IA, puis générer <b>'+total+' image(s)</b> en style <b>'+esc(style?style.name:'—')+'</b>. Chaque image aura une légende politique qui forme une narration progressive.'+pvInfo;
+  $('icSummary').innerHTML='Vous allez analyser <b>'+n+' actualité(s)</b>'+(pastedCount?' dont <b>'+pastedCount+' collé(s)</b>':'')+' avec l\'IA, puis générer <b>'+total+' image(s)</b> en style <b>'+esc(style?style.name:'—')+'</b>. Chaque image aura une légende politique qui forme une narration progressive.'+pvInfo;
   $('icMeta').innerHTML=
     '<span>🎨 '+esc(style?style.name:'—')+'</span>'+
     '<span>🖼️ '+total+' images</span>'+
@@ -1882,7 +1909,48 @@ function showInlineConfirm(){
   },100);
 }
 
-(function init(){
+/* ══════════════ COLLER UN ARTICLE ══════════════ */
+function addPastedArticle(){
+  var title=$('pasteTitle').value.trim();
+  var body=$('pasteBody').value.trim();
+  var source=$('pasteSource').value.trim()||'Article collé';
+  if(title.length<8)return toast('Titre trop court (8 caractères min)','err');
+  if(body.length<80)return toast('Contenu trop court (80 caractères min)','err');
+  if(st.running)return toast('Génération en cours — attends la fin','warn');
+
+  var desc=body.replace(/\s+/g,' ').slice(0,600);
+
+  var news={
+    title:title,
+    description:desc,
+    body:body,
+    source:source,
+    publishedAt:new Date().toISOString(),
+    url:'',
+    rank:0,
+    pasted:true
+  };
+
+  st.news.unshift(news);
+
+  var newSel=new Set();
+  st.selected.forEach(function(i){newSel.add(i+1)});
+  st.selected=newSel;
+
+  renderNews();updateValBar();
+
+  $('pasteTitle').value='';$('pasteSource').value='';$('pasteBody').value='';
+
+  toast('Article ajouté à la liste','ok');
+  log('📋 Article collé : '+title.slice(0,60),'s');
+
+  setTimeout(function(){
+    var first=document.querySelector('#newsList .news-item');
+    if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+  },120);
+}
+
+(async function init(){
   loadEndpoints();
   loadStyles();
   loadPolitics();
@@ -1899,6 +1967,11 @@ function showInlineConfirm(){
 
   $('searchBtn').addEventListener('click',doSearch);
   $('searchQ').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doSearch()}});
+
+  $('pasteAdd').addEventListener('click',addPastedArticle);
+  $('pasteClear').addEventListener('click',function(){
+    $('pasteTitle').value='';$('pasteSource').value='';$('pasteBody').value='';
+  });
 
   $('validateBtn').addEventListener('click',showInlineConfirm);
   $('clearSelBtn').addEventListener('click',function(){
@@ -1968,6 +2041,7 @@ function showInlineConfirm(){
   log('NewsReel prêt — '+st.styles.length+' styles disponibles','s');
   log('Vision politique : '+(st.politicalVision?'définie':'neutre'),'s');
   log('Endpoints news : '+NEWS_ENDPOINTS.map(function(e){return e.name}).join(' → '),'s');
+  log('📋 Collage d\'article : disponible','s');
 })();
 
 async function doSearch(){
@@ -1976,21 +2050,31 @@ async function doSearch(){
   var btn=$('searchBtn');
   busy(btn,true);
   btn.textContent='Recherche…';
+  var keptPasted=st.news.filter(function(x){return x.pasted});
   st.news=[];st.selected.clear();renderNews();updateValBar();
   $('inlineConfirm').classList.remove('on');
   $('newsList').innerHTML='<div class="news-empty"><span class="ic">🔍</span>Recherche en cours…</div>';
   showOverlay('Recherche d\'actualités…','Interrogation des endpoints','Étape 1');
   try{
     var result=await searchNews(q);
-    st.news=result.items;renderNews();
-    toast(result.items.length+' actualité(s) via '+result.endpoint,'ok');
-    log('✅ '+result.items.length+' actualités via '+result.endpoint,'s');
+    st.news=keptPasted.concat(result.items);
+    renderNews();
+    var msg=result.items.length+' actualité(s) via '+result.endpoint;
+    if(keptPasted.length)msg+=' · '+keptPasted.length+' collé(s) préservé(s)';
+    toast(msg,'ok');
+    log('✅ '+result.items.length+' actualités via '+result.endpoint+(keptPasted.length?' (+'+keptPasted.length+' collé(s))':''),'s');
     updateOverlay('Terminé',result.items.length+' actualité(s) trouvée(s)',100);
     setTimeout(hideOverlay,900);
   }catch(e){
     log('Erreur : '+(e.message||e),'e');
     toast('Erreur : '+(e.message||e),'err');
-    $('newsList').innerHTML='<div class="news-empty"><span class="ic">⚠️</span>'+esc(e.message||'Erreur inconnue')+'<br><br>Vérifie le journal technique.</div>';
+    if(keptPasted.length){
+      st.news=keptPasted;
+      renderNews();
+      $('newsList').innerHTML='<div class="news-empty" style="padding:16px"><span class="ic">⚠️</span>'+esc(e.message||'Erreur inconnue')+'<br><br>'+keptPasted.length+' article(s) collé(s) toujours dans la liste.</div>';
+    }else{
+      $('newsList').innerHTML='<div class="news-empty"><span class="ic">⚠️</span>'+esc(e.message||'Erreur inconnue')+'<br><br>Vérifie le journal technique.</div>';
+    }
     updateOverlay('Erreur',e.message||'Erreur inconnue',100);
     setTimeout(hideOverlay,2200);
   }finally{
