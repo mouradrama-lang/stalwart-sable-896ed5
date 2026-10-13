@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Forge Engine v4</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -164,6 +165,8 @@ textarea{font-family:var(--mono);font-size:12px;min-height:80px;resize:vertical;
 h3.sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);margin:14px 0 10px}
 .optgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:640px){.optgrid{grid-template-columns:1fr}}
+.diskrow{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.diskstat{font-size:11.5px;color:var(--mut);font-family:var(--mono);padding:4px 10px;border-radius:100px;background:var(--bg3)}
 </style>
 </head>
 <body>
@@ -172,7 +175,7 @@ h3.sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.0
 <div class="brand">
 <div class="mark">FE</div>
 <div><h1>Forge Engine <span style="color:var(--gold)">v4</span></h1>
-<div class="sub">Le pack crée l'application · générateurs à options</div></div>
+<div class="sub">Le pack crée l'application · sauvegarde disque</div></div>
 </div>
 <div class="statchip" id="chip"><span class="dot"></span><span id="chipTx">Prêt</span></div>
 </header>
@@ -290,19 +293,32 @@ h3.sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.0
 <div class="f"><label>Workers simultanés</label><input type="number" id="workers" value="4" min="1" max="12"></div>
 <div class="f"><label>Intervalle/clé (ms)</label><input type="number" id="interval" value="3000" min="500" max="20000" step="500"></div>
 </div>
-<button class="btn gold" id="startBtn">⚡ LANCER LA PRODUCTION</button>
+
+<div class="gsep" style="height:1px;background:var(--line);margin:16px 0"></div>
+<h3 class="sec" style="margin-top:0">Sauvegarde disque</h3>
+<label class="chk"><input type="checkbox" id="autosaveIn" checked>
+<div><div class="t">Sauvegarder chaque image automatiquement</div>
+<div class="d">Chaque image générée part directement sur ton disque. Rien ne vit dans le navigateur. Tes images survivent à la fermeture de l'onglet, au redémarrage, au vidage de cache.</div></div>
+</label>
+<div class="diskrow">
+<button class="btn sm" id="folderBtn">📁 Choisir un dossier cible</button>
+<span class="diskstat" id="diskStat">Mode : téléchargements</span>
+</div>
+<div class="hint" style="margin-top:8px" id="diskHint">Sans dossier cible, chaque image part dans ton dossier Téléchargements avec un nom horodaté. Sur Chrome/Edge desktop, tu peux choisir un dossier dédié : les images y seront écrites silencieusement.</div>
+
+<button class="btn gold" id="startBtn" style="margin-top:14px">⚡ LANCER LA PRODUCTION</button>
 <div class="hint" style="margin-top:8px">Chaque image générée peut être modifiée par prompt, dérivée en variantes, servir de source à une nouvelle série, ou recevoir les actions du pack.</div>
 </div>
 </details>
 <section id="stream"></section>
 <div class="empty" id="empty">
 <span class="ic">🎬</span><div class="t">Aucune image</div>
-<div class="s">Choisis une application, un générateur, règle ses options, puis lance. La production est toujours en série. Chaque image est modifiable et re-générable.</div>
+<div class="s">Choisis une application, un générateur, règle ses options, puis lance. La production est toujours en série. Chaque image est modifiable et re-générable. Sauvegarde disque activée par défaut.</div>
 </div>
 </section>
 
 <section class="stepsec" id="s4">
-<div class="empty" id="galEmpty"><span class="ic">🗂</span><div class="t">Galerie vide</div><div class="s">Les images de cette session apparaissent ici.</div></div>
+<div class="empty" id="galEmpty"><span class="ic">🗂</span><div class="t">Galerie vide</div><div class="s">Les images de cette session apparaissent ici. Elles sont sauvegardées sur ton disque au fur et à mesure.</div></div>
 <div id="gallery" style="display:none;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px"></div>
 </section>
 
@@ -315,6 +331,7 @@ h3.sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.0
 
 <nav id="bar">
 <button class="bbtn" id="consBtn" title="Console">🛠</button>
+<button class="bbtn" id="zipBtn" title="Tout télécharger en ZIP">📦</button>
 <button class="bbtn play" id="playBtn" disabled>▶</button>
 <button class="bbtn stopb" id="stopBtn" style="display:none">⏹</button>
 <div class="binfo">
@@ -331,26 +348,7 @@ h3.sec{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.0
 <script>
 'use strict';
 /* ════════════════════════════════════════════════════════════════
-   FORGE ENGINE v4
-   ─────────────────────────────────────────────────────────────
-   PRINCIPES :
-   1. Le moteur est une coquille. Un pack = une application.
-   2. Un pack contient des GÉNÉRATEURS d'images. Un générateur
-      déclare : ses sources (images avec rôles : character, decor,
-      outfit…), son texte, son volume, son format, ses OPTIONS
-      (interrupteurs, menus, champs) et son pipeline de prompt.
-   3. Les OPTIONS rendent l'application modifiable sans toucher au
-      code : préserver le visage, garder/changer les vêtements,
-      fusionner 2-3 styles (ex : Picasso × Lindbergh), texte sur le
-      vêtement, incrustation typographique, époque, monochrome…
-      Le moteur affiche les options automatiquement et les intègre
-      au prompt.
-   4. Production TOUJOURS en série (bulk). Chaque image varie sur
-      les axes autorisés par le générateur.
-   5. Chaque image générée est une source : modification par
-      prompt, variantes, actions du pack, nouvelle série.
-   6. L'IA invente les packs via un CONTRAT précis ; un
-      normalisateur répare tout pack imparfait avant validation.
+   FORGE ENGINE v4 — avec sauvegarde disque (A+B+C)
 ════════════════════════════════════════════════════════════════ */
 
 /* ── OUTILS ── */
@@ -389,15 +387,16 @@ var st={
 keys:[],
 api:{endpoint:'https://apihub.agnes-ai.com/v1',mtx:'agnes-2.5-flash',mimg:'agnes-image-2.1-flash'},
 packs:[],
-slots:{},            /* roleId → dataURL */
-optVals:{},          /* "packId:genId:optId" → valeur courante */
+slots:{},
+optVals:{},
 batch:40,ratio:'1:1',size:'1K',workers:4,interval:3000,
-running:false,stop:false,count:0,total:0,items:[]
+running:false,stop:false,count:0,total:0,items:[],
+autosave:true
 };
 var queue=[],workers=[];
 
 /* ════════════════════════════════════════════════════════════════
-   CLÉS & API (config Agnès figée — jamais affichée)
+   CLÉS & API
 ════════════════════════════════════════════════════════════════ */
 function keysFromInput(){
   return($('keysIn').value||'').split(/\r?\n/).map(function(l){return l.trim()}).filter(Boolean)
@@ -441,7 +440,7 @@ function acquire(){
       if(st.stop)return rej(new Error('Arrêt demandé'));
       var k=availKey();
       if(k){k.count++;k.lastReq=Date.now();return res(k)}
-      if(!st.keys.some(function(x){return x.active}))return rej(new Error('Aucune clé disponible (cooldown ou mortes)'));
+      if(!st.keys.some(function(x){return x.active}))return rej(new Error('Aucune clé disponible'));
       setTimeout(loop,300);
     })();
   });
@@ -499,7 +498,131 @@ function callText(system,user,maxTok){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   NORMALISATEUR — tout pack IA approximatif devient exploitable
+   PERSISTANCE DISQUE — A) téléchargement auto · B) dossier cible · C) ZIP
+════════════════════════════════════════════════════════════════ */
+var dirHandle=null;
+
+function pad2(n){return String(n).padStart(2,'0')}
+function makeFilename(styleName,idx){
+  var d=new Date();
+  var ts=d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'-'+pad2(d.getHours())+pad2(d.getMinutes())+pad2(d.getSeconds());
+  var slug=String(styleName||'image').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,30)||'image';
+  return 'forge-'+ts+'-'+pad2(idx||1)+'-'+slug+'.png';
+}
+
+/* A — téléchargement via ancre */
+function saveToDisk(url,filename){
+  return fetch(url,{mode:'cors'})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.blob()})
+    .then(function(blob){
+      var u=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=u;a.download=filename;a.style.display='none';
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(u)},400);
+      log('💾 Téléchargements/'+filename,'s');
+      return true;
+    })
+    .catch(function(e){
+      log('Téléchargement direct impossible ('+(e.message||e)+') → onglet','w');
+      window.open(url,'_blank');
+      return false;
+    });
+}
+
+/* B — dossier cible (File System Access API) */
+async function pickFolder(){
+  if(!window.showDirectoryPicker)throw new Error('Navigateur non supporté — utilise Chrome ou Edge desktop');
+  dirHandle=await window.showDirectoryPicker({mode:'readwrite'});
+  saveLS('fe_folder',{name:dirHandle.name});
+  log('📁 Dossier cible : '+dirHandle.name,'s');
+  toast('Dossier « '+dirHandle.name+' » sélectionné','ok');
+  updateDiskUI();
+}
+async function saveToFolder(url,filename){
+  if(!dirHandle)return false;
+  try{
+    var resp=await fetch(url,{mode:'cors'});
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    var blob=await resp.blob();
+    var fh=await dirHandle.getFileHandle(filename,{create:true});
+    var w=await fh.createWritable();
+    await w.write(blob);
+    await w.close();
+    log('💾 '+dirHandle.name+'/'+filename,'s');
+    return true;
+  }catch(e){
+    log('Écriture dossier échouée ('+(e.message||e)+') → repli téléchargement','w');
+    return saveToDisk(url,filename);
+  }
+}
+
+/* Routage intelligent A ou B */
+function saveImage(url,styleName){
+  if(st.autosave===false)return;
+  var fname=makeFilename(styleName,st.items.length+1);
+  if(dirHandle)return saveToFolder(url,fname);
+  return saveToDisk(url,fname);
+}
+
+/* C — archive ZIP avec manifest */
+function downloadZip(){
+  return run($('zipBtn'),function(){
+    if(!st.items.length)throw new Error('Aucune image à archiver');
+    if(typeof JSZip==='undefined')throw new Error('JSZip non chargé — vérifie ta connexion');
+    log('Préparation de l\'archive ('+st.items.length+' images)…');
+    var zip=new JSZip();
+    var folder=zip.folder('forge-'+Date.now());
+    var manifest=[];
+    var tasks=st.items.map(function(it,i){
+      var fname=makeFilename(it.style,i+1);
+      manifest.push({file:fname,style:it.style,pack:it.pack,prompt:it.prompt,source:it.url.slice(0,120)});
+      return fetch(it.url,{mode:'cors'})
+        .then(function(r){return r.blob()})
+        .then(function(b){folder.file(fname,b)})
+        .catch(function(e){log('Image '+(i+1)+' non archivée : '+(e.message||e),'w')});
+    });
+    folder.file('manifest.json',JSON.stringify(manifest,null,2));
+    return Promise.all(tasks)
+      .then(function(){return zip.generateAsync({type:'blob'},function(m){
+        $('bStat').textContent='Compression… '+Math.round(m.percent)+'%';
+      })})
+      .then(function(blob){
+        var u=URL.createObjectURL(blob);
+        var a=document.createElement('a');
+        a.href=u;a.download='forge-export-'+Date.now()+'.zip';
+        a.click();
+        setTimeout(function(){URL.revokeObjectURL(u)},1500);
+        toast('Archive prête : '+st.items.length+' images','ok');
+        log('📦 Archive téléchargée','s');
+      });
+  });
+}
+
+function updateDiskUI(){
+  var stat=$('diskStat'),btn=$('folderBtn'),hint=$('diskHint');
+  if(!stat)return;
+  if(dirHandle){
+    stat.textContent='📁 '+dirHandle.name;
+    btn.textContent='📁 '+dirHandle.name;
+    btn.classList.remove('dng');
+    hint.textContent='Chaque image générée sera écrite directement dans « '+dirHandle.name+' ». Aucun passage par Téléchargements.';
+  }else if(window.showDirectoryPicker){
+    stat.textContent='Mode : téléchargements';
+    btn.textContent='📁 Choisir un dossier cible';
+    hint.textContent='Sans dossier cible, chaque image part dans ton dossier Téléchargements avec un nom horodaté. Tu peux choisir un dossier dédié : les images y seront écrites silencieusement.';
+  }else{
+    stat.textContent='Mode : téléchargements';
+    btn.textContent='📁 Non supporté sur ce navigateur';
+    btn.disabled=true;
+    hint.textContent='Ton navigateur ne supporte pas la sélection de dossier. Chaque image sera téléchargée automatiquement dans Téléchargements.';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   NORMALISATEUR
 ════════════════════════════════════════════════════════════════ */
 function normOpt(o,i){
   if(!o||typeof o!=='object')return null;
@@ -545,7 +668,6 @@ function normalizePack(p){
     if(!Array.isArray(p.layers[k]))delete p.layers[k];
     else p.layers[k]=p.layers[k].filter(function(x){return typeof x==='string'&&x.trim()});
   });
-  /* GÉNÉRATEURS (ex recipes/modes/generators) */
   var gens=[];
   (p.generators||p.recipes||p.modes||[]).forEach(function(g,i){
     if(typeof g==='string')g={name:g};
@@ -565,13 +687,11 @@ function normalizePack(p){
     gen.ratio=g.ratio||null;
     gen.variants=g.variants||g.vary||['location','light','mood'];
     if(typeof gen.variants==='string')gen.variants=gen.variants.split(',');
-    /* options du générateur */
     gen.options=[];
     (g.options||[]).forEach(function(o,j){
       var opt=normOpt(o,j);
       if(opt)gen.options.push(opt);
     });
-    /* pipeline de prompt */
     var steps=g.steps||g.pipeline||[];
     if(!steps.length){
       steps=[];
@@ -634,7 +754,7 @@ function exportPack(id){
 }
 function editPack(id){
   var p=packById(id);if(!p)return;
-  openModal('✏️ Éditer : '+p.name,'<div class="f"><label>JSON de l\'application — styles, générateurs, options, actions. Modifie puis sauvegarde.</label><textarea id="edJson" rows="18" spellcheck="false">'+esc(JSON.stringify(p,null,2))+'</textarea></div><button class="btn gold" id="edSave">💾 Sauvegarder</button>');
+  openModal('✏️ Éditer : '+p.name,'<div class="f"><label>JSON de l\'application</label><textarea id="edJson" rows="18" spellcheck="false">'+esc(JSON.stringify(p,null,2))+'</textarea></div><button class="btn gold" id="edSave">💾 Sauvegarder</button>');
   $('edSave').onclick=function(){return run(this,function(){
     var obj=JSON.parse($('edJson').value);
     if(obj.id===p.id){st.packs=st.packs.filter(function(x){return x.id!==p.id});savePacks()}
@@ -644,7 +764,7 @@ function editPack(id){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   MOTEUR — options, fusions de styles, prompt, production
+   MOTEUR
 ════════════════════════════════════════════════════════════════ */
 function optKey(pid,gid,oid){return pid+':'+gid+':'+oid}
 function getOptVal(pack,gen,opt){
@@ -653,7 +773,6 @@ function getOptVal(pack,gen,opt){
   return opt.def;
 }
 function setOptVal(pack,gen,opt,v){st.optVals[optKey(pack.id,gen.id,opt.id)]=v}
-/* Fragment de prompt produit par une option */
 function optFragment(pack,gen,opt){
   var v=getOptVal(pack,gen,opt);
   if(opt.type==='toggle')return v?String(opt.on||''):'';
@@ -668,7 +787,6 @@ function optFragment(pack,gen,opt){
   if(opt.type==='number')return String(opt.prompt||'{{VALUE}}').replace(/\{\{VALUE\}\}/g,String(v));
   return'';
 }
-/* Tirage de styles — avec fusion si une option "styleMix" existe et vaut >1 */
 function mixOptOf(pack,gen){
   return gen.options.find(function(o){return o.id==='styleMix'||o.id==='mix'||(o.type==='select'&&(o.id==='styles'||o.id==='fusion'))});
 }
@@ -696,7 +814,6 @@ function layerValue(pack,layer){
   var L=pack.layers&&pack.layers[layer];
   return(L&&L.length)?rnd(L):'';
 }
-/* Variations par image : axes autorisés par le générateur */
 var AXES_PROMPTS={
 pose:['new pose, different body language','seated composition','walking stance','three-quarter turn'],
 location:['new location entirely','different environment','another place, same mood'],
@@ -711,14 +828,12 @@ function variantFragment(gen){
   var a=rnd(axes);
   return'EACH IMAGE VARIES ON: '+a+' — '+rnd(AXES_PROMPTS[a])+'.';
 }
-/* Résolution des {{...}} dans un texte */
 function resolveVars(txt,ctx){
   return String(txt)
     .replace(/\{\{USER\}\}/g,ctx.userText||'')
     .replace(/\{\{STYLE\}\}/g,ctx.styles.map(function(s){return s.name}).join(' × '))
     .replace(/\{\{VALUE\}\}/g,ctx.optionValue||'');
 }
-/* Construction du prompt complet */
 function buildPrompt(pack,gen,ctx){
   var parts=[];
   gen.steps.forEach(function(stp){
@@ -733,7 +848,6 @@ function buildPrompt(pack,gen,ctx){
           ctx.styles.map(function(s){return s.name+' ('+s.prompt+')'}).join(' ; ')+'. The fusion must feel intentional, coherent, not collage.');
       }
     }else if(stp.styleEach){
-      /* un style différent par image : déjà géré par ctx.styles */
     }else if(stp.layer){
       var v=layerValue(pack,stp.layer);
       if(v)parts.push(String(stp.label||stp.layer).toUpperCase()+': '+v+'.');
@@ -748,10 +862,6 @@ function buildPrompt(pack,gen,ctx){
       parts.push(resolveVars(stp.text,ctx));
     }
   });
-  /* Injection des fragments d'options non référencées explicitement :
-     toute option "importante" (toggle/select/text non vide) qui n'est
-     pas déjà dans le prompt est ajoutée, pour que TOUTE option cochée
-     agisse toujours. */
   gen.options.forEach(function(o){
     if(gen.steps.some(function(s){return s.opt===o.id}))return;
     if(mixOptOf(pack,gen)===o)return;
@@ -767,7 +877,7 @@ function currentPack(){return packById($('packSel').value)}
 function currentGen(){var p=currentPack();return p?(p.generators.find(function(g){return g.id===$('genSel').value})||null):null}
 function pickRatio(){return st.ratio==='mixed'?rnd(['1:1','1:1','9:16','16:9']):st.ratio}
 
-/* ── SLOTS (images avec rôles) ── */
+/* ── SLOTS ── */
 function renderSlots(){
   var gen=currentGen();
   var el=$('slots');el.innerHTML='';
@@ -775,7 +885,7 @@ function renderSlots(){
   if(!gen.images.length){
     el.innerHTML='<div class="slot" id="slot-free"><input type="file" accept="image/*"><div class="ic">🖼</div><div class="st">Image source</div><div class="sr">optionnel</div></div>';
     wireSlot($('slot-free'),'free');
-    $('slotsHint').textContent='Aucun rôle déclaré : une image source optionnelle est disponible (utile pour dériver ensuite).';
+    $('slotsHint').textContent='Aucun rôle déclaré : une image source optionnelle est disponible.';
     return;
   }
   gen.images.forEach(function(img){
@@ -806,7 +916,7 @@ function genSources(gen){
   return gen.images.map(function(i){return st.slots[i.role]}).filter(Boolean);
 }
 
-/* ── OPTIONS dynamiques du générateur ── */
+/* ── OPTIONS ── */
 function renderGenOpts(){
   var pack=currentPack(),gen=currentGen();
   var el=$('genOpts');
@@ -814,7 +924,7 @@ function renderGenOpts(){
   if(!pack||!gen){$('genOptsHint').style.display='none';return}
   $('genOptsHint').style.display='';
   if(!gen.options.length){
-    el.innerHTML='<div class="hint">Ce générateur n\'a pas d\'option déclarée — il fonctionne avec ses réglages par défaut.</div>';
+    el.innerHTML='<div class="hint">Ce générateur n\'a pas d\'option déclarée.</div>';
     return;
   }
   gen.options.forEach(function(o){
@@ -837,7 +947,7 @@ function renderGenOpts(){
   });
 }
 
-/* ── EXÉCUTION ── */
+/* ── PRODUCTION ── */
 function updateBar(){
   $('bProg').style.width=(st.total?Math.round(100*st.count/st.total):0)+'%';
   if(st.running)$('bStat').textContent='Production '+st.count+' / '+st.total+'…';
@@ -924,9 +1034,11 @@ function addItem(pack,label,styleName,url,prompt){
     '<div class="bmsg" id="msg-'+id+'"></div>';
   $('stream').appendChild(el);$('empty').style.display='none';
   el.querySelector('img').onclick=function(){openZoom(url,styleName,prompt)};
-  st.items.push({url:url,style:styleName,pack:pack.name,prompt:prompt});
+  st.items.push({id:id,url:url,style:styleName,pack:pack.name,prompt:prompt});
   renderActs(pack,id,url,prompt);renderGallery();
   log('✓ image : '+styleName,'s');
+  /* ↓↓↓ SAUVEGARDE DISQUE AUTOMATIQUE ↓↓↓ */
+  saveImage(url,styleName);
 }
 function addErrBlock(msg){
   var el=document.createElement('div');el.className='blk err';
@@ -966,7 +1078,7 @@ function toggleEditZone(pack,id,url){
   var z=$('ed-'+id);
   if(z.classList.contains('on')){z.classList.remove('on');z.innerHTML='';return}
   z.classList.add('on');
-  z.innerHTML='<textarea id="ta-'+id+'" placeholder="Ta modification : ex « même personnage, haute couture noire, galerie au crépuscule, fusion Picasso × photo argentique »"></textarea>'+
+  z.innerHTML='<textarea id="ta-'+id+'" placeholder="Ta modification : ex « même personnage, haute couture noire, galerie au crépuscule »"></textarea>'+
   '<div class="brow"><button class="btn sm" id="cn-'+id+'" style="flex:0 0 130px">Série ('+st.batch+')</button><button class="btn gold" id="go-'+id+'">🎨 Forger la modification</button></div>';
   $('go-'+id).onclick=function(){return run(this,function(){
     var p=$('ta-'+id).value.trim();
@@ -988,7 +1100,7 @@ function toggleEditZone(pack,id,url){
 function runPackAction(pack,action,url,id){
   var userText='';
   if(action.ask){userText=(window.prompt(action.ask)||'').trim();if(!userText)return}
-  log('Action « '+action.name+' » · '+action.n+' image(s) en branche');
+  log('Action « '+action.name+' » · '+action.n+' image(s)');
   produceSeries(pack,{name:action.name,steps:action.steps||[{use:'ref'},{style:true},{use:'quality'}],images:[],needsText:false,count:true,variants:['pose','light','mood'],options:[]},
     {n:action.n,sources:[url],userText:userText});
   var m=$('msg-'+id);if(m){m.textContent='✔ '+action.n+' « '+action.name+' » lancé(s)';m.className='bmsg on ok'}
@@ -1018,11 +1130,11 @@ function renderGallery(){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   ASSISTANT IA — le CONTRAT complet du moteur v4
+   ASSISTANT IA
 ════════════════════════════════════════════════════════════════ */
-var CONTRACT='CONTRAT Forge Engine v4. API image : POST /v1/images/generations {model, prompt(<=1900 chars), n:1, size:"1K"|"2K", ratio, image:[dataURL sources, max 4], extra_body:{response_format:"url"}}. Un pack = une application : {"id","name","icon","desc","styles":[{"id","cat","name","prompt"(anglais)}],"layers":{"nomCouche":["valeur",...]},"generators":[...],"actions":[...],"blocks":{"blocId":"texte"}}. GENERATEUR = {"id","name","hint","images":[{"role":"character|decor|outfit|style|reference|...","label","required":bool}],"needsText":bool,"count":true,"ratio":null,"variants":["pose|location|light|mood|outfit|era",...],"options":[...],"steps":[...]}. OPTIONS (le moteur affiche ces contrôles automatiquement et les intègre au prompt) : {"id","label","type":"toggle"|"select"|"text"|"number","def","hint","on":"fragment prompt si activé","off":""} OU select {"choices":[{"v","label","prompt":"fragment"}]} OU text/number {"prompt":"fragment avec {{VALUE}}"}. Convention recommandée : option id "styleMix" type select avec choices v:"1"|"2"|"3" = nombre de styles fusionnés par image (fusion Picasso x photographe = v 2). Autres options utiles : keepFace (toggle, conservation du visage), keepOutfit, monochrome, era (text), clothingText (text, texte imprime sur le vetement). STEPS du pipeline : {"use":"blocId"} | {"style":true} (injecte le(s) style(s) tires, fusion si styleMix>1) | {"layer":"couche","label":"ETIQUETTE"} | {"opt":"optionId"} (fragment de l option) | {"text":"litteral avec {{USER}} et {{STYLE}}"}. Regles : chaque "use" existe dans blocks ; chaque "layer" existe dans layers (5-8 valeurs) ; toute option non referencee par un step est quand meme ajoutee si son fragment est non vide ; production toujours en serie (count:true) ; JSON strict une ligne ; apostrophes echappees \\u0027 ; pas de guillemets doubles dans le texte.';
-var OPT_SYSTEM='Tu es un architecte d\'applications pour Forge Engine. Réponds UNIQUEMENT du JSON valide : {"suggestions":[{"id":"kebab","title":"titre court","desc":"une ligne en français : ce que ce générateur produit, ses sources (image? texte? rôles?), ses options"}]}. Propose 8 à 14 GÉNÉRATEURS D\'IMAGES concrets, adaptés au domaine : séries depuis une image personnage, depuis texte seul, multi-sources avec rôles (character+decor, character+outfit), moodboards, fusions de styles, avec options (keepFace, monochrome, styleMix, clothingText…). Échappe les apostrophes en \\u0027.';
-var BUILD_SYSTEM='Tu es un architecte d\'applications pour Forge Engine v4. '+CONTRACT+' Réponds UNIQUEMENT du JSON du pack complet. Les générateurs cochés doivent tous apparaître avec des OPTIONS riches et pertinentes (n\'aie pas peur des toggles, selects et champs texte : le moteur les affiche automatiquement). Utilise styleMix quand la fusion d\'artistes a du sens.';
+var CONTRACT='CONTRAT Forge Engine v4. API image : POST /v1/images/generations {model, prompt(<=1900 chars), n:1, size:"1K"|"2K", ratio, image:[dataURL sources, max 4], extra_body:{response_format:"url"}}. Un pack = une application : {"id","name","icon","desc","styles":[{"id","cat","name","prompt"(anglais)}],"layers":{"nomCouche":["valeur",...]},"generators":[...],"actions":[...],"blocks":{"blocId":"texte"}}. GENERATEUR = {"id","name","hint","images":[{"role":"character|decor|outfit|style|reference|...","label","required":bool}],"needsText":bool,"count":true,"ratio":null,"variants":["pose|location|light|mood|outfit|era",...],"options":[...],"steps":[...]}. OPTIONS : {"id","label","type":"toggle"|"select"|"text"|"number","def","hint","on":"fragment prompt si activé","off":""} OU select {"choices":[{"v","label","prompt":"fragment"}]} OU text/number {"prompt":"fragment avec {{VALUE}}"}. Convention recommandée : option id "styleMix" type select avec choices v:"1"|"2"|"3" = nombre de styles fusionnés par image. Autres options : keepFace (toggle), keepOutfit, monochrome, era (text), clothingText (text). STEPS du pipeline : {"use":"blocId"} | {"style":true} | {"layer":"couche","label":"ETIQUETTE"} | {"opt":"optionId"} | {"text":"litteral avec {{USER}} et {{STYLE}}"}. Regles : chaque "use" existe dans blocks ; chaque "layer" existe dans layers (5-8 valeurs) ; JSON strict une ligne ; apostrophes echappees \\u0027.';
+var OPT_SYSTEM='Tu es un architecte d\'applications pour Forge Engine. Réponds UNIQUEMENT du JSON valide : {"suggestions":[{"id":"kebab","title":"titre court","desc":"une ligne en français"}]}. Propose 8 à 14 GÉNÉRATEURS D\'IMAGES concrets. Échappe les apostrophes en \\u0027.';
+var BUILD_SYSTEM='Tu es un architecte d\'applications pour Forge Engine v4. '+CONTRACT+' Réponds UNIQUEMENT du JSON du pack complet.';
 
 var wzOpts=[];
 function tryParseJSON(txt){
@@ -1096,9 +1208,9 @@ function wzBuild(){
     var count=12;
     document.querySelectorAll('#wzCount button').forEach(function(b){if(b.classList.contains('on'))count=parseInt(b.dataset.v)});
     var selTxt=sel.map(function(s,i){return(i+1)+'. '+s.title+' — '+(s.desc||'')}).join('\n');
-    wzBusy(true);wzStep('L\'IA construit l\'application ('+count+' styles, '+sel.length+' générateurs avec leurs options)… 20 à 60 secondes.');
+    wzBusy(true);wzStep('L\'IA construit l\'application ('+count+' styles, '+sel.length+' générateurs)… 20 à 60 secondes.');
     log('Assistant : construction — '+count+' styles, générateurs : '+sel.map(function(s){return s.title}).join(', '));
-    var req='Application : '+desc+'.\nGénérateurs à inclure :\n'+selTxt+'\nDonne exactement '+count+' styles. Chaque générateur coché devient un generator complet avec ses options (toggles, selects, textes) — enrichis selon ta connaissance du domaine. Utilise des rôles d\'images pertinents (character, decor, outfit…) et styleMix quand la fusion d\'artistes a du sens. JSON seul.';
+    var req='Application : '+desc+'.\nGénérateurs à inclure :\n'+selTxt+'\nDonne exactement '+count+' styles. JSON seul.';
     function attempt(n,fix){
       return callText(BUILD_SYSTEM,fix?('Ta réponse précédente est invalide ('+fix+'). Renvoie une version corrigée STRICTEMENT valide, JSON seul.'):(req),6000)
         .then(function(txt){
@@ -1149,13 +1261,12 @@ function renderPacks(){
   var el=$('packList');
   $('packBadge').textContent=st.packs.length;
   if(!st.packs.length){
-    el.innerHTML='<div class="hint">Aucune application. Utilise l\'assistant IA ci-dessous : décris ce que tu veux produire, il conçoit l\'application avec ses générateurs et options.</div>';
+    el.innerHTML='<div class="hint">Aucune application. Utilise l\'assistant IA ci-dessous.</div>';
   }else{
     el.innerHTML=st.packs.map(function(p){
       var genInfo=p.generators.map(function(g){
         var roles=g.images.map(function(i){return i.role}).join('+')||'—';
-        var nOpt=g.options.length;
-        return'• ⚙️ '+esc(g.name)+' <span style="color:var(--faint)">(sources : '+esc(roles)+(g.needsText?' · texte':'')+' · '+nOpt+' option(s)+'+g.variants.length+' axes de variation)</span>';
+        return'• ⚙️ '+esc(g.name)+' <span style="color:var(--faint)">(sources : '+esc(roles)+(g.needsText?' · texte':'')+' · '+g.options.length+' option(s)+'+g.variants.length+' axes)</span>';
       }).join('<br>');
       return'<div class="pack"><span class="pi">'+esc(p.icon||'📦')+'</span>'+
       '<div class="pt"><div class="pn">'+esc(p.name)+' <span style="color:var(--faint);font-size:11px;font-weight:600">'+esc(p.id)+'</span></div>'+
@@ -1208,8 +1319,11 @@ $('ratio').onchange=function(){st.ratio=this.value};
 $('sizeSel').onchange=function(){st.size=this.value};
 $('workers').onchange=function(){st.workers=Math.max(1,Math.min(12,parseInt(this.value)||4));renderKeys()};
 $('interval').onchange=function(){st.interval=Math.max(500,parseInt(this.value)||3000);renderKeys()};
+$('autosaveIn').onchange=function(){st.autosave=this.checked;saveLS('fe_cfg',{autosave:this.checked});log('Sauvegarde disque → '+(this.checked?'activée':'désactivée'))};
+$('folderBtn').onclick=function(){return run(this,function(){return pickFolder()})};
 $('startBtn').onclick=runProduction;
 $('playBtn').onclick=runProduction;
+$('zipBtn').onclick=downloadZip;
 $('stopBtn').onclick=function(){
   st.stop=true;queue.length=0;
   log('Arrêt demandé','w');toast('Arrêt — les requêtes en vol se terminent','warn');
@@ -1245,19 +1359,22 @@ $('lbX').onclick=function(){$('lb').classList.remove('on')};
   if(cfg.ratio){st.ratio=cfg.ratio;$('ratio').value=st.ratio}
   if(cfg.size){st.size=cfg.size;$('sizeSel').value=st.size}
   if(cfg.workers){st.workers=cfg.workers;$('workers').value=st.workers}
-  if(cfg.interval){st.interval=cfg.interval;$('interval').value=st.interval}
-  renderPacks();renderKeys();
-  setInterval(function(){saveLS('fe_cfg',{batch:st.batch,ratio:st.ratio,size:st.size,workers:st.workers,interval:st.interval})},2000);
-  log('Forge Engine v4 démarré — '+st.packs.length+' application(s)');
+  if(cfg.interval){st.interval=cfg.interval;$('interval').value=cfg.interval}
+  if(cfg.autosave===false){st.autosave=false;$('autosaveIn').checked=false}
+  var fold=loadLS('fe_folder',null);
+  if(fold&&fold.name)log('Dossier cible mémorisé : '+fold.name+' (à re-sélectionner à chaque session pour raisons de sécurité)','w');
+  renderPacks();renderKeys();updateDiskUI();
+  setInterval(function(){saveLS('fe_cfg',{batch:st.batch,ratio:st.ratio,size:st.size,workers:st.workers,interval:st.interval,autosave:st.autosave})},2000);
+  log('Forge Engine v4 démarré — '+st.packs.length+' application(s) · sauvegarde disque '+(st.autosave?'activée':'désactivée'));
   if(!st.packs.length)log('Aucune application : étape 2, l\'assistant IA en construit une','w');
   updateSteps();
 })();
 
-/* ══ APPLICATION DÉMO — génèreurs riches avec options ══ */
+/* ══ APPLICATION DÉMO ══ */
 if(!packById('app-demo')){
   installPack({
   id:'app-demo',name:'Studio portraits · couture · fusion',icon:'🎨',
-  desc:'Application de démonstration : générateurs multi-sources avec options complètes — fusion de styles (Picasso × photographes), conservation visage/vêtements, texte sur vêtement, monochrome, époque.',
+  desc:'Application de démonstration : générateurs multi-sources avec options complètes — fusion de styles, conservation visage/vêtements, texte sur vêtement, monochrome, époque.',
   styles:[
   {id:'lindb',cat:'photo',name:'Peter Lindbergh',prompt:'Peter Lindbergh style: black and white portrait, natural light, no retouch, raw skin and soul, close crop'},
   {id:'avedon',cat:'photo',name:'Richard Avedon',prompt:'Richard Avedon style: bare white seamless backdrop, subject alone, sharp raking daylight, unposed honesty'},
@@ -1279,36 +1396,36 @@ if(!packById('app-demo')){
   eras:['1930s Paris','1960s New York','contemporary','1920s Belle Époque','near future']
   },
   generators:[
-  {id:'serie',name:'Série portraits (image personnage)',hint:'Série de portraits : même visage, styles tirés selon l\'option fusion',images:[{role:'character',label:'Personnage (visage)',required:true}],needsText:false,count:true,
+  {id:'serie',name:'Série portraits (image personnage)',hint:'Série de portraits : même visage, styles tirés selon fusion',images:[{role:'character',label:'Personnage (visage)',required:true}],needsText:false,count:true,
    variants:['pose','location','light','mood'],
    options:[
-   {id:'styleMix',label:'Fusion de styles par image',type:'select',def:'1',hint:'1 = un style par image · 2 ou 3 = fusion d\'artistes (ex : Picasso × Lindbergh)',choices:[{v:'1',label:'Un seul style',prompt:''},{v:'2',label:'Fusion de 2 artistes',prompt:''},{v:'3',label:'Fusion de 3 artistes',prompt:''}]},
-   {id:'keepFace',label:'Préserver strictement le visage',type:'toggle',def:true,hint:'Le visage doit rester identique à la source',on:'CRITICAL: the face MUST stay the EXACT SAME person as the reference. Identical features, never beautify, never age.'},
-   {id:'keepOutfit',label:'Garder les vêtements de la source',type:'toggle',def:false,hint:'Sinon la garde-robe change à chaque image',on:'Keep the SAME hairstyle and clothing articles as the reference image (silhouette, color, texture).'},
-   {id:'clothingText',label:'Texte imprimé sur le vêtement',type:'text',def:'',hint:'Laisse vide pour aucun texte. Ex : FOLLOW, VOTEZ, MON FILM',prompt:'TEXT ON CLOTHING: print exactly and only "{{VALUE}}" on the front of the garment, centered, uppercase bold sans-serif, perfectly readable, flat and undistorted. No other text anywhere.'},
-   {id:'era',label:'Époque',type:'select',def:'free',hint:'Transposition d\'époque',choices:[{v:'free',label:'Libre',prompt:''},{v:'1930',label:'Années 1930',prompt:'Restage in the 1930s: period wardrobe, art deco atmosphere.'},{v:'1960',label:'Années 1960',prompt:'Restage in the 1960s: mod wardrobe, analog film mood.'},{v:'now',label:'Contemporain',prompt:'Restage in the present day, contemporary wardrobe and setting.'}]},
-   {id:'mono',label:'Monochrome',type:'toggle',def:false,hint:'Force le noir et blanc',on:'Strict black and white rendering, silver halide tonality.'}
+   {id:'styleMix',label:'Fusion de styles par image',type:'select',def:'1',hint:'1 = un style · 2 ou 3 = fusion',choices:[{v:'1',label:'Un seul style',prompt:''},{v:'2',label:'Fusion de 2',prompt:''},{v:'3',label:'Fusion de 3',prompt:''}]},
+   {id:'keepFace',label:'Préserver strictement le visage',type:'toggle',def:true,on:'CRITICAL: the face MUST stay the EXACT SAME person as the reference. Identical features, never beautify, never age.'},
+   {id:'keepOutfit',label:'Garder les vêtements de la source',type:'toggle',def:false,on:'Keep the SAME hairstyle and clothing articles as the reference image.'},
+   {id:'clothingText',label:'Texte imprimé sur le vêtement',type:'text',def:'',prompt:'TEXT ON CLOTHING: print exactly and only "{{VALUE}}" on the front of the garment, centered, uppercase bold sans-serif.'},
+   {id:'era',label:'Époque',type:'select',def:'free',choices:[{v:'free',label:'Libre',prompt:''},{v:'1930',label:'Années 1930',prompt:'Restage in the 1930s: period wardrobe, art deco atmosphere.'},{v:'1960',label:'Années 1960',prompt:'Restage in the 1960s.'},{v:'now',label:'Contemporain',prompt:'Restage in the present day.'}]},
+   {id:'mono',label:'Monochrome',type:'toggle',def:false,on:'Strict black and white rendering, silver halide tonality.'}
    ],
    steps:[{use:'ref'},{use:'face'},{use:'expr'},{style:true},{layer:'locations',label:'location'},{layer:'lights',label:'light'},{layer:'moods',label:'mood'},{use:'quality'}]},
   {id:'duo',name:'Personnage + décor (2 images)',hint:'Le visage de l\'image 1 dans le décor de l\'image 2',images:[{role:'character',label:'Personnage (visage)',required:true},{role:'decor',label:'Décor / ambiance',required:true}],needsText:false,count:true,
    variants:['pose','light','mood'],
-   options:[{id:'styleMix',label:'Fusion de styles',type:'select',def:'1',choices:[{v:'1',label:'Un style',prompt:''},{v:'2',label:'Fusion de 2',prompt:''}]}],
-   steps:[{use:'ref'},{use:'face'},{text:'PLACE the person from the FIRST source image inside the environment of the SECOND source image, respecting its light, palette and atmosphere.'},{use:'expr'},{style:true},{layer:'moods',label:'mood'},{use:'quality'}]},
-  {id:'texte',name:'Série depuis un texte',hint:'Le brief devient le sujet ; styles selon fusion',images:[],needsText:true,count:true,
+   options:[{id:'styleMix',label:'Fusion',type:'select',def:'1',choices:[{v:'1',label:'Un style',prompt:''},{v:'2',label:'Fusion de 2',prompt:''}]}],
+   steps:[{use:'ref'},{use:'face'},{text:'PLACE the person from the FIRST source image inside the environment of the SECOND source image.'},{use:'expr'},{style:true},{layer:'moods',label:'mood'},{use:'quality'}]},
+  {id:'texte',name:'Série depuis un texte',hint:'Le brief devient le sujet',images:[],needsText:true,count:true,
    variants:['pose','location','light','mood'],
-   options:[{id:'styleMix',label:'Fusion de styles',type:'select',def:'1',choices:[{v:'1',label:'Un style',prompt:''},{v:'2',label:'Fusion de 2',prompt:''},{v:'3',label:'Fusion de 3',prompt:''}]}],
+   options:[{id:'styleMix',label:'Fusion',type:'select',def:'1',choices:[{v:'1',label:'Un style',prompt:''},{v:'2',label:'Fusion de 2',prompt:''},{v:'3',label:'Fusion de 3',prompt:''}]}],
    steps:[{text:'SCENE: {{USER}}.'},{style:true},{layer:'locations',label:'location'},{layer:'moods',label:'mood'},{use:'quality'}]},
   {id:'fusion',name:'Fusion libre (2 images de style)',hint:'Image 1 = personnage, image 2 = style à imiter',images:[{role:'character',label:'Personnage',required:true},{role:'style',label:'Image dont il faut imiter le style',required:true}],needsText:false,count:true,
    variants:['pose','light','mood'],
    options:[],
-   steps:[{use:'ref'},{use:'face'},{text:'Repaint the person from the FIRST source image ADOPTING the exact art style, palette and texture of the SECOND source image.'},{style:true},{use:'quality'}]},
+   steps:[{use:'ref'},{use:'face'},{text:'Repaint the person from the FIRST source image ADOPTING the exact art style of the SECOND source image.'},{style:true},{use:'quality'}]},
   {id:'mood',name:'Moodboard décor (sans personnage)',hint:'Atmosphères pures, 16:9',images:[],needsText:false,count:true,ratio:'16:9',
    variants:['location','light','mood'],
    options:[{id:'mono',label:'Monochrome',type:'toggle',def:false,on:'Strict black and white rendering.'}],
    steps:[{use:'decor'},{style:true},{layer:'locations',label:'location'},{layer:'lights',label:'light'},{layer:'moods',label:'mood'},{use:'quality'}]}
   ],
   actions:[
-  {id:'var',name:'Variantes',icon:'🎨',n:3,steps:[{use:'ref'},{text:'SAME person, SAME art style, TOTALLY DIFFERENT pose, decor, lighting and era.'},{style:true},{use:'quality'}]},
+  {id:'var',name:'Variantes',icon:'🎨',n:3,steps:[{use:'ref'},{text:'SAME person, SAME art style, TOTALLY DIFFERENT pose, decor, lighting.'},{style:true},{use:'quality'}]},
   {id:'outfit',name:'Changer la tenue',icon:'👗',n:2,ask:'Nouvelle tenue :',steps:[{use:'ref'},{text:'SAME person, SAME style, wearing: {{USER}}.'},{use:'quality'}]},
   {id:'decor',name:'Changer le décor',icon:'🏛️',n:2,ask:'Nouveau décor :',steps:[{use:'ref'},{text:'SAME person, SAME outfit, placed in: {{USER}}.'},{use:'quality'}]}
   ],
@@ -1316,8 +1433,8 @@ if(!packById('app-demo')){
   face:'FACE PRESERVATION: the person in the output MUST be the EXACT SAME PERSON as in the reference image. Identical features, bone structure, eyes, nose, mouth, skin tone. Never beautify, never age.',
   expr:'The character faces the camera, head clearly visible, composed and intelligent expression.',
   ref:'Take THIS image as the new reference.',
-  decor:'ENVIRONMENT ONLY: no person, no face — pure set design, architecture, props and atmosphere. Cinematic scale, restrained palette.',
-  quality:'Masterpiece quality: refined lighting, professional color grading, high detail. No watermark, no signature, no garishness.'
+  decor:'ENVIRONMENT ONLY: no person, no face — pure set design, architecture, props and atmosphere.',
+  quality:'Masterpiece quality: refined lighting, professional color grading, high detail. No watermark, no signature.'
   }
   },false);
 }
