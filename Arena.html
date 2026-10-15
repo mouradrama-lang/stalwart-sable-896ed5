@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ma Todo List</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh; display: flex;
+    justify-content: center; padding: 40px 20px;
+  }
+  .container {
+    background: white; border-radius: 16px;
+    padding: 30px; width: 100%; max-width: 450px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  h1 { text-align: center; color: #333; margin-bottom: 20px; }
+  .input-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  input[type="text"] {
+    flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0;
+    border-radius: 8px; font-size: 16px; outline: none;
+    transition: border-color 0.3s;
+  }
+  input[type="text"]:focus { border-color: #667eea; }
+  button.add {
+    padding: 12px 20px; background: #667eea; color: white;
+    border: none; border-radius: 8px; font-size: 16px;
+    cursor: pointer; transition: background 0.3s;
+  }
+  button.add:hover { background: #5a6fd6; }
+  .stats {
+    text-align: center; color: #888; margin-bottom: 15px;
+    font-size: 14px;
+  }
+  ul { list-style: none; }
+  li {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; border-radius: 8px; margin-bottom: 8px;
+    background: #f8f9fa; transition: all 0.3s;
+  }
+  li:hover { background: #eef0ff; }
+  li.done span { text-decoration: line-through; color: #aaa; }
+  li input[type="checkbox"] {
+    width: 20px; height: 20px; cursor: pointer;
+    accent-color: #667eea;
+  }
+  li span { flex: 1; font-size: 16px; color: #333; }
+  li button.del {
+    background: none; border: none; color: #e74c3c;
+    font-size: 20px; cursor: pointer; opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+  li button.del:hover { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 Ma Todo List</h1>
+  <div class="input-row">
+    <input type="text" id="taskInput" placeholder="Nouvelle tâche..." />
+    <button class="add" onclick="addTask()">+</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <ul id="taskList"></ul>
+</div>
+<script>
+  let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+
+  function save() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+
+  function render() {
+    const list = document.getElementById('taskList');
+    const stats = document.getElementById('stats');
+    const done = tasks.filter(t => t.done).length;
+    stats.textContent = tasks.length
+      ? `${done}/${tasks.length} tâche(s) terminée(s)`
+      : 'Aucune tâche pour le moment ✨';
+    list.innerHTML = '';
+    tasks.forEach((t, i) => {
+      const li = document.createElement('li');
+      li.className = t.done ? 'done' : '';
+      li.innerHTML = `
+        <input type="checkbox" ${t.done ? 'checked' : ''}
+               onchange="toggle(${i})">
+        <span>${t.text}</span>
+        <button class="del" onclick="remove(${i})">✕</button>`;
+      list.appendChild(li);
+    });
+  }
+
+  function addTask() {
+    const input = document.getElementById('taskInput');
+    const text = input.value.trim();
+    if (!text) return;
+    tasks.push({ text, done: false });
+    input.value = '';
+    save(); render();
+  }
+
+  function toggle(i) { tasks[i].done = !tasks[i].done; save(); render(); }
+  function remove(i) { tasks.splice(i, 1); save(); render(); }
+
+  document.getElementById('taskInput')
+    .addEventListener('keypress', e => { if (e.key === 'Enter') addTask(); });
+
+  render();
+</script>
+</body>
+</html>
