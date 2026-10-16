@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agnes Video 2.5 Flash — Test T2V / I2V</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0a0a12;--panel:#12121c;--panel2:#1a1a28;--border:#2a2a3a;
+--ink:#e8e6e0;--dim:#8a8896;--faint:#4a4858;
+--gold:#e5c15a;--gold2:#b89a3a;
+--ok:#4a9d6a;--err:#c85a4a;--warn:#d4a017;
+--r:8px;
+--fm:ui-monospace,'SF Mono',Menlo,monospace;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1.5rem 1rem 4rem;font-size:15px;line-height:1.5;max-width:900px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:300;margin-bottom:.4rem;background:linear-gradient(135deg,var(--gold),#e87b35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
+.subtitle{text-align:center;color:var(--dim);font-size:.85rem;font-style:italic;margin-bottom:1.5rem}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem;margin-bottom:1rem}
+.panel h2{font-size:.75rem;text-transform:uppercase;letter-spacing:.15em;color:var(--dim);margin-bottom:.8rem;font-weight:700}
+input[type=password],input[type=text],textarea,select{width:100%;padding:.8rem 1rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.9rem;margin-bottom:.6rem;outline:none}
+textarea{min-height:90px;resize:vertical;font-family:var(--fm);font-size:.82rem;line-height:1.5}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+select{cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23e5c15a' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right 1rem center;background-size:10px;-webkit-appearance:none;appearance:none}
+.btn{width:100%;padding:.9rem;border-radius:var(--r);border:none;background:linear-gradient(135deg,var(--gold),#e87b35);color:#0a0a12;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.05em;margin-bottom:.6rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:hover:not(:disabled){opacity:.9}
+.tabs{display:flex;gap:.4rem;margin-bottom:1rem}
+.tab{flex:1;padding:.7rem;border-radius:var(--r);border:1px solid var(--border);background:var(--panel);color:var(--dim);font-weight:600;cursor:pointer;font-family:inherit;font-size:.85rem}
+.tab.active{background:var(--gold);color:#0a0a12;border-color:var(--gold)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.status{font-size:.75rem;padding:.6rem .9rem;border-radius:var(--r);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;background:var(--panel2);color:var(--dim);border:1px solid var(--border)}
+.status.ok{background:rgba(74,157,106,.1);color:var(--ok);border-color:rgba(74,157,106,.4)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex-shrink:0}
+.status.ok .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.hint{font-size:.72rem;color:var(--dim);line-height:1.5;margin-top:.4rem}
+.hint a{color:var(--gold);text-decoration:none;border-bottom:1px dotted var(--gold2)}
+.log{background:#05050a;border:1px solid var(--border);border-radius:var(--r);padding:.8rem 1rem;font-family:var(--fm);font-size:.72rem;line-height:1.55;max-height:260px;overflow-y:auto;color:#a8d8b0}
+.log .line{margin-bottom:.15rem}
+.log .t{color:var(--faint);margin-right:.5rem}
+.log .info{color:#7cc4e8}
+.log .ok{color:var(--ok)}
+.log .warn{color:var(--warn)}
+.log .err{color:var(--err)}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1rem}
+.video-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeIn .4s}
+.video-card video{width:100%;display:block;background:#000;aspect-ratio:9/16;object-fit:contain}
+.video-card .cap{padding:.6rem .8rem;font-size:.72rem;color:var(--dim);background:var(--panel);border-top:1px solid var(--border)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--faint);font-size:.85rem;border:1px dashed var(--border);border-radius:var(--r)}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--r);padding:1.2rem;text-align:center;cursor:pointer;background:var(--bg);margin-bottom:.6rem;position:relative;transition:.2s}
+.upload-zone:hover{border-color:var(--gold);background:rgba(229,193,90,.04)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-zone .icon{font-size:1.8rem;opacity:.6;margin-bottom:.3rem}
+.upload-zone .t1{font-size:.85rem}
+.upload-zone .t2{font-size:.7rem;color:var(--dim);margin-top:.2rem}
+.preview{margin-top:.6rem;position:relative}
+.preview img{width:100%;max-height:280px;object-fit:contain;background:#000;border:1px solid var(--gold2);border-radius:var(--r)}
+.preview .rm{position:absolute;top:.5rem;right:.5rem;background:rgba(200,90,74,.9);color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.9rem}
+</style>
+</head>
+<body>
+
+<h1>Agnes Video 2.5 Flash</h1>
+<p class="subtitle">Test Text-to-Video & Image-to-Video</p>
+
+<!-- API KEY -->
+<div class="panel">
+<h2>🔑 Clé API Agnes</h2>
+<input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" spellcheck="false">
+<button class="btn" id="saveKey">Enregistrer la clé</button>
+<div class="status" id="apiStatus"><span class="dot"></span><span id="apiText">Aucune clé enregistrée</span></div>
+<div class="hint">Clé gratuite sur <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+<button class="tab active" data-tab="t2v">📝 Texte → Vidéo</button>
+<button class="tab" data-tab="i2v">🖼️ Image → Vidéo</button>
+</div>
+
+<!-- TEXT TO VIDEO -->
+<div class="tab-content active" id="tab-t2v">
+<div class="panel">
+<h2>Prompt (en anglais recommandé)</h2>
+<textarea id="t2vPrompt" placeholder="Ex: A cinematic shot of a wolf running through a snowy forest at dusk, slow motion, atmospheric fog, warm golden light"></textarea>
+
+<div class="row">
+<div>
+<h2>Ratio</h2>
+<select id="t2vRatio">
+<option value="9:16">9:16 — Portrait</option>
+<option value="16:9">16:9 — Paysage</option>
+<option value="1:1">1:1 — Carré</option>
+</select>
+</div>
+<div>
+<h2>Durée</h2>
+<select id="t2vSeconds">
+<option value="4">4 secondes</option>
+<option value="5" selected>5 secondes</option>
+<option value="8">8 secondes</option>
+<option value="10">10 secondes</option>
+<option value="12">12 secondes</option>
+</select>
+</div>
+</div>
+
+<button class="btn" id="genT2V">🎬 Générer la vidéo</button>
+</div>
+</div>
+
+<!-- IMAGE TO VIDEO -->
+<div class="tab-content" id="tab-i2v">
+<div class="panel">
+<h2>Image de départ</h2>
+
+<div class="upload-zone" id="i2vUpload">
+<input type="file" id="i2vFile" accept="image/*">
+<div class="icon">🖼️</div>
+<div class="t1">Cliquez pour choisir une image</div>
+<div class="t2">Elle sera uploadée automatiquement pour obtenir une URL publique</div>
+</div>
+
+<div id="i2vPreviewContainer" style="display:none" class="preview">
+<img id="i2vPreview" alt="">
+<button class="rm" id="i2vRemove">✕</button>
+</div>
+
+<div style="margin-top:.6rem">
+<h2>Ou collez directement une URL d'image (optionnel)</h2>
+<input type="text" id="i2vUrl" placeholder="https://exemple.com/image.jpg">
+</div>
+
+<h2 style="margin-top:1rem">Prompt de mouvement</h2>
+<textarea id="i2vPrompt" placeholder="Ex: The camera slowly pushes in while the character smiles and the wind moves their hair"></textarea>
+
+<div class="row">
+<div>
+<h2>Ratio</h2>
+<select id="i2vRatio">
+<option value="9:16" selected>9:16 — Portrait</option>
+<option value="16:9">16:9 — Paysage</option>
+<option value="1:1">1:1 — Carré</option>
+</select>
+</div>
+<div>
+<h2>Durée</h2>
+<select id="i2vSeconds">
+<option value="4">4 secondes</option>
+<option value="5" selected>5 secondes</option>
+<option value="8">8 secondes</option>
+<option value="10">10 secondes</option>
+<option value="12">12 secondes</option>
+</select>
+</div>
+</div>
+
+<button class="btn" id="genI2V">🎬 Générer depuis l'image</button>
+</div>
+</div>
+
+<!-- RESULTS -->
+<div class="panel">
+<h2>🎥 Vidéos générées</h2>
+<div id="results">
+<div class="empty">Les vidéos générées apparaîtront ici</div>
+</div>
+</div>
+
+<!-- LOG -->
+<div class="panel">
+<h2>📋 Journal</h2>
+<div class="log" id="log">
+<div class="line"><span class="t">--:--:--</span><span class="info">[Init]</span> Prêt. Collez votre clé API.</div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+const POLL_BASE = 'https://apihub.agnes-ai.com/agnesapi';
+const MODEL_VIDEO = 'agnes-video-2.5-flash';
+const API_KEY_STORAGE = 'agnes_video_test_key';
+
+const POLL_INTERVAL_SEC = 8;
+const FIRST_POLL_DELAY_SEC = 60;
+const MAX_POLL_ATTEMPTS = 100;
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function log(msg, type){
+  type = type || 'info';
+  const el = $('log');
+  const t = new Date().toLocaleTimeString('fr-FR');
+  const line = document.createElement('div');
+  line.className = 'line';
+  line.innerHTML = '<span class="t">'+t+'</span><span class="'+type+'">['+type.toUpperCase()+']</span> '+msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+  console.log('[Agnes]', msg);
+}
+
+// ═══════════════════════════════════════════════════════════
+// API KEY
+// ═══════════════════════════════════════════════════════════
+function getKey(){
+  try { return (localStorage.getItem(API_KEY_STORAGE) || '').trim(); }
+  catch(e){ return ''; }
+}
+function saveKey(){
+  const k = $('apiKey').value.trim();
+  try {
+    if(k) localStorage.setItem(API_KEY_STORAGE, k);
+    else localStorage.removeItem(API_KEY_STORAGE);
+  } catch(e){}
+  updateKeyUI();
+  log(k ? 'Clé API enregistrée' : 'Clé API supprimée', k ? 'ok' : 'warn');
+}
+function updateKeyUI(){
+  const k = getKey();
+  if(k){
+    $('apiStatus').classList.add('ok');
+    $('apiText').textContent = 'Clé active · ' + k.slice(0,8) + '…' + k.slice(-4);
+    $('apiKey').value = k;
+  } else {
+    $('apiStatus').classList.remove('ok');
+    $('apiText').textContent = 'Aucune clé enregistrée';
+    $('apiKey').value = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    $('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// IMAGE UPLOAD (via catbox.moe pour URL publique)
+// ═══════════════════════════════════════════════════════════
+let uploadedImageUrl = null;
+
+$('i2vUpload').addEventListener('click', () => $('i2vFile').click());
+
+$('i2vFile').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ log('Fichier non image', 'err'); return; }
+  if(file.size > 8*1024*1024){ log('Image trop lourde (max 8 Mo)', 'err'); return; }
+
+  // Preview
+  const reader = new FileReader();
+  reader.onload = ev => {
+    $('i2vPreview').src = ev.target.result;
+    $('i2vPreviewContainer').style.display = 'block';
+    $('i2vUpload').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+
+  // Upload
+  log('Upload de l\'image vers catbox.moe…', 'info');
+  try {
+    const formData = new FormData();
+    formData.append('reqtype', 'fileupload');
+    formData.append('fileToUpload', file);
+
+    const res = await fetch('https://catbox.moe/user/api.php', {
+      method: 'POST',
+      body: formData
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const url = (await res.text()).trim();
+    if(!url.startsWith('http')) throw new Error('Réponse invalide : ' + url.slice(0, 100));
+
+    uploadedImageUrl = url;
+    log('Image uploadée : ' + url.slice(0, 60) + '…', 'ok');
+  } catch(err){
+    log('Erreur upload : ' + err.message, 'err');
+    log('Essaie une URL manuelle dans le champ prévu', 'warn');
+  }
+});
+
+$('i2vRemove').addEventListener('click', () => {
+  uploadedImageUrl = null;
+  $('i2vPreviewContainer').style.display = 'none';
+  $('i2vUpload').style.display = 'block';
+  $('i2vFile').value = '';
+});
+
+// ═══════════════════════════════════════════════════════════
+// API CALLS
+// ═══════════════════════════════════════════════════════════
+async function createVideoTask(body){
+  const key = getKey();
+  if(!key) throw new Error('Clé API manquante');
+
+  log('POST /videos — mode=' + (body.mode || 'text') + ' · ' + body.seconds + 's · ' + body.aspect_ratio, 'info');
+
+  const res = await fetch(API_BASE + '/videos', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + key,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  const text = await res.text();
+  if(!res.ok){
+    log('HTTP ' + res.status + ' : ' + text.slice(0, 300), 'err');
+    throw new Error('HTTP ' + res.status);
+  }
+
+  let data;
+  try { data = JSON.parse(text); } catch(e){ throw new Error('Réponse JSON invalide'); }
+
+  const videoId = data.video_id || data.id || data.task_id;
+  if(!videoId){
+    log('Réponse complète : ' + text.slice(0, 400), 'err');
+    throw new Error('Pas de video_id');
+  }
+
+  log('Tâche créée : ' + videoId, 'ok');
+  return videoId;
+}
+
+async function pollVideo(videoId){
+  const key = getKey();
+
+  // Attente initiale
+  let rem = FIRST_POLL_DELAY_SEC;
+  while(rem > 0){
+    log('Attente initiale — ' + rem + 's', 'info');
+    await sleep(1000);
+    rem--;
+  }
+
+  for(let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++){
+    if(attempt > 0){
+      let r = POLL_INTERVAL_SEC;
+      while(r > 0){
+        log('Prochain poll dans ' + r + 's', 'info');
+        await sleep(1000);
+        r--;
+      }
+    }
+
+    const url = POLL_BASE + '?video_id=' + encodeURIComponent(videoId)
+              + '&model_name=' + encodeURIComponent(MODEL_VIDEO);
+
+    try {
+      const res = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      const d = await res.json();
+      const status = d.status || 'unknown';
+      const progress = d.progress || 0;
+
+      log('Poll #' + (attempt + 1) + ' — status=' + status + ' progress=' + progress + '%', 'info');
+
+      if(status === 'completed' || status === 'succeeded' || status === 'done'){
+        const videoUrl = d.url || (d.metadata && d.metadata.url) || (d.output && d.output.url);
+        if(!videoUrl) throw new Error('Terminé mais pas d\'URL');
+        log('Vidéo prête !', 'ok');
+        return videoUrl;
+      }
+      if(status === 'failed' || status === 'error' || status === 'cancelled'){
+        throw new Error('Échec (' + status + ') : ' + (d.error || d.message || 'inconnu'));
+      }
+    } catch(err){
+      log('Erreur poll : ' + err.message, 'warn');
+    }
+  }
+  throw new Error('Délai maximal dépassé');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DISPLAY RESULT
+// ═══════════════════════════════════════════════════════════
+function displayVideo(url, label){
+  const results = $('results');
+  const empty = results.querySelector('.empty');
+  if(empty) empty.remove();
+
+  const card = document.createElement('div');
+  card.className = 'video-card';
+  card.innerHTML =
+    '<video src="' + url + '" controls playsinline preload="metadata"></video>' +
+    '<div class="cap">' + label + '</div>';
+  results.insertBefore(card, results.firstChild);
+}
+
+// ═══════════════════════════════════════════════════════════
+// GENERATE — TEXT TO VIDEO
+// ═══════════════════════════════════════════════════════════
+$('genT2V').addEventListener('click', async () => {
+  const prompt = $('t2vPrompt').value.trim();
+  if(!prompt){ log('Prompt vide', 'err'); return; }
+  if(!getKey()){ log('Ajoutez une clé API', 'err'); return; }
+
+  const ratio = $('t2vRatio').value;
+  const seconds = $('t2vSeconds').value;
+
+  $('genT2V').disabled = true;
+  $('genT2V').textContent = '⏳ Génération…';
+
+  log('════════════════════════════', 'info');
+  log('Text-to-Video : ' + seconds + 's · ' + ratio, 'info');
+
+  try {
+    const body = {
+      model: MODEL_VIDEO,
+      prompt: prompt,
+      seconds: seconds,
+      size: '720P',
+      aspect_ratio: ratio,
+      mode: 'text'
+    };
+
+    const videoId = await createVideoTask(body);
+    const url = await pollVideo(videoId);
+    displayVideo(url, '📝 T2V · ' + seconds + 's · ' + ratio);
+    log('✅ Vidéo affichée', 'ok');
+  } catch(err){
+    log('Erreur : ' + err.message, 'err');
+  }
+
+  $('genT2V').disabled = false;
+  $('genT2V').textContent = '🎬 Générer la vidéo';
+});
+
+// ═══════════════════════════════════════════════════════════
+// GENERATE — IMAGE TO VIDEO
+// ═══════════════════════════════════════════════════════════
+$('genI2V').addEventListener('click', async () => {
+  const prompt = $('i2vPrompt').value.trim();
+  const manualUrl = $('i2vUrl').value.trim();
+  const imageUrl = manualUrl || uploadedImageUrl;
+
+  if(!imageUrl){ log('Ajoutez une image (upload ou URL)', 'err'); return; }
+  if(!getKey()){ log('Ajoutez une clé API', 'err'); return; }
+
+  const ratio = $('i2vRatio').value;
+  const seconds = $('i2vSeconds').value;
+
+  $('genI2V').disabled = true;
+  $('genI2V').textContent = '⏳ Génération…';
+
+  log('════════════════════════════', 'info');
+  log('Image-to-Video : ' + seconds + 's · ' + ratio, 'info');
+  log('Image : ' + imageUrl.slice(0, 60) + '…', 'info');
+
+  try {
+    const body = {
+      model: MODEL_VIDEO,
+      prompt: prompt || 'subtle movement, camera slowly pushes in, natural motion',
+      seconds: seconds,
+      size: '720P',
+      aspect_ratio: ratio,
+      mode: 'keyframe',
+      first_frame: imageUrl
+    };
+
+    const videoId = await createVideoTask(body);
+    const url = await pollVideo(videoId);
+    displayVideo(url, '🖼️ I2V · ' + seconds + 's · ' + ratio);
+    log('✅ Vidéo affichée', 'ok');
+  } catch(err){
+    log('Erreur : ' + err.message, 'err');
+  }
+
+  $('genI2V').disabled = false;
+  $('genI2V').textContent = '🎬 Générer depuis l\'image';
+});
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+$('saveKey').addEventListener('click', saveKey);
+$('apiKey').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); saveKey(); }
+});
+
+updateKeyUI();
+log('Application prête. Modèle : ' + MODEL_VIDEO, 'ok');
+log('Format : seconds (4-12) · size=720P · aspect_ratio 9:16/16:9/1:1', 'info');
+log('Mode text : pas d\'image · Mode keyframe : first_frame + last_frame', 'info');
+</script>
+</body>
+</html>
