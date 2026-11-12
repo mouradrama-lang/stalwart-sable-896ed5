@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrameForge — générateur visuel pour La Trame du Réel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TRAMEFORGE — "Steel Editorial"
+   Moteur ArtForge adapté à La Trame du Réel
+   Palette : papier vieilli, encre, sépia, bleu-gris maritime
+============================================================ */
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* palette documentaire / archives */
+  --bg:#d6d1c6;
+  --bg2:#efeae0;
+  --bg3:#ddd6c9;
+  --line:#b8b0a0;
+  --line2:#8c8474;
+  --ink:#1a1510;
+  --ink2:#453d31;
+  --ink3:#7a7060;
+  --navy:#1a1510;
+  --navy2:#2a221a;
+  --pill:#8b6f47;
+  --pill2:#b89a6a;
+
+  /* variables historiques utilisées par la logique JS */
+  --gold:#8b6f47;
+  --gold-dim:rgba(139,111,71,.10);
+  --cyan:#4a6b7a;
+  --cyan-dim:rgba(74,107,122,.10);
+  --green:#4a6b3c;
+  --green-dim:rgba(74,107,60,.11);
+  --red:#a83b2c;
+  --red-dim:rgba(168,59,44,.10);
+  --orange:#c4581f;
+
+  --radius:22px;
+  --radius-sm:14px;
+  --sans:'Inter Tight','Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --serif:'Cormorant Garamond',Georgia,serif;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font:14px/1.55 var(--sans);
+  color:var(--ink);
+  min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(ellipse 60% 50% at 85% -5%,rgba(255,255,255,.5),transparent 62%),
+    radial-gradient(ellipse 50% 45% at -5% 100%,rgba(139,111,71,.28),transparent 60%),
+    linear-gradient(180deg,#ddd7c8 0%,#c9c1b0 100%);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;mix-blend-mode:multiply;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .08  0 0 0 0 .06  0 0 0 0 .03  0 0 0 .35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    linear-gradient(rgba(26,21,16,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(26,21,16,.045) 1px,transparent 1px);
+  background-size:180px 180px,96px 96px,96px 96px;
+}
+body::after{
+  content:"";position:fixed;right:-12vw;bottom:-18vw;width:60vw;height:60vw;pointer-events:none;z-index:0;border-radius:50%;
+  background:repeating-radial-gradient(circle at 50% 50%,transparent 0 38px,rgba(26,21,16,.07) 38px 39px);
+  -webkit-mask-image:radial-gradient(circle,#000 20%,transparent 70%);
+  mask-image:radial-gradient(circle,#000 20%,transparent 70%);
+}
+::selection{background:var(--navy);color:#f2eee0}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#c9c1b0}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:99px;border:2px solid #c9c1b0}
+::-webkit-scrollbar-thumb:hover{background:var(--navy2)}
+
+.hidden{display:none!important}
+#main,#loginBox{position:relative;z-index:3}
+
+/* ---------- HUD ---------- */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:45}
+#hud .c{position:absolute;width:22px;height:22px;border:0 solid var(--navy);opacity:.55}
+#hud .tl{top:70px;left:12px;border-top-width:1.5px;border-left-width:1.5px}
+#hud .tr{top:70px;right:12px;border-top-width:1.5px;border-right-width:1.5px}
+#hud .bl{bottom:64px;left:12px;border-bottom-width:1.5px;border-left-width:1.5px}
+#hud .br{bottom:64px;right:12px;border-bottom-width:1.5px;border-right-width:1.5px}
+#hud .coord{position:absolute;right:42px;top:76px;font:500 9px var(--mono);letter-spacing:.26em;color:var(--ink3);text-transform:uppercase}
+#hud .coord b{color:var(--orange);font-weight:700}
+#hud .rail{position:absolute;left:16px;top:50%;width:1px;height:96px;background:linear-gradient(transparent,var(--navy),transparent);opacity:.4;transform:translateY(-50%)}
+@media(max-width:860px){#hud .coord,#hud .rail{display:none}}
+
+/* ---------- TOPBAR ---------- */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:60px;padding:0 1.4rem;
+  display:flex;align-items:center;gap:.9rem;z-index:50;
+  background:rgba(239,234,224,.78);
+  backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);
+  border-bottom:1px solid var(--line);
+  font:500 11px var(--mono);
+}
+#topbar::after{
+  content:"";position:absolute;left:0;bottom:-1px;height:2px;width:100%;
+  background:linear-gradient(90deg,var(--navy) 0,var(--pill) 40%,var(--orange) 78%,var(--navy) 100%);
+  background-size:300% 100%;animation:flow 10s linear infinite;opacity:.9;
+}
+@keyframes flow{to{background-position:300% 0}}
+.brand{display:flex;align-items:center;gap:.65rem;flex-shrink:0}
+.brand svg{width:34px;height:34px;display:block}
+.brand b{font:800 1rem var(--sans);letter-spacing:-.01em;color:var(--navy);text-transform:uppercase}
+.brand b i{font-style:normal;color:var(--pill)}
+.brand small{display:block;font:500 8.5px var(--mono);letter-spacing:.24em;color:var(--ink3);margin-top:-2px}
+#modeTag{
+  padding:.32rem .85rem;border-radius:99px;background:rgba(26,21,16,.07);
+  border:1px solid var(--line);color:var(--ink3);
+  font:700 10px var(--mono);letter-spacing:.14em;white-space:nowrap;
+}
+#modeTag.live{background:var(--navy);border-color:var(--navy);color:#f2eee0}
+#modeTag.live::before{content:"";display:inline-block;width:6px;height:6px;margin-right:.5rem;background:#7ec46a;border-radius:50%;box-shadow:0 0 10px #7ec46a;animation:pulse 1.6s ease-in-out infinite;vertical-align:middle}
+@keyframes pulse{50%{opacity:.3;transform:scale(.6)}}
+#globalStat{color:var(--ink2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;letter-spacing:.04em}
+#globalStat b{color:var(--navy)}
+@media(max-width:640px){.brand small{display:none}#globalStat{display:none}}
+
+/* ---------- LAYOUT ---------- */
+#main{max-width:1280px;margin:0 auto;padding:5.2rem 1.4rem 140px}
+
+/* ---------- TITRES ---------- */
+h1{font:800 2.4rem var(--sans);letter-spacing:-.045em;color:var(--navy);text-transform:uppercase;line-height:.95}
+h2{
+  font:800 1.65rem var(--sans);letter-spacing:-.035em;color:var(--navy);
+  margin:.3rem 0 .5rem;display:flex;align-items:center;gap:.6rem;
+}
+h2::before{content:"";width:.5em;height:.5em;border-radius:50%;background:var(--pill);box-shadow:0 0 0 4px rgba(139,111,71,.28);flex-shrink:0}
+.sub{color:var(--ink2);font-size:.9rem;margin-bottom:1.2rem;max-width:62ch}
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero{
+  position:relative;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);
+  align-items:end;gap:1rem;margin-bottom:1.4rem;min-height:300px;
+}
+.hero-copy{position:relative;z-index:2;padding-bottom:.4rem}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font:700 10px var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--ink3);margin-bottom:.9rem;
+}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--navy)}
+.hero h1{
+  font:900 clamp(3.6rem,11vw,9rem)/.82 var(--sans);letter-spacing:-.062em;color:var(--navy);
+  margin-bottom:1.1rem;
+}
+.hero h1 em{font-style:normal;display:inline-flex;align-items:center;gap:.25em;vertical-align:middle}
+.hero h1 .out{color:transparent;-webkit-text-stroke:2px var(--navy)}
+.chip-people{
+  display:inline-flex;align-items:center;gap:.55rem;padding:.35rem .9rem .35rem .4rem;border-radius:99px;
+  background:rgba(239,234,224,.92);border:1px solid var(--line);box-shadow:0 8px 24px -10px rgba(26,21,16,.4);
+  font:600 11px var(--mono);letter-spacing:0;color:var(--ink);text-transform:none;transform:translateY(-.4em);
+}
+.chip-people .av{display:flex}
+.chip-people .av i{width:26px;height:26px;border-radius:50%;border:2px solid #efeae0;margin-left:-8px;background:radial-gradient(circle at 35% 30%,#fff,#8b6f47 60%,#1a1510)}
+.chip-people .av i:first-child{margin-left:0}
+.chip-people .av i:nth-child(2){background:radial-gradient(circle at 35% 30%,#fff,#c4581f 60%,#5a1f0a)}
+.chip-people small{display:block;font-size:9px;color:var(--ink3)}
+.hero-pills{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.2rem}
+.pill-tag{
+  padding:.38rem .85rem;border-radius:99px;background:var(--pill);color:#f2eee0;
+  font:700 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;
+}
+.pill-tag.ghost{background:transparent;border:1px solid var(--navy);color:var(--navy)}
+.hero-art{position:relative;z-index:1;align-self:stretch;display:flex;align-items:flex-end;justify-content:flex-end;min-height:260px}
+.hero-art svg{width:min(100%,430px);height:auto;display:block;margin-bottom:-1.4rem;filter:drop-shadow(0 30px 40px rgba(26,21,16,.35))}
+@media(max-width:860px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .hero-art{position:absolute;right:-6%;top:-1rem;width:52%;min-height:0;opacity:.9}
+  .hero-art svg{margin:0}
+}
+
+/* ---------- ONGLETS ---------- */
+.tabs{
+  display:flex;gap:0;margin-bottom:1.5rem;flex-wrap:wrap;counter-reset:t;
+  background:linear-gradient(180deg,var(--navy2),var(--navy));
+  border-radius:16px;padding:5px;border:1px solid #3a2e22;
+  box-shadow:0 18px 40px -22px rgba(26,21,16,.8),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.tab{
+  flex:1;min-width:max-content;padding:.8rem 1.1rem;border-radius:11px;border:none;background:transparent;
+  color:#c9b896;cursor:pointer;font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;
+  transition:.2s;position:relative;
+}
+.tab::before{counter-increment:t;content:"0" counter(t);font:500 9px var(--mono);opacity:.5;margin-right:.55rem}
+.tab + .tab::after{content:"";position:absolute;left:0;top:28%;bottom:28%;width:1px;background:rgba(255,255,255,.14)}
+.tab:hover{color:#fff;background:rgba(255,255,255,.07)}
+.tab.active{background:var(--pill2);color:var(--navy);box-shadow:0 6px 18px -6px rgba(0,0,0,.5)}
+.tab.active::after,.tab.active + .tab::after{display:none}
+@media(max-width:700px){.tab{flex:1 1 45%;font-size:10px;padding:.7rem .6rem}}
+
+/* ---------- CARTES ---------- */
+.card{
+  position:relative;background:rgba(239,234,224,.9);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(140,132,116,.55);border-radius:var(--radius);
+  padding:1.5rem;margin-bottom:1rem;
+  box-shadow:0 1px 0 #fff inset,0 24px 60px -28px rgba(26,21,16,.45);
+}
+.card::after{content:"+";position:absolute;top:.85rem;right:1.15rem;font:500 15px var(--mono);color:var(--ink3)}
+.card-head{
+  display:flex;align-items:center;gap:.7rem;margin:-.2rem 0 .6rem;padding-bottom:.8rem;border-bottom:1px dashed var(--line2);
+  font:700 10px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);
+}
+.card-head b{color:var(--navy);font-weight:700}
+.card-head i{width:8px;height:8px;border-radius:50%;background:var(--orange);display:block}
+
+/* ---------- FORMULAIRES ---------- */
+label.lab{
+  display:flex;align-items:center;gap:.5rem;
+  font:700 10px var(--mono);color:var(--ink2);text-transform:uppercase;letter-spacing:.18em;margin:1rem 0 .45rem;
+}
+label.lab::before{content:"";width:6px;height:6px;background:var(--pill);border-radius:2px;flex-shrink:0}
+input[type=text],input[type=password],input[type=number],textarea,select{
+  width:100%;background:#f7f4ec;border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:.75rem 1rem;font:500 13.5px var(--sans);color:var(--ink);outline:none;transition:.18s;min-height:46px;
+  box-shadow:inset 0 1px 2px rgba(26,21,16,.05);
+}
+textarea{min-height:92px;line-height:1.6;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--ink3)}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--gold);background:#fff;box-shadow:0 0 0 4px rgba(139,111,71,.14);
+}
+select{
+  appearance:none;-webkit-appearance:none;padding-right:2.6rem;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><path d='M2 5l5 5 5-5' fill='none' stroke='%231a1510' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 1rem center;
+}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.hint-line{
+  margin-top:.4rem;font:500 10.5px var(--mono);color:var(--ink3);letter-spacing:.02em;line-height:1.5;
+}
+.hint-line b{color:var(--gold);font-weight:700}
+
+/* interrupteurs */
+input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;width:42px!important;height:25px!important;min-height:25px!important;
+  border-radius:99px;background:var(--line);position:relative;cursor:pointer;flex-shrink:0;transition:.25s;
+  border:none;padding:0;box-shadow:inset 0 1px 3px rgba(26,21,16,.25);
+}
+input[type=checkbox]::after{
+  content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;
+  box-shadow:0 2px 5px rgba(26,21,16,.35);transition:.25s;
+}
+input[type=checkbox]:checked{background:var(--navy)}
+input[type=checkbox]:checked::after{transform:translateX(17px);background:var(--pill2)}
+input[type=checkbox]:focus-visible{outline:3px solid rgba(139,111,71,.35);outline-offset:2px}
+
+.chk-row{
+  display:flex;align-items:center;gap:.8rem;margin-top:1rem;padding:.8rem 1rem;
+  background:#f7f4ec;border:1px solid var(--line);border-radius:var(--radius-sm);cursor:pointer;transition:.18s;
+}
+.chk-row:hover{border-color:var(--gold);background:#fff}
+.chk-row label{font:700 .8rem var(--sans);color:var(--navy);cursor:pointer;letter-spacing:.01em}
+.chk-row .hint{font:500 10.5px var(--mono);color:var(--ink3);flex:1;text-align:right}
+@media(max-width:520px){.chk-row{flex-wrap:wrap}.chk-row .hint{text-align:left;flex-basis:100%}}
+
+/* ---------- BOUTONS ---------- */
+.btn{
+  min-height:44px;padding:.6rem 1.3rem;border-radius:99px;
+  font:700 .7rem var(--mono);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:1px solid;
+  transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
+}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-gold{background:var(--pill);border-color:var(--pill);color:#f2eee0}
+.btn-gold:hover:not(:disabled){background:var(--navy);border-color:var(--navy);color:#fff;transform:translateY(-1px)}
+.btn-cyan{background:transparent;border-color:var(--navy);color:var(--navy)}
+.btn-cyan:hover:not(:disabled){background:var(--navy);color:#fff}
+.btn-red{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.btn-red:hover:not(:disabled){background:var(--red);color:#fff}
+.btn-slate{background:rgba(26,21,16,.06);border-color:var(--line);color:var(--ink2);font-size:.64rem}
+.btn-slate:hover:not(:disabled){border-color:var(--navy);color:var(--navy)}
+
+.btn-mega{
+  position:relative;width:100%;min-height:62px;margin-top:1.3rem;padding:.7rem 4.2rem .7rem 1.8rem;
+  background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid #3a2e22;color:#fff;border-radius:99px;
+  font:800 .95rem var(--sans);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:flex-start;
+  box-shadow:0 18px 36px -16px rgba(26,21,16,.8),inset 0 1px 0 rgba(255,255,255,.15);
+  transition:.25s;overflow:hidden;
+}
+.btn-mega::before{
+  content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);
+  transform:translateX(-120%);
+}
+.btn-mega:hover:not(:disabled)::before{transform:translateX(120%);transition:transform .8s}
+.btn-mega::after{
+  content:"→";position:absolute;right:8px;top:8px;bottom:8px;aspect-ratio:1;border-radius:50%;
+  background:var(--pill);color:#f2eee0;display:grid;place-items:center;font:700 1.25rem var(--sans);transition:.3s;
+}
+.btn-mega:hover:not(:disabled)::after{transform:rotate(-45deg);background:var(--pill2)}
+.btn-mega:hover:not(:disabled){transform:translateY(-2px)}
+.btn-mega:disabled{opacity:.6;cursor:not-allowed}
+
+.btn-mini{
+  background:#f7f4ec;border:1px solid var(--line);color:var(--ink2);
+  font:700 .6rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:.45rem .9rem;border-radius:99px;
+  cursor:pointer;transition:.18s;min-height:0;
+}
+.btn-mini:hover:not(:disabled),.btn-mini.active{color:#fff;border-color:var(--navy);background:var(--navy)}
+.btn-mini:disabled{opacity:.4;cursor:not-allowed}
+.btn-mini.btn-red{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.btn-mini.btn-red:hover{background:var(--red);color:#fff;border-color:var(--red)}
+
+.pipeline-ctrl{display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap}
+.pipeline-ctrl .btn{flex:1;min-width:120px}
+
+/* ---------- DÉPÔT ---------- */
+.drop{
+  position:relative;border:1.5px dashed var(--line2);border-radius:18px;padding:1.5rem;text-align:center;cursor:pointer;
+  background:
+    repeating-linear-gradient(45deg,transparent 0 11px,rgba(26,21,16,.025) 11px 12px),#f7f4ec;
+  transition:.2s;
+}
+.drop:hover{border-color:var(--gold);background-color:#fff;transform:translateY(-1px)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%!important;height:100%!important;min-height:0!important}
+.drop .icon{
+  width:54px;height:54px;margin:0 auto .5rem;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;
+  background:radial-gradient(circle at 35% 30%,#fff,var(--pill2) 60%,var(--pill));box-shadow:0 10px 22px -10px rgba(26,21,16,.5);
+}
+.drop .txt{font:600 11px var(--mono);letter-spacing:.06em;color:var(--ink2)}
+.preview{margin-top:.8rem;position:relative;display:inline-block;max-width:230px}
+.preview img{max-width:100%;border-radius:16px;border:1px solid var(--line);display:block;box-shadow:0 14px 32px -14px rgba(26,21,16,.55)}
+.preview .rm{
+  position:absolute;top:8px;right:8px;background:var(--navy);color:#fff;border:none;border-radius:50%;
+  width:26px;height:26px;cursor:pointer;font-size:.7rem;display:grid;place-items:center;transition:.2s;
+}
+.preview .rm:hover{background:var(--red);transform:rotate(90deg)}
+
+/* ---------- STATUTS ---------- */
+.status{
+  font:500 11.5px/1.5 var(--mono);padding:.65rem .95rem;border-radius:12px;
+  background:var(--bg3);color:var(--ink2);border-left:3px solid var(--line2);word-break:break-word;margin-top:.55rem;
+}
+.status.ok{background:var(--green-dim);color:var(--green);border-left-color:var(--green)}
+.status.err{background:var(--red-dim);color:var(--red);border-left-color:var(--red)}
+.status.warn{background:rgba(196,88,31,.11);color:#a0440f;border-left-color:var(--orange)}
+
+/* ---------- ÉTAPES ---------- */
+.step{
+  display:flex;align-items:flex-start;gap:.7rem;padding:.8rem 1rem;background:rgba(247,244,236,.92);
+  border:1px solid var(--line);border-radius:14px;margin-bottom:.5rem;
+  font:500 .76rem var(--mono);animation:rise .35s ease both;
+}
+.step .ico{flex-shrink:0;font-size:1.05rem}
+.step .msg{flex:1;color:var(--ink2)}
+.step.running{border-color:var(--pill)}
+.step.running .msg{color:var(--gold)}
+.step.done{border-left:4px solid var(--green)}
+.step.error{border-left:4px solid var(--red);background:var(--red-dim)}
+.step.error .msg{color:var(--red)}
+.spinner{
+  display:inline-block;width:12px;height:12px;border:2px solid rgba(139,111,71,.22);border-top-color:var(--gold);
+  border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+
+/* ============================================================
+   CRÉER : atelier à deux colonnes
+============================================================ */
+#tab-create{display:grid;grid-template-columns:minmax(330px,440px) minmax(0,1fr);gap:1.4rem;align-items:start}
+#tab-create>.card{grid-column:1;grid-row:1 / span 8;margin-bottom:0}
+#stepsBox,#resultsBox,#emptyCanvas{grid-column:2}
+#stepsBox{margin-top:0!important}
+@media(max-width:1020px){
+  #tab-create{grid-template-columns:1fr}
+  #tab-create>.card,#stepsBox,#resultsBox,#emptyCanvas{grid-column:1;grid-row:auto}
+}
+#emptyCanvas{
+  display:none;position:relative;min-height:520px;border-radius:var(--radius);padding:2rem;
+  border:1.5px dashed var(--line2);text-align:center;overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 38%,rgba(255,255,255,.7),transparent 55%),
+    repeating-linear-gradient(0deg,transparent 0 31px,rgba(26,21,16,.04) 31px 32px),
+    repeating-linear-gradient(90deg,transparent 0 31px,rgba(26,21,16,.04) 31px 32px);
+}
+#resultsBox.hidden + #emptyCanvas{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem}
+#emptyCanvas svg{width:210px;height:210px;filter:drop-shadow(0 26px 30px rgba(26,21,16,.35));animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+#emptyCanvas h3{font:800 1.6rem var(--sans);letter-spacing:-.035em;color:var(--navy);text-transform:uppercase;margin-top:.8rem}
+#emptyCanvas p{font:500 11.5px var(--mono);color:var(--ink3);max-width:38ch;letter-spacing:.03em}
+#emptyCanvas .corner{position:absolute;width:18px;height:18px;border:0 solid var(--navy);opacity:.5}
+#emptyCanvas .c1{top:14px;left:14px;border-top-width:1.5px;border-left-width:1.5px}
+#emptyCanvas .c2{top:14px;right:14px;border-top-width:1.5px;border-right-width:1.5px}
+#emptyCanvas .c3{bottom:14px;left:14px;border-bottom-width:1.5px;border-left-width:1.5px}
+#emptyCanvas .c4{bottom:14px;right:14px;border-bottom-width:1.5px;border-right-width:1.5px}
+
+/* ============================================================
+   GRILLE + CARTES IMAGE
+============================================================ */
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.1rem;margin-top:1rem}
+
+.img-card{
+  position:relative;display:flex;flex-direction:column;overflow:hidden;
+  background:rgba(244,241,232,.94);border:1px solid var(--line);border-radius:20px;
+  box-shadow:0 1px 0 #fff inset,0 18px 40px -26px rgba(26,21,16,.6);transition:.28s;animation:rise .45s ease both;
+}
+.img-card:hover{transform:translateY(-4px);box-shadow:0 28px 54px -26px rgba(26,21,16,.7);border-color:var(--pill)}
+.img-card .img-wrap{padding:.55rem;position:relative}
+.img-card img{width:100%;display:block;border-radius:14px;background:var(--bg3)}
+.img-card .img-wrap .old{opacity:.5;margin-bottom:.5rem;border:1px solid var(--red);position:relative}
+.img-card .img-wrap .old::after{
+  content:'ancienne';position:absolute;top:4px;right:4px;background:var(--red);color:#fff;
+  font:700 .6rem var(--mono);padding:.15rem .5rem;border-radius:99px;
+}
+.img-card .img-wrap .new{border:2px solid var(--green)}
+
+.img-card .fav-btn{
+  position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;
+  border:none;background:rgba(244,241,232,.92);color:var(--ink3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:17px;z-index:2;transition:.2s;
+  box-shadow:0 6px 16px -4px rgba(26,21,16,.5);backdrop-filter:blur(6px);
+}
+.img-card .fav-btn:hover:not(:disabled){color:var(--orange);transform:scale(1.12)}
+.img-card .fav-btn:disabled{opacity:.5;cursor:wait}
+.img-card .fav-btn.active{background:var(--orange);color:#fff}
+
+.img-card .info{padding:.7rem .85rem .85rem;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:.5rem}
+.img-card .info .meta,.img-card>.meta{
+  font:700 9.5px var(--mono);color:var(--gold);text-transform:uppercase;letter-spacing:.14em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.img-card>.meta{padding:.7rem .9rem 0}
+.img-card .info textarea,.img-card>textarea{
+  min-height:74px;font:500 10.5px/1.55 var(--mono);margin:0;border-radius:12px;padding:.6rem .75rem;
+}
+.img-card>textarea{width:calc(100% - 1.8rem);margin:.5rem .9rem .9rem}
+.img-card .info .actions{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+
+/* ============================================================
+   SESSIONS / PAGINATION / FILTRE
+============================================================ */
+.session-block{
+  border:1px solid var(--line);border-radius:20px;margin-bottom:1rem;overflow:hidden;
+  background:rgba(244,241,232,.7);box-shadow:0 18px 40px -30px rgba(26,21,16,.6);
+}
+.session-header{
+  display:flex;align-items:center;gap:.9rem;padding:1rem 1.2rem;cursor:pointer;user-select:none;transition:.2s;
+  background:linear-gradient(180deg,var(--navy2),var(--navy));color:#fff;
+}
+.session-header:hover{filter:brightness(1.15)}
+.session-header .s-arrow{font-size:.7rem;color:var(--pill2);transition:.25s;width:14px;text-align:center}
+.session-block.open .s-arrow{transform:rotate(90deg)}
+.session-header .s-title{font:700 .78rem var(--mono);letter-spacing:.14em;text-transform:uppercase;flex:1}
+.session-header .s-meta{font:500 10px var(--mono);color:#c9b896;letter-spacing:.08em}
+.session-body{padding:1.1rem;display:none}
+.session-block.open .session-body{display:block}
+
+.pagination{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:1.4rem;flex-wrap:wrap}
+.pagination .btn-mini{min-width:96px;padding:.6rem 1rem}
+.pagination .page-info{font:600 11px var(--mono);color:var(--ink2);letter-spacing:.06em}
+
+.filter-bar{display:flex;gap:.6rem;align-items:center;margin-bottom:1.1rem;flex-wrap:wrap}
+.filter-bar .chk{
+  display:inline-flex;align-items:center;gap:.7rem;padding:.55rem 1rem .55rem .7rem;
+  background:#f7f4ec;border:1px solid var(--line);border-radius:99px;font:700 11px var(--mono);
+  letter-spacing:.06em;color:var(--ink2);cursor:pointer;transition:.18s;
+}
+.filter-bar .chk:hover{border-color:var(--gold)}
+
+#historyBox>.sub,#favBox>.sub{
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:.4rem;margin:0 auto;max-width:44ch;
+  padding:2.4rem 1rem;font:500 12px var(--mono);color:var(--ink3);
+}
+#historyBox>.sub::before,#favBox>.sub::before{
+  content:"";width:150px;height:150px;margin-bottom:.4rem;filter:drop-shadow(0 20px 24px rgba(26,21,16,.28));
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><radialGradient id='o' cx='.35' cy='.3' r='.85'><stop offset='0' stop-color='%23f2eee0'/><stop offset='.4' stop-color='%23b8b0a0'/><stop offset='.8' stop-color='%235a5247'/><stop offset='1' stop-color='%231a1510'/></radialGradient></defs><ellipse cx='100' cy='100' rx='92' ry='28' fill='none' stroke='%238b6f47' stroke-width='3' transform='rotate(-22 100 100)' opacity='.9'/><circle cx='100' cy='100' r='62' fill='url(%23o)'/><ellipse cx='80' cy='72' rx='20' ry='11' fill='%23f2eee0' opacity='.65' transform='rotate(-30 80 72)'/><circle cx='168' cy='66' r='7' fill='%23c4581f'/></svg>") center/contain no-repeat;
+}
+
+/* ============================================================
+   ÉDITEURS
+============================================================ */
+.style-editor,.sb-editor{
+  position:relative;background:rgba(239,234,224,.9);border:1px solid var(--line);border-radius:20px;
+  padding:1.2rem;margin-bottom:1rem;box-shadow:0 18px 40px -30px rgba(26,21,16,.6);
+}
+.style-editor h4,.sb-editor h4{display:flex;align-items:center;gap:.6rem;font-size:.95rem;margin-bottom:.6rem;flex-wrap:wrap}
+.style-editor h4 input,.sb-editor h4 input{flex:1;min-width:180px;font-weight:700}
+.style-editor .slug,.sb-editor .slug{font:600 9.5px var(--mono);color:var(--ink3);padding:.25rem .6rem;border-radius:99px;background:var(--bg3);letter-spacing:.08em}
+.style-editor textarea,.sb-editor textarea{min-height:190px;font:500 11.5px/1.65 var(--mono)}
+.sb-editor .items-area{min-height:150px;font-size:12px}
+.style-editor .actions,.sb-editor .actions{display:flex;gap:.5rem;margin-top:.7rem;flex-wrap:wrap;align-items:center}
+
+/* ============================================================
+   PANNEAU CLÉS API
+============================================================ */
+#apiPanel{
+  position:fixed;bottom:0;left:0;right:0;z-index:40;color:#e8dcc4;
+  background:linear-gradient(180deg,#2a221a,#14100a);
+  border-top:1px solid #4a3e2e;box-shadow:0 -18px 44px rgba(26,21,16,.35);
+}
+#apiPanel::before{content:"";position:absolute;left:0;right:0;top:-1px;height:2px;background:linear-gradient(90deg,var(--orange),var(--pill),var(--pill2))}
+#apiHead{min-height:50px;padding:.75rem 1.4rem;cursor:pointer;display:flex;align-items:center;gap:.9rem;user-select:none}
+#apiHead:hover{background:rgba(255,255,255,.05)}
+#apiHead .lbl{font:700 .72rem var(--mono);color:#c9b896;letter-spacing:.22em}
+#apiPanel #apiSummary{color:#b8a482!important;font:500 11px var(--mono)!important}
+#apiPanel #apiChevron{color:var(--pill2)!important}
+#apiBody{padding:1.1rem 1.4rem 1.3rem;border-top:1px solid rgba(255,255,255,.1);max-height:55vh;overflow-y:auto;display:none}
+#apiBody.open{display:block}
+#apiBody p{color:#b8a482!important;font:500 11.5px var(--mono)!important}
+#apiPanel code{font-family:var(--mono);background:rgba(255,255,255,.1);color:var(--pill2);padding:.1rem .4rem;border-radius:6px}
+#apiPanel textarea{background:#0d0a06;color:#e8dcc4;border-color:#4a3e2e;box-shadow:none}
+#apiPanel textarea:focus{border-color:var(--pill);box-shadow:0 0 0 4px rgba(139,111,71,.2)}
+#apiPanel .status{background:rgba(255,255,255,.06);color:#d4c8ac;border-left-color:#5a4a36}
+#apiPanel .status.ok{background:rgba(126,196,106,.12);color:#a8e098;border-left-color:#7ec46a}
+#apiPanel .status.err{background:rgba(255,110,100,.14);color:#ff9a92;border-left-color:#ff6e64}
+#apiPanel .btn-slate{background:rgba(255,255,255,.07);border-color:#5a4a36;color:#e8dcc4}
+#apiPanel .btn-slate:hover{border-color:var(--pill2);color:#fff}
+
+/* ============================================================
+   TOAST
+============================================================ */
+#toast{
+  position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-150px);
+  display:flex;align-items:center;gap:.7rem;background:var(--navy);color:#fff;border-radius:99px;
+  padding:.8rem 1.5rem;font:600 .74rem var(--mono);letter-spacing:.03em;z-index:200;opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.2);
+  max-width:min(600px,92vw);text-align:left;box-shadow:0 22px 50px -12px rgba(26,21,16,.7);
+}
+#toast::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--pill);flex-shrink:0}
+#toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.ok::before{background:#7ec46a;box-shadow:0 0 10px #7ec46a}
+#toast.err::before{background:#ff6e64;box-shadow:0 0 10px #ff6e64}
+#toast.info::before{background:var(--pill2)}
+#toast.warn::before{background:var(--orange);box-shadow:0 0 10px var(--orange)}
+
+/* ============================================================
+   MODALE
+============================================================ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(200,192,176,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  z-index:150;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.22s;padding:1rem;
+}
+.modal-overlay.on{opacity:1;pointer-events:auto}
+.modal-box{
+  position:relative;background:#efeae0;border:1px solid var(--line);border-radius:28px;padding:1.7rem;
+  max-width:540px;width:100%;box-shadow:0 40px 90px -20px rgba(26,21,16,.55);
+  transform:translateY(14px) scale(.98);transition:.25s;max-height:90vh;overflow-y:auto;
+}
+.modal-overlay.on .modal-box{transform:none}
+.modal-box h3{font:800 1.45rem var(--sans);letter-spacing:-.035em;color:var(--navy);text-transform:uppercase;margin-bottom:.7rem}
+.modal-box p{color:var(--ink2);font-size:.88rem;margin-bottom:.9rem;line-height:1.6}
+.modal-box .modal-actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.2rem;flex-wrap:wrap}
+.modal-box .modal-actions .btn{min-width:110px}
+
+/* ============================================================
+   CONNEXION + PAGE D'ACCUEIL
+============================================================ */
+#loginBox{width:min(450px,calc(100% - 2rem));margin:15vh 0 3rem clamp(1rem,7vw,7rem)}
+#loginBox h1{font-size:3rem;margin-bottom:.4rem}
+#loginBox .sub{font:500 11px var(--mono);letter-spacing:.04em;margin-bottom:.8rem}
+#loginBox .status{margin-top:.8rem}
+#loginBox .btn-mega{margin-top:1.4rem}
+
+#landing{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+#loginBox.hidden + #landing{display:none}
+#landing .l-title{
+  position:absolute;right:3vw;top:11vh;text-align:right;
+  font:900 clamp(4.5rem,13vw,13rem)/.82 var(--sans);letter-spacing:-.06em;text-transform:uppercase;color:var(--navy);
+}
+#landing .l-title span{display:block}
+#landing .l-title span:last-child{color:transparent;-webkit-text-stroke:2px var(--navy)}
+#landing .l-art{position:absolute;right:2vw;bottom:-9vh;height:82vh;aspect-ratio:1}
+#landing .l-art svg{width:100%;height:100%;display:block;filter:drop-shadow(0 40px 50px rgba(26,21,16,.32))}
+#landing .l-meta{
+  position:absolute;left:clamp(1rem,7vw,7rem);bottom:5.5rem;font:500 10px var(--mono);letter-spacing:.2em;color:var(--ink3);text-transform:uppercase;
+  display:flex;gap:1.2rem;flex-wrap:wrap;
+}
+#landing .l-meta b{color:var(--navy)}
+@media(max-width:860px){
+  #loginBox{margin:36vh auto 3rem}
+  #landing .l-title{right:auto;left:1rem;top:9vh;text-align:left;font-size:clamp(3.5rem,18vw,7rem)}
+  #landing .l-art{right:-12vw;bottom:auto;top:8vh;height:42vh;opacity:.55}
+  #landing .l-meta{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= SPRITE SVG ================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gInk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a2e22"/>
+      <stop offset=".5" stop-color="#1a1510"/>
+      <stop offset="1" stop-color="#0a0806"/>
+    </linearGradient>
+    <radialGradient id="gFog" cx=".5" cy=".6" r=".85">
+      <stop offset="0" stop-color="#e8dcc4"/>
+      <stop offset=".5" stop-color="#b8a482"/>
+      <stop offset="1" stop-color="#5a4a36"/>
+    </radialGradient>
+    <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b7c82"/>
+      <stop offset="1" stop-color="#1a1510"/>
+    </linearGradient>
+    <filter id="fBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+
+    <!-- logo : cercle encre + point rouille -->
+    <symbol id="logo" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="14" fill="none" stroke="#1a1510" stroke-width="2"/>
+      <circle cx="16" cy="16" r="9" fill="none" stroke="#8b6f47" stroke-width="1.5" stroke-dasharray="3 2.4"/>
+      <circle cx="16" cy="16" r="4.6" fill="#1a1510"/>
+      <circle cx="25.2" cy="8.4" r="2.4" fill="#c4581f"/>
+    </symbol>
+
+    <!-- phare solitaire dans la brume (illustration hero) -->
+    <symbol id="phare" viewBox="0 0 420 420">
+      <!-- brume de fond -->
+      <ellipse cx="210" cy="260" rx="200" ry="90" fill="url(#gFog)" opacity=".55" filter="url(#fBlur)"/>
+      <!-- mer -->
+      <path d="M0 320 Q105 300 210 320 T420 315 L420 420 L0 420Z" fill="url(#gSea)"/>
+      <!-- rayons du phare -->
+      <path d="M210 130 L80 60 L80 90Z" fill="#e8dcc4" opacity=".25"/>
+      <path d="M210 130 L340 60 L340 90Z" fill="#e8dcc4" opacity=".25"/>
+      <!-- falaise -->
+      <path d="M150 420 L170 280 Q190 270 220 270 Q250 275 270 290 L290 420Z" fill="#2a221a"/>
+      <!-- phare corps -->
+      <path d="M195 270 L192 160 L228 160 L225 270 Z" fill="#e8dcc4"/>
+      <path d="M195 270 L192 160 L228 160 L225 270 Z" fill="none" stroke="#1a1510" stroke-width="1.5"/>
+      <!-- bandes rouges -->
+      <path d="M193 195 L227 195 L226 215 L194 215 Z" fill="#a83b2c"/>
+      <path d="M194 235 L226 235 L225 255 L195 255 Z" fill="#a83b2c"/>
+      <!-- lanterne -->
+      <rect x="196" y="140" width="28" height="22" fill="#1a1510"/>
+      <rect x="200" y="144" width="20" height="14" fill="#f4d78a"/>
+      <path d="M192 140 L228 140 L210 128 Z" fill="#1a1510"/>
+      <!-- fenêtres -->
+      <rect x="206" y="175" width="8" height="10" fill="#1a1510"/>
+      <rect x="206" y="225" width="8" height="10" fill="#1a1510"/>
+      <!-- horizon / oiseaux -->
+      <path d="M60 200 q6 -4 12 0 M90 190 q6 -4 12 0 M330 210 q6 -4 12 0" stroke="#1a1510" stroke-width="1.2" fill="none" opacity=".6"/>
+      <!-- silhouette de dos regardant -->
+      <g transform="translate(295 340)">
+        <ellipse cx="0" cy="0" rx="16" ry="22" fill="#1a1510"/>
+        <circle cx="0" cy="-22" r="10" fill="#1a1510"/>
+        <path d="M-16 0 L-22 40 L22 40 L16 0Z" fill="#1a1510"/>
+      </g>
+      <!-- légende technique -->
+      <g font-family="JetBrains Mono, monospace" font-size="8" letter-spacing="2" fill="#1a1510" opacity=".7">
+        <path d="M30 60h74M104 60l10 10h46" stroke="#1a1510" stroke-opacity=".6" fill="none"/>
+        <text x="30" y="50">FIG.01 — LA TRAME DU RÉEL</text>
+      </g>
+    </symbol>
+
+    <!-- orbe de la canvas vide : boussole ancienne -->
+    <symbol id="orb" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="62" fill="url(#gFog)"/>
+      <circle cx="100" cy="100" r="62" fill="none" stroke="#1a1510" stroke-width="1.5"/>
+      <circle cx="100" cy="100" r="48" fill="none" stroke="#8b6f47" stroke-width="1" stroke-dasharray="2 4"/>
+      <path d="M100 45 L112 100 L100 155 L88 100Z" fill="#1a1510"/>
+      <path d="M100 45 L112 100 L100 100Z" fill="#a83b2c"/>
+      <circle cx="100" cy="100" r="6" fill="#f4d78a"/>
+      <circle cx="100" cy="100" r="2" fill="#1a1510"/>
+      <ellipse cx="80" cy="72" rx="20" ry="11" fill="#f2eee0" opacity=".4" transform="rotate(-30 80 72)"/>
+      <circle cx="168" cy="66" r="7" fill="#c4581f"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="hud" aria-hidden="true"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><i class="rail"></i><span class="coord">TRAMEFORGE // <b>SYS.ONLINE</b></span></div>
+
+<div id="topbar">
+  <div class="brand">
+    <svg aria-hidden="true"><use href="#logo"/></svg>
+    <div><b>Trame<i>Forge</i></b><small>VISUELS POUR LA TRAME DU RÉEL</small></div>
+  </div>
+  <span id="modeTag">NON CONFIGURÉ</span>
+  <span id="globalStat">Ajoutez vos clés API pour commencer</span>
+  <button class="btn-slate btn hidden" id="logoutBtn" style="margin-left:auto">↻ Déconnexion</button>
+</div>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginBox" class="card">
+  <div class="card-head"><i></i><b>Accès</b> — Connexion / Inscription</div>
+  <h1>TrameForge</h1>
+  <p class="sub">Pseudo + PIN 4 chiffres · Studio visuel pour La Trame du Réel</p>
+  <label class="lab">Pseudo</label>
+  <input type="text" id="loginUser" placeholder="Votre pseudo" autocomplete="username">
+  <label class="lab">PIN (4 chiffres)</label>
+  <input type="password" id="loginPin" maxlength="4" inputmode="numeric" placeholder="••••" autocomplete="current-password">
+  <button class="btn-mega" id="loginBtn">Se connecter / Créer un compte</button>
+  <div id="loginStatus" class="status" style="margin-top:.6rem"></div>
+</div>
+<div id="landing" aria-hidden="true">
+  <div class="l-title"><span>Trame</span><span>Forge</span></div>
+  <div class="l-art"><svg viewBox="0 0 420 420"><use href="#phare" width="420" height="420"/></svg></div>
+  <div class="l-meta"><span>IMG → TXT</span><span><b>FAITS · HYPOTHÈSES · LÉGENDES</b></span><span>9:16 · 2K PAR DÉFAUT</span><span>SANS VISAGE</span></div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="main" class="hidden">
+
+  <header class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">TRAMEFORGE — STUDIO VISUEL</span>
+      <h1>Trame<br>Forge <em><span class="chip-people"><span class="av"><i></i><i></i><i></i></span><span>25 sujets<small>prêts à illustrer</small></span></span></em></h1>
+      <p class="sub">Visuels 9:16 cohérents pour les Shorts de « La Trame du Réel ». Faits établis, hypothèses, légendes — sans visage, sans texte inventé, sans anachronisme.</p>
+      <div class="hero-pills"><span class="pill-tag">Sans visage</span><span class="pill-tag ghost">Garde-fous IA</span><span class="pill-tag ghost">9:16 · 2K</span><span class="pill-tag ghost">8 styles d'époque</span></div>
+    </div>
+    <div class="hero-art" aria-hidden="true"><svg viewBox="0 0 420 420"><use href="#phare" width="420" height="420"/></svg></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="create">🎬 Créer</button>
+    <button class="tab" data-tab="admin">⚙️ Admin styles</button>
+    <button class="tab" data-tab="bulk">📋 Bulk</button>
+    <button class="tab" data-tab="history">🖼️ Ma bibliothèque</button>
+    <button class="tab" data-tab="favorites">⭐ Favoris</button>
+  </div>
+
+  <!-- ================= CRÉER ================= -->
+  <section id="tab-create">
+    <div class="card">
+      <div class="card-head"><i></i><b>01</b> — Paramètres de génération</div>
+
+      <label class="lab">Style</label>
+      <select id="styleSelect"></select>
+
+      <label class="lab">Sujet du Short / intention (optionnel)</label>
+      <textarea id="promptInput" placeholder="Ex. : Opération Mincemeat, 1943 — un cadavre jeté à la mer pour tromper Hitler… (laisse vide si tu fournis juste une image de référence)"></textarea>
+
+      <div class="chk-row" id="optimizerRow" style="margin-top:.7rem">
+        <input type="checkbox" id="aiOptimizerCheck">
+        <label for="aiOptimizerCheck">✨ IA Optimizer</label>
+        <span class="hint">désactivé = prompt direct, sans appel IA de rédaction</span>
+      </div>
+      <p class="hint-line">Sans optimizer, le prompt utilisateur + le style + chaque élément bulk sont assemblés directement. Avec optimizer, l’IA réécrit chaque prompt, puis l’image démarre immédiatement sans attendre les prompts suivants.</p>
+
+      <label class="lab">Image source (optionnel)</label>
+      <div class="drop" id="imageDrop">
+        <input type="file" id="imageInput" accept="image/*">
+        <div class="icon">📷</div>
+        <div class="txt">Cliquez ou glissez une image de référence</div>
+      </div>
+      <div id="imagePreviewWrap"></div>
+
+      <div class="row" style="margin-top:.4rem">
+        <div>
+          <label class="lab">Taille</label>
+          <select id="sizeSelect">
+            <option value="1K">1K · rapide</option>
+            <option value="2K" selected>2K · équilibré</option>
+            <option value="3K">3K · détaillé</option>
+            <option value="4K">4K · keyframes clés</option>
+          </select>
+        </div>
+        <div>
+          <label class="lab">Ratio</label>
+          <select id="ratioSelect">
+            <option value="9:16" selected>9:16 · Short (défaut)</option>
+            <option value="1:1">1:1 · carré</option>
+            <option value="3:4">3:4 · portrait</option>
+            <option value="4:3">4:3 · paysage</option>
+            <option value="16:9">16:9 · écran</option>
+            <option value="2:3">2:3 · portrait photo</option>
+            <option value="3:2">3:2 · photo</option>
+            <option value="21:9">21:9 · cinéma</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint-line">Réglage par défaut : <b>9:16 · 2K</b> pour tes Shorts. Passe en <b>4K</b> pour les keyframes les plus importantes (couverture, plan final).</p>
+
+      <div class="row" style="margin-top:.2rem">
+        <div>
+          <label class="lab">Nombre d'images (par élément storyboard)</label>
+          <input type="number" id="countInput" min="1" max="10" value="1" style="min-height:46px">
+        </div>
+        <div>
+          <label class="lab">Concurrence</label>
+          <select id="concurrencySelect">
+            <option value="1">1 (séquentiel)</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="chk-row" id="storyboardRow">
+        <input type="checkbox" id="storyboardCheck">
+        <label for="storyboardCheck">📖 Pack storyboard</label>
+        <span class="hint" id="sbHint">— utiliser la liste active pour multiplier les plans</span>
+      </div>
+
+      <div id="sbSelectWrap" class="hidden" style="margin-top:.7rem">
+        <label class="lab">Storyboard à utiliser</label>
+        <select id="storyboardSelect"></select>
+      </div>
+
+      <button class="btn-mega" id="generateBtn">🎬 Générer</button>
+      <div class="pipeline-ctrl hidden" id="pipelineCtrl">
+        <button class="btn btn-cyan" id="pauseBtn">⏸ Pause</button>
+        <button class="btn btn-red" id="stopBtn">⏹ Stop</button>
+        <button class="btn btn-gold hidden" id="resumeBtn">▶ Reprendre</button>
+      </div>
+    </div>
+
+    <div id="stepsBox" class="hidden" style="margin-top:1rem"></div>
+    <div id="resultsBox" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <h2 style="margin:0;border:none;font-size:1.1rem">Résultats</h2>
+        <span class="status" id="resultsCount" style="margin:0;padding:.3rem .7rem">0 / 0</span>
+      </div>
+      <div class="result-grid" id="resultGrid"></div>
+    </div>
+    <div id="emptyCanvas" aria-hidden="true">
+      <i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i>
+      <svg viewBox="0 0 200 200"><use href="#orb" width="200" height="200"/></svg>
+      <h3>Prêt à illustrer</h3>
+      <p>Choisis un style (Mystère maritime, Sépia XIXe…), un sujet parmi tes 25 idées, puis lance la génération : tes visuels 9:16 apparaîtront ici, sans visage, sans texte inventé.</p>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN ================= -->
+  <section id="tab-admin" class="hidden">
+    <h2>Mes styles</h2>
+    <p class="sub" style="font-size:.82rem">Éditez vos prompts de style. <b>✨ IA améliore</b> réécrit le prompt via Agnes en conservant les garde-fous (pas de visage, pas de texte, pas d'anachronisme, pas de gore). <b>+ Nouveau style</b> ajoute un style personnalisé.</p>
+    <button class="btn btn-gold" id="addStyleBtn" style="margin-bottom:1rem">+ Nouveau style</button>
+    <div id="styleEditors"></div>
+  </section>
+
+  <!-- ================= BULK ================= -->
+  <section id="tab-bulk" class="hidden">
+    <h2>Listes storyboard (Bulk)</h2>
+    <p class="sub" style="font-size:.82rem">Chaque élément de la liste est une contrainte obligatoire et visible dans l’image. Trois listes sont fournies par défaut : <b>Plans Shorts 9:16</b>, <b>Époques historiques</b>, <b>Atmosphères narratives</b>. <b>✨ IA améliore</b> nettoie la liste sans ajouter d'objets inventés.</p>
+    <button class="btn btn-gold" id="addSbBtn" style="margin-bottom:1rem">+ Nouvelle liste</button>
+    <div id="sbEditors"></div>
+  </section>
+
+  <!-- ================= HISTORIQUE ================= -->
+  <section id="tab-history" class="hidden">
+    <h2>Ma bibliothèque</h2>
+    <p class="sub" style="font-size:.82rem">Vos générations par sessions de 3 images visibles. Cliquez sur un bloc de session pour tout voir. Cliquez sur ⭐ pour ajouter aux favoris.</p>
+    <div class="filter-bar">
+      <label class="chk">
+        <input type="checkbox" id="historyFavOnly">
+        <span>⭐ Favoris uniquement</span>
+      </label>
+    </div>
+    <div id="historyBox"></div>
+    <div id="historyPagination" class="pagination hidden"></div>
+  </section>
+
+  <!-- ================= FAVORIS ================= -->
+  <section id="tab-favorites" class="hidden">
+    <h2>⭐ Mes favoris</h2>
+    <p class="sub" style="font-size:.82rem">Toutes les images que vous avez marquées ⭐, les plus récentes en premier.</p>
+    <div id="favBox"></div>
+    <div id="favPagination" class="pagination hidden"></div>
+  </section>
+</div>
+
+<!-- ================= PANNEAU CLÉS API ================= -->
+<div id="apiPanel">
+  <div id="apiHead">
+    <span class="lbl">🔑 AGNES API</span>
+    <span style="font-size:.7rem;color:var(--ink2);flex:1" id="apiSummary">Cliquez pour configurer</span>
+    <span style="font:700 .7rem ui-monospace;color:var(--gold)" id="apiChevron">▲</span>
+  </div>
+  <div id="apiBody">
+    <p style="font-size:.75rem;color:var(--ink2);margin-bottom:.5rem">Clés Agnes (une par ligne, format <code>sk-…</code>). Stockées dans votre navigateur.</p>
+    <textarea id="apiInput" placeholder="sk-xxx&#10;sk-yyy" style="min-height:90px;font-family:ui-monospace,monospace;font-size:12px"></textarea>
+    <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
+      <button class="btn btn-gold" id="apiValidate">✓ Valider & tester</button>
+      <button class="btn btn-slate" id="apiClear">Effacer</button>
+    </div>
+    <div id="apiStatus" class="status">Aucune clé configurée</div>
+  </div>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMsg"></p>
+    <div id="modalFieldWrap" class="hidden">
+      <label class="lab" id="modalFieldLabel"></label>
+      <textarea id="modalFieldInput"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-slate" id="modalCancel">Annuler</button>
+      <button class="btn btn-gold" id="modalOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   LocalAPI — moteur TrameForge
+   Base locale : IndexedDB · Appels Agnes : fetch direct
+============================================================ */
+const AGNES_BASE = 'https://apihub.agnes-ai.com/v1';
+const AGNES_TEXT_MODEL = 'agnes-3.0-flash';
+const AGNES_TEXT_MODEL_FALLBACK = 'agnes-2.5-flash';
+const AGNES_IMG_MODEL = 'agnes-image-2.5-flash';
+
+/* ---------- GARDE-FOUS ÉDITORIAUX (injectés partout) ---------- */
+const GUARDRAILS = [
+  'NO visible faces: characters seen from behind, in silhouette, in shadow, or at distance only.',
+  'NO text, NO letters, NO numbers, NO signs painted or written anywhere in the image (no invented ship names, no fake documents with legible text, no newspaper headlines).',
+  'NO anachronism: every object, costume, architecture, technology must match the requested era exactly.',
+  'NO gore, NO wounds, NO dead bodies, NO realistic depictions of violence or victims.',
+  'NO modern logos, NO watermarks, NO photorealism of identifiable real persons.',
+  'Respectful, sober, documentary tone. The image must evoke a documented past, not a fantasy.',
+  'Vertical 9:16 framing unless otherwise specified. Composition must leave breathing space at top and bottom for short-form subtitles.'
+].join(' ');
+
+/* ---------- STYLES PAR DÉFAUT (8) ---------- */
+const DEFAULT_STYLES = [
+  {
+    slug: 'mystere_maritime',
+    name: 'Mystère maritime',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in atmospheric maritime mystery photography for a documentary YouTube Short channel.\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: cold blue-grey tones, fog and sea haze, 35mm film grain, muted desaturated palette, documentary photographic realism.\n- Palette: storm blue, slate grey, faded teal, bone white, hints of rust.\n- Lighting: overcast diffuse light, low horizon, no direct sun, faint lantern glow allowed.\n- Composition: wide establishing shots, tiny human silhouettes seen from behind or at distance, vast empty sea, abandoned ships, lighthouses in the fog.\n- Atmosphere: silent, ominous, suspended, melancholic.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  },
+  {
+    slug: 'sepia_xixe',
+    name: 'Sépia XIXe siècle',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in 19th-century sepia photography and early documentary imagery.\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: warm sepia tone, daguerreotype or early wet-plate aesthetic, aged paper grain, subtle scratches and vignetting, historical documentary photography.\n- Palette: warm browns, cream, burnt sienna, faint gold, near-black shadows.\n- Lighting: low raking light, gaslight or oil lantern warmth, deep chiaroscuro, no harsh modern shadows.\n- Composition: sober and formal, characters small or seen from behind, period-appropriate interiors, cobblestone streets, workshops, courtrooms, train stations.\n- Atmosphere: solemn, dusty, restrained, elegiac.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  },
+  {
+    slug: 'cinema_noir_docu',
+    name: 'Cinéma noir documentaire',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in film-noir documentary aesthetics.\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: high-contrast black and white, film noir documentary, silver gelatin print quality, deep blacks and luminous greys, 1950s newsreel soberness.\n- Lighting: hard single-source light, long shadows, venetian blind stripes allowed, cigarette smoke haze, wet asphalt reflections.\n- Composition: low angles, empty streets, anonymous silhouettes in trench coats seen from behind, typewriters, courtroom benches, prison corridors, dim hotel lobbies.\n- Atmosphere: paranoid, restrained, investigative, morally charged.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  },
+  {
+    slug: 'guerre_espionnage',
+    name: 'Guerre & espionnage',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in WWII and Cold War intelligence documentary imagery.\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: desaturated documentary photography, 1940s–1950s military and intelligence archives aesthetic, subtle film grain, faded khaki and steel grey.\n- Palette: khaki, olive, steel grey, faded navy, paper yellow, ink black.\n- Lighting: overcast daylight or shaded lamp interior, no theatrical light.\n- Composition: maps and typewriters, sealed envelopes, radios, distant bombers in the sky, generals seen from behind, silhouettes in briefing rooms, docks at dawn, tropical jungle clearings, submarines and warships seen from afar.\n- Atmosphere: tense, methodical, secretive, poised.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  },
+  {
+    slug: 'peinture_histoire',
+    name: 'Peinture d\'Histoire',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in academic history painting and grand manner reconstruction.\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: 19th-century academic history painting, oil on canvas, visible brushwork, museum-quality grandeur, careful period accuracy in costume and architecture.\n- Palette: warm gold, deep crimson, ivory, muted blue, earth brown.\n- Lighting: theatrical chiaroscuro inspired by David and Delacroix, warm directional glow, deep background shadows.\n- Composition: classical pyramidal or sweeping diagonal arrangement, characters small or seen from behind, symbolic objects in foreground, crowded medieval squares, Roman basilicas, royal courts, ships, battlefields from a distance.\n- Atmosphere: elevated, ceremonial, dramatic, dignified.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  },
+  {
+    slug: 'cabinet_curiosites',
+    name: 'Science & énigmes',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in wunderkammer, cabinet of curiosities and antiquarian scientific illustration.\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: engraved illustration mixed with aged photographic plate, wunderkammer aesthetic, antique paper, faded ink, precise scientific detail, alchemical curiosity.\n- Palette: aged paper yellow, sepia ink, muted verdigris, oxblood red, charcoal.\n- Lighting: soft even light on paper, faint directional lamp glow for three-dimensional objects.\n- Composition: open manuscripts and encyclopedias, magnifying glasses, specimen jars, brass instruments, astronomical charts, ancient maps, skeletal fragments, taxidermy, clockwork mechanisms, no legible text.\n- Atmosphere: mysterious, scholarly, obsessive, quietly unsettling.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  },
+  {
+    slug: 'catastrophe_sobre',
+    name: 'Catastrophe sobre',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in sober, respectful documentary imagery of historical disasters.\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: documentary photography of aftermath, muted desaturated palette, archival newsreel aesthetic, respectful restraint, no sensationalism.\n- Palette: pale grey, ash white, dust brown, faded industrial green, cold daylight.\n- Lighting: overcast, pallid, flat, no dramatic effect.\n- Composition: empty streets, shattered windows seen from afar, distant smoke columns, debris on cobblestones, abandoned tools, anonymous onlookers seen from behind, no close-ups of victims or bodies.\n- Atmosphere: quiet, dignified, grieving, factual.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  },
+  {
+    slug: 'absurde_presse',
+    name: 'Absurde historique',
+    prompt: `ROLE: You are a world-class prompt engineer specialized in gently ironic historic documentary imagery (absurd true stories).\nTASK: Convert the given scene description into ONE English image prompt (100–140 words) for a 9:16 vertical short.\nSTRUCTURE: Subject → Scene → Style → Lighting → Composition → Quality.\nALWAYS INCLUDE:\n- Style: 19th–early 20th-century press illustration crossed with documentary photography, sober but subtly absurd, deadpan visual humour, no over-the-top comedy.\n- Palette: newsprint cream, faded ink, muted green, warm terracotta.\n- Lighting: natural daylight, gentle shadows, no theatrical effect.\n- Composition: wide absurd scene (army facing emus, farmers, village squares, telegraph posts, telescopes aimed at the Moon, courtroom benches, oddly formal animals), characters small or seen from behind.\n- Atmosphere: serious people doing something inherently ridiculous, straight face, no wink to the camera.\nCONSTRAINTS: ${GUARDRAILS}\nReturn ONLY the prompt. No quotes, no preamble.`
+  }
+];
+
+/* ---------- STORYBOARDS PAR DÉFAUT (3) ---------- */
+const DEFAULT_STORYBOARDS = [
+  {
+    slug: 'plans_shorts',
+    name: 'Plans Shorts 9:16',
+    items: [
+      'Plan d\'ensemble atmosphérique (establishing shot, wide)',
+      'Plan large du lieu, personnage minuscule de dos',
+      'Plan moyen du décor, aucun visage visible',
+      'Gros plan sur un objet symbolique (document, lettre, objet clé)',
+      'Très gros plan sur un détail (tampon, sceau, gravure)',
+      'Silhouette à contre-jour dans une porte ou une fenêtre',
+      'Plan par-dessus l\'épaule (personnage de dos, regardant au loin)',
+      'Insert d\'ambiance (ciel, brume, eau, fumée, neige)',
+      'Plan de transition (couloir, escalier, route vide)',
+      'Plan de fin émotionnel (objet abandonné, lumière qui décline)'
+    ]
+  },
+  {
+    slug: 'epoques',
+    name: 'Époques historiques',
+    items: [
+      'Antiquité', 'Haut Moyen Âge', 'Renaissance', 'Grand Siècle',
+      'XVIIIe siècle', 'XIXe industriel', 'Belle Époque',
+      'Entre-deux-guerres', 'Seconde Guerre mondiale',
+      'Guerre froide', 'Époque contemporaine (1990-2024)'
+    ]
+  },
+  {
+    slug: 'atmospheres',
+    name: 'Atmosphères narratives',
+    items: [
+      'Mystère suspendu', 'Tension montante', 'Révélation imminente',
+      'Mélancolie contemplative', 'Espoir fragile', 'Absurde sobre',
+      'Deuil digne', 'Silence pesant', 'Étrangeté inquiétante'
+    ]
+  }
+];
+
+/* ---------- PROMPTS SYSTÈME (3) ---------- */
+const SYS = {
+  vision: `You are a professional visual describer preparing a reference image for a documentary historical short (French YouTube channel "La Trame du Réel").\nYour output will help an image AI re-create the SAME SUBJECT in a different historical style.\nDescribe ONLY what you see, factually and neutrally. No diagnosis of people, no psychological interpretation, no invented details.\nStructure your answer in French with these sections:\n1. SUJET — the main subject, its pose, its framing (seen from behind? at distance? in silhouette?)\n2. DÉCOR — location, architecture, era, furniture, objects, materials, textures\n3. ÉCLAIRAGE — light sources, direction, quality, shadows\n4. PALETTE — dominant colours with approximate hex codes\n5. COMPOSITION — camera angle, framing, perspective\n6. ÉLÉMENTS NARRATIFS — any symbolic object, prop, or element that carries meaning\nRules:\n- If a face is visible, describe it only generically ("a face turned away", "a silhouette in shadow") — never invent features.\n- If there is text in the image, mention its presence but do NOT transcribe it.\n- Length: 160–220 words.`,
+  improveStyle: `You are an expert prompt engineer specialised in DOCUMENTARY ART-STYLE SYSTEM PROMPTS for a French historical short-form YouTube channel.\nYour job is to IMPROVE A TEMPLATE, not to execute it.\n\nCONTEXT:\nThe input is a SYSTEM PROMPT / TEMPLATE used by a pipeline. This template teaches an AI how to convert ANY documentary subject into a final image prompt. It is REUSABLE for any subject (mysteries, historical events, unusual destinies, disappearances...).\n\nYOUR TASK:\nRewrite the template to make it clearer, more precise, and more effective — while keeping it GENERIC and REUSABLE.\n\nCRITICAL RULES — VIOLATION = FAILURE:\n1. DO NOT execute the template. DO NOT generate a scene. DO NOT invent subjects, characters, or events.\n2. The output MUST remain a reusable TEMPLATE with the same structure.\n3. Preserve the original style identity completely (maritime mystery, sepia 19th, noir docu, etc.).\n4. Keep the SAME LANGUAGE as the input (French or English).\n5. You MAY add: precise palettes (with hex), period-accuracy guards, composition rules, and a clear instruction to preserve the user's subject verbatim.\n6. Structure in Agnes-recommended order: Subject → Scene → Style → Lighting → Composition → Quality.\n7. ALWAYS preserve these editorial guardrails (do NOT remove them): no visible faces, no invented text, no anachronism, no gore, no realistic depiction of victims, sober documentary tone, 9:16 vertical by default.\n8. Output ONLY the rewritten template. No preamble. No explanation. No quotation marks. No markdown fences.`,
+  improveStoryboard: `You are an expert list-generator AI for a French documentary YouTube short channel.\n\nThe user will describe a storyboard list or a theme. Produce EXACTLY that kind of list.\n\nRULES:\n- Read the user's request carefully. Do NOT assume it is a shot list unless it clearly is one.\n- Produce items that match EXACTLY what the user asks for.\n- One item per line. No bullets, no numbering, no quotes, no preamble.\n- Each item must be short (max 120 characters), self-contained, usable as-is.\n- Produce between 8 and 40 items.\n- Reply in the SAME LANGUAGE as the user's request.\n- If the input is a list of camera shots or historical eras, keep items NEUTRAL and GENERIC: do not add props, costumes, characters, or invented details.\n- Preserve the editorial guardrails implicitly: no proposed item should require visible faces, gore, or invented text.\n\nOUTPUT FORMAT (strict):\nOne item per line. Nothing else.`
+};const LocalAPI = (() => {
+  const DB_NAME = 'trameforge_db', DB_VER = 1;
+  const SESSION_KEY = 'trameforge_session', OFFSET_KEY = 'trameforge_key_offset';
+  const E = (msg, status = 500) => Object.assign(new Error(msg), { status });
+  const sleepMs = ms => new Promise(r => setTimeout(r, ms));
+  const nowStr = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const objUrlToId = new Map(), idToObjUrl = new Map();
+  let _db = null;
+
+  /* ---------- IndexedDB ---------- */
+  function openDB() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise((res, rej) => {
+      if (!window.indexedDB) return rej(new Error('IndexedDB indisponible dans ce navigateur'));
+      const rq = indexedDB.open(DB_NAME, DB_VER);
+      rq.onupgradeneeded = () => {
+        const d = rq.result;
+        const mk = (n, idx) => { const s = d.createObjectStore(n, { keyPath: 'id', autoIncrement: true }); (idx || []).forEach(i => s.createIndex(i, i)); };
+        mk('users', ['username']); mk('styles', ['user_id']); mk('storyboards', ['user_id']);
+        mk('generations', ['user_id']); mk('images');
+        d.createObjectStore('favorites', { keyPath: ['user_id', 'generation_id'] }).createIndex('user_id', 'user_id');
+      };
+      rq.onsuccess = () => { _db = rq.result; res(_db); };
+      rq.onerror = () => rej(rq.error || new Error('IndexedDB : ouverture impossible'));
+      rq.onblocked = () => rej(new Error('IndexedDB bloquée par un autre onglet'));
+    });
+  }
+  const rq2p = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  async function store(name, mode) { const d = await openDB(); return d.transaction(name, mode || 'readonly').objectStore(name); }
+  async function getAll(name, idx, val) { const s = await store(name); return rq2p(idx ? s.index(idx).getAll(val) : s.getAll()); }
+  async function getOne(name, key) { const s = await store(name); return rq2p(s.get(key)); }
+  async function putRow(name, obj) { const s = await store(name, 'readwrite'); return rq2p(s.put(obj)); }
+  async function delRow(name, key) { const s = await store(name, 'readwrite'); return rq2p(s.delete(key)); }
+
+  /* ---------- Session ---------- */
+  function session() { try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; } }
+  function needAuth() { const s = session(); if (!s || !s.user_id) throw E('Non authentifié', 401); return s.user_id; }
+
+  async function hashPin(pin, salt) {
+    const data = new TextEncoder().encode(salt + ':' + pin);
+    if (window.crypto && crypto.subtle) {
+      const b = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+    let h = 2166136261; for (const x of data) { h ^= x; h = Math.imul(h, 16777619) >>> 0; }
+    return 'f' + h.toString(16);
+  }
+  function randHex(n) { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a).map(x => x.toString(16).padStart(2, '0')).join(''); }
+
+  /* ---------- Presets ---------- */
+  async function ensureUserPresets(uid) {
+    if (!(await getAll('styles', 'user_id', uid)).length) {
+      for (const s of DEFAULT_STYLES) await putRow('styles', { user_id: uid, slug: s.slug, name: s.name, prompt: s.prompt, updated_at: nowStr() });
+    }
+    if (!(await getAll('storyboards', 'user_id', uid)).length) {
+      for (const sb of DEFAULT_STORYBOARDS) await putRow('storyboards', { user_id: uid, slug: sb.slug, name: sb.name, items: sb.items.slice(), updated_at: nowStr() });
+    }
+  }
+  const makeSlug = name => (name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')) + '_' + randHex(2);
+
+  /* ---------- Clés & Agnes HTTP ---------- */
+  function sanitizeKeys(keys) {
+    const out = [];
+    (Array.isArray(keys) ? keys : []).forEach(k => {
+      if (typeof k !== 'string') return;
+      k = k.trim();
+      if (k.length < 20 || !k.startsWith('sk-')) return;
+      if (!out.includes(k)) out.push(k);
+    });
+    return out;
+  }
+  function keyOffset(n) {
+    if (n <= 0) return 0;
+    let c = 0;
+    try { c = parseInt(localStorage.getItem(OFFSET_KEY) || '0', 10) || 0; localStorage.setItem(OFFSET_KEY, String(c + 1)); } catch (e) {}
+    return c % n;
+  }
+  async function agnesCall(path, payload, apiKey, timeoutSec) {
+    const ctl = new AbortController();
+    const tid = setTimeout(() => ctl.abort(), timeoutSec * 1000);
+    let res, txt;
+    try {
+      res = await fetch(AGNES_BASE + path, {
+        method: 'POST', signal: ctl.signal,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        body: JSON.stringify(payload)
+      });
+      txt = await res.text();
+    } catch (e) {
+      throw E(e.name === 'AbortError' ? 'Délai dépassé (' + timeoutSec + 's)' : 'Réseau : ' + e.message, 0);
+    } finally { clearTimeout(tid); }
+    let data = null; try { data = JSON.parse(txt); } catch (e) {}
+    if (res.status >= 400) {
+      const msg = (data && data.error && data.error.message) || txt.slice(0, 250);
+      throw E('Agnes HTTP ' + res.status + ': ' + msg, res.status);
+    }
+    return (data && typeof data === 'object') ? data : {};
+  }
+  async function agnesCallMulti(path, payload, keys, timeout) {
+    const n = keys.length;
+    if (!n) throw E('Aucune clé API disponible');
+    const start = keyOffset(n);
+    const rotated = keys.slice(start).concat(keys.slice(0, start));
+    const models = path.includes('chat/completions') ? [AGNES_TEXT_MODEL, AGNES_TEXT_MODEL_FALLBACK] : [null];
+    let lastErr = null;
+    for (const m of models) for (const key of rotated) for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const p = Object.assign({}, payload); if (m !== null) p.model = m;
+        return await agnesCall(path, p, key, timeout);
+      } catch (e) {
+        lastErr = e;
+        const code = e.status || 0;
+        if (code >= 400 && code < 500 && code !== 429) break;
+        if (attempt === 0) await sleepMs(500);
+      }
+    }
+    throw lastErr || E('Toutes les clés ont échoué');
+  }
+  const chatPayload = (messages, temperature, max_tokens) => ({
+    model: AGNES_TEXT_MODEL, messages, temperature, max_tokens,
+    reasoning_effort: 'none', chat_template_kwargs: { enable_thinking: false }
+  });
+  const stripFences = s => String(s || '').trim().replace(/^```[a-z]*\s*|\s*```$/gi, '');
+
+  /* ---------- Images : stockage local ---------- */
+  async function storeImage(url, uid, label) {
+    let blob = null;
+    if (/^data:image\//i.test(url)) {
+      try { blob = await (await fetch(url)).blob(); } catch (e) { throw E('base64 invalide'); }
+      if (!blob || blob.size < 100) throw E('base64 invalide');
+    } else {
+      if (!/^https?:\/\//i.test(url)) throw E('URL invalide');
+      try {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        blob = await r.blob();
+        if (blob.size > 25 * 1024 * 1024 || blob.size < 100) blob = null;
+      } catch (e) { blob = null; }
+      if (!blob) return url;
+    }
+    const id = await putRow('images', { user_id: uid, label: String(label || 'img'), type: blob.type || 'image/png', blob, created_at: nowStr() });
+    const ou = URL.createObjectURL(blob);
+    objUrlToId.set(ou, id); idToObjUrl.set(id, ou);
+    return ou;
+  }
+  async function resolveImage(stored) {
+    const s = String(stored || '');
+    if (!s.startsWith('idb:')) return s;
+    const id = parseInt(s.slice(4), 10);
+    if (idToObjUrl.has(id)) return idToObjUrl.get(id);
+    const row = await getOne('images', id);
+    if (!row || !row.blob) return '';
+    const ou = URL.createObjectURL(row.blob);
+    idToObjUrl.set(id, ou); objUrlToId.set(ou, id);
+    return ou;
+  }
+  const toStoredUrl = u => (objUrlToId.has(u) ? 'idb:' + objUrlToId.get(u) : String(u || ''));
+
+  /* ---------- Actions ---------- */
+  const A = {
+    async login(b) {
+      const user = String(b.username || '').trim(), pin = String(b.pin || '').trim();
+      if (!/^[a-zA-Z0-9_-]{2,32}$/.test(user)) throw E('Pseudo invalide (2-32 car., a-z 0-9 _ -)', 400);
+      if (!/^\d{4}$/.test(pin)) throw E('PIN : 4 chiffres requis', 400);
+      const row = (await getAll('users', 'username', user))[0];
+      let uid;
+      if (row) {
+        if ((await hashPin(pin, row.salt)) !== row.pin_hash) throw E('PIN incorrect', 403);
+        uid = row.id;
+      } else {
+        const salt = randHex(8);
+        uid = await putRow('users', { username: user, salt, pin_hash: await hashPin(pin, salt), created_at: nowStr() });
+      }
+      await ensureUserPresets(uid);
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ user_id: uid, username: user }));
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+      return { ok: true, user, user_id: uid };
+    },
+    async logout() { localStorage.removeItem(SESSION_KEY); return { ok: true }; },
+    async me() { const s = session(); return { user: s ? s.username : null, user_id: s ? s.user_id : null }; },
+
+    async get_styles() {
+      const uid = needAuth(); await ensureUserPresets(uid);
+      const rows = (await getAll('styles', 'user_id', uid)).sort((a, b) => a.id - b.id);
+      return { ok: true, styles: rows.map(r => ({ id: r.id, slug: r.slug, name: r.name, prompt: r.prompt, updated_at: r.updated_at })) };
+    },
+    async save_style(b) {
+      const uid = needAuth();
+      const id = parseInt(b.id || 0, 10) || 0, name = String(b.name || '').trim(), prompt = String(b.prompt || '').trim();
+      if (!name || !prompt) throw E('name et prompt requis', 400);
+      if (id > 0) {
+        const r = await getOne('styles', id);
+        if (r && r.user_id === uid) { r.name = name; r.prompt = prompt; r.updated_at = nowStr(); await putRow('styles', r); }
+      } else await putRow('styles', { user_id: uid, slug: makeSlug(name), name, prompt, updated_at: nowStr() });
+      return { ok: true };
+    },
+    async delete_style(b) {
+      const uid = needAuth(); const id = parseInt(b.id || 0, 10) || 0;
+      const r = await getOne('styles', id); if (r && r.user_id === uid) await delRow('styles', id);
+      return { ok: true };
+    },
+    async improve_style(b) {
+      needAuth();
+      const current = String(b.prompt || '').trim(), keys = sanitizeKeys(b.keys);
+      if (!current || !keys.length) throw E('prompt et keys requis', 400);
+      const userMsg = "=== TEMPLATE À AMÉLIORER (À RÉÉCRIRE, NE PAS EXÉCUTER) ===\n" + current +
+        "\n=== FIN DU TEMPLATE ===\n\n" +
+        "Réécris CE TEMPLATE en conservant son rôle d'instruction générique.\n" +
+        "NE génère AUCUNE scène. NE choisis AUCUN sujet.\n" +
+        "CONSERVE impérativement les garde-fous éditoriaux de la chaîne La Trame du Réel : aucun visage visible, aucun texte inventé, aucun anachronisme, aucune violence graphique, ton sobre documentaire, format 9:16 vertical par défaut.\n" +
+        "Retourne uniquement le template amélioré, dans la même langue.";
+      const data = await agnesCallMulti('/chat/completions', chatPayload([{ role: 'system', content: SYS.improveStyle }, { role: 'user', content: userMsg }], 0.4, 1400), keys, 120);
+      const out = stripFences(((data.choices || [])[0] || {}).message && data.choices[0].message.content);
+      if (!out) throw E('Réponse IA vide');
+      return { ok: true, prompt: out.trim() };
+    },
+
+    async get_storyboards() {
+      const uid = needAuth(); await ensureUserPresets(uid);
+      const rows = (await getAll('storyboards', 'user_id', uid)).sort((a, b) => a.id - b.id);
+      return { ok: true, storyboards: rows.map(r => ({ id: r.id, slug: r.slug, name: r.name, items: Array.isArray(r.items) ? r.items : [], updated_at: r.updated_at })) };
+    },
+    async save_storyboard(b) {
+      const uid = needAuth();
+      const id = parseInt(b.id || 0, 10) || 0, name = String(b.name || '').trim();
+      if (!name) throw E('name requis', 400);
+      const items = (Array.isArray(b.items) ? b.items : []).map(x => String(x).trim()).filter(x => x !== '');
+      if (id > 0) {
+        const r = await getOne('storyboards', id);
+        if (r && r.user_id === uid) { r.name = name; r.items = items; r.updated_at = nowStr(); await putRow('storyboards', r); }
+      } else await putRow('storyboards', { user_id: uid, slug: makeSlug(name), name, items, updated_at: nowStr() });
+      return { ok: true };
+    },
+    async delete_storyboard(b) {
+      const uid = needAuth(); const id = parseInt(b.id || 0, 10) || 0;
+      const r = await getOne('storyboards', id); if (r && r.user_id === uid) await delRow('storyboards', id);
+      return { ok: true };
+    },
+    async improve_storyboard(b) {
+      needAuth();
+      const theme = String(b.theme || '').trim(), keys = sanitizeKeys(b.keys);
+      if (!theme || !keys.length) throw E('theme et keys requis', 400);
+      const userMsg = "LISTE OU THÈME À AMÉLIORER :\n" + theme +
+        "\n\nRÈGLES STRICTES :\n" +
+        "- Si l'entrée est déjà une liste, NE PAS ajouter d'objets, de vêtements, de lieux ou de détails concrets.\n" +
+        "- Garde chaque élément GÉNÉRIQUE (type de plan, angle caméra, époque, atmosphère uniquement).\n" +
+        "- Corrige l'orthographe, déduplique, et ajoute au maximum 1 ou 2 entrées manquantes cohérentes.\n" +
+        "- Un élément par ligne. Pas de puces, pas de numéros, pas de guillemets.";
+      const data = await agnesCallMulti('/chat/completions', chatPayload([{ role: 'system', content: SYS.improveStoryboard }, { role: 'user', content: userMsg }], 0.2, 500), keys, 90);
+      const out = stripFences(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
+      const items = [];
+      out.split(/\r\n|\r|\n/).forEach(ln => {
+        ln = ln.trim().replace(/^[\-\*•\d\.\)]+\s*/, '').replace(/^["' \t]+|["' \t]+$/g, '');
+        if (ln !== '' && Array.from(ln).length <= 120) items.push(ln);
+      });
+      if (!items.length) throw E('Réponse IA vide');
+      return { ok: true, items: items.slice(0, 40) };
+    },
+
+    async analyze(b) {
+      needAuth();
+      const image = String(b.image || ''), keys = sanitizeKeys(b.keys);
+      if (!image || !keys.length) throw E('image et keys requis', 400);
+      if (image.length > 18000000) throw E('Image trop volumineuse', 413);
+      const msgs = [{ role: 'system', content: SYS.vision }, { role: 'user', content: [
+        { type: 'text', text: 'Décris cette image selon la structure demandée.' }, { type: 'image_url', image_url: { url: image } }] }];
+      try {
+        const data = await agnesCallMulti('/chat/completions', chatPayload(msgs, 0.2, 2000), keys, 240);
+        const txt = String((data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '').trim();
+        if (!txt) throw E('Réponse vide');
+        return { ok: true, content: txt };
+      } catch (e) { throw E('Analyse échouée : ' + e.message); }
+    },
+    async generate_prompt(b) {
+      needAuth();
+      const system = String(b.system || '').trim(), userMsg = String(b.user || '').trim(), keys = sanitizeKeys(b.keys);
+      const maxTok = Math.max(80, Math.min(2000, parseInt(b.max_tokens || 500, 10) || 500));
+      let temp = parseFloat(b.temperature); if (isNaN(temp)) temp = 0.75; temp = Math.max(0, Math.min(1.5, temp));
+      if (!system || !userMsg || !keys.length) throw E('system, user et keys requis', 400);
+      try {
+        const data = await agnesCallMulti('/chat/completions', chatPayload([{ role: 'system', content: system }, { role: 'user', content: userMsg }], temp, maxTok), keys, 120);
+        let out = stripFences(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
+        out = out.replace(/^["' \n\r\t]+|["' \n\r\t]+$/g, '');
+        if (!out) throw E('Réponse vide');
+        return { ok: true, content: out };
+      } catch (e) { throw E('Prompt échoué : ' + e.message); }
+    },
+    async generate_image(b) {
+      const uid = needAuth();
+      const prompt = String(b.prompt || '').trim(), keys = sanitizeKeys(b.keys), label = String(b.label || 'img');
+      let size = String(b.size || '2K'), ratio = String(b.ratio || '9:16');
+      if (!prompt || !keys.length) throw E('prompt et keys requis', 400);
+      if (prompt.length > 20000) throw E('Prompt trop long', 413);
+      if (!['1K', '2K', '3K', '4K'].includes(size)) size = '2K';
+      if (!['1:1', '3:4', '4:3', '16:9', '9:16', '2:3', '3:2', '21:9'].includes(ratio)) ratio = '9:16';
+      const payload = { model: AGNES_IMG_MODEL, prompt: Array.from(prompt).slice(0, 5000).join(''), size, ratio, extra_body: { response_format: 'url' } };
+      try {
+        const data = await agnesCallMulti('/images/generations', payload, keys, 240);
+        const d0 = (data.data || [])[0] || {};
+        let url = d0.url || null;
+        if (!url && d0.b64_json) url = 'data:image/png;base64,' + d0.b64_json;
+        if (!url) throw E("Pas d'URL dans la réponse");
+        const local = await storeImage(url, uid, label);
+        return { ok: true, url: local, remote: url };
+      } catch (e) { throw E('Image échouée : ' + e.message); }
+    },
+
+    async log_generation(b) {
+      const uid = needAuth();
+      const id = await putRow('generations', {
+        user_id: uid, style_slug: String(b.style_slug || ''), user_input: String(b.user_input || ''),
+        used_image: parseInt(b.used_image || 0, 10) || 0, vision_desc: String(b.vision_desc || ''),
+        final_prompt: String(b.final_prompt || ''), image_url: toStoredUrl(b.image_url),
+        parent_id: (b.parent_id !== undefined && b.parent_id !== null) ? (parseInt(b.parent_id, 10) || 0) : null,
+        created_at: nowStr()
+      });
+      return { ok: true, id };
+    },
+    async history(b) {
+      const uid = needAuth();
+      const page = Math.max(1, parseInt(b.page || 1, 10) || 1);
+      const perPage = Math.max(1, Math.min(60, parseInt(b.per_page || 30, 10) || 30));
+      const onlyFav = parseInt(b.favorites_only || 0, 10) === 1;
+      const favs = new Set((await getAll('favorites', 'user_id', uid)).map(f => f.generation_id));
+      let rows = (await getAll('generations', 'user_id', uid)).sort((a, b2) => b2.id - a.id);
+      if (onlyFav) rows = rows.filter(r => favs.has(r.id));
+      const total = rows.length, offset = (page - 1) * perPage;
+      const items = [];
+      for (const g of rows.slice(offset, offset + perPage)) items.push({
+        id: g.id, style_slug: g.style_slug, user_input: g.user_input, used_image: g.used_image, final_prompt: g.final_prompt,
+        image_url: await resolveImage(g.image_url), parent_id: g.parent_id, created_at: g.created_at, is_favorite: favs.has(g.id) ? 1 : 0 });
+      return { ok: true, items, total, page, per_page: perPage, favorites_only: onlyFav ? 1 : 0 };
+    },
+    async toggle_favorite(b) {
+      const uid = needAuth(); const gid = parseInt(b.generation_id || 0, 10) || 0;
+      if (gid <= 0) throw E('generation_id requis', 400);
+      const g = await getOne('generations', gid);
+      if (!g || g.user_id !== uid) throw E('Génération introuvable', 404);
+      const ex = await getOne('favorites', [uid, gid]);
+      if (ex) { await delRow('favorites', [uid, gid]); return { ok: true, is_favorite: 0 }; }
+      await putRow('favorites', { user_id: uid, generation_id: gid, created_at: nowStr(), created_ms: Date.now() });
+      return { ok: true, is_favorite: 1 };
+    },
+    async get_favorites(b) {
+      const uid = needAuth();
+      const page = Math.max(1, parseInt(b.page || 1, 10) || 1);
+      const perPage = Math.max(1, Math.min(60, parseInt(b.per_page || 30, 10) || 30));
+      const favs = (await getAll('favorites', 'user_id', uid)).sort((a, b2) => (b2.created_ms || 0) - (a.created_ms || 0));
+      const offset = (page - 1) * perPage, items = [];
+      for (const f of favs.slice(offset, offset + perPage)) {
+        const g = await getOne('generations', f.generation_id);
+        if (!g || g.user_id !== uid) continue;
+        items.push({ id: g.id, style_slug: g.style_slug, user_input: g.user_input, used_image: g.used_image, final_prompt: g.final_prompt,
+          image_url: await resolveImage(g.image_url), parent_id: g.parent_id, created_at: g.created_at, is_favorite: 1 });
+      }
+      return { ok: true, items, total: favs.length, page, per_page: perPage };
+    },
+
+    async test_keys(b) {
+      const keys = sanitizeKeys(b.keys).slice(0, 30);
+      if (!keys.length) throw E('Aucune clé valide', 400);
+      const results = await Promise.all(keys.map(async key => {
+        const ctl = new AbortController(), tid = setTimeout(() => ctl.abort(), 20000);
+        let code = 0;
+        try {
+          const r = await fetch(AGNES_BASE + '/chat/completions', { method: 'POST', signal: ctl.signal,
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+            body: JSON.stringify({ model: AGNES_TEXT_MODEL, messages: [{ role: 'user', content: 'ok' }], max_tokens: 1 }) });
+          code = r.status;
+        } catch (e) { code = 0; } finally { clearTimeout(tid); }
+        return { key, ok: (code >= 200 && code < 300) || code === 429, status: code };
+      }));
+      return { ok: true, results };
+    }
+  };
+
+  async function handle(action, params, method) {
+    const fn = A[action];
+    if (!fn) throw E('Action inconnue : ' + action, 404);
+    return fn(params || {});
+  }
+  return { handle, isLogged: () => !!session(), username: () => (session() || {}).username || '' };
+})();
+
+window.TRAMEFORGE = { ajaxUrl: 'local', isLogged: LocalAPI.isLogged(), username: LocalAPI.username() };
+  </script>
+</body>
+</html>
