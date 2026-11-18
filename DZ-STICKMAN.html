@@ -1028,4 +1028,1223 @@ input[type=checkbox]:checked::after{transform:translateX(16px);background:var(--
 
 <!-- ================= TOAST ================= -->
 <div id="toast"></div>
+<script>
+/* ============================================================
+   DZ STICKMAN STUDIO — Moteur local + Agnes API
+   Basé sur ArtForge v6
+============================================================ */
+const AGNES_BASE = 'https://apihub.agnes-ai.com/v1';
+const AGNES_TEXT_MODEL = 'agnes-3.0-flash';
+const AGNES_TEXT_MODEL_FALLBACK = 'agnes-2.5-flash';
+const AGNES_IMG_MODEL = 'agnes-image-2.5-flash';
 
+/* ---------- FICHES PERSONNAGES (injectées dans tous les prompts) ---------- */
+const CHARS = {
+  sami: "SAMI — Pure black round-headed stickman (NO human face, no skin, no nose, no mouth). Small expressive white eyes/marks. Short slightly messy black hair. Worn cobalt blue jacket. Faded beige pants. Bright red sneakers. Slim, slightly short silhouette. Optimistic, resourceful, friendly, sometimes naive. Voice: warm young man, natural, slightly naive, authentic Algerian darija.",
+  karim: "KARIM — Pure black round-headed stickman (NO human face, no skin, no nose, no mouth). Small expressive white eyes/marks. Small upward black hair tuft. Saturated orange hoodie. Dark forest green pants. White sneakers. Silver watch. Taller and wider than Sami. Spontaneous, teasing, provocative, observant, ironic. Voice: young man, deeper than Sami, energetic, ironic, authentic Algerian darija."
+};
+const STYLE_REF = "2D cartoon hand-drawn stickman style, cinematographic staging, expressive body language, detailed recognizable Algerian settings, dramatic lighting, strong shadows, depth of field when it serves the scene, careful composition, varied framings, visual continuity between shots, vertical 9:16 format (1080x1920), NO text, NO logo, NO subtitles in the image.";
+
+/* ---------- PROMPTS SYSTÈME ---------- */
+const SYS = {
+  vision: `Tu es un descripteur visuel professionnel pour DZ Stickman (série animée algérienne). Décris l'image de référence en français, section par section, sans inventer : 
+1. PERSONNAGES — Pour chaque personnage : est-ce Sami, Karim, ou secondaire ? Décris posture, expression corporelle, gestes, vêtements et couleurs si visibles.
+2. DÉCOR — Lieu algérien reconnaissable (quartier, marché, café, bus, maison, administration…). Détaille architecture, objets, textures.
+3. ÉCLAIRAGE — Direction, qualité, ambiance (jour/nuit/crépuscule).
+4. AMBIANCE — Mood, palette dominante (noir/jaune/blanc/cobalt ou autres).
+Longueur : 180-260 mots. Sois chirurgical, chaque détail peut être réutilisé.`,
+
+  concept: `Tu es le directeur artistique de DZ Stickman, marque algérienne de divertissement animé.
+Génère un CONCEPT complet d'épisode pour la série "يوميات سامي وكريم" (les aventures de Sami et Karim).
+
+Public : exclusivement algérien. Langue : darija algérienne naturelle.
+Format : Reel Instagram 9:16.
+Personnages : Sami (optimiste, naïf) + Karim (ironique, taquin).
+
+Produis en français + darija :
+
+🎬 TITRE (darija) : [titre accrocheur en darija]
+📝 IDÉE (3-4 lignes) : [résumé de la situation comique]
+🎯 PROBLÈME SOCIAL : [quel problème du quotidien algérien]
+😂 SITUATION COMIQUE : [la scène, la montée, la chute]
+💡 MESSAGE IMPLICITE : [ce que le public doit ressentir]
+⏱️ DURÉE CIBLE : [15-30s / 45-60s / 60-90s]
+🎭 TON : [satire sociale / absurde / tendre / mordant / quotidien]
+
+Sois concret, évocateur, algérien. Pas de généralités.`,
+
+  scenario: `Tu es scénariste de DZ Stickman. Écris un dialogue en darija algérienne naturelle.
+
+Règles :
+- Phrases courtes et prononçables.
+- Structure : SITUATION → MONTÉE COMIQUE → CHUTE.
+- Sami = optimiste naïf · Karim = ironique taquin.
+- Dialogue VIVANT, comme dans la rue algérienne.
+- Pas de français soutenu, pas d'arabe standard artificiel.
+- Notation : "SAMI : ..." / "KARIM : ..."
+- Ajoute des indications entre [crochets] pour les gestes/expressions.
+
+Format attendu :
+
+TITRE :
+SITUATION (2-3 lignes) :
+DIALOGUE :
+SAMI : [geste] "réplique"
+KARIM : [geste] "réplique"
+...
+CHUTE (1-2 lignes) :`,
+
+  decoupage: `Tu es réalisateur de DZ Stickman. Produis un DÉCOUPAGE TECHNIQUE complet.
+
+Pour chaque plan, indique EXACTEMENT :
+
+PLAN [N°] — [durée en secondes]
+Personnages : [Sami / Karim / secondaire]
+Lieu : [décor algérien précis]
+Action : [description concise]
+Dialogue/VO : [réplique ou silence]
+Cadrage : [plan large / moyen / gros / contre-plongée / etc.]
+Mouvement caméra : [fixe / pan / zoom / travelling]
+Ambiance sonore : [ambiance + musique]
+
+Le total des durées doit correspondre à la durée cible.
+Numérote les plans de 1 à N.
+Algérien, concret, prêt à tourner.`,
+
+  prompt_image: `You are an image prompt engineer for DZ Stickman, an Algerian animated series.
+
+CRITICAL RULES:
+- Sami and Karim MUST remain pure black round-headed stickmen. NO human face, NO skin, NO nose, NO mouth.
+- Never modify their clothes, colors, proportions, or hairstyles.
+- Format: vertical 9:16 (1080x1920).
+- NO text, NO logo, NO subtitles in the image.
+- Algerian setting must be recognizable.
+- Cinematographic lighting, strong shadows, depth of field when useful.
+
+Write ONE complete English image prompt (80-120 words) that:
+1. Opens with the exact characters present (use their full descriptions)
+2. Describes the scene, setting, action
+3. Specifies lighting, composition, camera framing
+4. Ends with style constraints
+
+Return ONLY the final prompt. No explanation.`,
+
+  prompt_video: `You are a video prompt engineer for Google Flow (Omni Flash model).
+
+CRITICAL RULES:
+- Duration must be EXACTLY one of: 4, 6, 8, or 10 seconds. NEVER 5 seconds.
+- Prompts must be in English, ready to copy-paste.
+- Describe ONLY the motion needed. Keep it simple.
+- No lip-sync, no generated dialogue in Flow.
+- Preserve character identity absolutely (Sami & Karim pure stickmen, same clothes/colors).
+- Specify body expressions, gestures, camera moves, background motion.
+- No text, logo, watermark.
+
+Format expected:
+
+DURATION: [X seconds]
+CHARACTERS: [list]
+ACTION: [precise description of movement]
+CAMERA: [camera movement]
+BACKGROUND: [background motion if any]
+PROMPT (ready to paste): "[complete English prompt]"
+
+Return the format exactly.`,
+
+  voix: `Tu es directeur de casting vocal pour DZ Stickman, expert ElevenLabs.
+
+Prépare les dialogues en séparant SAMI et KARIM.
+
+Pour chaque réplique :
+- Locuteur (SAMI / KARIM)
+- Texte en darija (exactement ce qui sera lu)
+- Intention (joyeux / ironique / énervé / naïf / etc.)
+- Pauses suggérées (ex: "pause 0.5s après X")
+- Émotion dominante
+- Vitesse (lent / normal / rapide)
+
+Ajoute à la fin :
+🎙️ PARAMÈTRES ELEVENLABS :
+- Sami : stability / similarity / style
+- Karim : stability / similarity / style
+🔊 EFFETS SONORES suggérés :
+🎵 MUSIQUE suggérée :
+
+Darija authentique uniquement.`,
+
+  montage: `Tu es monteur CapCut mobile (Android) pour DZ Stickman.
+
+Produis un PLAN DE MONTAGE prêt à suivre :
+
+1. ORDRE DES PLANS (numérotés)
+2. DURÉE EXACTE de chaque plan (en secondes)
+3. PLACEMENT DES DIALOGUES (à quel timecode)
+4. EFFETS SONORES (à quel moment)
+5. MUSIQUE (volume, montée, chute)
+6. TRANSITIONS (cut / fondu / etc.)
+7. SOUS-TITRES DARIJA (texte + timing)
+8. LOGO DZ STICKMAN FINAL (2s)
+
+Format : tableau simple, instructions directes, pas de blabla.
+Android CapCut : instructions compatibles avec l'interface mobile.`,
+
+  instagram: `Tu es stratège Instagram pour DZ Stickman, marque algérienne.
+
+Public : ALGÉRIE UNIQUEMENT.
+4 piliers : Réalité quotidienne (40%) · Situations humoristiques (25%) · Mèmes (20%) · Coulisses (15%).
+
+Réponds selon le type demandé :
+- calendrier : tableau 2 semaines (date / heure / format / sujet / pilier)
+- idees : liste de 10 idées par pilier
+- caption : légende darija + 15 hashtags algériens pertinents
+- bio : bio 150 caractères + lien
+- reponse : 5 réponses types aux commentaires
+
+Tout en darija (sauf hashtags). Concret, prêt à publier.`,
+
+  analyses: `Tu es analyste de performance pour DZ Stickman.
+
+RÈGLE ABSOLUE : ne JAMAIS inventer de données. Analyse uniquement les chiffres fournis.
+
+Structure :
+1. 📊 LECTURE DES CHIFFRES (ce qu'ils disent vraiment)
+2. ✅ CE QUI A MARCHÉ (points forts)
+3. ⚠️ CE QUI A DÉCROCHÉ (points faibles)
+4. 💡 3 AMÉLIORATIONS CONCRÈTES pour le prochain Reel
+5. 🎯 PRÉVISION (sans inventer — basée sur la tendance)
+
+Concis, actionnable, pas de généralités.`,
+
+  improveStyle: `Tu es expert en prompts de style pour DZ Stickman (série animée algérienne).
+
+Tu reçois un template de style. Tu le RÉÉCRIS pour le rendre plus clair, plus précis, plus efficace — SANS changer l'identité visuelle de DZ Stickman.
+
+RÈGLES :
+1. Ne PAS exécuter le template. Ne PAS inventer de scène.
+2. Le résultat reste un TEMPLATE réutilisable.
+3. Préserver les personnages Sami (cobalt/baskets rouges) et Karim (orange/vert forêt/baskets blanches).
+4. Format 9:16 · pas de texte dans l'image.
+5. Ajouter précisions utiles : palette exacte (hex), technique, éclairage, composition.
+6. Garder la MÊME LANGUE (français ou anglais).
+
+Retourne UNIQUEMENT le template réécrit.`,
+
+  improveStoryboard: `Tu es expert en listes bulk pour DZ Stickman.
+
+La liste doit être utilisable pour la série "يوميات سامي وكريم".
+
+RÈGLES :
+- Éléments courts (max 80 caractères).
+- Pertinents pour l'univers algérien.
+- Pas de doublons.
+- Culturellement justes.
+
+Un élément par ligne. Rien d'autre.`
+};
+
+/* ---------- 6 STYLES DZ STICKMAN PRÉCONFIGURÉS ---------- */
+const DEFAULT_STYLES = [
+  {
+    slug: 'dz_base',
+    name: 'DZ Stickman — Base',
+    prompt: `DZ STICKMAN BASE STYLE. 2D hand-drawn cartoon animation, pure black round-headed stickmen with small white expressive eyes (NO human face, NO skin, NO nose, NO mouth). Sami: worn cobalt blue jacket, faded beige pants, bright red sneakers, short messy black hair, slim slightly short. Karim: saturated orange hoodie, dark forest green pants, white sneakers, silver watch, small upward black hair tuft, taller wider. Cinematographic staging, expressive body language, strong shadows, depth of field when it serves. Detailed recognizable Algerian settings. Vertical 9:16 format 1080x1920. NO text, NO logo, NO subtitles in image.`
+  },
+  {
+    slug: 'dz_rue',
+    name: 'DZ Stickman — Scène de rue',
+    prompt: `DZ STICKMAN STREET SCENE. Urban Algerian neighborhood at street level: crowded market, sidewalk cafe, public bus stop, small shops with Arabic signage, cobblestone streets, hanging laundry, satellite dishes on rooftops, warm sunlight, crowds in motion. Pure black round-headed stickmen with small white expressive eyes. Sami (cobalt jacket, beige pants, red sneakers) and Karim (orange hoodie, forest green pants, white sneakers). Documentary-like framing, medium shots, life-like density. Cinematographic lighting. Vertical 9:16. NO text, NO logo, NO subtitles in image.`
+  },
+  {
+    slug: 'dz_interieur',
+    name: 'DZ Stickman — Scène intérieure',
+    prompt: `DZ STICKMAN INTERIOR SCENE. Modest Algerian home or office: patterned tiles, low sofa, tea table with mint tea glasses, wall decorations with calligraphy, ceiling fan, warm lamps. Pure black round-headed stickmen, small white expressive eyes. Sami (cobalt jacket, beige pants, red sneakers). Karim (orange hoodie, forest green pants, white sneakers). Close and medium shots, intimate framing, warm interior lighting, soft shadows. Vertical 9:16. NO text, NO logo, NO subtitles in image.`
+  },
+  {
+    slug: 'dz_nuit',
+    name: 'DZ Stickman — Scène de nuit',
+    prompt: `DZ STICKMAN NIGHT SCENE. Algerian streets at night: street lamps with warm orange glow, lit windows, café terraces with neons, mosques with green-lit minarets, dark alleys with dramatic shadows, moonlight. Pure black round-headed stickmen with small white expressive eyes. Sami (cobalt jacket, beige pants, red sneakers). Karim (orange hoodie, forest green pants, white sneakers). Cinematographic noir lighting, strong contrast, back-lit silhouettes. Vertical 9:16. NO text, NO logo, NO subtitles in image.`
+  },
+  {
+    slug: 'dz_gros_plan',
+    name: 'DZ Stickman — Gros plan émotion',
+    prompt: `DZ STICKMAN CLOSE-UP EMOTION. Extreme close-up on Sami or Karim's round black head. Small white expressive eyes convey emotion (surprise, joy, frustration, irony, worry). Shallow depth of field, blurred Algerian background (tiles, market, café). Pure stickman identity preserved (NO human face, NO skin, NO nose, NO mouth). Cinematographic lighting, dramatic side light, subtle rim light. Vertical 9:16. NO text, NO logo, NO subtitles in image.`
+  },
+  {
+    slug: 'dz_plan_large',
+    name: 'DZ Stickman — Plan large',
+    prompt: `DZ STICKMAN WIDE SHOT. Establish the Algerian location: rooftop view over a dense neighborhood, busy market square, soccer field at sunset, mosque courtyard, coastal city street. Pure black round-headed stickmen Sami (cobalt jacket, beige pants, red sneakers) and Karim (orange hoodie, forest green pants, white sneakers) small in the frame, walking or standing. Cinematographic lighting, wide composition, depth and atmosphere. Vertical 9:16. NO text, NO logo, NO subtitles in image.`
+  }
+];
+
+/* ---------- 6 BULKS DZ STICKMAN PRÉCONFIGURÉS ---------- */
+const DEFAULT_BULKS = [
+  { slug: 'dz_plans', name: 'Types de plans', items: ['plan large', 'plan moyen', 'gros plan', 'très gros plan', 'plan américain', 'contre-plongée', 'plongée', 'vue subjective'] },
+  { slug: 'dz_lieux', name: 'Lieux algériens', items: ['rue de quartier', 'marché populaire', 'café de rue', 'bus bondé', 'maison modeste', 'administration', 'école', 'hôpital', 'mosquée', 'stade', 'plage', 'montagne', 'désert', 'village'] },
+  { slug: 'dz_expressions', name: 'Expressions stickman', items: ['joie', 'colère', 'surprise', 'tristesse', 'peur', 'dégoût', 'fatigue', 'espoir', 'ironie', 'résignation'] },
+  { slug: 'dz_moments', name: 'Moments de la journée', items: ['aube', 'matin', 'midi', 'après-midi', 'crépuscule', 'nuit'] },
+  { slug: 'dz_situations', name: 'Situations comiques algériennes', items: ['malentendu au marché', 'file d\'attente à l\'administration', 'embouteillage sur l\'autoroute', 'facture surprise Sonelgaz', 'voisin envahissant', 'ami qui demande de l\'argent', 'bureaucratie kafkaïenne', 'transport bondé à 7h', 'mariage avec 500 invités', 'ramadan et faim'] },
+  { slug: 'dz_secondaires', name: 'Personnages secondaires', items: ['voisin curieux', 'collègue fayot', 'commerçant filou', 'policier zélé', 'fonctionnaire indifférent', 'membre de la famille', 'ami d\'enfance', 'patron autoritaire', 'inconnu pressé', 'foule'] }
+];
+
+/* ============================================================
+   LOCALAPI
+============================================================ */
+const LocalAPI = (() => {
+  const DB_NAME = 'dzstickman_db', DB_VER = 1;
+  const SESSION_KEY = 'dzstickman_session', OFFSET_KEY = 'dzstickman_key_offset';
+  const E = (msg, status = 500) => Object.assign(new Error(msg), { status });
+  const sleepMs = ms => new Promise(r => setTimeout(r, ms));
+  const nowStr = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const objUrlToId = new Map(), idToObjUrl = new Map();
+  let _db = null;
+
+  function openDB() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise((res, rej) => {
+      if (!window.indexedDB) return rej(new Error('IndexedDB indisponible'));
+      const rq = indexedDB.open(DB_NAME, DB_VER);
+      rq.onupgradeneeded = () => {
+        const d = rq.result;
+        const mk = (n, idx) => { const s = d.createObjectStore(n, { keyPath: 'id', autoIncrement: true }); (idx || []).forEach(i => s.createIndex(i, i)); };
+        mk('users', ['username']); mk('styles', ['user_id']); mk('storyboards', ['user_id']);
+        mk('generations', ['user_id']); mk('images');
+        d.createObjectStore('favorites', { keyPath: ['user_id', 'generation_id'] }).createIndex('user_id', 'user_id');
+      };
+      rq.onsuccess = () => { _db = rq.result; res(_db); };
+      rq.onerror = () => rej(rq.error || new Error('IndexedDB erreur'));
+    });
+  }
+  const rq2p = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  async function store(name, mode) { const d = await openDB(); return d.transaction(name, mode || 'readonly').objectStore(name); }
+  async function getAll(name, idx, val) { const s = await store(name); return rq2p(idx ? s.index(idx).getAll(val) : s.getAll()); }
+  async function getOne(name, key) { const s = await store(name); return rq2p(s.get(key)); }
+  async function putRow(name, obj) { const s = await store(name, 'readwrite'); return rq2p(s.put(obj)); }
+  async function delRow(name, key) { const s = await store(name, 'readwrite'); return rq2p(s.delete(key)); }
+
+  function session() { try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; } }
+  function needAuth() { const s = session(); if (!s || !s.user_id) throw E('Non authentifié', 401); return s.user_id; }
+
+  async function hashPin(pin, salt) {
+    const data = new TextEncoder().encode(salt + ':' + pin);
+    if (window.crypto && crypto.subtle) {
+      const b = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+    let h = 2166136261; for (const x of data) { h ^= x; h = Math.imul(h, 16777619) >>> 0; }
+    return 'f' + h.toString(16);
+  }
+  function randHex(n) { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a).map(x => x.toString(16).padStart(2, '0')).join(''); }
+
+  async function ensureUserPresets(uid) {
+    if (!(await getAll('styles', 'user_id', uid)).length) {
+      for (const s of DEFAULT_STYLES) await putRow('styles', { user_id: uid, slug: s.slug, name: s.name, prompt: s.prompt, updated_at: nowStr() });
+    }
+    if (!(await getAll('storyboards', 'user_id', uid)).length) {
+      for (const b of DEFAULT_BULKS) await putRow('storyboards', { user_id: uid, slug: b.slug, name: b.name, items: b.items.slice(), updated_at: nowStr() });
+    }
+  }
+  const makeSlug = name => (name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')) + '_' + randHex(2);
+
+  function sanitizeKeys(keys) {
+    const out = [];
+    (Array.isArray(keys) ? keys : []).forEach(k => {
+      if (typeof k !== 'string') return;
+      k = k.trim();
+      if (k.length < 20 || !k.startsWith('sk-')) return;
+      if (!out.includes(k)) out.push(k);
+    });
+    return out;
+  }
+  function keyOffset(n) {
+    if (n <= 0) return 0;
+    let c = 0;
+    try { c = parseInt(localStorage.getItem(OFFSET_KEY) || '0', 10) || 0; localStorage.setItem(OFFSET_KEY, String(c + 1)); } catch (e) {}
+    return c % n;
+  }
+  async function agnesCall(path, payload, apiKey, timeoutSec) {
+    const ctl = new AbortController();
+    const tid = setTimeout(() => ctl.abort(), timeoutSec * 1000);
+    let res, txt;
+    try {
+      res = await fetch(AGNES_BASE + path, {
+        method: 'POST', signal: ctl.signal,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        body: JSON.stringify(payload)
+      });
+      txt = await res.text();
+    } catch (e) {
+      throw E(e.name === 'AbortError' ? 'Délai dépassé (' + timeoutSec + 's)' : 'Réseau : ' + e.message, 0);
+    } finally { clearTimeout(tid); }
+    let data = null; try { data = JSON.parse(txt); } catch (e) {}
+    if (res.status >= 400) {
+      const msg = (data && data.error && data.error.message) || txt.slice(0, 250);
+      throw E('Agnes HTTP ' + res.status + ': ' + msg, res.status);
+    }
+    return (data && typeof data === 'object') ? data : {};
+  }
+  async function agnesCallMulti(path, payload, keys, timeout) {
+    const n = keys.length;
+    if (!n) throw E('Aucune clé API disponible');
+    const start = keyOffset(n);
+    const rotated = keys.slice(start).concat(keys.slice(0, start));
+    const models = path.includes('chat/completions') ? [AGNES_TEXT_MODEL, AGNES_TEXT_MODEL_FALLBACK] : [null];
+    let lastErr = null;
+    for (const m of models) for (const key of rotated) for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const p = Object.assign({}, payload); if (m !== null) p.model = m;
+        return await agnesCall(path, p, key, timeout);
+      } catch (e) {
+        lastErr = e;
+        const code = e.status || 0;
+        if (code >= 400 && code < 500 && code !== 429) break;
+        if (attempt === 0) await sleepMs(500);
+      }
+    }
+    throw lastErr || E('Toutes les clés ont échoué');
+  }
+  const chatPayload = (messages, temperature, max_tokens) => ({
+    model: AGNES_TEXT_MODEL, messages, temperature, max_tokens,
+    reasoning_effort: 'none', chat_template_kwargs: { enable_thinking: false }
+  });
+  const stripFences = s => String(s || '').trim().replace(/^```[a-z]*\s*|\s*```$/gi, '');
+
+  async function storeImage(url, uid, label) {
+    let blob = null;
+    if (/^data:image\//i.test(url)) {
+      try { blob = await (await fetch(url)).blob(); } catch (e) { throw E('base64 invalide'); }
+      if (!blob || blob.size < 100) throw E('base64 invalide');
+    } else {
+      if (!/^https?:\/\//i.test(url)) throw E('URL invalide');
+      try {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        blob = await r.blob();
+        if (blob.size > 25 * 1024 * 1024 || blob.size < 100) blob = null;
+      } catch (e) { blob = null; }
+      if (!blob) return url;
+    }
+    const id = await putRow('images', { user_id: uid, label: String(label || 'img'), type: blob.type || 'image/png', blob, created_at: nowStr() });
+    const ou = URL.createObjectURL(blob);
+    objUrlToId.set(ou, id); idToObjUrl.set(id, ou);
+    return ou;
+  }
+  async function resolveImage(stored) {
+    const s = String(stored || '');
+    if (!s.startsWith('idb:')) return s;
+    const id = parseInt(s.slice(4), 10);
+    if (idToObjUrl.has(id)) return idToObjUrl.get(id);
+    const row = await getOne('images', id);
+    if (!row || !row.blob) return '';
+    const ou = URL.createObjectURL(row.blob);
+    idToObjUrl.set(id, ou); objUrlToId.set(ou, id);
+    return ou;
+  }
+  const toStoredUrl = u => (objUrlToId.has(u) ? 'idb:' + objUrlToId.get(u) : String(u || ''));
+
+  const A = {
+    async login(b) {
+      const user = String(b.username || '').trim(), pin = String(b.pin || '').trim();
+      if (!/^[a-zA-Z0-9_-]{2,32}$/.test(user)) throw E('Pseudo invalide (2-32 car.)', 400);
+      if (!/^\d{4}$/.test(pin)) throw E('PIN : 4 chiffres requis', 400);
+      const row = (await getAll('users', 'username', user))[0];
+      let uid;
+      if (row) {
+        if ((await hashPin(pin, row.salt)) !== row.pin_hash) throw E('PIN incorrect', 403);
+        uid = row.id;
+      } else {
+        const salt = randHex(8);
+        uid = await putRow('users', { username: user, salt, pin_hash: await hashPin(pin, salt), created_at: nowStr() });
+      }
+      await ensureUserPresets(uid);
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ user_id: uid, username: user }));
+      try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+      return { ok: true, user, user_id: uid };
+    },
+    async logout() { localStorage.removeItem(SESSION_KEY); return { ok: true }; },
+
+    async get_styles() {
+      const uid = needAuth(); await ensureUserPresets(uid);
+      const rows = (await getAll('styles', 'user_id', uid)).sort((a, b) => a.id - b.id);
+      return { ok: true, styles: rows.map(r => ({ id: r.id, slug: r.slug, name: r.name, prompt: r.prompt, updated_at: r.updated_at })) };
+    },
+    async save_style(b) {
+      const uid = needAuth();
+      const id = parseInt(b.id || 0, 10) || 0, name = String(b.name || '').trim(), prompt = String(b.prompt || '').trim();
+      if (!name || !prompt) throw E('name et prompt requis', 400);
+      if (id > 0) {
+        const r = await getOne('styles', id);
+        if (r && r.user_id === uid) { r.name = name; r.prompt = prompt; r.updated_at = nowStr(); await putRow('styles', r); }
+      } else await putRow('styles', { user_id: uid, slug: makeSlug(name), name, prompt, updated_at: nowStr() });
+      return { ok: true };
+    },
+    async delete_style(b) {
+      const uid = needAuth(); const id = parseInt(b.id || 0, 10) || 0;
+      const r = await getOne('styles', id); if (r && r.user_id === uid) await delRow('styles', id);
+      return { ok: true };
+    },
+    async improve_style(b) {
+      needAuth();
+      const current = String(b.prompt || '').trim(), keys = sanitizeKeys(b.keys);
+      if (!current || !keys.length) throw E('prompt et keys requis', 400);
+      const userMsg = "=== TEMPLATE À AMÉLIORER ===\n" + current + "\n=== FIN ===\nRéécris ce template DZ Stickman en conservant son rôle, ses personnages et son format 9:16.";
+      const data = await agnesCallMulti('/chat/completions', chatPayload([{ role: 'system', content: SYS.improveStyle }, { role: 'user', content: userMsg }], 0.4, 1200), keys, 120);
+      const out = stripFences(((data.choices || [])[0] || {}).message && data.choices[0].message.content);
+      if (!out) throw E('Réponse IA vide');
+      return { ok: true, prompt: out.trim() };
+    },
+
+    async get_storyboards() {
+      const uid = needAuth(); await ensureUserPresets(uid);
+      const rows = (await getAll('storyboards', 'user_id', uid)).sort((a, b) => a.id - b.id);
+      return { ok: true, storyboards: rows.map(r => ({ id: r.id, slug: r.slug, name: r.name, items: Array.isArray(r.items) ? r.items : [], updated_at: r.updated_at })) };
+    },
+    async save_storyboard(b) {
+      const uid = needAuth();
+      const id = parseInt(b.id || 0, 10) || 0, name = String(b.name || '').trim();
+      if (!name) throw E('name requis', 400);
+      const items = (Array.isArray(b.items) ? b.items : []).map(x => String(x).trim()).filter(x => x !== '');
+      if (id > 0) {
+        const r = await getOne('storyboards', id);
+        if (r && r.user_id === uid) { r.name = name; r.items = items; r.updated_at = nowStr(); await putRow('storyboards', r); }
+      } else await putRow('storyboards', { user_id: uid, slug: makeSlug(name), name, items, updated_at: nowStr() });
+      return { ok: true };
+    },
+    async delete_storyboard(b) {
+      const uid = needAuth(); const id = parseInt(b.id || 0, 10) || 0;
+      const r = await getOne('storyboards', id); if (r && r.user_id === uid) await delRow('storyboards', id);
+      return { ok: true };
+    },
+
+    async analyze(b) {
+      needAuth();
+      const image = String(b.image || ''), keys = sanitizeKeys(b.keys);
+      if (!image || !keys.length) throw E('image et keys requis', 400);
+      if (image.length > 18000000) throw E('Image trop volumineuse', 413);
+      const msgs = [{ role: 'system', content: SYS.vision }, { role: 'user', content: [
+        { type: 'text', text: 'Décris cette image.' }, { type: 'image_url', image_url: { url: image } }] }];
+      try {
+        const data = await agnesCallMulti('/chat/completions', chatPayload(msgs, 0.2, 2000), keys, 240);
+        const txt = String((data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '').trim();
+        if (!txt) throw E('Réponse vide');
+        return { ok: true, content: txt };
+      } catch (e) { throw E('Analyse échouée : ' + e.message); }
+    },
+    async generate_prompt(b) {
+      needAuth();
+      const system = String(b.system || '').trim(), userMsg = String(b.user || '').trim(), keys = sanitizeKeys(b.keys);
+      const maxTok = Math.max(80, Math.min(4000, parseInt(b.max_tokens || 800, 10) || 800));
+      let temp = parseFloat(b.temperature); if (isNaN(temp)) temp = 0.75; temp = Math.max(0, Math.min(1.5, temp));
+      if (!system || !userMsg || !keys.length) throw E('system, user et keys requis', 400);
+      try {
+        const data = await agnesCallMulti('/chat/completions', chatPayload([{ role: 'system', content: system }, { role: 'user', content: userMsg }], temp, maxTok), keys, 120);
+        let out = stripFences(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
+        out = out.replace(/^["' \n\r\t]+|["' \n\r\t]+$/g, '');
+        if (!out) throw E('Réponse vide');
+        return { ok: true, content: out };
+      } catch (e) { throw E('Prompt échoué : ' + e.message); }
+    },
+    async generate_image(b) {
+      const uid = needAuth();
+      const prompt = String(b.prompt || '').trim(), keys = sanitizeKeys(b.keys), label = String(b.label || 'img');
+      let size = String(b.size || '2K'), ratio = String(b.ratio || '9:16');
+      if (!prompt || !keys.length) throw E('prompt et keys requis', 400);
+      if (prompt.length > 20000) throw E('Prompt trop long', 413);
+      if (!['1K', '2K', '3K', '4K'].includes(size)) size = '2K';
+      if (!['1:1', '3:4', '4:3', '16:9', '9:16', '2:3', '3:2', '21:9'].includes(ratio)) ratio = '9:16';
+      const payload = { model: AGNES_IMG_MODEL, prompt: Array.from(prompt).slice(0, 5000).join(''), size, ratio, extra_body: { response_format: 'url' } };
+      try {
+        const data = await agnesCallMulti('/images/generations', payload, keys, 240);
+        const d0 = (data.data || [])[0] || {};
+        let url = d0.url || null;
+        if (!url && d0.b64_json) url = 'data:image/png;base64,' + d0.b64_json;
+        if (!url) throw E("Pas d'URL dans la réponse");
+        const local = await storeImage(url, uid, label);
+        return { ok: true, url: local, remote: url };
+      } catch (e) { throw E('Image échouée : ' + e.message); }
+    },
+
+    async log_generation(b) {
+      const uid = needAuth();
+      const id = await putRow('generations', {
+        user_id: uid, style_slug: String(b.style_slug || ''), user_input: String(b.user_input || ''),
+        used_image: parseInt(b.used_image || 0, 10) || 0, vision_desc: String(b.vision_desc || ''),
+        final_prompt: String(b.final_prompt || ''), image_url: toStoredUrl(b.image_url),
+        parent_id: (b.parent_id !== undefined && b.parent_id !== null) ? (parseInt(b.parent_id, 10) || 0) : null,
+        created_at: nowStr()
+      });
+      return { ok: true, id };
+    },
+    async history(b) {
+      const uid = needAuth();
+      const page = Math.max(1, parseInt(b.page || 1, 10) || 1);
+      const perPage = Math.max(1, Math.min(60, parseInt(b.per_page || 30, 10) || 30));
+      const onlyFav = parseInt(b.favorites_only || 0, 10) === 1;
+      const favs = new Set((await getAll('favorites', 'user_id', uid)).map(f => f.generation_id));
+      let rows = (await getAll('generations', 'user_id', uid)).sort((a, b2) => b2.id - a.id);
+      if (onlyFav) rows = rows.filter(r => favs.has(r.id));
+      const total = rows.length, offset = (page - 1) * perPage;
+      const items = [];
+      for (const g of rows.slice(offset, offset + perPage)) items.push({
+        id: g.id, style_slug: g.style_slug, user_input: g.user_input, used_image: g.used_image, final_prompt: g.final_prompt,
+        image_url: await resolveImage(g.image_url), parent_id: g.parent_id, created_at: g.created_at, is_favorite: favs.has(g.id) ? 1 : 0 });
+      return { ok: true, items, total, page, per_page: perPage, favorites_only: onlyFav ? 1 : 0 };
+    },
+    async toggle_favorite(b) {
+      const uid = needAuth(); const gid = parseInt(b.generation_id || 0, 10) || 0;
+      if (gid <= 0) throw E('generation_id requis', 400);
+      const g = await getOne('generations', gid);
+      if (!g || g.user_id !== uid) throw E('Génération introuvable', 404);
+      const ex = await getOne('favorites', [uid, gid]);
+      if (ex) { await delRow('favorites', [uid, gid]); return { ok: true, is_favorite: 0 }; }
+      await putRow('favorites', { user_id: uid, generation_id: gid, created_at: nowStr(), created_ms: Date.now() });
+      return { ok: true, is_favorite: 1 };
+    },
+    async get_favorites(b) {
+      const uid = needAuth();
+      const page = Math.max(1, parseInt(b.page || 1, 10) || 1);
+      const perPage = Math.max(1, Math.min(60, parseInt(b.per_page || 30, 10) || 30));
+      const favs = (await getAll('favorites', 'user_id', uid)).sort((a, b2) => (b2.created_ms || 0) - (a.created_ms || 0));
+      const offset = (page - 1) * perPage, items = [];
+      for (const f of favs.slice(offset, offset + perPage)) {
+        const g = await getOne('generations', f.generation_id);
+        if (!g || g.user_id !== uid) continue;
+        items.push({ id: g.id, style_slug: g.style_slug, user_input: g.user_input, used_image: g.used_image, final_prompt: g.final_prompt,
+          image_url: await resolveImage(g.image_url), parent_id: g.parent_id, created_at: g.created_at, is_favorite: 1 });
+      }
+      return { ok: true, items, total: favs.length, page, per_page: perPage };
+    },
+    async test_keys(b) {
+      const keys = sanitizeKeys(b.keys).slice(0, 30);
+      if (!keys.length) throw E('Aucune clé valide', 400);
+      const results = await Promise.all(keys.map(async key => {
+        const ctl = new AbortController(), tid = setTimeout(() => ctl.abort(), 20000);
+        let code = 0;
+        try {
+          const r = await fetch(AGNES_BASE + '/chat/completions', { method: 'POST', signal: ctl.signal,
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+            body: JSON.stringify({ model: AGNES_TEXT_MODEL, messages: [{ role: 'user', content: 'ok' }], max_tokens: 1 }) });
+          code = r.status;
+        } catch (e) { code = 0; } finally { clearTimeout(tid); }
+        return { key, ok: (code >= 200 && code < 300) || code === 429, status: code };
+      }));
+      return { ok: true, results };
+    }
+  };
+
+  async function handle(action, params) {
+    const fn = A[action];
+    if (!fn) throw new Error('Action inconnue : ' + action);
+    return fn(params || {});
+  }
+  return { handle, isLogged: () => !!session(), username: () => (session() || {}).username || '' };
+})();
+
+window.DZSTUDIO = { isLogged: LocalAPI.isLogged(), username: LocalAPI.username() };
+
+/* ============================================================
+   APP LOGIC
+============================================================ */
+const CFG = { lsKeys: 'dzstickman_keys_v1', lsFavFilter: 'dzstickman_fav_filter' };
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+let apiKeys = [];
+let STYLES = [];
+let BULKS = [];
+let LOGGED = window.DZSTUDIO.isLogged;
+let CURRENT_USER = window.DZSTUDIO.username;
+let HIST_STATE = { page: 1, perPage: 30, total: 0, items: [] };
+let FAV_STATE = { page: 1, perPage: 30, total: 0, items: [] };
+const PIPE = { running: false, paused: false, stopped: false, total: 0, done: 0, failed: 0 };
+
+function toast(msg, type='') {
+  const t = $('toast'); t.textContent = msg; t.className = 'on ' + type;
+  clearTimeout(t._tid); t._tid = setTimeout(() => t.className = type, 3500);
+}
+
+async function showModal({title, message='', fieldLabel='', fieldValue='', okText='OK', cancelText='Annuler', showCancel=true}) {
+  return new Promise(resolve => {
+    const overlay = $('modalOverlay');
+    $('modalTitle').textContent = title; $('modalMsg').textContent = message;
+    $('modalMsg').style.display = message ? '' : 'none';
+    const fieldWrap = $('modalFieldWrap'), input = $('modalFieldInput');
+    if (fieldLabel) {
+      fieldWrap.classList.remove('hidden');
+      $('modalFieldLabel').textContent = fieldLabel;
+      input.value = fieldValue;
+      input.style.minHeight = '88px';
+    } else { fieldWrap.classList.add('hidden'); input.value = ''; }
+    $('modalOk').textContent = okText; $('modalCancel').textContent = cancelText;
+    $('modalCancel').classList.toggle('hidden', !showCancel);
+    overlay.classList.add('on');
+    const close = (val) => { overlay.classList.remove('on');
+      $('modalOk').removeEventListener('click', onOk); $('modalCancel').removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onOverlay); resolve(val); };
+    const onOk = () => close(fieldLabel ? input.value.trim() : true);
+    const onCancel = () => close(null);
+    const onOverlay = e => { if (e.target === overlay) close(null); };
+    $('modalOk').addEventListener('click', onOk);
+    $('modalCancel').addEventListener('click', onCancel);
+    overlay.addEventListener('click', onOverlay);
+  });
+}
+
+const Backend = {
+  async call(action, params = {}) {
+    try { return await LocalAPI.handle(action, params); }
+    catch (e) {
+      if (e && e.status === 401) { location.reload(); throw new Error('Session expirée'); }
+      throw (e instanceof Error ? e : new Error(String(e)));
+    }
+  },
+  login(u, p) { return this.call('login', {username: u, pin: p}); },
+  logout() { return this.call('logout'); },
+  getStyles() { return this.call('get_styles'); },
+  saveStyle(id, name, prompt) { return this.call('save_style', {id, name, prompt}); },
+  deleteStyle(id) { return this.call('delete_style', {id}); },
+  improveStyle(prompt, keys) { return this.call('improve_style', {prompt, keys}); },
+  getBulk() { return this.call('get_storyboards'); },
+  saveBulk(id, name, items) { return this.call('save_storyboard', {id, name, items}); },
+  deleteBulk(id) { return this.call('delete_storyboard', {id}); },
+  generatePrompt(system, user, keys, max=800, temp=0.7) { return this.call('generate_prompt', {system, user, keys, max_tokens: max, temperature: temp}); },
+  generateImage(prompt, keys, label='dz', size='2K', ratio='9:16') { return this.call('generate_image', {prompt, keys, label, size, ratio}); },
+  logGeneration(d) { return this.call('log_generation', d); },
+  history(page=1, perPage=30, favOnly=false) { return this.call('history', {page, per_page: perPage, favorites_only: favOnly ? 1 : 0}); },
+  getFavorites(page=1, perPage=30) { return this.call('get_favorites', {page, per_page: perPage}); },
+  toggleFavorite(genId) { return this.call('toggle_favorite', {generation_id: genId}); },
+  testKeys(keys) { return this.call('test_keys', {keys}); }
+};
+
+/* ---------- AUTH ---------- */
+async function doLogin() {
+  const u = $('loginUser').value.trim(), p = $('loginPin').value.trim();
+  const status = $('loginStatus');
+  if (!u || !/^\d{4}$/.test(p)) { status.className = 'status err'; status.textContent = 'Pseudo + PIN 4 chiffres requis'; return; }
+  const btn = $('loginBtn');
+  btn.disabled = true; btn.textContent = '⏳ Connexion…';
+  status.className = 'status'; status.textContent = 'Connexion…';
+  try {
+    const r = await Backend.login(u, p);
+    CURRENT_USER = r.user; LOGGED = true;
+    $('loginBox').classList.add('hidden');
+    $('main').classList.remove('hidden');
+    $('logoutBtn').classList.remove('hidden');
+    $('globalStat').innerHTML = 'Connecté : <b>' + esc(CURRENT_USER) + '</b>';
+    await bootApp();
+    toast('Bienvenue ' + CURRENT_USER, 'ok');
+  } catch (e) { status.className = 'status err'; status.textContent = '❌ ' + e.message; }
+  finally { btn.disabled = false; btn.textContent = 'Se connecter / Créer un compte'; }
+}
+async function doLogout() { try { await Backend.logout(); } catch(e){} location.reload(); }
+
+/* ---------- API KEYS ---------- */
+function updateApiTag() {
+  const tag = $('modeTag'), stat = $('globalStat');
+  if (apiKeys.length) {
+    tag.textContent = 'LIVE · ' + apiKeys.length;
+    tag.className = 'mode live';
+    stat.innerHTML = '<b>' + apiKeys.length + '</b> clé(s) prête(s)';
+    $('apiSummary').textContent = apiKeys.length + ' clé(s)';
+  } else {
+    tag.textContent = 'NON CONFIGURÉ'; tag.className = 'mode';
+    stat.textContent = 'Configurez vos clés API Agnes pour commencer';
+    $('apiSummary').textContent = 'Cliquez pour configurer';
+  }
+}
+async function validateKeys() {
+  const raw = $('apiInput').value.split('\n').map(l => l.trim()).filter(l => l.startsWith('sk-'));
+  const status = $('apiStatus');
+  if (!raw.length) { status.className='status err'; status.textContent='Aucune clé valide'; return; }
+  status.className = 'status'; status.textContent = '⏳ Test de ' + raw.length + ' clé(s)…';
+  try {
+    const r = await Backend.testKeys(raw);
+    const valid = (r.results || []).filter(x => x.ok).map(x => x.key);
+    if (!valid.length) { status.className = 'status err'; status.textContent = '❌ Aucune clé acceptée'; apiKeys = []; }
+    else {
+      apiKeys = valid;
+      try { localStorage.setItem(CFG.lsKeys, JSON.stringify(valid)); } catch(e){}
+      status.className = 'status ok'; status.textContent = '✓ ' + valid.length + ' clé(s) validée(s)';
+      toast(valid.length + ' clé(s) validée(s)', 'ok');
+    }
+    updateApiTag();
+  } catch (e) { status.className = 'status err'; status.textContent = '❌ ' + e.message; }
+}
+
+/* ---------- STYLES ---------- */
+async function loadStyles() {
+  try {
+    const r = await Backend.getStyles();
+    STYLES = r.styles || [];
+    $('imgStyleSelect').innerHTML = STYLES.map(s => `<option value="${esc(s.slug)}">${esc(s.name)}</option>`).join('');
+    renderStyleEditors();
+  } catch (e) { toast('Styles : ' + e.message, 'err'); }
+}
+function renderStyleEditors() {
+  const box = $('styleEditors');
+  box.innerHTML = STYLES.map(s => `
+    <div class="style-editor" data-id="${s.id}">
+      <h4><input type="text" class="style-name" value="${esc(s.name)}"><span class="slug">${esc(s.slug)}</span>
+        <button class="btn-mini btn-red" data-del style="margin-left:auto">🗑</button></h4>
+      <textarea class="style-prompt">${esc(s.prompt)}</textarea>
+      <div class="actions"><button class="btn-mini" data-save>💾 Sauvegarder</button>
+        <button class="btn-mini" data-improve>✨ IA améliore</button>
+        <span class="status" data-status style="margin:0;padding:.3rem .6rem;font-size:.68rem;display:none"></span></div>
+    </div>`).join('');
+  box.querySelectorAll('.style-editor').forEach(el => {
+    const id = parseInt(el.dataset.id, 10);
+    const nameEl = el.querySelector('.style-name'), promptEl = el.querySelector('.style-prompt'), statusEl = el.querySelector('[data-status]');
+    el.querySelector('[data-save]').addEventListener('click', async () => {
+      try { await Backend.saveStyle(id, nameEl.value.trim(), promptEl.value.trim()); toast('Style sauvegardé', 'ok'); await loadStyles(); }
+      catch(e) { toast('Sauvegarde : ' + e.message, 'err'); }
+    });
+    el.querySelector('[data-improve]').addEventListener('click', async (ev) => {
+      if (!apiKeys.length) { toast('Configurez vos clés', 'err'); return; }
+      const btn = ev.currentTarget; btn.disabled = true; btn.textContent = '⏳…';
+      try {
+        const r = await Backend.improveStyle(promptEl.value.trim(), apiKeys);
+        promptEl.value = r.prompt;
+        statusEl.style.display = 'inline-block'; statusEl.className = 'status warn';
+        statusEl.textContent = '✨ Amélioré — Sauvegarder';
+      } catch(e) { toast('IA : ' + e.message, 'err'); }
+      finally { btn.disabled = false; btn.textContent = '✨ IA améliore'; }
+    });
+    el.querySelector('[data-del]').addEventListener('click', async () => {
+      const ok = await showModal({title: 'Supprimer ce style ?', message: 'Irréversible.', okText: 'Supprimer'});
+      if (!ok) return;
+      try { await Backend.deleteStyle(id); toast('Style supprimé', 'ok'); await loadStyles(); }
+      catch(e) { toast('Suppression : ' + e.message, 'err'); }
+    });
+  });
+}
+
+/* ---------- BULKS ---------- */
+async function loadBulks() {
+  try {
+    const r = await Backend.getBulk();
+    BULKS = r.storyboards || [];
+    $('imgBulkSelect').innerHTML = BULKS.map(s => `<option value="${esc(s.slug)}">${esc(s.name)} (${(s.items||[]).length})</option>`).join('');
+    renderBulkEditors();
+  } catch (e) { toast('Bulks : ' + e.message, 'err'); }
+}
+function renderBulkEditors() {
+  const box = $('sbEditors');
+  box.innerHTML = BULKS.map(s => `
+    <div class="sb-editor" data-id="${s.id}">
+      <h4><input type="text" class="sb-name" value="${esc(s.name)}"><span class="slug">${esc(s.slug)}</span>
+        <button class="btn-mini btn-red" data-del style="margin-left:auto">🗑</button></h4>
+      <label class="lab" style="margin-top:.3rem">Éléments (un par ligne)</label>
+      <textarea class="sb-items">${esc((s.items||[]).join('\n'))}</textarea>
+      <div class="actions"><button class="btn-mini" data-save>💾 Sauvegarder</button></div>
+    </div>`).join('');
+  box.querySelectorAll('.sb-editor').forEach(el => {
+    const id = parseInt(el.dataset.id, 10);
+    const nameEl = el.querySelector('.sb-name'), itemsEl = el.querySelector('.sb-items');
+    el.querySelector('[data-save]').addEventListener('click', async () => {
+      const items = itemsEl.value.split('\n').map(l => l.trim()).filter(l => l !== '');
+      try { await Backend.saveBulk(id, nameEl.value.trim(), items); toast('Liste sauvegardée', 'ok'); await loadBulks(); }
+      catch(e) { toast('Sauvegarde : ' + e.message, 'err'); }
+    });
+    el.querySelector('[data-del]').addEventListener('click', async () => {
+      const ok = await showModal({title: 'Supprimer cette liste ?', message: 'Irréversible.', okText: 'Supprimer'});
+      if (!ok) return;
+      try { await Backend.deleteBulk(id); toast('Liste supprimée', 'ok'); await loadBulks(); }
+      catch(e) { toast('Suppression : ' + e.message, 'err'); }
+    });
+  });
+}
+
+/* ---------- TABS ---------- */
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  ['dashboard','personnages','concept','scenario','decoupage','images','video','voix','montage','instagram','analyses','styles','bulks','biblio','favoris'].forEach(id => {
+    const el = $('tab-' + id); if (el) el.classList.toggle('hidden', id !== name);
+  });
+  if (name === 'biblio') loadHistory(1);
+  if (name === 'favoris') loadFavorites(1);
+}
+
+/* ---------- HELPERS pour générations texte ---------- */
+function renderOutput(container, content) {
+  container.classList.remove('hidden');
+  container.innerHTML = `
+    <div class="export-box">
+      <div class="export-preview">${esc(content)}</div>
+      <div class="export-actions">
+        <button class="btn-mini" onclick="navigator.clipboard.writeText(this.closest('.export-box').querySelector('.export-preview').textContent).then(()=>toast('Copié','ok'))">📋 Copier</button>
+        <button class="btn-mini" onclick="exportToFile(this.closest('.export-box').querySelector('.export-preview').textContent)">💾 Exporter .txt</button>
+      </div>
+    </div>`;
+}
+function exportToFile(txt) {
+  const blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dzstickman_' + Date.now() + '.txt';
+  a.click();
+}
+
+async function genText(systemPrompt, userMsg, outputEl, btn, max=1800, temp=0.75) {
+  if (!apiKeys.length) { toast('Configurez vos clés API', 'err'); return; }
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳ Génération…';
+  try {
+    const r = await Backend.generatePrompt(systemPrompt, userMsg, apiKeys, max, temp);
+    renderOutput(outputEl, r.content);
+    toast('Généré ✓', 'ok');
+  } catch (e) { toast('Erreur : ' + e.message, 'err'); }
+  finally { btn.disabled = false; btn.textContent = orig; }
+}
+
+/* ---------- A. CONCEPT ---------- */
+async function genConcept() {
+  const theme = $('conceptTheme').value.trim();
+  if (!theme) { toast('Thème requis', 'err'); return; }
+  const angle = $('conceptAngle').value.trim();
+  const dur = $('conceptDuration').value;
+  const tone = $('conceptTone').value;
+  const userMsg = `Thème : ${theme}\nAngle : ${angle || '(libre)'}\nDurée cible : ${dur}\nTon : ${tone}\nGénère le concept complet.`;
+  await genText(SYS.concept, userMsg, $('conceptOutput'), $('conceptGenBtn'), 2000, 0.85);
+}
+
+/* ---------- B. SCÉNARIO ---------- */
+async function genScenario() {
+  const concept = $('scenarioConcept').value.trim();
+  if (!concept) { toast('Concept requis', 'err'); return; }
+  const n = $('scenarioRepliques').value || '10';
+  const style = $('scenarioStyle').value;
+  const userMsg = `Concept validé :\n${concept}\n\nNombre de répliques cible : ${n}\nStyle : ${style}\nÉcris le scénario en darija.`;
+  await genText(SYS.scenario, userMsg, $('scenarioOutput'), $('scenarioGenBtn'), 1800, 0.85);
+}
+
+/* ---------- C. DÉCOUPAGE ---------- */
+async function genDecoupage() {
+  const scenario = $('decoupageScenario').value.trim();
+  if (!scenario) { toast('Scénario requis', 'err'); return; }
+  const plans = $('decoupagePlans').value || '8';
+  const total = $('decoupageTotal').value;
+  const userMsg = `Scénario :\n${scenario}\n\nNombre de plans cible : ${plans}\nDurée totale cible : ${total}\nProduis le découpage.`;
+  await genText(SYS.decoupage, userMsg, $('decoupageOutput'), $('decoupageGenBtn'), 2500, 0.7);
+}
+
+/* ---------- D. IMAGES (pipeline simplifié) ---------- */
+function resetImgUI() {
+  $('imgResultGrid').innerHTML = '';
+  $('imgResults').classList.add('hidden');
+  $('imgEmpty').classList.remove('show');
+  $('imgStatus').textContent = '';
+  PIPE.running = false; PIPE.paused = false; PIPE.stopped = false;
+  PIPE.total = 0; PIPE.done = 0; PIPE.failed = 0;
+}
+function createImgCard(data) {
+  const card = document.createElement('div');
+  card.className = 'img-card';
+  const isFav = parseInt(data.is_favorite || 0, 10) === 1;
+  card.innerHTML = `
+    <button class="fav-btn ${isFav ? 'active' : ''}" data-fav ${data.genId ? '' : 'disabled'}>${isFav ? '★' : '☆'}</button>
+    <div class="img-wrap"><img src="${esc(data.url)}" alt="" loading="lazy"></div>
+    <div class="info">
+      <div class="meta">${esc(data.style || '')} · #${(data.index||0)+1}</div>
+      <textarea class="prompt-edit">${esc(data.prompt)}</textarea>
+      <div class="actions"><button class="btn-mini" data-copy>📋 Copier</button></div>
+    </div>`;
+  card.querySelector('[data-copy]').addEventListener('click', () => {
+    navigator.clipboard.writeText(card.querySelector('.prompt-edit').value).then(() => toast('Copié', 'ok'));
+  });
+  const favBtn = card.querySelector('[data-fav]');
+  favBtn.addEventListener('click', async () => {
+    if (!data.genId) { toast('Patientez…', 'info'); return; }
+    try {
+      const r = await Backend.toggleFavorite(data.genId);
+      if (r.is_favorite) { favBtn.classList.add('active'); favBtn.textContent = '★'; toast('Favori', 'ok'); }
+      else { favBtn.classList.remove('active'); favBtn.textContent = '☆'; toast('Retiré', 'info'); }
+    } catch(e) { toast(e.message, 'err'); }
+  });
+  card._data = data;
+  return card;
+}
+
+async function genImages() {
+  if (!apiKeys.length) { toast('Configurez vos clés', 'err'); return; }
+  const styleSlug = $('imgStyleSelect').value;
+  const style = STYLES.find(s => s.slug === styleSlug);
+  if (!style) { toast('Style invalide', 'err'); return; }
+  const brief = $('imgSceneBrief').value.trim();
+  if (!brief) { toast('Décrivez la scène', 'err'); return; }
+  const count = Math.max(1, Math.min(10, parseInt($('imgCount').value || '1', 10)));
+  const concurrency = Math.max(1, Math.min(5, parseInt($('imgConcurrency').value || '2', 10)));
+  const useBulk = $('imgUseBulk').checked;
+  const useOptimizer = $('imgAiOptimizer').checked;
+  let bulkItems = [''];
+  if (useBulk) {
+    const bslug = $('imgBulkSelect').value;
+    const b = BULKS.find(x => x.slug === bslug);
+    if (b && (b.items || []).length) bulkItems = b.items;
+    else { toast('Liste bulk vide', 'err'); return; }
+  }
+
+  resetImgUI();
+  PIPE.running = true; PIPE.total = count * bulkItems.length;
+  $('imgResults').classList.remove('hidden');
+  $('imgEmpty').classList.remove('show');
+  $('imgGenBtn').disabled = true;
+  $('imgGenBtn').textContent = useOptimizer ? '⏳ Optimisation + images…' : '⏳ Génération directe…';
+  $('imgPipelineCtrl').classList.remove('hidden');
+  $('imgResultsCount').textContent = '0 / ' + PIPE.total;
+
+  const grid = $('imgResultGrid');
+  const queue = [];
+  let producerDone = false, idx = 0;
+
+  const workers = Array.from({length: concurrency}, async () => {
+    while (true) {
+      if (PIPE.stopped) return;
+      if (!queue.length) { if (producerDone) return; await sleep(100); continue; }
+      const t = queue.shift(); if (!t) continue;
+      try {
+        const label = 'dz_' + styleSlug + '_' + t.index;
+        const r = await Backend.generateImage(t.promptFinal, apiKeys, label, '2K', '9:16');
+        PIPE.done++;
+        $('imgResultsCount').textContent = PIPE.done + ' / ' + PIPE.total;
+        const card = createImgCard({ prompt: t.promptFinal, url: r.url, style: styleSlug, index: t.index, genId: null });
+        grid.appendChild(card);
+        Backend.logGeneration({
+          style_slug: styleSlug, user_input: brief, used_image: 0, vision_desc: '',
+          final_prompt: t.promptFinal, image_url: r.url, parent_id: null
+        }).then(lr => {
+          if (lr && lr.id) { card._data.genId = lr.id; card.querySelector('[data-fav]').disabled = false; }
+        }).catch(() => { card.querySelector('[data-fav]').disabled = false; });
+      } catch (e) { PIPE.failed++; $('imgStatus').textContent = 'Erreur : ' + e.message; }
+    }
+  });
+
+  try {
+    for (const item of bulkItems) {
+      if (PIPE.stopped) break;
+      for (let v = 0; v < count; v++) {
+        if (PIPE.stopped) break;
+        let promptFinal;
+        if (useOptimizer) {
+          const userMsg = `STYLE TEMPLATE :\n${style.prompt}\n\nSCENE BRIEF :\n${brief}\n\nMANDATORY BULK ELEMENT : ${item || '(none)'}\n\nGenerate ONE English image prompt for DZ Stickman, vertical 9:16, keep Sami and Karim identities.`;
+          try {
+            const r = await Backend.generatePrompt(SYS.prompt_image, userMsg, apiKeys, 500, 0.6);
+            promptFinal = r.content;
+          } catch(e) { promptFinal = `${style.prompt}\n\nScene: ${brief}${item ? '\n\nMUST INCLUDE: '+item : ''}\n\n${STYLE_REF}`; }
+        } else {
+          promptFinal = `${style.prompt}\n\nSCENE : ${brief}${item ? '\n\nMANDATORY ELEMENT : '+item : ''}\n\nSTYLE REFERENCE : ${STYLE_REF}`;
+        }
+        queue.push({ index: idx++, promptFinal });
+      }
+    }
+  } finally { producerDone = true; }
+
+  await Promise.all(workers);
+  PIPE.running = false;
+  $('imgGenBtn').disabled = false;
+  $('imgGenBtn').textContent = '🎨 Générer les images';
+  $('imgPipelineCtrl').classList.add('hidden');
+  toast(PIPE.failed ? `Terminé : ${PIPE.done} ok, ${PIPE.failed} err` : `Terminé : ${PIPE.done} image(s)`, PIPE.failed ? 'warn' : 'ok');
+}
+
+/* ---------- E. VIDÉO ---------- */
+async function genVideo() {
+  const plan = $('videoPlanBrief').value.trim();
+  if (!plan) { toast('Décrivez le plan', 'err'); return; }
+  const dur = $('videoDuration').value;
+  const cam = $('videoCamera').value;
+  const userMsg = `PLAN À ANIMER :\n${plan}\n\nDURÉE : ${dur} secondes\nCAMÉRA : ${cam}\n\nProduis le prompt vidéo Google Flow prêt à copier-coller.`;
+  await genText(SYS.prompt_video, userMsg, $('videoOutput'), $('videoGenBtn'), 1200, 0.6);
+}
+
+/* ---------- F. VOIX ---------- */
+async function genVoix() {
+  const scen = $('voixScenario').value.trim();
+  if (!scen) { toast('Scénario requis', 'err'); return; }
+  const userMsg = `Scénario :\n${scen}\n\nVoix Sami : ${$('voixSami').value}\nVoix Karim : ${$('voixKarim').value}\n\nProduis les dialogues séparés avec intentions pour ElevenLabs.`;
+  await genText(SYS.voix, userMsg, $('voixOutput'), $('voixGenBtn'), 2000, 0.75);
+}
+
+/* ---------- G. MONTAGE ---------- */
+async function genMontage() {
+  const brief = $('montageBrief').value.trim();
+  if (!brief) { toast('Brief requis', 'err'); return; }
+  const userMsg = `Découpage + clips :\n${brief}\n\nProduis les instructions de montage CapCut mobile Android.`;
+  await genText(SYS.montage, userMsg, $('montageOutput'), $('montageGenBtn'), 2000, 0.6);
+}
+
+/* ---------- H. INSTAGRAM ---------- */
+async function genInstagram() {
+  const type = $('igType').value;
+  const ctx = $('igContext').value.trim();
+  const userMsg = `Type : ${type}\nContexte : ${ctx || '(non précisé)'}\nProduis le livrable Instagram correspondant.`;
+  await genText(SYS.instagram, userMsg, $('igOutput'), $('igGenBtn'), 2000, 0.8);
+}
+
+/* ---------- I. ANALYSES ---------- */
+async function genAnalyses() {
+  const stats = $('anaStats').value.trim();
+  if (!stats) { toast('Stats requises', 'err'); return; }
+  const subj = $('anaSubject').value.trim();
+  const userMsg = `Sujet : ${subj || '(non précisé)'}\nStats :\n${stats}\n\nAnalyse ces données SANS inventer.`;
+  await genText(SYS.analyses, userMsg, $('anaOutput'), $('anaGenBtn'), 1800, 0.5);
+}
+
+/* ---------- HISTORIQUE / FAVORIS ---------- */
+async function loadHistory(page = 1) {
+  const box = $('biblioBox'), pag = $('biblioPagination');
+  const favOnly = $('biblioFavOnly').checked;
+  box.innerHTML = '<p class="sub">⏳ Chargement…</p>'; pag.classList.add('hidden');
+  try {
+    const r = await Backend.history(page, 30, favOnly);
+    const items = r.items || [];
+    HIST_STATE = { page: r.page || page, perPage: r.per_page || 30, total: r.total || 0, items };
+    if (!items.length) { box.innerHTML = '<p class="sub">Aucune génération.</p>'; return; }
+    const groups = []; for (let i = 0; i < items.length; i += 30) groups.push(items.slice(i, i + 30));
+    box.innerHTML = groups.map((g, si) => `
+      <div class="session-block" data-session="${si}">
+        <div class="session-header"><span class="s-arrow">▶</span>
+          <span class="s-title">Session ${si+1} · ${g.length} image(s)</span>
+          <span class="s-meta">ids ${g[g.length-1]?.id || 0}–${g[0]?.id || 0}</span></div>
+        <div class="session-body"><div class="result-grid">${g.slice(0,3).map(it => renderHistCard(it)).join('')}</div>
+        ${g.length > 3 ? `<div class="result-grid" data-hidden style="display:none;margin-top:1rem">${g.slice(3).map(it => renderHistCard(it)).join('')}</div>` : ''}
+        </div></div>`).join('');
+    box.querySelectorAll('.session-block').forEach(b => {
+      b.querySelector('.session-header').addEventListener('click', () => {
+        b.classList.toggle('open');
+        if (b.classList.contains('open')) { const h = b.querySelector('[data-hidden]'); if (h) h.style.display = ''; }
+      });
+    });
+    bindHistCards(box);
+    const tp = Math.max(1, Math.ceil(HIST_STATE.total / HIST_STATE.perPage));
+    if (tp > 1) {
+      pag.classList.remove('hidden');
+      pag.innerHTML = `<button class="btn-mini" data-page="${Math.max(1, page-1)}" ${page<=1?'disabled':''}>← Préc.</button>
+        <span class="page-info">Page ${page} / ${tp}</span>
+        <button class="btn-mini" data-page="${Math.min(tp, page+1)}" ${page>=tp?'disabled':''}>Suiv. →</button>`;
+      pag.querySelectorAll('[data-page]').forEach(btn => btn.addEventListener('click', () => loadHistory(parseInt(btn.dataset.page,10))));
+    }
+  } catch(e) { box.innerHTML = '<p class="sub">Erreur : ' + esc(e.message) + '</p>'; }
+}
+function renderHistCard(it) {
+  return `<div class="img-card history-card" data-id="${it.id}">
+    <button class="fav-btn ${it.is_favorite ? 'active' : ''}" data-fav>${it.is_favorite ? '★' : '☆'}</button>
+    <div class="img-wrap"><img src="${esc(it.image_url)}" alt="" loading="lazy"></div>
+    <div class="info"><div class="meta">${esc(it.style_slug||'')} · ${esc(it.created_at)}</div>
+    <textarea class="prompt-edit">${esc(it.final_prompt)}</textarea>
+    <div class="actions"><button class="btn-mini" data-copy>📋 Copier</button></div></div></div>`;
+}
+function bindHistCards(box) {
+  box.querySelectorAll('.history-card').forEach(card => {
+    const id = parseInt(card.dataset.id, 10);
+    const fb = card.querySelector('[data-fav]');
+    fb.addEventListener('click', async () => {
+      try { const r = await Backend.toggleFavorite(id);
+        if (r.is_favorite) { fb.classList.add('active'); fb.textContent = '★'; } else { fb.classList.remove('active'); fb.textContent = '☆'; }
+      } catch(e) { toast(e.message, 'err'); }
+    });
+    card.querySelector('[data-copy]').addEventListener('click', () => {
+      navigator.clipboard.writeText(card.querySelector('.prompt-edit').value).then(() => toast('Copié', 'ok'));
+    });
+  });
+}
+
+async function loadFavorites(page = 1) {
+  const box = $('favBox'), pag = $('favPagination');
+  box.innerHTML = '<p class="sub">⏳ Chargement…</p>'; pag.classList.add('hidden');
+  try {
+    const r = await Backend.getFavorites(page, 30);
+    const items = r.items || [];
+    FAV_STATE = { page: r.page || page, perPage: r.per_page || 30, total: r.total || 0, items };
+    if (!items.length) { box.innerHTML = '<p class="sub">Aucun favori.</p>'; return; }
+    box.innerHTML = '<div class="result-grid">' + items.map(it => renderHistCard(it)).join('') + '</div>';
+    bindHistCards(box);
+    const tp = Math.max(1, Math.ceil(FAV_STATE.total / FAV_STATE.perPage));
+    if (tp > 1) {
+      pag.classList.remove('hidden');
+      pag.innerHTML = `<button class="btn-mini" data-page="${Math.max(1,page-1)}" ${page<=1?'disabled':''}>← Préc.</button>
+        <span class="page-info">Page ${page} / ${tp}</span>
+        <button class="btn-mini" data-page="${Math.min(tp,page+1)}" ${page>=tp?'disabled':''}>Suiv. →</button>`;
+      pag.querySelectorAll('[data-page]').forEach(btn => btn.addEventListener('click', () => loadFavorites(parseInt(btn.dataset.page,10))));
+    }
+  } catch(e) { box.innerHTML = '<p class="sub">Erreur : ' + esc(e.message) + '</p>'; }
+}
+
+/* ---------- BOOT ---------- */
+async function bootApp() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CFG.lsKeys) || '[]');
+    if (saved.length) { apiKeys = saved; $('apiInput').value = saved.join('\n');
+      $('apiStatus').className = 'status ok'; $('apiStatus').textContent = '✓ ' + saved.length + ' clé(s) restaurée(s)'; }
+  } catch(e){}
+  updateApiTag();
+  await loadStyles();
+  await loadBulks();
+}
+
+/* ---------- BIND ---------- */
+function bind() {
+  $('loginBtn').addEventListener('click', doLogin);
+  $('loginPin').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+  $('logoutBtn').addEventListener('click', doLogout);
+
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+
+  $('apiHead').addEventListener('click', () => {
+    $('apiBody').classList.toggle('open');
+    $('apiChevron').textContent = $('apiBody').classList.contains('open') ? '▼' : '▲';
+  });
+  $('apiValidate').addEventListener('click', validateKeys);
+  $('apiClear').addEventListener('click', () => {
+    $('apiInput').value = ''; apiKeys = [];
+    try { localStorage.removeItem(CFG.lsKeys); } catch(e){}
+    $('apiStatus').className = 'status'; $('apiStatus').textContent = 'Aucune clé configurée';
+    updateApiTag();
+  });
+
+  $('addStyleBtn').addEventListener('click', async () => {
+    const name = await showModal({title: 'Nouveau style DZ', message: 'Nom du style.', fieldLabel: 'Nom', okText: 'Suivant'});
+    if (!name) return;
+    const prompt = await showModal({title: 'Template du style', message: 'Décrivez le style (DZ Stickman).', fieldLabel: 'Prompt', okText: 'Créer'});
+    if (!prompt) return;
+    try { await Backend.saveStyle(0, name.trim(), prompt.trim()); toast('Style ajouté', 'ok'); await loadStyles(); }
+    catch(e) { toast(e.message, 'err'); }
+  });
+  $('addBulkBtn').addEventListener('click', async () => {
+    const name = await showModal({title: 'Nouvelle liste', message: 'Nom de la liste.', fieldLabel: 'Nom', okText: 'Créer'});
+    if (!name) return;
+    try { await Backend.saveBulk(0, name.trim(), ['gros plan', 'plan large']); toast('Liste ajoutée', 'ok'); await loadBulks(); }
+    catch(e) { toast(e.message, 'err'); }
+  });
+
+  $('conceptGenBtn').addEventListener('click', genConcept);
+  $('scenarioGenBtn').addEventListener('click', genScenario);
+  $('decoupageGenBtn').addEventListener('click', genDecoupage);
+  $('imgGenBtn').addEventListener('click', genImages);
+  $('videoGenBtn').addEventListener('click', genVideo);
+  $('voixGenBtn').addEventListener('click', genVoix);
+  $('montageGenBtn').addEventListener('click', genMontage);
+  $('igGenBtn').addEventListener('click', genInstagram);
+  $('anaGenBtn').addEventListener('click', genAnalyses);
+
+  $('imgUseBulk').addEventListener('change', () => $('imgBulkWrap').classList.toggle('hidden', !$('imgUseBulk').checked));
+  $('imgPauseBtn').addEventListener('click', () => { PIPE.paused = !PIPE.paused; $('imgPauseBtn').textContent = PIPE.paused ? '▶ Reprendre' : '⏸ Pause'; });
+  $('imgStopBtn').addEventListener('click', () => { PIPE.stopped = true; toast('Arrêt demandé', 'info'); });
+  $('biblioFavOnly').addEventListener('change', () => loadHistory(1));
+
+  if (LOGGED) {
+    $('loginBox').classList.add('hidden');
+    $('main').classList.remove('hidden');
+    $('logoutBtn').classList.remove('hidden');
+    $('globalStat').innerHTML = 'Connecté : <b>' + esc(CURRENT_USER) + '</b>';
+    bootApp();
+  } else {
+    $('main').classList.add('hidden');
+  }
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+else bind();
+</script>
+
+</body>
+  </html>
