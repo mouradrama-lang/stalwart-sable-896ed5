@@ -430,3 +430,602 @@ input[type=checkbox]:checked::after{transform:translateX(16px);background:var(--
 }
 </style>
 </head>
+<body>
+
+<!-- ================= SVG SPRITE : illustrations DZ Stickman ================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd75e"/>
+      <stop offset=".5" stop-color="#ffc107"/>
+      <stop offset="1" stop-color="#ff8f00"/>
+    </linearGradient>
+    <linearGradient id="gCobalt" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4a8de0"/>
+      <stop offset="1" stop-color="#1e5baf"/>
+    </linearGradient>
+
+    <!-- Sami stickman -->
+    <symbol id="sami" viewBox="0 0 120 200">
+      <!-- corps stickman noir -->
+      <circle cx="60" cy="35" r="28" fill="#0a0a0f" stroke="#1a1a24" stroke-width="2"/>
+      <!-- yeux expressifs (traits blancs) -->
+      <ellipse cx="50" cy="32" rx="4" ry="5" fill="#fff"/>
+      <ellipse cx="70" cy="32" rx="4" ry="5" fill="#fff"/>
+      <circle cx="51" cy="33" r="2" fill="#0a0a0f"/>
+      <circle cx="71" cy="33" r="2" fill="#0a0a0f"/>
+      <!-- cheveux courts hérissés -->
+      <path d="M34 22 L40 12 L46 18 L52 10 L58 17 L64 10 L70 18 L76 12 L82 20 L86 15 L84 24" fill="#0a0a0f" stroke="#0a0a0f" stroke-width="1.5"/>
+      <!-- corps : veste cobalt -->
+      <path d="M38 68 Q34 110 34 140 L38 195 L54 195 L58 150 L62 150 L66 195 L82 195 L86 140 Q86 110 82 68 Z" fill="url(#gCobalt)"/>
+      <!-- ceinture/pantalon beige -->
+      <path d="M38 140 L54 195 L58 150 L62 150 L66 195 L82 140 Z" fill="#d4c4a8"/>
+      <!-- baskets rouges -->
+      <ellipse cx="46" cy="196" rx="9" ry="4" fill="#e63946"/>
+      <ellipse cx="74" cy="196" rx="9" ry="4" fill="#e63946"/>
+      <!-- bras -->
+      <path d="M38 78 L24 120 L26 150" stroke="#0a0a0f" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <path d="M82 78 L96 120 L94 150" stroke="#0a0a0f" stroke-width="7" stroke-linecap="round" fill="none"/>
+    </symbol>
+
+    <!-- Karim stickman -->
+    <symbol id="karim" viewBox="0 0 120 200">
+      <circle cx="60" cy="38" r="30" fill="#0a0a0f" stroke="#1a1a24" stroke-width="2"/>
+      <!-- yeux -->
+      <ellipse cx="48" cy="34" rx="4" ry="5" fill="#fff"/>
+      <ellipse cx="72" cy="34" rx="4" ry="5" fill="#fff"/>
+      <circle cx="49" cy="35" r="2" fill="#0a0a0f"/>
+      <circle cx="73" cy="35" r="2" fill="#0a0a0f"/>
+      <!-- touffe de cheveux vers le haut -->
+      <path d="M45 12 Q50 2 55 10 Q60 0 65 10 Q70 2 75 12" fill="#0a0a0f" stroke="#0a0a0f" stroke-width="2"/>
+      <!-- sweat orange -->
+      <path d="M34 72 Q28 116 30 145 L36 195 L54 195 L58 150 L62 150 L66 195 L84 195 L90 145 Q92 116 86 72 Z" fill="#ff6b2c"/>
+      <!-- capuche -->
+      <path d="M36 72 Q60 60 84 72 Q78 80 60 82 Q42 80 36 72 Z" fill="#cc4a1a"/>
+      <!-- pantalon vert forêt -->
+      <path d="M36 145 L54 195 L58 150 L62 150 L66 195 L84 145 Z" fill="#2d4a1e"/>
+      <!-- baskets blanches -->
+      <ellipse cx="44" cy="196" rx="10" ry="4" fill="#f5f5fa"/>
+      <ellipse cx="76" cy="196" rx="10" ry="4" fill="#f5f5fa"/>
+      <!-- montre argentée -->
+      <ellipse cx="94" cy="146" rx="4" ry="3" fill="#c0c0c0"/>
+      <!-- bras -->
+      <path d="M34 82 L18 126 L22 158" stroke="#0a0a0f" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <path d="M86 82 L100 126 L96 158" stroke="#0a0a0f" stroke-width="8" stroke-linecap="round" fill="none"/>
+    </symbol>
+
+    <!-- Paire Sami + Karim -->
+    <symbol id="duo" viewBox="0 0 300 200">
+      <use href="#sami" x="10" y="0" width="140" height="200"/>
+      <use href="#karim" x="160" y="0" width="140" height="200"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="topbar">
+  <div class="brand">
+    <div class="brand-logo">DZ</div>
+    <div>
+      <b>DZ <i>STICKMAN</i></b>
+      <small class="ar">الضحك من واقعنا!</small>
+    </div>
+  </div>
+  <span id="modeTag">NON CONFIGURÉ</span>
+  <span id="globalStat">Configurez vos clés API Agnes pour commencer</span>
+  <button class="btn-slate btn hidden" id="logoutBtn" style="margin-left:auto">↻ Déconnexion</button>
+</div>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginBox" class="card">
+  <div class="card-head"><i></i><b>ACCÈS</b> — DZ Stickman Studio</div>
+  <h1>DZ Stickman</h1>
+  <p class="sub">Studio de production animée · Pseudo + PIN 4 chiffres</p>
+  <label class="lab">Pseudo</label>
+  <input type="text" id="loginUser" placeholder="Votre pseudo" autocomplete="username">
+  <label class="lab">PIN (4 chiffres)</label>
+  <input type="password" id="loginPin" maxlength="4" inputmode="numeric" placeholder="••••" autocomplete="current-password">
+  <button class="btn-mega" id="loginBtn">Se connecter / Créer un compte</button>
+  <div id="loginStatus" class="status" style="margin-top:.6rem"></div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="main" class="hidden">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div>
+      <h1>DZ<br><em>Stickman</em>
+        <span class="ar-title ar">ستوديو الإنتاج</span>
+      </h1>
+      <p class="signature ar">الضحك من واقعنا!</p>
+      <p class="sub" style="margin-top:.8rem">Studio complet de production pour la série <b style="color:var(--gold)">يوميات سامي وكريم</b> : concept, scénario, découpage, images, prompts vidéo Google Flow, dialogues ElevenLabs, montage CapCut, stratégie Instagram et analyses.</p>
+    </div>
+    <div class="hero-art">
+      <svg class="stickman-pair" viewBox="0 0 300 200"><use href="#duo"/></svg>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs-scroll">
+    <div class="tabs" id="tabsBar">
+      <button class="tab active" data-tab="dashboard"><span class="tab-emoji">🏠</span> Dashboard</button>
+      <button class="tab" data-tab="personnages"><span class="tab-emoji">👥</span> Personnages</button>
+      <button class="tab" data-tab="concept"><span class="tab-emoji">💡</span> Concept</button>
+      <button class="tab" data-tab="scenario"><span class="tab-emoji">✍️</span> Scénario</button>
+      <button class="tab" data-tab="decoupage"><span class="tab-emoji">🎞️</span> Découpage</button>
+      <button class="tab" data-tab="images"><span class="tab-emoji">🎨</span> Images</button>
+      <button class="tab" data-tab="video"><span class="tab-emoji">🎥</span> Vidéo Flow</button>
+      <button class="tab" data-tab="voix"><span class="tab-emoji">🗣️</span> Voix</button>
+      <button class="tab" data-tab="montage"><span class="tab-emoji">🎬</span> Montage</button>
+      <button class="tab" data-tab="instagram"><span class="tab-emoji">📱</span> Instagram</button>
+      <button class="tab" data-tab="analyses"><span class="tab-emoji">📊</span> Analyses</button>
+      <button class="tab" data-tab="styles"><span class="tab-emoji">⚙️</span> Styles</button>
+      <button class="tab" data-tab="bulks"><span class="tab-emoji">📋</span> Bulks</button>
+      <button class="tab" data-tab="biblio"><span class="tab-emoji">🖼️</span> Bibliothèque</button>
+      <button class="tab" data-tab="favoris"><span class="tab-emoji">⭐</span> Favoris</button>
+    </div>
+  </div>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section id="tab-dashboard">
+    <h2>Tableau de bord</h2>
+    <p class="sub">Vue d'ensemble du studio DZ Stickman : vos épisodes en cours, votre production, vos stats rapides.</p>
+
+    <div class="row" style="gap:1rem;margin-bottom:1rem">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-head"><i></i><b>ÉPISODES</b> en cours</div>
+        <div style="font:900 2.6rem var(--sans);color:var(--gold)" id="dashEpisodes">0</div>
+        <p class="hint-line">Épisodes sauvegardés dans votre bibliothèque</p>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-head"><i></i><b>IMAGES</b> générées</div>
+        <div style="font:900 2.6rem var(--sans);color:var(--cobalt)" id="dashImages">0</div>
+        <p class="hint-line">Total des images produites</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>WORKFLOW</b> de production DZ Stickman</div>
+      <ol style="margin:.6rem 0 0 1.4rem;line-height:1.9;color:var(--ink2);font-size:.85rem">
+        <li><b style="color:var(--gold)">Concept</b> — Titre darija, idée, problème social, chute, durée cible</li>
+        <li><b style="color:var(--gold)">Scénario</b> — Dialogue en darija naturelle, situation, montée comique, chute</li>
+        <li><b style="color:var(--gold)">Découpage</b> — Scènes, plans, durées, cadrages, ambiance sonore</li>
+        <li><b style="color:var(--gold)">Images</b> — Prompts en anglais, 9:16, continuité Sami/Karim garantie</li>
+        <li><b style="color:var(--gold)">Vidéo Flow</b> — Prompts Google Flow (4/6/8/10 s) prêts à copier-coller</li>
+        <li><b style="color:var(--gold)">Voix</b> — Dialogues darija séparés Sami/Karim avec intentions ElevenLabs</li>
+        <li><b style="color:var(--gold)">Montage</b> — Instructions CapCut : ordre, durées, transitions, logo</li>
+        <li><b style="color:var(--gold)">Instagram</b> — Stratégie, calendrier, posts, hashtags DZ</li>
+        <li><b style="color:var(--gold)">Analyses</b> — Suivi performances, recommandations</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>RACCOURCIS</b></div>
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem">
+        <button class="btn btn-gold" onclick="switchTab('concept')">💡 Nouvel épisode</button>
+        <button class="btn btn-cobalt" onclick="switchTab('images')">🎨 Générer images</button>
+        <button class="btn btn-cobalt" onclick="switchTab('video')">🎥 Prompts vidéo</button>
+        <button class="btn btn-slate" onclick="switchTab('biblio')">🖼️ Bibliothèque</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PERSONNAGES ================= -->
+  <section id="tab-personnages" class="hidden">
+    <h2>Personnages principaux</h2>
+    <p class="sub">Fiches de référence absolue. <b style="color:var(--gold)">Ne jamais modifier</b> les couleurs, proportions, coiffures ou vêtements de Sami et Karim.</p>
+
+    <div class="char-grid">
+      <div class="char-card sami">
+        <div class="char-name">SAMI</div>
+        <div class="char-role">Le héros ordinaire · سامي</div>
+        <div class="char-attr"><b>Tête</b><span>Ronde noire, sans visage humain · yeux blancs expressifs</span></div>
+        <div class="char-attr"><b>Cheveux</b><span>Noirs courts, légèrement ébouriffés et hérissés</span></div>
+        <div class="char-attr"><b>Veste</b><span>Bleu cobalt usée</span></div>
+        <div class="char-attr"><b>Pantalon</b><span>Beige délavé</span></div>
+        <div class="char-attr"><b>Baskets</b><span>Rouge vif</span></div>
+        <div class="char-attr"><b>Silhouette</b><span>Mince, légèrement petite</span></div>
+        <div class="char-attr"><b>Personnalité</b><span>Optimiste, débrouillard, sympathique, parfois naïf</span></div>
+        <div class="char-attr"><b>Voix</b><span>Homme jeune, chaleureuse, naturelle, légèrement naïve</span></div>
+      </div>
+
+      <div class="char-card karim">
+        <div class="char-name">KARIM</div>
+        <div class="char-role">Le taquin ironique · كريم</div>
+        <div class="char-attr"><b>Tête</b><span>Ronde noire, sans visage humain · yeux blancs expressifs</span></div>
+        <div class="char-attr"><b>Cheveux</b><span>Petite touffe de cheveux noirs orientée vers le haut</span></div>
+        <div class="char-attr"><b>Sweat</b><span>À capuche orange saturé</span></div>
+        <div class="char-attr"><b>Pantalon</b><span>Vert forêt foncé</span></div>
+        <div class="char-attr"><b>Baskets</b><span>Blanches</span></div>
+        <div class="char-attr"><b>Montre</b><span>Argentée</span></div>
+        <div class="char-attr"><b>Silhouette</b><span>Plus grande et plus large que Sami</span></div>
+        <div class="char-attr"><b>Personnalité</b><span>Spontané, taquin, provocateur, observateur, ironique</span></div>
+        <div class="char-attr"><b>Voix</b><span>Homme jeune, plus grave, énergique, ironique</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>RÈGLES</b> de continuité absolue</div>
+      <ul style="margin:.5rem 0 0 1.4rem;line-height:1.9;color:var(--ink2);font-size:.85rem">
+        <li>Ne jamais modifier les vêtements, couleurs, proportions, formes de tête ou coiffures</li>
+        <li>Sami et Karim restent des <b style="color:var(--gold)">stickmen purs</b> (pas de peau, nez, bouche humaine)</li>
+        <li>Les personnages secondaires peuvent être humanoïdes cartoon si le scénario le justifie</li>
+        <li>Utiliser les images de référence fournies lorsqu'elles existent</li>
+        <li>Format cible : <b>9:16 · 1080×1920</b> (Reels Instagram)</li>
+        <li>Pas de texte, logo ou sous-titre dans les images générées — ajoutés au montage CapCut</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= CONCEPT ================= -->
+  <section id="tab-concept" class="hidden">
+    <h2>Étape A — Concept</h2>
+    <p class="sub">Idée brute de l'épisode : titre darija, problème social, situation comique, message, public cible, durée.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>BRIEF</b> — Générateur de concept</div>
+      <label class="lab">Thème / sujet du quotidien algérien</label>
+      <input type="text" id="conceptTheme" placeholder="ex: hausse des prix, embouteillages, facture Sonelgaz, voisin envahissant, mariage…">
+      <label class="lab">Angle / intention comique (optionnel)</label>
+      <textarea id="conceptAngle" placeholder="ex: Sami découvre que son salaire n'a pas bougé mais que tout a augmenté…"></textarea>
+      <div class="row">
+        <div>
+          <label class="lab">Durée cible</label>
+          <select id="conceptDuration">
+            <option value="15-30s">15–30 s (sketch court)</option>
+            <option value="45-60s" selected>45–60 s (épisode narratif)</option>
+            <option value="60-90s">60–90 s (épisode long)</option>
+          </select>
+        </div>
+        <div>
+          <label class="lab">Ton</label>
+          <select id="conceptTone">
+            <option value="satire_sociale" selected>Satire sociale</option>
+            <option value="absurde">Absurde</option>
+            <option value="tendre">Touchant</option>
+            <option value="mordant">Mordant</option>
+            <option value="quotidien">Quotidien pur</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-mega" id="conceptGenBtn">💡 Générer le concept</button>
+      <div id="conceptOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= SCÉNARIO ================= -->
+  <section id="tab-scenario" class="hidden">
+    <h2>Étape B — Scénario</h2>
+    <p class="sub">Dialogue en darija algérienne naturelle. Phrases courtes et prononçables. Structure : situation → montée comique → chute.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>SCÉNARIO</b> — Générateur darija</div>
+      <label class="lab">Concept validé (résumé)</label>
+      <textarea id="scenarioConcept" placeholder="Collez ici le concept validé à l'étape A…" style="min-height:70px"></textarea>
+      <div class="row">
+        <div>
+          <label class="lab">Nombre de répliques cible</label>
+          <input type="number" id="scenarioRepliques" min="4" max="24" value="10" style="min-height:42px">
+        </div>
+        <div>
+          <label class="lab">Style dominant</label>
+          <select id="scenarioStyle">
+            <option value="dialogue_duo">Dialogue Sami / Karim</option>
+            <option value="monologue_sami">Monologue Sami</option>
+            <option value="monologue_karim">Monologue Karim</option>
+            <option value="avec_secondaires">Avec personnages secondaires</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-mega" id="scenarioGenBtn">✍️ Générer le scénario</button>
+      <div id="scenarioOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= DÉCOUPAGE ================= -->
+  <section id="tab-decoupage" class="hidden">
+    <h2>Étape C — Découpage technique</h2>
+    <p class="sub">Chaque scène décomposée : plan, durée, personnages, lieu, action, dialogue, cadrage, ambiance sonore.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>DÉCOUPAGE</b> — Scène par scène</div>
+      <label class="lab">Scénario à découper</label>
+      <textarea id="decoupageScenario" placeholder="Collez ici le scénario validé…" style="min-height:110px"></textarea>
+      <div class="row">
+        <div>
+          <label class="lab">Nombre de plans cible</label>
+          <input type="number" id="decoupagePlans" min="4" max="20" value="8" style="min-height:42px">
+        </div>
+        <div>
+          <label class="lab">Durée totale cible</label>
+          <select id="decoupageTotal">
+            <option value="15-30s">15–30 s</option>
+            <option value="45-60s" selected>45–60 s</option>
+            <option value="60-90s">60–90 s</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-mega" id="decoupageGenBtn">🎞️ Générer le découpage</button>
+      <div id="decoupageOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= IMAGES ================= -->
+  <section id="tab-images" class="hidden">
+    <h2>Étape D — Images clés</h2>
+    <p class="sub">Prompts d'images en anglais · 9:16 · Sami et Karim toujours cohérents · pas de texte dans l'image.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>IMAGES</b> — Génération</div>
+
+      <label class="lab">Style DZ Stickman</label>
+      <select id="imgStyleSelect"></select>
+
+      <label class="lab">Découpage validé (résumé scène)</label>
+      <textarea id="imgSceneBrief" placeholder="Collez ici le découpage ou le résumé de la scène à illustrer…" style="min-height:80px"></textarea>
+
+      <div class="row">
+        <div>
+          <label class="lab">Nombre d'images</label>
+          <input type="number" id="imgCount" min="1" max="10" value="1" style="min-height:42px">
+        </div>
+        <div>
+          <label class="lab">Concurrence</label>
+          <select id="imgConcurrency">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-bar" style="margin-top:.8rem">
+        <label class="chk">
+          <input type="checkbox" id="imgUseBulk">
+          <span>📋 Activer une liste bulk</span>
+        </label>
+      </div>
+
+      <div id="imgBulkWrap" class="hidden" style="margin-top:.5rem">
+        <label class="lab">Liste bulk à utiliser</label>
+        <select id="imgBulkSelect"></select>
+      </div>
+
+      <div class="filter-bar" style="margin-top:.5rem">
+        <label class="chk">
+          <input type="checkbox" id="imgAiOptimizer">
+          <span>✨ IA Optimizer (réécrit le prompt)</span>
+        </label>
+      </div>
+
+      <button class="btn-mega" id="imgGenBtn">🎨 Générer les images</button>
+      <div class="hidden" id="imgPipelineCtrl" style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">
+        <button class="btn btn-cobalt" id="imgPauseBtn">⏸ Pause</button>
+        <button class="btn btn-red" id="imgStopBtn">⏹ Stop</button>
+      </div>
+      <div id="imgStatus" class="status" style="margin-top:.6rem"></div>
+    </div>
+
+    <div id="imgResults" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <h3 style="margin:0">Résultats</h3>
+        <span class="status" id="imgResultsCount" style="margin:0;padding:.3rem .6rem">0 / 0</span>
+      </div>
+      <div class="result-grid" id="imgResultGrid"></div>
+    </div>
+
+    <div id="imgEmpty" class="show">
+      <svg style="width:120px;height:120px;opacity:.4" viewBox="0 0 300 200"><use href="#duo"/></svg>
+      <h3>Canvas vide</h3>
+      <p>Choisissez un style DZ Stickman, décrivez la scène et lancez la génération.</p>
+    </div>
+  </section>
+
+  <!-- ================= VIDÉO ================= -->
+  <section id="tab-video" class="hidden">
+    <h2>Étape E — Prompts vidéo Google Flow</h2>
+    <p class="sub">Prompts en anglais prêts à copier-coller dans Google Flow. Durées confirmées : <b style="color:var(--gold)">4, 6, 8, 10 s</b>. Jamais 5 s.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>VIDÉO</b> — Générateur par plan</div>
+      <label class="lab">Plan à animer (découpage validé)</label>
+      <textarea id="videoPlanBrief" placeholder="Collez ici le plan à animer : action, personnages, cadrage…" style="min-height:70px"></textarea>
+
+      <div class="row">
+        <div>
+          <label class="lab">Durée du clip</label>
+          <select id="videoDuration">
+            <option value="4">4 s</option>
+            <option value="6" selected>6 s</option>
+            <option value="8">8 s</option>
+            <option value="10">10 s</option>
+          </select>
+        </div>
+        <div>
+          <label class="lab">Mouvement de caméra</label>
+          <select id="videoCamera">
+            <option value="static">Fixe</option>
+            <option value="pan_left">Pan gauche</option>
+            <option value="pan_right">Pan droite</option>
+            <option value="tilt_up">Tilt haut</option>
+            <option value="tilt_down">Tilt bas</option>
+            <option value="zoom_in">Zoom avant</option>
+            <option value="zoom_out">Zoom arrière</option>
+            <option value="tracking">Travelling</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-mega" id="videoGenBtn">🎥 Générer le prompt vidéo</button>
+      <div id="videoOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= VOIX ================= -->
+  <section id="tab-voix" class="hidden">
+    <h2>Étape F — Voix et dialogues (ElevenLabs)</h2>
+    <p class="sub">Dialogues séparés pour Sami et Karim. Intentions, pauses, émotions, rythme comique. Darija algérienne authentique.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>VOIX</b> — Dialogues</div>
+      <label class="lab">Scénario / dialogues à préparer</label>
+      <textarea id="voixScenario" placeholder="Collez ici le scénario validé…" style="min-height:110px"></textarea>
+
+      <div class="row">
+        <div>
+          <label class="lab">Voix Sami</label>
+          <select id="voixSami">
+            <option value="sami_standard" selected>Sami standard (jeune, chaleureux)</option>
+            <option value="sami_enerve">Sami énervé</option>
+            <option value="sami_naif">Sami naïf</option>
+            <option value="sami_tendre">Sami tendre</option>
+          </select>
+        </div>
+        <div>
+          <label class="lab">Voix Karim</label>
+          <select id="voixKarim">
+            <option value="karim_standard" selected>Karim standard (ironique)</option>
+            <option value="karim_provoc">Karim provocateur</option>
+            <option value="karim_grave">Karim grave</option>
+            <option value="karim_enerve">Karim énervé</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-mega" id="voixGenBtn">🗣️ Générer les dialogues</button>
+      <div id="voixOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= MONTAGE ================= -->
+  <section id="tab-montage" class="hidden">
+    <h2>Étape G — Montage CapCut</h2>
+    <p class="sub">Instructions précises pour montage mobile Android : ordre, durées, transitions, sous-titres darija, logo final.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>MONTAGE</b> — Plan de travail</div>
+      <label class="lab">Découpage + vidéos générées (résumé)</label>
+      <textarea id="montageBrief" placeholder="Collez ici le découpage validé + liste des clips générés…" style="min-height:110px"></textarea>
+
+      <button class="btn-mega" id="montageGenBtn">🎬 Générer les instructions de montage</button>
+      <div id="montageOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= INSTAGRAM ================= -->
+  <section id="tab-instagram" class="hidden">
+    <h2>Stratégie éditoriale Instagram</h2>
+    <p class="sub">Public : Algérie uniquement. 4 piliers : Réalité quotidienne 40 % · Situations humoristiques 25 % · Mèmes 20 % · Coulisses 15 %.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>STRATÉGIE</b> — Générateur</div>
+      <label class="lab">Ce que vous voulez générer</label>
+      <select id="igType">
+        <option value="calendrier">Calendrier de publication 2 semaines</option>
+        <option value="idees">Idées de Reels par pilier éditorial</option>
+        <option value="caption">Légende + hashtags darija pour un Reel</option>
+        <option value="bio">Bio + lien profil optimisés</option>
+        <option value="reponse">Réponse type aux commentaires</option>
+      </select>
+      <label class="lab">Contexte / épisode concerné</label>
+      <textarea id="igContext" placeholder="ex: Reel sur la facture d'électricité, sortie vendredi 20h…" style="min-height:70px"></textarea>
+      <button class="btn-mega" id="igGenBtn">📱 Générer</button>
+      <div id="igOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= ANALYSES ================= -->
+  <section id="tab-analyses" class="hidden">
+    <h2>Analyses et amélioration</h2>
+    <p class="sub">Collez vos stats après publication. L'IA analyse sans inventer de données et propose des améliorations concrètes.</p>
+
+    <div class="card">
+      <div class="card-head"><i></i><b>ANALYSE</b> — Reel</div>
+      <label class="lab">Stats du Reel (copier-coller depuis Instagram)</label>
+      <textarea id="anaStats" placeholder="Vues : 12000&#10;Temps moyen : 18s / 45s&#10;Rétention : 40%&#10;Partages : 250&#10;Commentaires : 80&#10;Enregistrements : 60&#10;Nouveaux abonnés : 45" style="min-height:130px"></textarea>
+      <label class="lab">Sujet du Reel</label>
+      <input type="text" id="anaSubject" placeholder="ex: facture Sonelgaz">
+      <button class="btn-mega" id="anaGenBtn">📊 Analyser</button>
+      <div id="anaOutput" class="hidden" style="margin-top:1rem"></div>
+    </div>
+  </section>
+
+  <!-- ================= STYLES ================= -->
+  <section id="tab-styles" class="hidden">
+    <h2>Styles DZ Stickman</h2>
+    <p class="sub">Éditez vos prompts de style. L'IA améliore vos instructions. Chaque style est une instruction complète pour l'IA.</p>
+    <button class="btn btn-gold" id="addStyleBtn" style="margin-bottom:1rem">+ Nouveau style</button>
+    <div id="styleEditors"></div>
+  </section>
+
+  <!-- ================= BULKS ================= -->
+  <section id="tab-bulks" class="hidden">
+    <h2>Listes bulk DZ Stickman</h2>
+    <p class="sub">Listes réutilisables pour la production en série : plans, lieux, expressions, situations.</p>
+    <button class="btn btn-gold" id="addBulkBtn" style="margin-bottom:1rem">+ Nouvelle liste</button>
+    <div id="sbEditors"></div>
+  </section>
+
+  <!-- ================= BIBLIOTHÈQUE ================= -->
+  <section id="tab-biblio" class="hidden">
+    <h2>Bibliothèque</h2>
+    <p class="sub">Historique de vos générations par sessions. Cliquez sur ⭐ pour ajouter aux favoris.</p>
+    <div class="filter-bar">
+      <label class="chk">
+        <input type="checkbox" id="biblioFavOnly">
+        <span>⭐ Favoris uniquement</span>
+      </label>
+    </div>
+    <div id="biblioBox"></div>
+    <div id="biblioPagination" class="pagination hidden"></div>
+  </section>
+
+  <!-- ================= FAVORIS ================= -->
+  <section id="tab-favoris" class="hidden">
+    <h2>⭐ Mes favoris</h2>
+    <p class="sub">Toutes les images que vous avez marquées ⭐, les plus récentes en premier.</p>
+    <div id="favBox"></div>
+    <div id="favPagination" class="pagination hidden"></div>
+  </section>
+
+</div>
+
+<!-- ================= PANNEAU API ================= -->
+<div id="apiPanel">
+  <div id="apiHead">
+    <span class="lbl">🔑 AGNES API</span>
+    <span style="font-size:.7rem;color:var(--ink3);flex:1" id="apiSummary">Cliquez pour configurer</span>
+    <span style="font:700 .7rem var(--mono);color:var(--gold)" id="apiChevron">▲</span>
+  </div>
+  <div id="apiBody">
+    <p>Clés Agnes (une par ligne, format <code>sk-…</code>). Stockées dans votre navigateur.</p>
+    <textarea id="apiInput" placeholder="sk-xxx&#10;sk-yyy" style="min-height:80px;font-family:var(--mono);font-size:12px"></textarea>
+    <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
+      <button class="btn btn-gold" id="apiValidate">✓ Valider & tester</button>
+      <button class="btn btn-slate" id="apiClear">Effacer</button>
+    </div>
+    <div id="apiStatus" class="status">Aucune clé configurée</div>
+  </div>
+</div>
+
+<!-- ================= MODALE ================= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMsg"></p>
+    <div id="modalFieldWrap" class="hidden">
+      <label class="lab" id="modalFieldLabel"></label>
+      <textarea id="modalFieldInput"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-slate" id="modalCancel">Annuler</button>
+      <button class="btn btn-gold" id="modalOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toast"></div>
+
